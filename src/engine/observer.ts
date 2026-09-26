@@ -51,6 +51,7 @@ export function targetFacets(s: GameState, m: Monster): string[] {
   if (m.rank === 'geist') out.add('z:geistcrawler');
   if (m.downed > 0) out.add('z:liegend');
   if (!m.aware) out.add('z:ahnungslos');
+  if (m.asleep) out.add('z:schlafend');
   if (m.fleeing) out.add('z:fliehend');
   const diff = m.level - s.player.level;
   if (diff >= 3) out.add('z:staerker');

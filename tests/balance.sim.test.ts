@@ -63,7 +63,7 @@ function runBot(seed: number, maxFloor = 3) {
     }
     // Heilen
     if (p.hp < maxHp(s) * 0.35) {
-      const pot = p.inventory.find((i) => i.kind === 'verbrauch' && i.effekt?.heal);
+      const pot = p.inventory.find((i) => i.kind === 'verbrauch' && (i.effekt?.heal || i.effekt?.healPct));
       if (pot) {
         useItem(s, pot.uid);
         continue;

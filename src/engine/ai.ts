@@ -11,6 +11,7 @@ import { passProtects, petCast } from './extras';
 import { crawlerAt, monsterHitsCrawler } from './crawlers';
 import { checkEvolve, petAbilityTurn, petBiteBonus } from './petevo';
 import { mountAbsorbs } from './mounts';
+import { playerSees } from './sight';
 import { dynDefenseBonus, targetFacets, trainDefense } from './observer';
 import { ausweichen, totalBonuses } from './player';
 import * as R from './rng';
@@ -150,30 +151,97 @@ function attackPet(s: GameState, m: Monster) {
   }
 }
 
+/** Sichtweite eines Monsters: Fernkämpfer sehen weiter, Schattenmantel halbiert sie. */
+function perceptionRange(s: GameState, m: Monster): number {
+  let r = m.behavior === 'ranged' || m.range ? 9 : 8;
+  if (m.size === 'winzig') r -= 1;
+  if (s.player.buffs.some((b) => b.name === 'Schattenmantel')) r = Math.floor(r / 2);
+  return r;
+}
+
+/** Wann ein Monster flieht – nur wenn es zu seiner Art passt. */
+function wantsToFlee(s: GameState, m: Monster, d: number): boolean {
+  if (m.rank !== 'normal') return false;
+  // Feiglinge laut Beschreibung (Bürokraten, Heinzelmännchen …) halten Abstand
+  if (m.behavior === 'coward') return d <= 4;
+  // Diebe verschwinden mit der Beute
+  if (m.stolenGold) return true;
+  // Kleine Tiere hauen ab, wenn sie schwer verletzt sind
+  const smallAnimal = (m.size === 'winzig' || m.size === 'klein') && targetFacets(s, m).includes('z:tier');
+  return smallAnimal && m.hp < m.maxHp * 0.25;
+}
+
+/** Ein Monster hat den Crawler entdeckt: es warnt Artgenossen in der Nähe. */
+function spotPlayer(s: GameState, m: Monster, text: string) {
+  m.aware = true;
+  m.asleep = false;
+  m.lastSeen = { ...s.player.pos };
+  m.searching = 0;
+  if (playerSees(s, m.pos)) log(s, text, 'gefahr');
+  let warned = 0;
+  for (const o of s.monsters) {
+    if (o === m || o.aware || o.asleep || o.homeRoom !== undefined || chebyshev(o.pos, m.pos) > 6) continue;
+    if (o.defId !== m.defId && o.hood !== m.hood) continue;
+    o.aware = true;
+    o.lastSeen = { ...s.player.pos };
+    warned++;
+  }
+  if (warned && playerSees(s, m.pos)) log(s, `${NameOf(s, m)} warnt ${warned === 1 ? 'einen Artgenossen' : `${warned} Artgenossen`}.`, 'gefahr');
+}
+
+/**
+ * Lärm (Kampf, Explosionen, Stolperdrähte) weckt Schlafende und lockt
+ * Wache an die Stelle, an der es laut war.
+ */
+export function makeNoise(s: GameState, at: Pos, radius: number) {
+  for (const m of s.monsters) {
+    if (m.homeRoom !== undefined || chebyshev(m.pos, at) > radius) continue;
+    if (m.asleep) {
+      m.asleep = false;
+      if (playerSees(s, m.pos)) log(s, `${NameOf(s, m)} schreckt aus dem Schlaf hoch.`, 'gefahr');
+      continue;
+    }
+    if (!m.aware) {
+      m.lastSeen = { ...at };
+      m.searching = 12;
+    }
+  }
+}
+
 export function monsterTurn(s: GameState, m: Monster) {
   if (s.status !== 'playing' || !s.monsters.includes(m)) return;
   if (m.downed > 0) {
     m.downed -= 1;
-    if (m.downed === 0) log(s, `${NameOf(s, m)} rappelt sich wieder auf.`, 'kampf');
+    if (m.downed === 0 && playerSees(s, m.pos)) log(s, `${NameOf(s, m)} rappelt sich wieder auf.`, 'kampf');
+    return;
+  }
+  if (m.aware) m.asleep = false;
+  // Schlafende bemerken nur, was direkt neben ihnen passiert
+  if (m.asleep) {
+    if (chebyshev(m.pos, s.player.pos) <= 1 && R.chance(s, 0.5)) spotPlayer(s, m, `${NameOf(s, m)} wacht auf und sieht dich!`);
     return;
   }
   startOfTurn(s, m);
   const p = s.player;
   const d = chebyshev(m.pos, p.pos);
+  const sees = canSeePlayer(s, m, perceptionRange(s, m));
 
-  // Wahrnehmung
+  // Wahrnehmung: wer dich sieht, greift an
   if (!m.aware) {
     if (m.homeRoom !== undefined) {
-      if (roomOf(s.map, p.pos)?.id === m.homeRoom) {
-        m.aware = true;
-        log(s, `${NameOf(s, m)} bemerkt dich!`, 'gefahr');
-      }
-    } else if (canSeePlayer(s, m, 7) && R.chance(s, d <= 1 ? 1 : d <= 3 ? 0.7 : 0.35)) {
-      m.aware = true;
-      log(s, `${NameOf(s, m)} hat dich bemerkt!`, 'gefahr');
+      if (roomOf(s.map, p.pos)?.id === m.homeRoom) spotPlayer(s, m, `${NameOf(s, m)} bemerkt dich!`);
+    } else if (sees && (d <= 5 || R.chance(s, 0.6))) {
+      spotPlayer(s, m, `${NameOf(s, m)} hat dich entdeckt!`);
     }
   }
   if (!m.aware) {
+    // Einem Geräusch oder der letzten Spur nachgehen
+    if (m.searching && m.lastSeen && m.behavior !== 'stationary' && m.homeRoom === undefined) {
+      m.searching -= 1;
+      stepToward(s, m, m.lastSeen);
+      if (chebyshev(m.pos, m.lastSeen) <= 1) m.searching = 0;
+      return;
+    }
     if (m.behavior !== 'stationary' && m.homeRoom === undefined) wander(s, m);
     return;
   }
@@ -184,38 +252,57 @@ export function monsterTurn(s: GameState, m: Monster) {
     return;
   }
 
-  // Verliert das Interesse, wenn der Crawler weit weg ist
-  if (d > 14 && m.homeRoom === undefined) {
+  // Außer Sicht: zur letzten bekannten Position, dann eine Weile suchen, dann aufgeben
+  if (sees) m.lastSeen = { ...p.pos };
+  else if (m.homeRoom === undefined) {
     m.aware = false;
+    m.searching = 15;
+    if (m.lastSeen && m.behavior !== 'stationary') stepToward(s, m, m.lastSeen);
     return;
   }
 
   const pet = p.pet?.alive ? p.pet : null;
   const petAdj = pet && chebyshev(m.pos, pet.pos) <= 1;
 
-  // Fliehen bei wenig Leben (keine Bosse)
-  if (m.rank === 'normal' && m.hp < m.maxHp * 0.25 && !m.fleeing && R.chance(s, 0.3)) {
+  if (!m.fleeing && wantsToFlee(s, m, d)) {
     m.fleeing = true;
-    log(s, `${NameOf(s, m)} versucht zu fliehen!`, 'kampf');
+    if (playerSees(s, m.pos)) log(s, `${NameOf(s, m)} ergreift die Flucht!`, 'kampf');
   }
-  if (m.behavior === 'coward' && d <= 4) m.fleeing = true;
   if (m.fleeing) {
-    stepAway(s, m, p.pos);
-    if (has(m, 'schnell')) stepAway(s, m, p.pos);
-    return;
+    if (!wantsToFlee(s, m, d) && m.behavior !== 'coward') m.fleeing = false;
+    else {
+      stepAway(s, m, p.pos);
+      if (has(m, 'schnell')) stepAway(s, m, p.pos);
+      return;
+    }
+  }
+
+  // Elite und Bosse werden wütend, wenn es eng wird
+  if ((m.rank === 'elite' || m.rank === 'nachbarschaftsboss' || m.rank === 'boroughboss') && !m.enraged && m.hp < m.maxHp * 0.3) {
+    m.enraged = true;
+    m.dmg = [Math.round(m.dmg[0] * 1.3), Math.round(m.dmg[1] * 1.3)];
+    m.treffer += 5;
+    if (playerSees(s, m.pos)) log(s, `${NameOf(s, m)} gerät in Raserei! Die Angriffe werden härter.`, 'gefahr');
   }
 
   if (monsterHitsCrawler(s, m)) return;
+  const ranged = m.behavior === 'ranged' || !!m.range;
+  // Fernkämpfer halten Abstand, statt sich verprügeln zu lassen
+  if (ranged && d <= 1 && R.chance(s, 0.6)) {
+    const before = m.pos;
+    stepAway(s, m, p.pos);
+    if (m.pos !== before) return;
+  }
   if (d <= 1) {
     if (petAdj && R.chance(s, 0.25)) attackPet(s, m);
     else attackPlayer(s, m, false);
     return;
   }
-  if (petAdj && m.behavior !== 'ranged') {
+  if (petAdj && !ranged) {
     attackPet(s, m);
     return;
   }
-  if ((m.behavior === 'ranged' || m.range) && d <= (m.range ?? 4) && hasLineOfSight(s.map, m.pos, p.pos)) {
+  if (ranged && d <= (m.range ?? 4) && hasLineOfSight(s.map, m.pos, p.pos)) {
     attackPlayer(s, m, true);
     return;
   }

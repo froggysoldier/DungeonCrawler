@@ -313,7 +313,10 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
       for (let k = 0; k < packSize && i < count + 1; k++, i++) {
         const p = randomFloorIn(s, m, r, occupied);
         if (!p) break;
-        monsters.push(spawnMonster(s, mdef, lv, p, r.hood, d > 0.2 && R.chance(s, 0.07)));
+        const mob = spawnMonster(s, mdef, lv, p, r.hood, d > 0.2 && R.chance(s, 0.07));
+        // Ein Teil der Bewohner schläft – Gelegenheit für einen Hinterhalt
+        if (mob.behavior !== 'stationary' && R.chance(s, 0.3)) mob.asleep = true;
+        monsters.push(mob);
       }
     }
   }

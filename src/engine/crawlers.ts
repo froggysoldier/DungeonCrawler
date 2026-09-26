@@ -7,12 +7,13 @@ import { offerQuest, questOf } from './quests';
 import { monsterDefById, spawnMonster } from './monsters';
 import { isInSafeRoom, killMonster } from './combat';
 import { emit } from './events';
-import { chebyshev, hasLineOfSight } from './fov';
+import { chebyshev } from './fov';
 import { itemName, NameOf, nameOf } from './identify';
 import { log, toast } from './log';
 import { idx, isWalkable, tileAt } from './mapgen';
 import { canStep, findPath } from './path';
 import { effectiveStats } from './player';
+import { playerSees } from './sight';
 import * as R from './rng';
 import type { GameState, Item, Monster, NpcCrawler, Personality, Pos } from './types';
 
@@ -291,7 +292,7 @@ function turnHostile(s: GameState, c: NpcCrawler) {
 
 function hitMonster(s: GameState, c: NpcCrawler, m: Monster) {
   if (R.chance(s, 0.3)) {
-    if (c.party && seen(s, c)) log(s, `${c.name} schlägt nach ${nameOf(s, m)} und verfehlt.`, 'kampf');
+    if (seen(s, c)) log(s, `${c.name} schlägt nach ${nameOf(s, m)} und verfehlt.`, 'kampf');
     return;
   }
   const dmg = Math.max(1, R.int(s, c.dmg[0], c.dmg[1]) - m.ruestung);
@@ -308,14 +309,15 @@ function hitMonster(s: GameState, c: NpcCrawler, m: Monster) {
       c.maxHp += 6;
       c.hp = c.maxHp;
       c.dmg = [c.dmg[0] + 1, c.dmg[1] + 2];
-      if (c.party) log(s, `${c.name} steigt auf Level ${c.level} auf.`, 'system');
+      if (seen(s, c)) log(s, `${c.name} steigt auf Level ${c.level} auf.`, 'system');
     }
     killMonster(s, m, null, c.name);
   }
 }
 
+/** Nur was der Crawler selbst sieht, landet im Log – auch bei der eigenen Party. */
 function seen(s: GameState, c: NpcCrawler) {
-  return c.party || (chebyshev(c.pos, s.player.pos) <= 9 && hasLineOfSight(s.map, c.pos, s.player.pos));
+  return playerSees(s, c.pos);
 }
 
 export function hurtCrawler(s: GameState, c: NpcCrawler, dmg: number, by: string) {
@@ -331,11 +333,11 @@ function crawlerDies(s: GameState, c: NpcCrawler) {
   c.party = false;
   population(s).alive -= 1;
   s.crawlers = crawlers(s).filter((x) => x !== c);
-  if (wasParty || seen(s, c)) log(s, R.pick(s, DEATH_LINES).replace('{name}', c.name), 'gefahr');
+  if (seen(s, c)) log(s, R.pick(s, DEATH_LINES).replace('{name}', c.name), 'gefahr');
   if (wasParty) {
     s.fallen ??= [];
     s.fallen.push(c.name);
-    toast(s, 'Party-Mitglied gefallen', c.name, 'warnung');
+    if (seen(s, c)) toast(s, 'Party-Mitglied gefallen', c.name, 'warnung');
   }
   emit(s, { type: 'crawlerDied', name: c.name, party: wasParty });
 }
@@ -376,7 +378,7 @@ export function crawlersTurn(s: GameState) {
         const spot = DIRS.map((q) => ({ x: s.player.pos.x + q.x, y: s.player.pos.y + q.y })).find((q) => canStep(s.map, s.player.pos, q) && !blocked(s, q, c));
         if (spot) c.pos = spot;
       }
-      if (R.chance(s, 0.004)) log(s, R.pick(s, PARTY_BARKS).replace('{name}', c.name), 'dialog');
+      if (seen(s, c) && R.chance(s, 0.004)) log(s, R.pick(s, PARTY_BARKS).replace('{name}', c.name), 'dialog');
       continue;
     }
     // Fremde Crawler: umherstreifen; weit weg lebt es sich gefährlich

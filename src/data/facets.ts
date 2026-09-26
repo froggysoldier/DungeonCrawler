@@ -83,6 +83,7 @@ export const TARGET_FACETS: Record<string, FacetDef> = {
   // Lage im Kampf
   liegend: { label: 'liegende Gegner', weight: 0.5, skill: true },
   ahnungslos: { label: 'ahnungslose Gegner', weight: 1, skill: true },
+  schlafend: { label: 'schlafende Gegner', short: 'Schlafende', weight: 1.5, skill: true },
   fliehend: { label: 'fliehende Gegner', weight: 1 },
   staerker: { label: 'stärkere Gegner (3+ Level über dir)', short: 'Stärkere', weight: 3, skill: true },
   schwaecher: { label: 'schwächere Gegner (3+ Level unter dir)', short: 'Schwächere', weight: -1 },

@@ -405,7 +405,7 @@ export class GameView {
       const color = info.insight >= 3 ? '#b0a898' : mon.color;
       parts.push(`<b style="color:${color}">${esc(info.name)}</b>${info.rank ? ` <span class="muted">${info.rank}</span>` : ''}`);
       parts.push(`<span class="muted">${esc(info.level)} · ${esc(INSIGHT_NAMES[info.insight])}</span>`);
-      parts.push(`${esc(info.health)}${mon.downed > 0 ? ' · <span style="color:#7cc4ff">am Boden</span>' : ''}${!mon.aware ? ' · <span style="color:#6ee07a">ahnungslos</span>' : ''}`);
+      parts.push(`${esc(info.health)}${mon.downed > 0 ? ' · <span style="color:#7cc4ff">am Boden</span>' : ''}${mon.asleep ? ' · <span style="color:#6ee07a">schläft</span>' : !mon.aware ? ' · <span style="color:#6ee07a">ahnungslos</span>' : ''}`);
       if (info.combat) parts.push(esc(info.combat));
       if (info.abilities) parts.push(`<span style="color:#ff9dff">${esc(info.abilities)}</span>`);
       if (blocker) parts.push(`<span class="muted">${esc(techniqueName(tech))}: ${esc(blocker)}</span>`);

@@ -11,6 +11,8 @@ import { log } from './log';
 import { blast } from './traps';
 import { ramBonus } from './mounts';
 import { population } from './crawlers';
+import { playerSees } from './sight';
+import { makeNoise } from './ai';
 import { roomOf } from './mapgen';
 import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, totalBonuses } from './player';
 import * as R from './rng';
@@ -130,6 +132,8 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   // Kontext VOR dem Angriff festhalten – der Beobachter wertet ihn aus
   const facets = attackFacets(s, target, t);
   target.provoked = true;
+  // Kampflärm: laute Angriffe hört man weiter
+  makeNoise(s, target.pos, t.part === 'wurf' ? 4 : t.move === 'normal' ? 5 : 7);
   const isHit = R.next(s) * 100 < hitChance(s, target, t);
 
   const name = techniqueName(t);
@@ -297,9 +301,11 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
     s.player.techniqueKills[key] = (s.player.techniqueKills[key] ?? 0) + 1;
   }
   const killer = typeof byPet === 'string' ? byPet : byPet && s.player.pet ? s.player.pet.name : 'Du';
-  log(s, `${killer === 'Du' ? 'Du tötest' : `${killer} tötet`} ${nameOf(s, m)}!`, 'kampf');
+  // Was andere tun, erfährt man nur, wenn man es sieht
+  const witnessed = killer === 'Du' || playerSees(s, m.pos);
+  if (witnessed) log(s, `${killer === 'Du' ? 'Du tötest' : `${killer} tötet`} ${nameOf(s, m)}!`, 'kampf');
   const xp = gainXp(s, m.xp);
-  log(s, `+${xp} XP`, 'info');
+  if (witnessed) log(s, `+${xp} XP`, 'info');
 
   // Beute
   for (const drop of rollMobDrop(s, m.level, m.rank === 'elite')) dropNear(s, drop, m.pos);

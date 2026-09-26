@@ -2,7 +2,9 @@ import { hasSpecial, poison } from './abilities';
 import { isInSafeRoom, killMonster } from './combat';
 import { handleLethal } from './death';
 import { emit } from './events';
-import { chebyshev, hasLineOfSight } from './fov';
+import { chebyshev } from './fov';
+import { makeNoise } from './ai';
+import { playerSees } from './sight';
 import { NameOf, nameOf } from './identify';
 import { addToInventory } from './inventory';
 import { createItem } from './items';
@@ -173,9 +175,7 @@ export function springOnPlayer(s: GameState, t: Trap) {
       break;
     case 'stolperdraht': {
       log(s, 'Du bleibst an einem Draht hängen. Dutzende Blechdosen scheppern durch den Gang. Alles in der Nähe weiß jetzt, wo du bist.', 'gefahr');
-      for (const m of s.monsters) {
-        if (chebyshev(m.pos, p.pos) <= 12 && m.homeRoom === undefined) m.aware = true;
-      }
+      makeNoise(s, p.pos, 12);
       hurtPlayer(s, 1, 'über einen Stolperdraht gefallen');
       break;
     }
@@ -273,26 +273,26 @@ export function onMonsterStep(s: GameState, m: Monster) {
   removeTrap(s, t);
   const skill = skillLevel(s, 'fallenkunde');
   const facets = trapFacets(s, m, 'falle');
-  const seen = hasLineOfSight(s.map, s.player.pos, m.pos) && chebyshev(s.player.pos, m.pos) <= 10;
-  const who = seen ? NameOf(s, m) : 'Irgendetwas';
+  const seen = playerSees(s, m.pos);
+  const who = NameOf(s, m);
   emit(s, { type: 'trapTriggered', kind: t.kind, onPlayer: false });
   switch (t.kind) {
     case 'stachelfalle': {
       const dmg = Math.max(1, R.int(s, 6, 10) + s.floor * 2 + skill * 2 - Math.floor(m.ruestung / 2));
       m.hp -= dmg;
-      log(s, `${who} tritt in deine Stachelfalle. ${dmg} Schaden.`, 'kampf');
+      log(s, seen ? `${who} tritt in deine Stachelfalle. ${dmg} Schaden.` : 'Irgendwo schnappt deine Stachelfalle zu. Ein Schrei hallt durch die Gänge.', 'kampf');
       if (m.hp <= 0) killMonster(s, m, null, false, facets);
       break;
     }
     case 'schlingfalle': {
       m.downed = Math.max(m.downed, 4);
       m.hp -= 2;
-      log(s, `${who} verfängt sich in deiner Schlingfalle und stürzt zu Boden.`, 'kampf');
+      log(s, seen ? `${who} verfängt sich in deiner Schlingfalle und stürzt zu Boden.` : 'In der Ferne zieht sich deine Schlingfalle zu.', 'kampf');
       if (m.hp <= 0) killMonster(s, m, null, false, facets);
       break;
     }
     case 'sprengfalle':
-      log(s, `${who} löst deine Sprengfalle aus. BUMM!`, 'kampf');
+      log(s, seen ? `${who} löst deine Sprengfalle aus. BUMM!` : 'Irgendwo geht deine Sprengfalle hoch. BUMM!', 'kampf');
       blast(s, m.pos, R.int(s, 10, 15) + s.floor * 2 + skill * 2, 'falle', 'von der eigenen Sprengfalle zerlegt');
       break;
     default:
@@ -305,6 +305,7 @@ export function onMonsterStep(s: GameState, m: Monster) {
  * Trifft Monster, das Haustier und den Crawler.
  */
 export function blast(s: GameState, at: Pos, dmg: number, part: 'falle' | 'bombe', selfCause: string) {
+  makeNoise(s, at, 10);
   for (const o of [...s.monsters]) {
     if (chebyshev(o.pos, at) > 1) continue;
     const hit = Math.max(1, dmg - Math.floor(o.ruestung / 2));
@@ -312,7 +313,7 @@ export function blast(s: GameState, at: Pos, dmg: number, part: 'falle' | 'bombe
     o.hp -= hit;
     o.aware = true;
     o.provoked = true;
-    log(s, `Die Explosion trifft ${nameOf(s, o)} für ${hit} Schaden.`, 'kampf');
+    if (playerSees(s, o.pos)) log(s, `Die Explosion trifft ${nameOf(s, o)} für ${hit} Schaden.`, 'kampf');
     if (o.hp <= 0) killMonster(s, o, null, false, facets);
   }
   const pet = s.player.pet;

@@ -244,6 +244,14 @@ export interface Monster {
   provoked?: boolean;
   /** Techniken, mit denen dieser Mob in diesem Kampf getroffen wurde. */
   hitBy?: string[];
+  /** Schläft (wacht bei Lärm oder direkt daneben auf). */
+  asleep?: boolean;
+  /** Wo es den Crawler zuletzt gesehen oder gehört hat. */
+  lastSeen?: Pos;
+  /** Züge, die es noch sucht. */
+  searching?: number;
+  /** Raserei bei wenig Leben (Elite, Bosse). */
+  enraged?: boolean;
 }
 
 export interface Pet {
