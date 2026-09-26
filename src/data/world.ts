@@ -16,7 +16,6 @@ export interface FloorDef {
   /** Dauer bis zum Einsturz in Zügen (1 Zug = 3 Minuten). */
   duration: number;
   mobLevel: [number, number];
-  levelBonus: number;
 }
 
 export const MINUTES_PER_TURN = 3;
@@ -25,12 +24,12 @@ export const FLOORS: FloorDef[] = [
   {
     floor: 1, name: 'Die Kellergewölbe',
     intro: 'Unter den Trümmern deiner Stadt hat der Dungeon die Keller aller Häuser zu einem einzigen, endlosen Labyrinth verbunden. Es riecht nach Moder, Heizöl und etwas Totem. Irgendwo tropft es. Irgendwo knurrt es.',
-    duration: 2400, mobLevel: [1, 5], levelBonus: 0,
+    duration: 2400, mobLevel: [1, 5],
   },
   {
     floor: 2, name: 'Die tieferen Keller',
     intro: 'Die zweite Etage sieht aus wie die erste – nur dunkler, feuchter und mit mehr Zähnen. Die Systemstimme verspricht „spannende neue Features“. Das klingt nicht gut.',
-    duration: 2400, mobLevel: [3, 7], levelBonus: 2,
+    duration: 2400, mobLevel: [3, 7],
   },
 ];
 
@@ -64,6 +63,26 @@ export const ROOM_FLAVORS: RoomFlavor[] = [
   { name: 'Kinderzimmer im Keller', description: 'Ein Hochbett, Poster von Bands, die es nicht mehr gibt. Eine Spieluhr spielt von selbst.' },
   { name: 'Überfluteter Gang', description: 'Knöcheltiefes, schwarzes Wasser. Etwas schwimmt vorbei. Du entscheidest dich, nicht hinzusehen.' },
   { name: 'Gemeinschaftskeller', description: 'Nummerierte Holzverschläge, hinter jedem das Leben einer Familie in Kisten.' },
+  { name: 'Wäschetrockenraum', description: 'Leinen voller Bettlaken, die sich bewegen, obwohl kein Luftzug geht. Hinter einem steht etwas. Oder nicht.' },
+  { name: 'Hobbykeller mit Tischtennisplatte', description: 'Das Netz ist zerrissen. Auf der Platte: ein Blutfleck in Form eines Schlägers.' },
+  { name: 'Musikprobenraum', description: 'Eierkartons an den Wänden, ein Schlagzeug ohne Felle. Ein Plakat: „Die Kellerkinder – Tour 2003“.' },
+  { name: 'Heimkino', description: 'Drei Reihen Kinosessel, eine zerrissene Leinwand. Der Projektor zeigt immer noch das Menü einer DVD.' },
+  { name: 'Fitnesskeller', description: 'Hanteln, eine Rudermaschine, ein Spiegel mit Sprung. Irgendwer hat hier „No Pain No Gain“ an die Wand geschrieben. Mit Blut.' },
+  { name: 'Öltanklager', description: 'Riesige Kunststofftanks. Es riecht so stark nach Heizöl, dass dir schwindelig wird.' },
+  { name: 'Schutzraum der Grundschule', description: 'Kleine Stühle, Buntstiftzeichnungen an den Wänden. Auf einer: ein Monster mit sehr vielen Zähnen. Es sieht erschreckend realistisch aus.' },
+  { name: 'Kartoffelkeller', description: 'Ein Berg keimender Kartoffeln. Die Keime sind einen Meter lang und zucken leicht.' },
+  { name: 'Weinprobierstube', description: 'Ein Eichentisch, zwölf Gläser, alle halb voll. Wer hier saß, ist sehr plötzlich gegangen.' },
+  { name: 'Modelleisenbahn-Paradies', description: 'Eine komplette Miniaturstadt. Jemand hat kleine Monster dazwischengestellt. Handbemalt.' },
+  { name: 'Kellerbüro', description: 'Ein Schreibtisch, ein Röhrenmonitor, ein Faxgerät, das gelegentlich piept. Auf dem Papier: „Kündigung“.' },
+  { name: 'Pilzzucht', description: 'Regale voller leuchtender Pilze. Das Licht ist angenehm. Das Geräusch, das sie machen, weniger.' },
+  { name: 'Kegelbahn im Keller', description: 'Eine einzelne, uralte Kegelbahn. Alle Kegel liegen. Irgendwer hat zuletzt alle Neune geworfen.' },
+  { name: 'Aufzugsschacht', description: 'Die Tür steht offen. Kein Aufzug, nur Kabel, die in die Dunkelheit hängen. Von unten kommt ein Geräusch. Wie Kauen.' },
+  { name: 'Hausmeisterwerkstatt', description: 'Schraubenzieher, sortiert nach Größe. Ein Kalender von 1994. Ein Radio spielt leise Schlager.' },
+  { name: 'Sickergrube', description: 'Ein Gitter im Boden, darunter gurgelt es. Der Geruch hat eine eigene Persönlichkeit.' },
+  { name: 'Weihnachtsdeko-Lager', description: 'Kisten voller Kugeln, Lametta und ein aufblasbarer Weihnachtsmann, der sich langsam zu dir dreht.' },
+  { name: 'Kellerkapelle', description: 'Ein kleiner Altar, Kerzen, die von selbst brennen. Auf dem Gästebuch steht nur: „Hilfe“.' },
+  { name: 'Serverraum', description: 'Blinkende Lämpchen, obwohl es keinen Strom mehr gibt. Die Lüfter summen ein Lied.' },
+  { name: 'Aquarienkeller', description: 'Dutzende Aquarien, trüb und grün. In einem schwimmt etwas, das zu groß für das Becken ist.' },
 ];
 
 export const START_ROOM: RoomFlavor = {

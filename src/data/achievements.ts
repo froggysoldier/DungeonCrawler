@@ -1,3 +1,4 @@
+import { MORE_ACHIEVEMENTS } from './achievements_more';
 import type { BoxTier, BoxType, GameEvent, GameState } from '../engine/types';
 
 export interface AchievementDef {
@@ -17,7 +18,7 @@ const killsWithPart = (s: GameState, part: string) =>
     .reduce((sum, [, v]) => sum + v, 0);
 const hasEquipped = (s: GameState) => Object.keys(s.player.equipment).length;
 
-export const ACHIEVEMENTS: AchievementDef[] = [
+const BASE_ACHIEVEMENTS: AchievementDef[] = [
   // ----------------------------------------------------------- Start
   {
     id: 'willkommen', name: 'Willkommen im Abstieg!', tier: 'bronze', box: 'abenteurer',
@@ -376,5 +377,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     check: (e) => e.type === 'descend',
   },
 ];
+
+export const ACHIEVEMENTS: AchievementDef[] = [...BASE_ACHIEVEMENTS, ...MORE_ACHIEVEMENTS];
 
 export const ACHIEVEMENT_BY_ID: Record<string, AchievementDef> = Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, a]));

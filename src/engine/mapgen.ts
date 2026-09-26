@@ -283,16 +283,21 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
   const items: { pos: Pos; item: Item }[] = [];
   const maxDist = MAP_W + MAP_H;
 
-  const bosses = R.shuffle(s, HOOD_BOSSES.filter((b) => b.rank === 'nachbarschaftsboss'));
+  // Bosse: bevorzugt die „eigenen“ Bosse dieser Etage, sonst welche von oben
+  const ownBosses = HOOD_BOSSES.filter((b) => b.rank === 'nachbarschaftsboss' && b.floors[0] === floor);
+  const visiting = HOOD_BOSSES.filter((b) => b.rank === 'nachbarschaftsboss' && b.floors[0] !== floor && b.floors.includes(floor));
+  const bosses = [...R.shuffle(s, ownBosses), ...R.shuffle(s, visiting)];
   bossRooms.forEach((room, i) => {
     const p = center(room);
     occupied.add(`${p.x},${p.y}`);
-    monsters.push(spawnBoss(s, bosses[i % bosses.length], p, room.hood, room.id, def.levelBonus));
+    monsters.push(spawnBoss(s, bosses[i % bosses.length], p, room.hood, room.id, floor));
   });
-  const borough = HOOD_BOSSES.find((b) => b.rank === 'boroughboss')!;
+  const borough =
+    HOOD_BOSSES.find((b) => b.rank === 'boroughboss' && b.floors.includes(floor)) ??
+    HOOD_BOSSES.find((b) => b.rank === 'boroughboss')!;
   const arenaBossPos = { x: arenaC.x, y: arenaC.y + 1 };
   occupied.add(`${arenaBossPos.x},${arenaBossPos.y}`);
-  monsters.push(spawnBoss(s, borough, arenaBossPos, -1, arena.id, def.levelBonus));
+  monsters.push(spawnBoss(s, borough, arenaBossPos, -1, arena.id, floor));
 
   for (const r of m.rooms) {
     if (r.kind !== 'normal') continue;
@@ -301,8 +306,8 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
     let i = 0;
     while (i < count) {
       const level = Math.max(def.mobLevel[0], Math.round(def.mobLevel[0] + d * 1.6 * (def.mobLevel[1] - def.mobLevel[0]) + R.int(s, -1, 0)));
-      const mdef = pickMonsterDef(s, floor, level - def.levelBonus);
-      const lv = clampLevel(mdef, level, def.levelBonus);
+      const mdef = pickMonsterDef(s, floor, level);
+      const lv = clampLevel(mdef, level);
       const packSize = mdef.pack ? R.int(s, mdef.pack[0], mdef.pack[1]) : 1;
       for (let k = 0; k < packSize && i < count + 1; k++, i++) {
         const p = randomFloorIn(s, m, r, occupied);

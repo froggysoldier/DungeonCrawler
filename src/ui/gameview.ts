@@ -3,6 +3,7 @@ import { RARITY_COLORS, RARITY_NAMES, SLOT_NAMES } from '../data/items';
 import { SKILLS, skillXpNeeded } from '../data/skills';
 import { BOX_TIER_COLORS, FLOORS, RESTAURANT_HOSTS, RESTAURANT_MENU, SHOW_NAME } from '../data/world';
 import { monsterAt } from '../engine/ai';
+import { ABILITY_NAMES } from '../engine/abilities';
 import { describeBonuses, PART_NAMES, STAT_NAMES } from '../engine/bonuses';
 import {
   ATTACK_MOVES, ATTACK_PARTS, MOVE_NAMES, attackCost, hitChance, isInSafeRoom, techniqueBlocker, techniqueName,
@@ -264,6 +265,7 @@ export class GameView {
       const blocker = techniqueBlocker(s, mon, tech);
       const rank = mon.rank === 'normal' ? '' : ` · ${mon.rank === 'elite' ? 'Elite' : mon.rank === 'geist' ? 'Geist' : 'BOSS'}`;
       parts.push(`<b style="color:${mon.color}">${esc(mon.name)}</b> <span class="muted">Lv ${mon.level}${rank}</span>`);
+      if (mon.abilities?.length) parts.push(`<span style="color:#ff9dff">${esc(mon.abilities.map((a) => ABILITY_NAMES[a]).join(' · '))}</span>`);
       parts.push(`HP ${Math.max(0, mon.hp)}/${mon.maxHp}${mon.downed > 0 ? ' · <span style="color:#7cc4ff">am Boden</span>' : ''}${!mon.aware ? ' · <span style="color:#6ee07a">ahnungslos</span>' : ''}`);
       parts.push(blocker ? `<span class="muted">${esc(techniqueName(tech))}: ${esc(blocker)}</span>` : `${esc(techniqueName(tech))}: <b>${hitChance(s, mon, tech)} %</b> Trefferchance`);
       parts.push(`<span class="muted small">${esc(mon.flavor)}</span>`);
@@ -528,8 +530,9 @@ export class GameView {
     const mh = maxHp(s, b);
     const ma = maxAusdauer(s, b);
     const need = xpToNext(p.level);
+    const poisoned = p.buffs.some((x) => x.name === 'Vergiftet');
     let html = `<div class="bars">
-      <div class="bar hp"><div style="width:${(100 * Math.max(0, p.hp)) / mh}%"></div><span>HP ${Math.max(0, p.hp)} / ${mh}</span></div>
+      <div class="bar hp ${poisoned ? 'poison' : ''}"><div style="width:${(100 * Math.max(0, p.hp)) / mh}%"></div><span>HP ${Math.max(0, p.hp)} / ${mh}${poisoned ? ' · vergiftet' : ''}</span></div>
       <div class="bar st"><div style="width:${(100 * p.ausdauer) / ma}%"></div><span>Ausdauer ${p.ausdauer} / ${ma}</span></div>
       <div class="bar xp"><div style="width:${(100 * p.xp) / need}%"></div><span>XP ${p.xp} / ${need} (Level ${p.level})</span></div>
     </div>
@@ -550,7 +553,11 @@ export class GameView {
       <span>Krit-Chance</span><b>${5 + (b.krit ?? 0) + Math.max(0, st.ges - 5)} %</b><span></span>
       <span>Waffe</span><b>${esc(currentWeapon(s)?.name ?? '–')}</b><span></span>
     </div>`;
-    if (p.buffs.length) html += `<div class="section">Effekte</div>${p.buffs.map((x) => `<div class="small">✨ ${esc(x.name)} <span class="muted">(${x.turns} Züge)</span></div>`).join('')}`;
+    if (p.buffs.length) {
+      html += `<div class="section">Effekte</div>${p.buffs
+        .map((x) => `<div class="small" style="color:${x.debuff ? 'var(--danger)' : 'inherit'}">${x.debuff ? '☣' : '✨'} ${esc(x.name)}${x.dot ? ` (−${x.dot} HP/Zug)` : ''} <span class="muted">(${x.turns} Züge)</span></div>`)
+        .join('')}`;
+    }
     if (p.curses.length) html += `<div class="section">Flüche</div>${p.curses.map((c) => `<div class="small" style="color:var(--danger)">☠ ${esc(c)}</div>`).join('')}`;
     const hoods = s.map.hoods.map((h) => `<div class="small">${h.bossAlive ? '👹' : '✅'} ${esc(h.name)}${h.mapFound ? ' 🗺' : ''}</div>`).join('');
     html += `<div class="section">Viertel</div>${hoods}`;

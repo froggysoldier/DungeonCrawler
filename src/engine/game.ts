@@ -1,17 +1,20 @@
 import { INTERVIEW, BASE_STATS } from '../data/interview';
+import { FOOD_IDS } from '../data/items';
 import { HOOD_BOSSES } from '../data/monsters';
 import {
   COLLAPSE_WARNINGS, DEFAULT_GUIDE, FLOORS, LAST_PLAYABLE_FLOOR, RESTAURANT_HOSTS, RESTAURANT_MENU,
   SHOW_NAME, tutorialPages,
 } from '../data/world';
 import { monsterAt, monsterTurn, occupied, petLevelUp, petTurn } from './ai';
+import { cure, hasSpecial } from './abilities';
 import { isInSafeRoom, playerAttack } from './combat';
+import { handleLethal } from './death';
 import { emit } from './events';
 import { chebyshev, computeFov } from './fov';
 import { createItem, generateEquipment, isStackable, rollBoxContents } from './items';
 import { log, toast } from './log';
 import { MAP_H, MAP_W, generateFloor, hoodOf, idx, inBounds, isWalkable, roomOf, tileAt } from './mapgen';
-import { clampLevel, pickMonsterDef, spawnMonster } from './monsters';
+import { spawnForFloor } from './monsters';
 import { canStep, findPath } from './path';
 import { clampVitals, lichtradius, maxAusdauer, maxHp, skillLevel, totalBonuses } from './player';
 import * as R from './rng';
@@ -85,6 +88,8 @@ export function newGame(opts: NewGameOptions): GameState {
     counters: {
       kills: 0, killsByDef: {}, steps: 0, itemsPicked: 0, boxesOpened: 0, missStreak: 0,
       hitTakenStreak: 0, throws: 0, bossKills: 0, damageDealt: 0, damageTaken: 0,
+      goldEarned: 0, goldStolen: 0, poisonDamage: 0, mealsEaten: 0, potionsDrunk: 0, sleeps: 0,
+      crits: 0, knockdowns: 0, eliteKills: 0,
     },
     log: [],
     status: 'playing',
@@ -266,6 +271,19 @@ export function endTurn(s: GameState, opts: EndTurnOpts = {}) {
 /** Zeit vergeht: Buffs, Regeneration, Nachspawns, Einsturz. */
 function tickTime(s: GameState, turns: number, before: number) {
   const p = s.player;
+  // Gift und andere Schadenseffekte
+  for (const b of p.buffs) {
+    if (!b.dot) continue;
+    const ticks = Math.min(turns, b.turns);
+    const dmg = b.dot * ticks;
+    p.hp -= dmg;
+    s.counters.poisonDamage += dmg;
+    if (turns === 1) log(s, `${b.name}: −${dmg} HP.`, 'gefahr');
+    if (p.hp <= 0) {
+      handleLethal(s, 'an einer Vergiftung gestorben');
+      if (s.status !== 'playing') return;
+    }
+  }
   for (const b of p.buffs) b.turns -= turns;
   const expired = p.buffs.filter((b) => b.turns <= 0);
   if (expired.length) {
@@ -315,8 +333,7 @@ function respawn(s: GameState) {
     const p = { x: R.int(s, room.x, room.x + room.w - 1), y: R.int(s, room.y, room.y + room.h - 1) };
     if (vis.has(idx(s.map, p.x, p.y)) || occupied(s, p) || tileAt(s.map, p.x, p.y) !== 'floor') continue;
     const level = R.int(s, def.mobLevel[0], def.mobLevel[1]);
-    const mdef = pickMonsterDef(s, s.floor, level - def.levelBonus);
-    s.monsters.push(spawnMonster(s, mdef, clampLevel(mdef, level, def.levelBonus), p, hood.id, R.chance(s, 0.05)));
+    s.monsters.push(spawnForFloor(s, s.floor, level, p, hood.id, R.chance(s, 0.05)));
   }
 }
 
@@ -437,10 +454,18 @@ function addToInventory(s: GameState, item: Item) {
 }
 
 /** Gibt dem Crawler ein Item: Inventar, oder vor dem Tutorial in die Hand. */
+function gainGold(s: GameState, amount: number) {
+  const bonus = hasSpecial(s, 'goldmagnet') ? Math.round(amount * 0.5) : 0;
+  s.player.gold += amount + bonus;
+  s.counters.goldEarned += amount + bonus;
+  if (bonus) log(s, `Der Goldmagnet zieht ${bonus} Extra-Gold an.`, 'loot');
+  emit(s, { type: 'goldGained', amount: amount + bonus });
+}
+
 function giveItem(s: GameState, item: Item) {
   const p = s.player;
   if (item.kind === 'gold') {
-    p.gold += item.menge ?? 0;
+    gainGold(s, item.menge ?? 0);
     return;
   }
   if (item.kind === 'box') {
@@ -525,7 +550,7 @@ function removeOne(s: GameState, uid: string) {
   else p.inventory = p.inventory.filter((i) => i.uid !== uid);
 }
 
-const FOOD = new Set(['schokoriegel', 'dosenbrot']);
+const FOOD = FOOD_IDS;
 
 function applyEffect(s: GameState, e: ConsumableEffect, isFood: boolean) {
   const p = s.player;
@@ -536,6 +561,7 @@ function applyEffect(s: GameState, e: ConsumableEffect, isFood: boolean) {
     log(s, `+${amount} HP.`, 'info');
   }
   if (e.ausdauer) p.ausdauer = Math.min(maxAusdauer(s), p.ausdauer + e.ausdauer);
+  if (e.cure) cure(s);
   if (e.buff) {
     p.buffs = p.buffs.filter((b) => b.name !== e.buff!.name);
     p.buffs.push(structuredClone(e.buff));
@@ -559,6 +585,7 @@ export function useItem(s: GameState, uid: string): ActionResult {
     }
   } else {
     log(s, `Du benutzt: ${it.name}.`, 'info');
+    if (it.baseId.includes('trank') || it.baseId === 'gegengift') s.counters.potionsDrunk += 1;
     applyEffect(s, it.effekt ?? {}, FOOD.has(it.baseId));
     if (FOOD.has(it.baseId)) emit(s, { type: 'eat', item: it });
   }
@@ -653,6 +680,7 @@ export function buyMeal(s: GameState, menuId: string): ActionResult {
   if (s.player.gold < meal.price) return fail('Nicht genug Gold. „Anschreiben gibt’s nicht, Schätzchen.“');
   s.player.gold -= meal.price;
   log(s, `Du bestellst ${meal.name}. ${meal.flavor}`, 'dialog');
+  s.counters.mealsEaten += 1;
   applyEffect(s, meal.effekt, true);
   const pseudo: Item = {
     uid: `meal${s.turn}`, baseId: meal.id, name: meal.name, kind: 'verbrauch', rarity: 'gewoehnlich',
@@ -682,6 +710,8 @@ export function sleep(s: GameState): ActionResult {
   // Wache Monster verlieren das Interesse.
   for (const m of s.monsters) if (m.homeRoom === undefined) m.aware = false;
   log(s, `Du schläfst ${Math.round((duration * 3) / 60)} Stunden. Du fühlst dich erholt (${Math.round(healPct * 100)} % Heilung).`, 'info');
+  s.counters.sleeps += 1;
+  cure(s);
   emit(s, { type: 'sleep' });
   tickTime(s, duration, before);
   return OK;

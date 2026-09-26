@@ -1,11 +1,12 @@
+import { has, hasSpecial } from './abilities';
 import { PART_NAMES } from './bonuses';
 import { handleLethal } from './death';
 import { emit } from './events';
 import { chebyshev, hasLineOfSight } from './fov';
-import { createAreaMap, createBox, createItem, rollMobDrop } from './items';
+import { createAreaMap, createBox, createGold, createItem, rollMobDrop } from './items';
 import { log } from './log';
 import { roomOf } from './mapgen';
-import { currentWeapon, effectiveStats, gainXp, skillLevel, throwables, totalBonuses } from './player';
+import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, totalBonuses } from './player';
 import * as R from './rng';
 import { matchingSkills, techniqueKey, trainAmbush } from './skills';
 import type { AttackMove, AttackPart, GameState, Item, Monster, Pos, Technique } from './types';
@@ -59,6 +60,7 @@ export function techniqueBlocker(s: GameState, target: Monster, t: Technique): s
     return 'Stampfen geht nur auf Gegner, die am Boden liegen (oder winzig sind).';
   }
   if (t.move === 'stampfen' && t.part !== 'tritt') return 'Stampfen geht nur mit dem Fuß.';
+  if (t.move === 'stampfen' && has(target, 'fliegend')) return `${target.name} fliegt – draufstampfen unmöglich.`;
   if (t.move === 'anlauf') {
     const dir = p.lastMoveDir;
     if (!dir) return 'Für Anlauf musst du dich im letzten Zug auf den Gegner zubewegt haben.';
@@ -120,8 +122,9 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     s.counters.missStreak += 1;
     log(s, `Dein ${name} verfehlt ${target.name}.`, 'kampf');
     target.aware = true;
-    if (thrown) dropNear(s, thrown, target.pos);
-    emit(s, { type: 'attack', technique: t, hit: false, crit: false, damage: 0, target });
+    if (thrown?.special === 'bumerang') returnThrown(s, thrown);
+    else if (thrown) dropNear(s, thrown, target.pos);
+    emit(s, { type: 'attack', technique: t, hit: false, crit: false, damage: 0, target, thrown: thrown ?? undefined });
     return { ok: true };
   }
   s.counters.missStreak = 0;
@@ -139,9 +142,13 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   }
   let dmg = base * MOVE_MULT[t.move] * (1 + pct / 100) * (0.8 + R.next(s) * 0.4);
   if (target.downed > 0) dmg *= 1.2;
+  if (has(target, 'gepanzert') && t.part === 'faust') dmg *= 0.5;
   const critChance = 5 + (b.krit ?? 0) + Math.max(0, st.ges - 5);
   const crit = R.next(s) * 100 < critChance;
-  if (crit) dmg *= 2;
+  if (crit) {
+    dmg *= 2;
+    s.counters.crits += 1;
+  }
   const final = Math.max(1, Math.round(dmg - target.ruestung));
 
   target.hp -= final;
@@ -165,9 +172,10 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     if (t.move === 'anlauf') kd += 12;
     for (const { st: sk, def } of skills) kd += (def.knockdown ?? 0) * sk.level;
     if (target.size === 'gross') kd /= 2;
-    if (target.size === 'riesig') kd = 0;
+    if (target.size === 'riesig' || has(target, 'fliegend')) kd = 0;
     if (R.next(s) * 100 < kd) {
       target.downed = 2;
+      s.counters.knockdowns += 1;
       log(s, `${target.name} geht zu Boden!`, 'kampf');
     }
   }
@@ -185,11 +193,20 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   }
 
   if (thrown) {
-    if (thrown.baseId === 'flasche') log(s, 'Die Flasche zerschellt.', 'kampf');
+    if (thrown.special === 'bumerang') {
+      returnThrown(s, thrown);
+      log(s, `${thrown.name} fliegt zu dir zurück.`, 'kampf');
+    } else if (thrown.baseId === 'flasche' || thrown.baseId === 'kaffeetasse') log(s, `${thrown.name} zerschellt.`, 'kampf');
     else dropNear(s, thrown, target.pos);
   }
 
-  emit(s, { type: 'attack', technique: t, hit: true, crit, damage: final, target });
+  // Vampir-Effekt: ein Teil des Schadens heilt dich
+  if (hasSpecial(s, 'vampir') && t.part !== 'wurf') {
+    const heal = Math.max(1, Math.round(final * 0.15));
+    p.hp = Math.min(maxHp(s), p.hp + heal);
+  }
+
+  emit(s, { type: 'attack', technique: t, hit: true, crit, damage: final, target, thrown: thrown ?? undefined });
   if (target.hp <= 0) killMonster(s, target, t);
   return { ok: true };
 }
@@ -198,11 +215,49 @@ export function dropNear(s: GameState, item: Item, pos: Pos) {
   s.items.push({ pos: { ...pos }, item });
 }
 
+function returnThrown(s: GameState, item: Item) {
+  const p = s.player;
+  const same = p.inventory.find((i) => i.baseId === item.baseId);
+  if (same) same.menge = (same.menge ?? 0) + 1;
+  else if (!p.hand && !s.unlocks.includes('inventar')) p.hand = item;
+  else p.inventory.push(item);
+}
+
+/** Explosion beim Tod: trifft alles in direkter Nähe – auch dich. */
+function explode(s: GameState, m: Monster) {
+  const dmg = R.int(s, 3, 6) + Math.floor(m.level / 2);
+  log(s, `${m.name} explodiert mit einem feuchten KNALL!`, 'gefahr');
+  for (const o of [...s.monsters]) {
+    if (chebyshev(o.pos, m.pos) > 1) continue;
+    o.hp -= dmg;
+    log(s, `Die Explosion trifft ${o.name} für ${dmg} Schaden.`, 'kampf');
+    if (o.hp <= 0) killMonster(s, o, null);
+  }
+  const pet = s.player.pet;
+  if (pet?.alive && chebyshev(pet.pos, m.pos) <= 1) {
+    pet.hp -= dmg;
+    if (pet.hp <= 0) {
+      pet.hp = 0;
+      pet.alive = false;
+      log(s, `${pet.name} wird von der Explosion umgehauen und verschwindet bewusstlos in einem Transportlicht.`, 'gefahr');
+    }
+  }
+  if (chebyshev(s.player.pos, m.pos) <= 1 && s.status === 'playing') {
+    const taken = hasSpecial(s, 'explosionsschutz') ? Math.ceil(dmg / 2) : dmg;
+    s.player.hp -= taken;
+    s.counters.damageTaken += taken;
+    log(s, `Die Explosion erwischt dich für ${taken} Schaden.`, 'gefahr');
+    if (s.player.hp <= 0) handleLethal(s, `von einer explodierenden ${m.name} zerfetzt`);
+    else emit(s, { type: 'explosion', damage: taken, source: m.name });
+  }
+}
+
 export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet = false) {
   if (!s.monsters.includes(m)) return;
   s.monsters = s.monsters.filter((x) => x !== m);
   s.counters.kills += 1;
   s.counters.killsByDef[m.defId] = (s.counters.killsByDef[m.defId] ?? 0) + 1;
+  if (m.rank === 'elite') s.counters.eliteKills += 1;
   if (t) {
     const key = techniqueKey(t);
     s.player.techniqueKills[key] = (s.player.techniqueKills[key] ?? 0) + 1;
@@ -214,6 +269,10 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
 
   // Beute
   for (const drop of rollMobDrop(s, m.level, m.rank === 'elite')) dropNear(s, drop, m.pos);
+  if (m.stolenGold) {
+    dropNear(s, createGold(s, m.stolenGold), m.pos);
+    log(s, `Dein gestohlenes Gold (${m.stolenGold}) fällt klimpernd zu Boden.`, 'loot');
+  }
   if (m.loot) for (const id of m.loot) dropNear(s, createItem(s, id), m.pos);
 
   if (m.rank === 'nachbarschaftsboss') {
@@ -235,4 +294,5 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
     log(s, `Der Geist zerfällt. Zurück bleibt, was ${m.ghostOf} einst getragen hat.`, 'system');
   }
   emit(s, { type: 'kill', monster: m, technique: t, byPet });
+  if (has(m, 'explodiert')) explode(s, m);
 }

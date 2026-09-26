@@ -1,4 +1,4 @@
-import type { Behavior, MonsterSize } from '../engine/types';
+import type { Behavior, MonsterAbility, MonsterSize } from '../engine/types';
 
 export interface MonsterDef {
   id: string;
@@ -24,6 +24,7 @@ export interface MonsterDef {
   pack?: [number, number];
   flavor: string;
   tags?: string[];
+  abilities?: MonsterAbility[];
 }
 
 // Etage 1 und 2: Kellerlabyrinth unter der zerstörten Stadt. Eine bunte
@@ -62,7 +63,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [1, 3], floors: [1, 2], hp: 14, hpPerLevel: 5, dmg: [1, 2], dmgPerLevel: 1,
     treffer: 60, ruestung: 0, ausweichen: 0, size: 'mittel', behavior: 'melee', xp: 10, weight: 6,
     flavor: 'Eine wabbelnde Masse aus Kellerfeuchtigkeit und Bosheit. Faustschläge bleiben kurz stecken.',
-    tags: ['schleim'],
+    tags: ['schleim'], abilities: ['gepanzert'],
   },
   {
     id: 'wolpertinger', name: 'Wolpertinger', glyph: 'w', color: '#d8b04a',
@@ -76,7 +77,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [3, 5], floors: [1, 2], hp: 9, hpPerLevel: 3, dmg: [2, 4], dmgPerLevel: 1,
     treffer: 70, ruestung: 0, ausweichen: 20, size: 'mittel', behavior: 'ranged', range: 4, xp: 18, weight: 3,
     flavor: 'Wirft Geschirr. Wo kommt das ganze Geschirr her? Niemand weiß es.',
-    tags: ['geist'],
+    tags: ['geist'], abilities: ['fliegend'],
   },
   {
     id: 'grauer_spaeher', name: 'Grauer Späher', glyph: 'a', color: '#9aa8b8',
@@ -104,7 +105,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [3, 5], floors: [1, 2], hp: 22, hpPerLevel: 6, dmg: [3, 6], dmgPerLevel: 1,
     treffer: 70, ruestung: 1, ausweichen: 5, size: 'mittel', behavior: 'melee', xp: 28, weight: 2,
     flavor: 'Isst gerne Verstorbene. Ist bereit, bei dir eine Ausnahme zu machen.',
-    tags: ['untot'],
+    tags: ['untot'], abilities: ['regeneriert'],
   },
   {
     id: 'gnom_buerokrat', name: 'Gnom-Bürokrat', glyph: 'b', color: '#e0e070',
@@ -118,7 +119,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [3, 5], floors: [1, 2], hp: 18, hpPerLevel: 5, dmg: [2, 5], dmgPerLevel: 1,
     treffer: 75, ruestung: 1, ausweichen: 15, size: 'mittel', behavior: 'melee', xp: 24, weight: 3,
     flavor: 'Halb Ratte, halb Mensch, ganz schlechte Laune.',
-    tags: ['ratte'],
+    tags: ['ratte'], abilities: ['rufer'],
   },
   {
     id: 'toaster_mimic', name: 'Rauchender Toaster', glyph: 't', color: '#d05030',
@@ -126,6 +127,221 @@ export const MONSTERS: MonsterDef[] = [
     treffer: 60, ruestung: 3, ausweichen: 0, size: 'winzig', behavior: 'ranged', range: 3, xp: 16, weight: 2,
     flavor: 'Schießt glühende Toastscheiben. Das ist die Zukunft, vor der dich deine Mutter gewarnt hat.',
     tags: ['mimic'],
+  },
+  // ------------------------------------------------ weitere Etage-1/2-Mobs
+  {
+    id: 'kellerspinne', name: 'Kellerspinne', glyph: 'x', color: '#9a6ad8',
+    levels: [1, 3], floors: [1, 2], hp: 7, hpPerLevel: 3, dmg: [1, 2], dmgPerLevel: 1,
+    treffer: 70, ruestung: 0, ausweichen: 20, size: 'klein', behavior: 'melee', xp: 9, weight: 7,
+    flavor: 'Acht Beine, acht Augen, null Mitgefühl. Ihr Biss ist giftig.',
+    tags: ['insekt'], abilities: ['gift'],
+  },
+  {
+    id: 'fledermaus', name: 'Kellerfledermaus', glyph: 'v', color: '#7a6a8a',
+    levels: [1, 3], floors: [1, 2], hp: 5, hpPerLevel: 2, dmg: [1, 2], dmgPerLevel: 1,
+    treffer: 75, ruestung: 0, ausweichen: 30, size: 'winzig', behavior: 'melee', xp: 8, weight: 6, pack: [2, 3],
+    flavor: 'Flattert dir ins Gesicht. Immer ins Gesicht. Warum immer ins Gesicht?',
+    tags: ['tier'], abilities: ['fliegend', 'schnell'],
+  },
+  {
+    id: 'blaehkroete', name: 'Blähkröte', glyph: 'o', color: '#a0c040',
+    levels: [2, 4], floors: [1, 2], hp: 9, hpPerLevel: 3, dmg: [1, 3], dmgPerLevel: 1,
+    treffer: 65, ruestung: 0, ausweichen: 5, size: 'klein', behavior: 'melee', xp: 12, weight: 5,
+    flavor: 'Eine Kröte, prall wie ein Wasserball. Nicht draufhauen. Oder zumindest nicht aus der Nähe.',
+    tags: ['tier'], abilities: ['explodiert'],
+  },
+  {
+    id: 'elster_goblin', name: 'Elster-Kobold', glyph: 'e', color: '#e0e0ff',
+    levels: [2, 4], floors: [1, 2], hp: 9, hpPerLevel: 3, dmg: [1, 3], dmgPerLevel: 1,
+    treffer: 75, ruestung: 0, ausweichen: 25, size: 'klein', behavior: 'melee', xp: 14, weight: 4,
+    flavor: 'Liebt alles, was glänzt. Dein Gold glänzt. Du siehst, wohin das führt.',
+    tags: ['kobold'], abilities: ['diebisch', 'schnell'],
+  },
+  {
+    id: 'rattenschamane', name: 'Rattenschamane', glyph: 'r', color: '#ff9a40',
+    levels: [2, 5], floors: [1, 2], hp: 10, hpPerLevel: 3, dmg: [1, 3], dmgPerLevel: 1,
+    treffer: 65, ruestung: 0, ausweichen: 10, size: 'klein', behavior: 'ranged', range: 4, xp: 18, weight: 3,
+    flavor: 'Eine Ratte mit Knochenkette und Federschmuck. Pfeift – und es kommen mehr Ratten.',
+    tags: ['ratte'], abilities: ['rufer'],
+  },
+  {
+    id: 'heinzelmann', name: 'Heinzelmännchen', glyph: 'h', color: '#d0a070',
+    levels: [1, 3], floors: [1, 2], hp: 6, hpPerLevel: 2, dmg: [1, 2], dmgPerLevel: 1,
+    treffer: 70, ruestung: 0, ausweichen: 30, size: 'winzig', behavior: 'coward', xp: 10, weight: 4,
+    flavor: 'Hat früher nachts heimlich geputzt. Seit der Apokalypse klaut es nachts heimlich.',
+    tags: ['folklore'], abilities: ['diebisch', 'schnell'],
+  },
+  {
+    id: 'gartenzwerg', name: 'Belebter Gartenzwerg', glyph: 'z', color: '#e04040',
+    levels: [1, 4], floors: [1, 2], hp: 10, hpPerLevel: 3, dmg: [1, 3], dmgPerLevel: 1,
+    treffer: 65, ruestung: 3, ausweichen: 0, size: 'winzig', behavior: 'melee', xp: 12, weight: 5,
+    flavor: 'Aus Keramik. Zipfelmütze. Angelrute. Mordlust.',
+    tags: ['konstrukt'], abilities: ['gepanzert'],
+  },
+  {
+    id: 'moorleiche', name: 'Moorleiche', glyph: 'L', color: '#708050',
+    levels: [3, 5], floors: [1, 2], hp: 22, hpPerLevel: 6, dmg: [2, 5], dmgPerLevel: 1,
+    treffer: 65, ruestung: 1, ausweichen: 0, size: 'mittel', behavior: 'melee', xp: 26, weight: 2,
+    flavor: 'Zweitausend Jahre im Moor, und jetzt das. Heilt sich langsam, wenn man sie lässt.',
+    tags: ['untot'], abilities: ['regeneriert'],
+  },
+  {
+    id: 'irrlicht', name: 'Irrlicht', glyph: '*', color: '#a0ffff',
+    levels: [2, 5], floors: [1, 2], hp: 6, hpPerLevel: 2, dmg: [2, 4], dmgPerLevel: 1,
+    treffer: 70, ruestung: 0, ausweichen: 35, size: 'winzig', behavior: 'ranged', range: 4, xp: 16, weight: 3,
+    flavor: 'Ein schwebendes Licht, das Wanderer in Sümpfe lockt. In Ermangelung von Sümpfen: in Heizungskeller.',
+    tags: ['geist'], abilities: ['fliegend'],
+  },
+  {
+    id: 'abflusstentakel', name: 'Tentakel aus dem Abfluss', glyph: 'S', color: '#c060a0',
+    levels: [2, 5], floors: [1, 2], hp: 18, hpPerLevel: 5, dmg: [2, 4], dmgPerLevel: 1,
+    treffer: 75, ruestung: 1, ausweichen: 0, size: 'mittel', behavior: 'stationary', xp: 20, weight: 2,
+    flavor: 'Es kommt aus dem Bodenablauf. Es will nicht weg. Es ist giftig. Und irgendwie feucht.',
+    tags: ['aberration'], abilities: ['gift'],
+  },
+  {
+    id: 'waschmaschine_mimic', name: 'Schleudernde Waschmaschine', glyph: 'W', color: '#d0d0d0',
+    levels: [3, 5], floors: [1, 2], hp: 24, hpPerLevel: 5, dmg: [3, 6], dmgPerLevel: 1,
+    treffer: 65, ruestung: 3, ausweichen: 0, size: 'gross', behavior: 'stationary', xp: 26, weight: 1,
+    flavor: 'Sie steht im Schleudergang. Sie steht immer im Schleudergang. Komm ihr nicht zu nah.',
+    tags: ['mimic'], abilities: ['gepanzert'],
+  },
+  {
+    id: 'grey_drohne', name: 'Späher-Drohne', glyph: 'd', color: '#b0c0d0',
+    levels: [3, 5], floors: [1, 2], hp: 10, hpPerLevel: 3, dmg: [2, 4], dmgPerLevel: 1,
+    treffer: 75, ruestung: 2, ausweichen: 20, size: 'winzig', behavior: 'ranged', range: 5, xp: 20, weight: 2,
+    flavor: 'Eine surrende Metallkugel mit rotem Auge. Sendet vermutlich alles live an irgendwen.',
+    tags: ['alien'], abilities: ['fliegend'],
+  },
+  {
+    id: 'chupacabra', name: 'Chupacabra', glyph: 'c', color: '#80a080',
+    levels: [3, 5], floors: [1, 2], hp: 16, hpPerLevel: 4, dmg: [2, 5], dmgPerLevel: 1,
+    treffer: 75, ruestung: 0, ausweichen: 20, size: 'klein', behavior: 'melee', xp: 24, weight: 2,
+    flavor: 'Saugt Ziegen aus. Ziegen sind aus. Du bist keine Ziege, aber nah genug dran.',
+    tags: ['kryptid'], abilities: ['gift', 'schnell'],
+  },
+
+  // ------------------------------------------------ Etage 2 (tiefere Keller)
+  {
+    id: 'troll_lehrling', name: 'Troll-Lehrling', glyph: 'T', color: '#6a9a5a',
+    levels: [5, 8], floors: [2], hp: 34, hpPerLevel: 7, dmg: [4, 7], dmgPerLevel: 1,
+    treffer: 70, ruestung: 2, ausweichen: 0, size: 'gross', behavior: 'melee', xp: 45, weight: 3,
+    flavor: 'Noch in der Ausbildung. Die Prüfung heißt: dich zerquetschen.',
+    tags: ['troll'], abilities: ['regeneriert'],
+  },
+  {
+    id: 'knochenratte', name: 'Knochenratte', glyph: 'r', color: '#e8e8d0',
+    levels: [4, 7], floors: [2], hp: 12, hpPerLevel: 3, dmg: [2, 4], dmgPerLevel: 1,
+    treffer: 75, ruestung: 1, ausweichen: 15, size: 'winzig', behavior: 'melee', xp: 18, weight: 7, pack: [2, 4],
+    flavor: 'Eine Ratte ohne Fleisch. Ist ihr egal. Beißt trotzdem.',
+    tags: ['ratte', 'untot'],
+  },
+  {
+    id: 'wechselbalg', name: 'Wechselbalg', glyph: 'w', color: '#c0a0e0',
+    levels: [4, 7], floors: [2], hp: 20, hpPerLevel: 5, dmg: [3, 6], dmgPerLevel: 1,
+    treffer: 75, ruestung: 1, ausweichen: 20, size: 'klein', behavior: 'melee', xp: 32, weight: 3,
+    flavor: 'Sieht aus wie ein Kind. Ist keins. Lacht falsch.',
+    tags: ['folklore'], abilities: ['diebisch'],
+  },
+  {
+    id: 'kobold_bombe', name: 'Kobold-Sprengmeister', glyph: 'g', color: '#ff7040',
+    levels: [4, 7], floors: [2], hp: 14, hpPerLevel: 4, dmg: [3, 5], dmgPerLevel: 1,
+    treffer: 65, ruestung: 1, ausweichen: 10, size: 'klein', behavior: 'ranged', range: 4, xp: 30, weight: 3,
+    flavor: 'Trägt einen Gürtel voller Dynamit. Raucht. Natürlich raucht er.',
+    tags: ['kobold'], abilities: ['explodiert'],
+  },
+  {
+    id: 'kellermeister', name: 'Skelett des Kellermeisters', glyph: 'K', color: '#e0d8b0',
+    levels: [5, 8], floors: [2], hp: 26, hpPerLevel: 6, dmg: [3, 7], dmgPerLevel: 1,
+    treffer: 75, ruestung: 3, ausweichen: 5, size: 'mittel', behavior: 'melee', xp: 40, weight: 2,
+    flavor: 'Hat 60 Jahre lang Wein bewacht. Wird es weitere 60 Jahre tun. Mit einer Schöpfkelle.',
+    tags: ['untot'], abilities: ['gepanzert'],
+  },
+  {
+    id: 'nachtmahr', name: 'Nachtmahr', glyph: 'N', color: '#6040a0',
+    levels: [5, 8], floors: [2], hp: 22, hpPerLevel: 5, dmg: [3, 6], dmgPerLevel: 1,
+    treffer: 75, ruestung: 0, ausweichen: 25, size: 'mittel', behavior: 'melee', xp: 38, weight: 2,
+    flavor: 'Setzt sich Schlafenden auf die Brust. Du schläfst nicht? Dann eben so.',
+    tags: ['geist'], abilities: ['fliegend', 'gift'],
+  },
+  {
+    id: 'ghulhund', name: 'Ghulhund', glyph: 'D', color: '#9ab870',
+    levels: [4, 7], floors: [2], hp: 18, hpPerLevel: 4, dmg: [3, 5], dmgPerLevel: 1,
+    treffer: 75, ruestung: 0, ausweichen: 15, size: 'mittel', behavior: 'melee', xp: 28, weight: 4, pack: [1, 3],
+    flavor: 'Der Hund eines Ghuls. Treuer als der Ghul. Hungriger auch.',
+    tags: ['untot'], abilities: ['schnell'],
+  },
+
+  // ------------------------------------------------ Etage 3 (Kanalstadt)
+  {
+    id: 'kanalkroko', name: 'Kanal-Krokodil', glyph: 'C', color: '#608040',
+    levels: [7, 11], floors: [3], hp: 45, hpPerLevel: 7, dmg: [5, 9], dmgPerLevel: 1,
+    treffer: 70, ruestung: 3, ausweichen: 0, size: 'gross', behavior: 'melee', xp: 70, weight: 3,
+    flavor: 'Jemand hat es als Baby das Klo hinuntergespült. Es hat nicht vergeben.',
+    tags: ['reptil'], abilities: ['gepanzert'],
+  },
+  {
+    id: 'fischmensch', name: 'Fischmensch', glyph: 'f', color: '#60a0c0',
+    levels: [6, 10], floors: [3], hp: 28, hpPerLevel: 6, dmg: [4, 7], dmgPerLevel: 1,
+    treffer: 75, ruestung: 1, ausweichen: 15, size: 'mittel', behavior: 'melee', xp: 50, weight: 6, pack: [1, 3],
+    flavor: 'Glotzaugen, Kiemen, ein Dreizack aus einer Heugabel. Riecht, wie du es dir vorstellst.',
+    tags: ['aquatisch'],
+  },
+  {
+    id: 'morlock', name: 'Morlock', glyph: 'm', color: '#c0c0a0',
+    levels: [6, 9], floors: [3], hp: 24, hpPerLevel: 5, dmg: [4, 6], dmgPerLevel: 1,
+    treffer: 75, ruestung: 1, ausweichen: 15, size: 'mittel', behavior: 'melee', xp: 44, weight: 6, pack: [2, 3],
+    flavor: 'Blasse Tunnelbewohner, lichtempfindlich, hungrig. Sehr, sehr hungrig.',
+    tags: ['humanoid'], abilities: ['rufer'],
+  },
+  {
+    id: 'klaerschlamm', name: 'Klärschlamm-Elementar', glyph: 'E', color: '#806040',
+    levels: [7, 11], floors: [3], hp: 40, hpPerLevel: 7, dmg: [4, 8], dmgPerLevel: 1,
+    treffer: 65, ruestung: 0, ausweichen: 0, size: 'gross', behavior: 'melee', xp: 60, weight: 3,
+    flavor: 'Du willst nicht wissen, woraus es besteht. Du weißt es trotzdem. Es ist giftig.',
+    tags: ['elementar'], abilities: ['gift', 'gepanzert'],
+  },
+  {
+    id: 'kanalhexe', name: 'Kanalhexe', glyph: 'H', color: '#a060c0',
+    levels: [7, 10], floors: [3], hp: 22, hpPerLevel: 5, dmg: [4, 7], dmgPerLevel: 1,
+    treffer: 75, ruestung: 0, ausweichen: 20, size: 'mittel', behavior: 'ranged', range: 5, xp: 55, weight: 3,
+    flavor: 'Braut Tränke aus Abwasser. Wirft sie dir ins Gesicht. Die Tränke sind giftig, die Hexe auch.',
+    tags: ['hexe'], abilities: ['gift'],
+  },
+  {
+    id: 'pilzmensch', name: 'Sporenmensch', glyph: 'p', color: '#d0a0a0',
+    levels: [6, 9], floors: [3], hp: 20, hpPerLevel: 4, dmg: [3, 6], dmgPerLevel: 1,
+    treffer: 65, ruestung: 0, ausweichen: 5, size: 'mittel', behavior: 'melee', xp: 42, weight: 4,
+    flavor: 'Ein Pilz in Menschengestalt. Oder ein Mensch in Pilzgestalt. Platzt, wenn er stirbt.',
+    tags: ['pflanze'], abilities: ['explodiert', 'gift'],
+  },
+  {
+    id: 'mottenmann', name: 'Mottenmann', glyph: 'M', color: '#b0a080',
+    levels: [8, 11], floors: [3], hp: 30, hpPerLevel: 5, dmg: [5, 8], dmgPerLevel: 1,
+    treffer: 80, ruestung: 0, ausweichen: 30, size: 'gross', behavior: 'melee', xp: 70, weight: 2,
+    flavor: 'Rote Augen, riesige Flügel, eine unerklärliche Vorliebe für deine Taschenlampe.',
+    tags: ['kryptid'], abilities: ['fliegend', 'schnell'],
+  },
+  {
+    id: 'schmuggler', name: 'Schmuggler-Kobold', glyph: 'g', color: '#ffd060',
+    levels: [6, 9], floors: [3], hp: 18, hpPerLevel: 4, dmg: [3, 6], dmgPerLevel: 1,
+    treffer: 75, ruestung: 1, ausweichen: 25, size: 'klein', behavior: 'melee', xp: 40, weight: 4,
+    flavor: 'Verkauft dir alles. Klaut dir alles. Oft in derselben Minute.',
+    tags: ['kobold'], abilities: ['diebisch', 'schnell'],
+  },
+  {
+    id: 'neunauge', name: 'Riesen-Neunauge', glyph: 'n', color: '#8080a0',
+    levels: [7, 10], floors: [3], hp: 26, hpPerLevel: 5, dmg: [4, 7], dmgPerLevel: 1,
+    treffer: 75, ruestung: 0, ausweichen: 10, size: 'mittel', behavior: 'melee', xp: 50, weight: 3,
+    flavor: 'Ein Maul voller Zahnringe an einem Aal. Saugt sich fest. Saugt dich aus.',
+    tags: ['aquatisch'], abilities: ['regeneriert'],
+  },
+  {
+    id: 'taubenschwarm', name: 'Mutierte Stadttaube', glyph: 't', color: '#a0a0b0',
+    levels: [6, 9], floors: [3], hp: 12, hpPerLevel: 3, dmg: [3, 5], dmgPerLevel: 1,
+    treffer: 75, ruestung: 0, ausweichen: 30, size: 'klein', behavior: 'melee', xp: 30, weight: 5, pack: [2, 4],
+    flavor: 'Tauben waren schon vorher Ratten mit Flügeln. Jetzt haben sie auch Zähne.',
+    tags: ['tier'], abilities: ['fliegend'],
   },
 ];
 
@@ -144,6 +360,8 @@ export interface BossDef {
   range?: number;
   xp: number;
   rank: 'nachbarschaftsboss' | 'boroughboss';
+  floors: number[];
+  abilities?: MonsterAbility[];
   intro: string;
   flavor: string;
   loot: string[];
@@ -155,7 +373,7 @@ export const HOOD_BOSSES: BossDef[] = [
   {
     id: 'die_sammlerin', name: 'Die Sammlerin', glyph: 'S', color: '#e070e0', level: 7,
     hp: 70, dmg: [4, 7], treffer: 75, ruestung: 2, ausweichen: 5, size: 'gross', xp: 120,
-    rank: 'nachbarschaftsboss',
+    rank: 'nachbarschaftsboss', floors: [1], abilities: ['diebisch'],
     intro: 'Zwischen Türmen aus Zeitungen, Katzenfutterdosen und Porzellanpuppen erhebt sich etwas. Es hat zu viele Arme – und in jedem eine Handtasche.',
     flavor: 'Hat noch nie etwas weggeworfen. Wird auch dich nicht wegwerfen. Sie wird dich *behalten*.',
     loot: ['handtasche_der_sammlerin'],
@@ -163,7 +381,7 @@ export const HOOD_BOSSES: BossDef[] = [
   {
     id: 'der_hausmeister', name: 'Der Hausmeister', glyph: 'H', color: '#70a0e0', level: 7,
     hp: 80, dmg: [4, 8], treffer: 70, ruestung: 3, ausweichen: 0, size: 'gross', xp: 130,
-    rank: 'nachbarschaftsboss',
+    rank: 'nachbarschaftsboss', floors: [1, 2],
     intro: 'Ein drei Meter großer Mann im grauen Kittel dreht sich um. Sein Wischmopp tropft. „Hier wird nicht gelaufen!“',
     flavor: 'Seit 40 Jahren im Dienst. Hat jeden einzelnen Tag gehasst.',
     loot: ['wischmopp'],
@@ -171,7 +389,7 @@ export const HOOD_BOSSES: BossDef[] = [
   {
     id: 'koenig_kanalratte', name: 'König der Kanalratten', glyph: 'K', color: '#c0a060', level: 8,
     hp: 75, dmg: [5, 8], treffer: 75, ruestung: 1, ausweichen: 15, size: 'gross', xp: 140,
-    rank: 'nachbarschaftsboss',
+    rank: 'nachbarschaftsboss', floors: [1], abilities: ['rufer'],
     intro: 'Ein Knoten aus sieben Ratten, deren Schwänze verwachsen sind, trägt eine Krone aus Kronkorken. Er quiekt in sieben Stimmen.',
     flavor: 'Ein Rattenkönig im wörtlichsten Sinne. Die sieben Köpfe sind sich selten einig.',
     loot: ['kronkorkenkrone'],
@@ -179,7 +397,7 @@ export const HOOD_BOSSES: BossDef[] = [
   {
     id: 'muttis_mixer', name: 'Muttis Mega-Mixer', glyph: 'M', color: '#e0e0e0', level: 8,
     hp: 65, dmg: [5, 9], treffer: 70, ruestung: 4, ausweichen: 0, size: 'gross', xp: 140,
-    rank: 'nachbarschaftsboss',
+    rank: 'nachbarschaftsboss', floors: [1, 2], abilities: ['gepanzert'],
     intro: 'Ein Küchengerät von der Größe eines Kleinwagens erwacht brummend. Die Rührbesen drehen sich. Es riecht nach Rührkuchen und Tod.',
     flavor: 'Stufe 1: Sahne. Stufe 2: Eischnee. Stufe 3: dich.',
     loot: ['ruehrbesen'],
@@ -187,10 +405,93 @@ export const HOOD_BOSSES: BossDef[] = [
   {
     id: 'kesselkoenigin', name: 'Oma Gulasch, die Kesselkönigin', glyph: 'O', color: '#ff8040', level: 10,
     hp: 160, dmg: [6, 11], treffer: 75, ruestung: 3, ausweichen: 5, size: 'riesig', range: 4, xp: 400,
-    rank: 'boroughboss',
+    rank: 'boroughboss', floors: [1],
     intro: 'In der Mitte des Gewölbes steht ein Kessel, groß wie ein Pool. Eine riesige alte Frau rührt darin und dreht sich langsam um. „Du bist aber dünn geworden. Komm, iss was.“',
     flavor: 'Wirft kochendes Gulasch. Die Treppe nach unten ist direkt hinter ihr.',
     loot: ['schoepfkelle', 'omas_schuerze'],
+  },
+  // ---------------------------------------- weitere Nachbarschafts-Bosse
+  {
+    id: 'kammerjaeger', name: 'Der Kammerjäger', glyph: 'J', color: '#a0e060', level: 7,
+    hp: 65, dmg: [4, 7], treffer: 75, ruestung: 2, ausweichen: 10, size: 'gross', range: 3, xp: 130,
+    rank: 'nachbarschaftsboss', floors: [1, 2], abilities: ['gift'],
+    intro: 'Eine Gestalt im Schutzanzug mit Gasmaske und Sprühtank. „Ungeziefer entdeckt“, zischt es aus dem Filter. Es meint dich.',
+    flavor: 'Hat sein Leben lang Schädlinge vergiftet. Hält dich für einen. Hat vielleicht recht.',
+    loot: ['gasmaske'],
+  },
+  {
+    id: 'mottenmutter', name: 'Mutter aller Motten', glyph: 'V', color: '#d0c090', level: 7,
+    hp: 60, dmg: [4, 7], treffer: 80, ruestung: 0, ausweichen: 20, size: 'gross', xp: 130,
+    rank: 'nachbarschaftsboss', floors: [1, 2], abilities: ['fliegend', 'rufer'],
+    intro: 'Der Raum ist voller zerfressener Pelzmäntel. An der Decke hängt etwas mit einer Flügelspannweite von vier Metern. Es hat Hunger. Auf Wolle. Und auf dich.',
+    flavor: 'Hat jeden Wollpullover dieser Stadt gefressen. Du trägst Baumwolle? Egal.',
+    loot: ['mottenfluegel_umhang'],
+  },
+  {
+    id: 'pfandbaron', name: 'Der Pfandflaschen-Baron', glyph: 'B', color: '#60c0a0', level: 8,
+    hp: 75, dmg: [4, 8], treffer: 70, ruestung: 3, ausweichen: 0, size: 'gross', range: 4, xp: 140,
+    rank: 'nachbarschaftsboss', floors: [1, 2],
+    intro: 'Berge aus leeren Flaschen, sortiert nach Pfandwert. Auf dem höchsten Berg thront ein Mann aus Glas und Etiketten. „25 Cent pro Knochen!“, ruft er.',
+    flavor: 'Wirft Flaschen. Sammelt sie wieder ein. Wirft sie wieder. Kreislaufwirtschaft.',
+    loot: ['pfandkrone'],
+  },
+  {
+    id: 'heizungsbestie', name: 'Die Heizungsbestie', glyph: 'F', color: '#ff6030', level: 8,
+    hp: 85, dmg: [5, 8], treffer: 70, ruestung: 4, ausweichen: 0, size: 'riesig', xp: 150,
+    rank: 'nachbarschaftsboss', floors: [1, 2], abilities: ['gepanzert', 'regeneriert'],
+    intro: 'Ein Heizkessel aus den 60ern hat Beine bekommen. Und Zähne. Und schlechte Laune. Es wird sehr warm.',
+    flavor: 'Wurde nie gewartet. Hat es sich gemerkt.',
+    loot: ['thermostat_amulett'],
+  },
+  {
+    id: 'hausverwalter', name: 'Der Hausverwalter', glyph: 'V', color: '#ffb030', level: 12,
+    hp: 200, dmg: [7, 12], treffer: 75, ruestung: 4, ausweichen: 5, size: 'riesig', range: 5, xp: 600,
+    rank: 'boroughboss', floors: [2], abilities: ['rufer'],
+    intro: 'Hinter einem Schreibtisch aus Mietverträgen sitzt ein aufgedunsener Mann mit vier Armen. Jeder Arm hält einen Stempel. „Sie sind mit der Miete im Rückstand. Seit der Apokalypse.“',
+    flavor: 'Wirft Nebenkostenabrechnungen. Die schneiden tiefer als Messer.',
+    loot: ['generalschluessel', 'verwalter_stempel'],
+  },
+
+  // ---------------------------------------- Etage 3: Kanalstadt
+  {
+    id: 'kanalkoenigin', name: 'Die Kanalkönigin', glyph: 'Q', color: '#40c0a0', level: 12,
+    hp: 150, dmg: [6, 10], treffer: 75, ruestung: 3, ausweichen: 15, size: 'riesig', xp: 350,
+    rank: 'nachbarschaftsboss', floors: [3], abilities: ['gift', 'regeneriert'],
+    intro: 'Aus dem Wasser erhebt sich eine gewaltige Schlangenfrau mit einer Krone aus verrosteten Gullydeckeln. „Wer hat hier ohne zu fragen gespült?“',
+    flavor: 'Herrscherin über alles, was durch die Rohre kommt. Also über sehr viel Ekliges.',
+    loot: ['gullydeckel_schild'],
+  },
+  {
+    id: 'kommandant_schlamm', name: 'Kommandant Klärschlamm', glyph: 'K', color: '#a08040', level: 12,
+    hp: 170, dmg: [6, 11], treffer: 70, ruestung: 4, ausweichen: 0, size: 'riesig', xp: 350,
+    rank: 'nachbarschaftsboss', floors: [3], abilities: ['gepanzert', 'rufer'],
+    intro: 'Ein Berg aus Schlamm mit einer Offiziersmütze. Um ihn herum stehen kleinere Schlammhaufen stramm. „ACHTUNG!“',
+    flavor: 'Führt eine Armee aus Abfall. Die Armee ist loyal. Und klebrig.',
+    loot: ['offiziersmuetze'],
+  },
+  {
+    id: 'schwarzmarkt_oger', name: 'Der Schwarzmarkt-Oger', glyph: 'O', color: '#c09060', level: 13,
+    hp: 180, dmg: [7, 12], treffer: 70, ruestung: 3, ausweichen: 0, size: 'riesig', xp: 380,
+    rank: 'nachbarschaftsboss', floors: [3], abilities: ['diebisch'],
+    intro: 'Zwischen Kisten mit geklauten Waren sitzt ein Oger mit Goldzähnen und Bauchtasche. „Du kaufst nix? Dann bist DU die Ware.“',
+    flavor: 'Hat alles. Verkauft alles. Klaut den Rest.',
+    loot: ['bauchtasche'],
+  },
+  {
+    id: 'nixe', name: 'Die Nixe vom Überlauf', glyph: 'N', color: '#60e0ff', level: 12,
+    hp: 140, dmg: [6, 10], treffer: 80, ruestung: 1, ausweichen: 25, size: 'gross', range: 5, xp: 350,
+    rank: 'nachbarschaftsboss', floors: [3], abilities: ['fliegend'],
+    intro: 'Ein wunderschöner Gesang hallt durch das Gewölbe. Dann siehst du die Sängerin: halb Frau, halb Hecht. Mit sehr, sehr vielen Zähnen.',
+    flavor: 'Singt Seeleute in den Tod. Mangels Seeleuten: dich.',
+    loot: ['muschelhorn'],
+  },
+  {
+    id: 'rattenkaiser', name: 'Der Rattenkaiser', glyph: 'R', color: '#ffd700', level: 15,
+    hp: 320, dmg: [8, 14], treffer: 75, ruestung: 4, ausweichen: 10, size: 'riesig', range: 4, xp: 1000,
+    rank: 'boroughboss', floors: [3], abilities: ['rufer', 'regeneriert'],
+    intro: 'Auf einem Thron aus Fahrradreifen und Knochen sitzt eine Ratte so groß wie ein Bus, in einen Königsmantel aus Duschvorhängen gehüllt. Tausende kleine Augen leuchten im Dunkeln.',
+    flavor: 'Der Herrscher der Kanalstadt. Hinter ihm: die Treppe nach unten.',
+    loot: ['kaiserzepter', 'duschvorhang_mantel'],
   },
 ];
 

@@ -188,7 +188,7 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
   glow.addColorStop(1, 'rgba(255, 220, 90, 0)');
   ctx.fillStyle = glow;
   ctx.fillRect(px - TILE, py - TILE, TILE * 2, TILE * 2);
-  ctx.fillStyle = '#ffdc5a';
+  ctx.fillStyle = s.player.buffs.some((b) => b.name === 'Vergiftet') ? '#9be04a' : '#ffdc5a';
   ctx.beginPath();
   ctx.arc(px, py, 6, 0, Math.PI * 2);
   ctx.fill();

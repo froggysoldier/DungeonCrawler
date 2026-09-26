@@ -152,6 +152,7 @@ export function rollBoxContents(s: GameState, type: BoxType, tier: BoxTier): Ite
     out.push(createItem(s, tierIdx >= 1 ? 'heiltrank' : 'kleiner_heiltrank', 1 + Math.floor(tierIdx / 2)));
   }
   if (type === 'wurf') out.push(createItem(s, tierIdx >= 2 ? 'ziegel' : 'stein', 5 + tierIdx * 3));
+  if (type === 'ueberlebens') out.push(createItem(s, 'gegengift', 1 + Math.floor(tierIdx / 2)));
   if (type === 'brawler') out.push(createItem(s, 'energydrink', 1 + Math.floor(tierIdx / 2)));
   return out;
 }
@@ -181,6 +182,7 @@ export function rollMobDrop(s: GameState, level: number, elite: boolean): Item[]
   if (R.chance(s, elite ? 1 : 0.35)) out.push(createGold(s, R.int(s, 1, 3 + level * 2) * (elite ? 3 : 1)));
   if (R.chance(s, elite ? 0.6 : 0.12)) out.push(elite ? generateEquipment(s, R.chance(s, 0.3) ? 'selten' : 'ungewoehnlich') : rollGroundItem(s));
   if (R.chance(s, 0.05)) out.push(createItem(s, 'kleiner_heiltrank'));
+  if (R.chance(s, 0.03)) out.push(createItem(s, 'gegengift'));
   return out;
 }
 

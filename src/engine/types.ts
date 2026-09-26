@@ -114,10 +114,14 @@ export interface Item {
   wert: number;
 }
 
-export type SpecialEffect = 'zweite_chance' | 'stampf_beben' | 'katzenfreund' | 'glueckspilz';
+export type SpecialEffect =
+  | 'zweite_chance' | 'stampf_beben' | 'katzenfreund' | 'glueckspilz' | 'giftimmun' | 'goldmagnet'
+  | 'explosionsschutz' | 'bumerang' | 'vampir';
 
 export interface ConsumableEffect {
   heal?: number;
+  /** Heilt Vergiftung. */
+  cure?: boolean;
   ausdauer?: number;
   buff?: { name: string; turns: number; bonuses: Bonuses };
 }
@@ -136,6 +140,14 @@ export interface Technique {
 
 export type MonsterSize = 'winzig' | 'klein' | 'mittel' | 'gross' | 'riesig';
 export type Behavior = 'melee' | 'ranged' | 'coward' | 'boss' | 'stationary';
+
+/**
+ * Besondere Fähigkeiten von Monstern:
+ * gift – Treffer vergiften · explodiert – explodiert beim Tod · diebisch – klaut Gold und flieht ·
+ * rufer – ruft Verstärkung · regeneriert – heilt sich · schnell – zwei Schritte pro Zug ·
+ * fliegend – kann nicht umgeworfen oder gestampft werden · gepanzert – halber Schaden von Fäusten.
+ */
+export type MonsterAbility = 'gift' | 'explodiert' | 'diebisch' | 'rufer' | 'regeneriert' | 'schnell' | 'fliegend' | 'gepanzert';
 
 export interface Monster {
   uid: string;
@@ -168,6 +180,11 @@ export interface Monster {
   ghostOf?: string;
   ghostItems?: Item[];
   flavor: string;
+  abilities?: MonsterAbility[];
+  /** Wie oft dieser Mob schon Verstärkung gerufen hat. */
+  summoned?: number;
+  /** Gestohlenes Gold, das beim Tod zurückfällt. */
+  stolenGold?: number;
   /** Techniken, mit denen dieser Mob in diesem Kampf getroffen wurde. */
   hitBy?: string[];
 }
@@ -194,6 +211,9 @@ export interface Buff {
   name: string;
   turns: number;
   bonuses: Bonuses;
+  /** Schaden pro Zug (Gift). */
+  dot?: number;
+  debuff?: boolean;
 }
 
 export interface Player {
@@ -249,6 +269,15 @@ export interface Counters {
   bossKills: number;
   damageDealt: number;
   damageTaken: number;
+  goldEarned: number;
+  goldStolen: number;
+  poisonDamage: number;
+  mealsEaten: number;
+  potionsDrunk: number;
+  sleeps: number;
+  crits: number;
+  knockdowns: number;
+  eliteKills: number;
 }
 
 export interface GameState {
@@ -301,7 +330,7 @@ export interface Dialog {
 
 export type GameEvent =
   | { type: 'kill'; monster: Monster; technique: Technique | null; byPet?: boolean }
-  | { type: 'attack'; technique: Technique; hit: boolean; crit: boolean; damage: number; target: Monster }
+  | { type: 'attack'; technique: Technique; hit: boolean; crit: boolean; damage: number; target: Monster; thrown?: Item }
   | { type: 'damageTaken'; amount: number; source: string }
   | { type: 'dodged'; source: string }
   | { type: 'enterRoom'; room: Room }
@@ -318,6 +347,11 @@ export type GameEvent =
   | { type: 'stairsFound' }
   | { type: 'mapPicked'; hood: number }
   | { type: 'revived' }
+  | { type: 'poisoned'; source: string }
+  | { type: 'cured' }
+  | { type: 'robbed'; amount: number; source: string }
+  | { type: 'explosion'; damage: number; source: string }
+  | { type: 'goldGained'; amount: number }
   | { type: 'moved' }
   | { type: 'start' };
 

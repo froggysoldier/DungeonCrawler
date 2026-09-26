@@ -4,6 +4,7 @@ import { chebyshev, hasLineOfSight } from './fov';
 import { log } from './log';
 import { idx, randomOpenTile, roomOf } from './mapgen';
 import { canStep, findPath } from './path';
+import { has, onMonsterHit, startOfTurn } from './abilities';
 import { handleLethal } from './death';
 import { ausweichen, totalBonuses } from './player';
 import * as R from './rng';
@@ -26,8 +27,11 @@ export function monsterAt(s: GameState, p: Pos): Monster | undefined {
 }
 
 function allowedTile(s: GameState, m: Monster, p: Pos): boolean {
-  if (m.homeRoom !== undefined) return s.map.roomAt[idx(s.map, p.x, p.y)] === m.homeRoom;
-  return true;
+  const r = s.map.roomAt[idx(s.map, p.x, p.y)];
+  if (m.homeRoom !== undefined) return r === m.homeRoom;
+  // Normale Monster meiden Boss-Kammern
+  const kind = r >= 0 ? s.map.rooms[r].kind : null;
+  return kind !== 'boss' && kind !== 'arena';
 }
 
 function stepToward(s: GameState, m: Monster, goal: Pos) {
@@ -101,6 +105,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     return;
   }
   emit(s, { type: 'damageTaken', amount: dmg, source: m.name });
+  onMonsterHit(s, m);
 }
 
 function attackPet(s: GameState, m: Monster) {
@@ -126,6 +131,7 @@ export function monsterTurn(s: GameState, m: Monster) {
     if (m.downed === 0) log(s, `${m.name} rappelt sich wieder auf.`, 'kampf');
     return;
   }
+  startOfTurn(s, m);
   const p = s.player;
   const d = chebyshev(m.pos, p.pos);
 
@@ -163,6 +169,7 @@ export function monsterTurn(s: GameState, m: Monster) {
   if (m.behavior === 'coward' && d <= 4) m.fleeing = true;
   if (m.fleeing) {
     stepAway(s, m, p.pos);
+    if (has(m, 'schnell')) stepAway(s, m, p.pos);
     return;
   }
 
@@ -181,6 +188,7 @@ export function monsterTurn(s: GameState, m: Monster) {
   }
   if (m.behavior === 'stationary') return;
   stepToward(s, m, p.pos);
+  if (has(m, 'schnell') && chebyshev(m.pos, p.pos) > 1) stepToward(s, m, p.pos);
 }
 
 export function petTurn(s: GameState) {

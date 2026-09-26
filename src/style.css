@@ -244,3 +244,5 @@ h1, h2, h3 { margin: 0; }
 
 .here { max-height: 45%; overflow: auto; flex-shrink: 0; }
 .here .row button { padding: 2px 8px; font-size: 12px; }
+
+.bar.hp.poison > div { background: linear-gradient(90deg, #3d7a1e, #8fe04a); }

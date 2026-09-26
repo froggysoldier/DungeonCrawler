@@ -39,10 +39,13 @@ export function spawnMonster(s: GameState, def: MonsterDef, level: number, pos: 
     downed: 0,
     aware: false,
     flavor: def.flavor,
+    abilities: def.abilities ? [...def.abilities] : undefined,
   };
 }
 
-export function spawnBoss(s: GameState, def: BossDef, pos: Pos, hood: number, room: number, levelBonus: number): Monster {
+export function spawnBoss(s: GameState, def: BossDef, pos: Pos, hood: number, room: number, floor: number): Monster {
+  // Bosse, die auf einer tieferen Etage als ihrer ersten auftauchen, werden stärker.
+  const levelBonus = Math.max(0, floor - Math.min(...def.floors)) * 2;
   const scale = 1 + levelBonus * 0.25;
   const maxHp = Math.round(def.hp * scale);
   return {
@@ -70,6 +73,7 @@ export function spawnBoss(s: GameState, def: BossDef, pos: Pos, hood: number, ro
     homeRoom: room,
     loot: def.loot,
     flavor: def.flavor,
+    abilities: def.abilities ? [...def.abilities] : undefined,
   };
 }
 
@@ -104,12 +108,25 @@ export function spawnGhost(s: GameState, ghost: GhostRecord, pos: Pos, hood: num
   };
 }
 
+/** Wählt einen Monstertyp, der auf dieser Etage und in diesem Level vorkommt. */
 export function pickMonsterDef(s: GameState, floor: number, level: number): MonsterDef {
-  const pool = MONSTERS.filter((m) => m.floors.includes(floor) && level >= m.levels[0] && level <= m.levels[1] + 2);
-  const list = pool.length ? pool : MONSTERS;
+  const onFloor = MONSTERS.filter((m) => m.floors.includes(floor));
+  const pool = onFloor.filter((m) => level >= m.levels[0] && level <= m.levels[1] + 2);
+  const list = pool.length ? pool : onFloor.length ? onFloor : MONSTERS;
   return R.weighted(s, list.map((m) => [m, m.weight] as [MonsterDef, number]));
 }
 
-export function clampLevel(def: MonsterDef, level: number, bonus: number): number {
-  return Math.max(def.levels[0] + bonus, Math.min(def.levels[1] + bonus, level));
+/** Level eines Mobs: innerhalb seiner Spanne, auf tieferen Etagen bis zu 2 darüber. */
+export function clampLevel(def: MonsterDef, level: number): number {
+  return Math.max(def.levels[0], Math.min(def.levels[1] + 2, level));
+}
+
+/** Spawnt einen Mob passend zur Etage (für Nachspawns und Verstärkung). */
+export function spawnForFloor(s: GameState, floor: number, level: number, pos: Pos, hood: number, elite: boolean): Monster {
+  const def = pickMonsterDef(s, floor, level);
+  return spawnMonster(s, def, clampLevel(def, level), pos, hood, elite);
+}
+
+export function monsterDefById(id: string): MonsterDef | undefined {
+  return MONSTERS.find((m) => m.id === id);
 }
