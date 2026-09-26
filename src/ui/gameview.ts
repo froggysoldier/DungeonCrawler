@@ -22,7 +22,7 @@ import { idx, isWalkable } from '../engine/mapgen';
 import { saveRun, syncMeta, saveMeta } from '../engine/meta';
 import { canStep } from '../engine/path';
 import {
-  ausweichen, currentWeapon, effectiveStats, maxAusdauer, maxHp, throwables, totalBonuses, xpToNext,
+  ausweichen, currentWeapon, effectiveStats, lichtradius, maxAusdauer, maxHp, throwables, totalBonuses, xpToNext,
 } from '../engine/player';
 import { skillProgress } from '../engine/skills';
 import type { AttackMove, AttackPart, EquipSlot, GameState, Item, MetaState, Pos, StatKey } from '../engine/types';
@@ -591,6 +591,7 @@ export class GameView {
       <span>Ausweichen</span><b>${Math.round(ausweichen(s, b))} %</b><span></span>
       <span>Krit-Chance</span><b>${5 + (b.krit ?? 0) + Math.max(0, st.ges - 5)} %</b><span></span>
       <span>Waffe</span><b>${esc(currentWeapon(s)?.name ?? '–')}</b><span></span>
+      <span>Sichtweite</span><b>${lichtradius(s, b)} Felder</b><span></span>
     </div>`;
     if (p.buffs.length) {
       html += `<div class="section">Effekte</div>${p.buffs

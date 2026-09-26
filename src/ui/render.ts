@@ -1,5 +1,6 @@
 import { RARITY_COLORS } from '../data/items';
 import { hasUnlock, visibleTiles } from '../engine/game';
+import { lichtradius } from '../engine/player';
 import { describeMonster } from '../engine/identify';
 import { idx, isWalkable } from '../engine/mapgen';
 import type { GameState, Pos, RoomKind } from '../engine/types';
@@ -61,6 +62,11 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
   const vis = visibleTiles(s);
   const memory = hasUnlock(s, 'minimap');
   const m = s.map;
+  const radius = lichtradius(s);
+  const lightFalloff = (x: number, y: number) => {
+    const d = Math.hypot(x - s.player.pos.x, y - s.player.pos.y) / radius;
+    return Math.max(0, Math.min(0.6, (d - 0.45) * 1.1));
+  };
   const sx = (x: number) => (x - view.ox) * TILE;
   const sy = (y: number) => (y - view.oy) * TILE;
 
@@ -83,6 +89,11 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
         ctx.fillRect(px, py, TILE, TILE);
         ctx.fillStyle = seen ? '#7d6a52' : '#40372b';
         ctx.fillRect(px, py, TILE, 3);
+        const wallDark = seen ? lightFalloff(x, y) : 0.55;
+        if (wallDark > 0) {
+          ctx.fillStyle = `rgba(0,0,0,${wallDark})`;
+          ctx.fillRect(px, py, TILE, TILE);
+        }
         continue;
       }
       const room = m.roomAt[i] >= 0 ? m.rooms[m.roomAt[i]] : null;
@@ -92,15 +103,11 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
         ctx.fillStyle = 'rgba(255,255,255,0.025)';
         ctx.fillRect(px, py, TILE, TILE);
       }
-      if (tile === 'stairs') {
-        ctx.fillStyle = '#ffcc33';
-        ctx.font = `bold ${TILE - 4}px JetBrains Mono, monospace`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('>', px + TILE / 2, py + TILE / 2 + 1);
-      }
-      if (!seen) {
-        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      if (tile === 'stairs') drawStairs(ctx, px, py, seen);
+      // Licht: im Sichtfeld zum Rand hin dunkler, Erinnerung deutlich gedämpft
+      const dark = seen ? lightFalloff(x, y) : 0.78;
+      if (dark > 0) {
+        ctx.fillStyle = `rgba(0,0,0,${dark})`;
         ctx.fillRect(px, py, TILE, TILE);
       }
     }
@@ -123,7 +130,7 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
     const cx = sx(e.pos.x) + TILE / 2;
     const cy = sy(e.pos.y) + TILE / 2;
     ctx.fillStyle = e.item.kind === 'karte' ? '#7cc4ff' : e.item.kind === 'gold' ? '#ffd700' : RARITY_COLORS[e.item.rarity];
-    ctx.globalAlpha = vis.has(i) ? 1 : 0.5;
+    ctx.globalAlpha = vis.has(i) ? 1 : 0.3;
     ctx.beginPath();
     ctx.moveTo(cx, cy - 5);
     ctx.lineTo(cx + 5, cy);
@@ -208,4 +215,56 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
   }
 
   return { view, visible: vis };
+}
+
+/**
+ * Eine Treppe nach unten, von oben gesehen: ein Steinrahmen, darin Stufen,
+ * die zur Tiefe hin schmaler und dunkler werden, mit zwei Handläufen.
+ */
+function drawStairs(ctx: CanvasRenderingContext2D, px: number, py: number, seen: boolean) {
+  const T = TILE;
+  if (seen) {
+    const glow = ctx.createRadialGradient(px + T / 2, py + T / 2, 2, px + T / 2, py + T / 2, T);
+    glow.addColorStop(0, 'rgba(255, 190, 80, 0.35)');
+    glow.addColorStop(1, 'rgba(255, 190, 80, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(px - T / 2, py - T / 2, T * 2, T * 2);
+  }
+  // Steinrahmen
+  ctx.fillStyle = '#6e5a42';
+  ctx.fillRect(px + 1, py + 1, T - 2, T - 2);
+  ctx.fillStyle = '#8a7356';
+  ctx.fillRect(px + 1, py + 1, T - 2, 2);
+  // Schacht
+  ctx.fillStyle = '#2a1f14';
+  ctx.fillRect(px + 3, py + 3, T - 6, T - 5);
+  // Stufen: oben hell und breit, unten dunkel und schmal
+  const steps = 4;
+  const inner = T - 6;
+  const stepH = (T - 6) / steps;
+  for (let i = 0; i < steps; i++) {
+    const t = i / (steps - 1);
+    const inset = i * 1.2;
+    const x = px + 3 + inset;
+    const w = inner - inset * 2;
+    const y = py + 3 + i * stepH;
+    const light = Math.round(225 - t * 90);
+    ctx.fillStyle = `rgb(${light}, ${Math.round(light * 0.84)}, ${Math.round(light * 0.62)})`;
+    ctx.fillRect(x, y, w, stepH - 1.2);
+    // helle Stufenkante
+    ctx.fillStyle = `rgba(255, 245, 220, ${0.8 - t * 0.5})`;
+    ctx.fillRect(x, y, w, 1);
+    // Schattenfuge zur nächsten Stufe
+    ctx.fillStyle = '#140e08';
+    ctx.fillRect(x, y + stepH - 1.2, w, 1.2);
+  }
+  // Handläufe
+  ctx.strokeStyle = '#d4a94c';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(px + 2.5, py + 3);
+  ctx.lineTo(px + 2.5 + steps * 1.2, py + T - 3);
+  ctx.moveTo(px + T - 2.5, py + 3);
+  ctx.lineTo(px + T - 2.5 - steps * 1.2, py + T - 3);
+  ctx.stroke();
 }
