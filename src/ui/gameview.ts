@@ -22,11 +22,13 @@ import { disarmableTraps, disarmChance, knownTrapAt, trapName } from '../engine/
 import { allRecipes, hasWorkbench } from '../engine/crafting';
 import { crawlerAt, describeCrawler, joinChance, party, population, talkableCrawlers } from '../engine/crawlers';
 import { PERSONALITIES } from '../data/crawlers';
+import { SPONSOR_BY_ID } from '../data/sponsors';
+import { sponsorStates } from '../engine/sponsors';
 import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   chooseThrowable, craftItem, disarmTrap, placeTrap,
-  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow,
+  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable } from '../engine/mapgen';
@@ -743,9 +745,34 @@ export class GameView {
       drop: (b) => this.act(() => dropItem(this.s, b.dataset.uid!)),
       sell: (b) => this.act(() => sellItem(this.s, b.dataset.uid!)),
       place: (b) => this.act(() => placeTrap(this.s, b.dataset.uid!)),
+      'sponsor-yes': (b) => this.act(() => acceptSponsorOffer(this.s, b.dataset.id!)),
+      'sponsor-no': (b) => this.act(() => declineSponsorOffer(this.s, b.dataset.id!)),
       craft: (b) => this.act(() => craftItem(this.s, b.dataset.id!)),
       throwpick: (b) => this.act(() => chooseThrowable(this.s, b.dataset.id || null)),
     });
+  }
+
+  private sponsorHtml(): string {
+    const s = this.s;
+    const rows = sponsorStates(s)
+      .filter((st) => st.status !== 'none' || st.interest >= 20)
+      .map((st) => {
+        const d = SPONSOR_BY_ID[st.id];
+        if (!d) return '';
+        if (st.status === 'offer') {
+          return `<div class="item"><div class="name" style="color:var(--accent)">Angebot: ${esc(d.name)}</div><div class="meta">${esc(d.description)}</div>
+            <div class="bon">Mag nicht: ${esc(d.dislike.text)}</div>
+            <div class="actions"><button data-action="sponsor-yes" data-id="${d.id}">Annehmen</button><button data-action="sponsor-no" data-id="${d.id}">Ablehnen</button></div></div>`;
+        }
+        if (st.status === 'active') {
+          const w = d.wishes[st.wish];
+          return `<div class="small" style="margin-bottom:5px"><b style="color:#8fe38f">${esc(d.name)}</b> · Gunst ${st.favor} · ${st.completed} Wünsche erfüllt<br>Wunsch: ${esc(w.text)} <span class="muted">(${st.progress}/${w.count})</span></div>`;
+        }
+        if (st.status === 'dropped') return `<div class="small muted">${esc(d.name)}: Sponsoring beendet.</div>`;
+        return `<div class="small muted">${esc(d.name)} beobachtet dich (Interesse ${Math.round(st.interest)} %)</div>`;
+      })
+      .join('');
+    return `<div class="section">Sponsoren</div>${rows || '<div class="muted small">Noch interessiert sich niemand für dich. Mach eine gute Show.</div>'}`;
   }
 
   private craftTab(): string {
@@ -819,6 +846,7 @@ export class GameView {
         .map((c) => `<div class="small" style="margin-bottom:3px"><b style="color:#8fe38f">${esc(c.name)}</b> · Level ${c.level} · HP ${c.hp}/${c.maxHp} · ${c.kills} Kills <span class="muted">(früher ${esc(c.background)})</span></div>`)
         .join('')}`;
     }
+    if (hasUnlock(s, 'zuschauer')) html += this.sponsorHtml();
     if (s.fallen?.length) html += `<div class="muted small">Gefallen: ${esc(s.fallen.join(', '))}</div>`;
     const hoods = s.map.hoods.map((h) => `<div class="small">${esc(h.name)}: ${h.bossAlive ? 'Boss lebt' : 'Boss besiegt'}${h.mapFound ? ', Karte gefunden' : ''}</div>`).join('');
     html += `<div class="section">Viertel</div>${hoods}`;

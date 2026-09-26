@@ -3,6 +3,7 @@ import { skillsOnEvent } from './skills';
 import { observe } from './observer';
 import { traitsOnEvent } from './traits';
 import { viewersOnEvent } from './viewers';
+import { sponsorsOnEvent } from './sponsors';
 import type { GameEvent, GameState } from './types';
 
 /**
@@ -15,4 +16,5 @@ export function emit(s: GameState, e: GameEvent) {
   viewersOnEvent(s, e);
   observe(s, e);
   traitsOnEvent(s, e);
+  sponsorsOnEvent(s, e);
 }

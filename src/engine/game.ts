@@ -32,6 +32,7 @@ import { craft } from './crafting';
 import {
   announcePopulation, askTip, crawlerAt, crawlersTurn, dismiss, giveHealing, invite, populateCrawlers, populationOnDescend, talkTo,
 } from './crawlers';
+import { acceptSponsor, declineSponsor } from './sponsors';
 import { answerShow, floorRecap, snapshotFloor, startTalkShow, type ShowAnswerResult } from './talkshow';
 import type {
   ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique,
@@ -867,6 +868,18 @@ export function healCrawler(s: GameState, uid: string, itemUid: string): ActionR
     if (res.ok) removeOne(s, itemUid);
     return res;
   });
+}
+
+// ================================================================ Sponsoren
+
+export function acceptSponsorOffer(s: GameState, id: string): ActionResult {
+  const res = acceptSponsor(s, id);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+export function declineSponsorOffer(s: GameState, id: string): ActionResult {
+  const res = declineSponsor(s, id);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
 }
 
 // ================================================================ Talkshow

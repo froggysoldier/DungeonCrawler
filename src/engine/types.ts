@@ -287,6 +287,18 @@ export interface Population {
   lastAnnounce: number;
 }
 
+export interface SponsorState {
+  id: string;
+  /** Interesse bis zum Angebot (0–100). */
+  interest: number;
+  status: 'none' | 'offer' | 'active' | 'dropped';
+  /** Gunst als Sponsor (0–100): sinkt bei Dingen, die sie nicht mag. */
+  favor: number;
+  wish: number;
+  progress: number;
+  completed: number;
+}
+
 export interface SkillState {
   id: string;
   level: number;
@@ -513,6 +525,7 @@ export interface GameState {
   /** Namen gefallener Party-Mitglieder (für Rückblicke). */
   fallen?: string[];
   floorSnapshot?: FloorSnapshot;
+  sponsors?: SponsorState[];
   talkShow?: TalkShow;
   dynAchievements?: DynAchievement[];
   /** Rassen- und Klassenwahl steht an (Etage 3). */
@@ -576,6 +589,10 @@ export type GameEvent =
   | { type: 'crawlerDied'; name: string; party: boolean }
   | { type: 'crawlerTurned'; name: string }
   | { type: 'talkShow'; delta: number; tone: ShowTone }
+  | { type: 'petLevel'; level: number }
+  | { type: 'sponsorJoined'; id: string; count: number }
+  | { type: 'sponsorWish'; id: string; completed: number }
+  | { type: 'sponsorDropped'; id: string }
   | { type: 'bought'; item: Item; price: number; haggled: boolean }
   | { type: 'sold'; item: Item; price: number }
   | { type: 'haggle'; success: boolean; percent: number }

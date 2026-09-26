@@ -93,4 +93,28 @@ export const SOCIAL_ACHIEVEMENTS: AchievementDef[] = [
     comment: 'Das Internet vergisst nicht. Das galaktische Internet noch weniger.',
     check: (e) => e.type === 'talkShow' && e.delta < 0,
   },
+  {
+    id: 'sponsor_erster', name: 'Gekauft!', tier: 'silber', box: 'fan',
+    description: 'Nimm dein erstes Sponsorenangebot an.',
+    comment: 'Du bist jetzt offiziell eine Werbefläche. Lächeln, das Logo ist im Bild.',
+    check: (e) => e.type === 'sponsorJoined',
+  },
+  {
+    id: 'sponsor_drei', name: 'Litfaßsäule', tier: 'gold', box: 'fan',
+    description: 'Habe drei Sponsoren gleichzeitig.',
+    comment: 'Man sieht dich kaum noch hinter all den Logos. Die Monster auch nicht. Vorteil!',
+    check: (e) => e.type === 'sponsorJoined' && e.count >= 3,
+  },
+  {
+    id: 'sponsor_wunsch', name: 'Kundenzufriedenheit', tier: 'bronze', box: 'abenteurer',
+    description: 'Erfülle einen Sponsorenwunsch.',
+    comment: 'Der Kunde ist König. Du bist der Hofnarr. Aber ein gut bezahlter.',
+    check: (e) => e.type === 'sponsorWish',
+  },
+  {
+    id: 'sponsor_weg', name: 'Vertragsbruch', tier: 'bronze', box: 'kleidung',
+    description: 'Verliere einen Sponsor.',
+    comment: 'Die Anwälte der Galaxis haben schon angerufen. Die Systemstimme hat aufgelegt.',
+    check: (e) => e.type === 'sponsorDropped',
+  },
 ];

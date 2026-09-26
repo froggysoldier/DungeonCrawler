@@ -283,4 +283,5 @@ export function petLevelUp(s: GameState) {
   pet.hp = pet.maxHp;
   pet.dmg = [pet.dmg[0] + 1, pet.dmg[1] + 1];
   log(s, `${pet.name} steigt auf Stufe ${pet.level} auf!`, 'system');
+  emit(s, { type: 'petLevel', level: pet.level });
 }
