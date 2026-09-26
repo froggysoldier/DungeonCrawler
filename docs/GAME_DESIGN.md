@@ -1,166 +1,148 @@
-# Dungeon Crawler – Game Design Dokument (Entwurf v0.1)
+# Der Große Abstieg – Game Design Dokument (v0.2)
 
 > Inspiriert von der Buchreihe *Dungeon Crawler Carl* von Matt Dinniman.
-> Status: Konzeptphase. Offene Fragen stehen am Ende des Dokuments.
+> **Spoiler-Regel:** Dieses Dokument enthält nur Buch-Details bis einschließlich
+> Buch 1 (Etagen 1–2). Alles ab Etage 3 ist unser eigenes Design.
 
 ---
 
 ## 1. Vision
 
-Ein **textbasierter Dungeon-Crawler** mit Maus-Steuerung, der die Tiefe und den
-schwarzen Humor der Buchreihe abbildet: 18 Etagen, eine zynische System-KI als
-Erzähler, absurde Achievements, Lootboxen und ein Kampfsystem, das erkennt,
-*wie* der Spieler kämpft, und ihn dafür belohnt.
+Ein **textbasierter, rundenbasierter Dungeon-Crawler** im Browser. Der Spieler
+bewegt sich als Punkt über eine **klickbare Karte**, alles andere wird über
+Text erzählt – von einer zynischen Systemstimme. Ziel ist Tiefe: 18 Etagen,
+Hunderte Achievements, Lootboxen, ein Kampfsystem, das erkennt, *wie* man
+kämpft.
 
-- **Phase 1:** Singleplayer, textbasiert, Fokus auf Systemtiefe.
-- **Später:** Grafische Oberfläche, Multiplayer (geteilte Hardcore-Instanz).
-- **Architektur-Grundsatz:** Spiellogik (Engine) strikt getrennt von der
-  Darstellung (UI), damit Text-UI später durch Grafik ersetzt und Multiplayer
-  ergänzt werden kann.
+## 2. Getroffene Entscheidungen
 
----
-
-## 2. Was die Bücher vorgeben (Recherche Bücher 1–3)
-
-| Mechanik | Im Buch |
+| Frage | Entscheidung |
 |---|---|
-| Aufbau | 18 Etagen. Jede Etage hat einen **Einsturz-Timer** – wer bei Ablauf nicht im Treppenhaus ist, stirbt. |
-| Treppenhäuser | Auf Etage 1 unbegrenzt betretbar; auf Etage 1 haben alle Borough- und City-Bosse ein Treppenhaus in ihrer Arena. |
-| Tutorial-Gilde | Gildenhalle mit einem **Game Guide** (Mordecai). Erklärt Minimap, Stats, Sozialmenü. Auf Etage 3 kehrt man dorthin zurück für Rassen-/Klassenwahl. |
-| Rasse & Klasse | Ab Etage 3. ~400 Rassen zur Wahl, ~80 % behalten ihre Rasse. Die KI erstellt **30+ individuelle Klassen** basierend auf Stats, Rasse, Gegenständen und *bisherigem Verhalten*, und empfiehlt 3. Spezialisierung auf Etage 6, 9, 12. |
-| Bosse | Nachbarschafts-Bosse (Etage 1: Lvl 7–9, 4 pro Gebiet) → Borough-Bosse → City-/Länder-Bosse. Nach dem Tod eines Nachbarschafts-Bosses **spawnen dort keine Mobs mehr**. Etage-1-Bosse verlassen ihre Kammer nicht. Mobs Etage 1: Lvl 1–5. |
-| Safe Rooms | Keine Gewalt, kein Diebstahl. Mobs, die angreifen, werden **zufällig im Umkreis von ~1,5 km weg-teleportiert**. Wer 1 h vor Einsturz noch drin ist, wird rausgeworfen. Ab Etage 2: Briefkasten. |
-| Lootboxen | Dutzende Typen (Waffen-, Schuh-, Pet-, Boss-, Abenteurer-, Brawler-Box, „Lucky Bastard Box“ …) in **6 Stufen: Bronze → Silber → Gold → Platin → Legendär → Himmlisch (Celestial)**. Quellen: Achievements, Bosse (Boss-Boxen), Quests, Zuschauer (Fan-Boxen), Sponsoren. |
-| Achievements | Absurd und zahlreich, von der KI sarkastisch kommentiert (z. B. *Podophilia!* → Goldene Schuh-Box). |
-| Skills | Entstehen durch Nutzung: *Bare Knuckle/Pugilism* (+25 % Faustschaden/Stufe), *Powerful Strike* (Multiplikator unbewaffnet), *Iron Punch* (+10 % mit Panzerhandschuh), *Kicking* (+10 % Tritt/Stufe). |
-| Zuschauer | Das Ganze ist eine Galaxis-weite Gameshow. Ab Etage 2: Follower, Favoriten, Ratings. Ab Etage 3: Sponsoren, Bestenliste, Kopfgelder auf die Top 10. |
-| Pets | Selten (Donut, Mongo). Eigene Pet-Boxen, Pet-Belohnungsräume. |
-| NPC-Verträge | Überlebende ab Etage 9 können Verträge annehmen: als NPC/Gildenmeister für mehrere Staffeln dienen, um „frei“ zu werden (Mordecai). Nachteil: Verlust von Kontrolle (z. B. über die eigene Gestalt). |
-| Desperado Club | Exklusiver Club mit Casino, Markt usw.; Ebenen öffnen auf Etage 3, 6 und 9. |
-| Etagen-Themen | E1–2: zerstörte Erd-Oberfläche/Keller-Labyrinth · E3: *Over City* (Tag/Nacht-Zyklus, Zirkus, Quests) · E4: *Iron Tangle* (verknotetes U-Bahn-Netz) · E5: Wasser … |
+| Plattform | Browser-Spiel, TypeScript + Vite. Engine strikt getrennt von der UI. |
+| Zeitmodell | Rundenbasiert. 1 Zug = 3 Minuten Spielzeit. |
+| Sprache | Deutsch |
+| Tod | Alle vier Konzepte (siehe Abschnitt 6) |
+| Namen | Eigene Namen (Show, Guide, Bosse …), damit eine spätere Veröffentlichung möglich bleibt |
+| Etagen | Themen dürfen sich am Buch orientieren, aber keine Spoiler |
+| Oberfläche | Klickbare Karte, Spieler = leuchtender Punkt, daneben Panels + Textlog |
+| Erster Meilenstein | Etage 1 komplett spielbar (+ Etage 2 als Ausblick) ✅ |
 
----
+Eigene Namen: Die Show heißt **„Der Große Abstieg“**, der Erzähler
+**„die Systemstimme“**, der Standard-Guide **Barnabas**.
 
-## 3. Kernsysteme (Wunsch des Spielers + Ergänzungen)
+## 3. Systeme im aktuellen Stand
 
-### 3.1 Spielstart: „Das Vorher-Interview“
-Beim Start führt die System-KI ein Interview über das frühere Leben
-(Beruf, Hobbys, Fitness, Haustiere, Charakterzüge). Daraus ergeben sich:
-- Start-Stats (STR, DEX, CON, INT, CHA)
-- 1–2 Start-Talente (z. B. Koch → *Kochen* Lvl 1, Soldat → *Erste Hilfe*)
-- Startgegenstand (z. B. Bademantel und Boxershorts wie Carl)
-- Versteckte Flags, die später die Klassenliste auf Etage 3 beeinflussen.
+### 3.1 Spielstart: Das Vorher-Interview ✅
+Fünf Fragen (Beruf, Fitness, Haustier, Kleidung beim Weltuntergang,
+Konfliktverhalten) bestimmen Start-Stats, Start-Skills (z. B. Pflege →
+*Erste Hilfe*, Gamer → *Spielerfahrung*), Startkleidung, ein mögliches
+Haustier (Katze/Hund) und versteckte Flags für die spätere Klassenwahl.
 
-### 3.2 Welt & Bewegung
-- Etagen = prozedurale Karten aus Gebieten (Nachbarschaften → Boroughs).
-- Darstellung: Karte/Raster, per **Maus** klickbar (Bewegung, Interaktion),
-  plus Textlog als Erzählebene.
-- **Einsturz-Timer** pro Etage als zentraler Druckfaktor.
-- Treppen finden → Etage wechseln. Jede Etage schwerer, schaltet neue Systeme frei.
+### 3.2 Welt & Karte ✅
+- Etage = 72×52 Kacheln, vier **Viertel** (Nachbarschaften) + zentrales Gewölbe.
+- Räume mit Namen und Beschreibungen (Heizungskeller, Partykeller, Luftschutzbunker …).
+- Sichtfeld (Fog of War). **Vor dem Tutorial keine Karte** – man sieht nur, was gerade in Sicht ist.
+- **Einsturz-Timer**: 5 Tage (2400 Züge). Warnungen bei 24 h, 6 h, 1 h.
+- Treppenhäuser: eins hinter dem Borough-Boss, zwei in abgelegenen Räumen.
+- Boss-Kammern und Arena sind **Sackgassen mit genau einem Zugang**.
 
-### 3.3 Freischaltungen (Progression der Systeme)
-| Etage | Freischaltung |
-|---|---|
-| 1 (Start) | Nichts. Nur Fäuste, Füße, Umgebung. |
-| 1 (Tutorial-Gilde gefunden) | Tutorial abgeschlossen → **Inventar**, Minimap, Stats. |
-| 2 | Zuschauer/Follower, Briefkasten, Fan-Boxen |
-| 3 | **Rassen- & Klassenwahl**, Sponsoren, Bestenliste, Desperado Club |
-| 6 / 9 / 12 | Klassen-Spezialisierung |
-| 9+ | **NPC-Verträge** |
+### 3.3 Freischaltungen
+| Wann | Was | Status |
+|---|---|---|
+| Start | Nichts. Fäuste, Füße, ein Gegenstand in der Hand. | ✅ |
+| Tutorial-Gilde gefunden | Inventar, Werte, Skills-Übersicht, Kartengedächtnis, 2 Heiltränke | ✅ |
+| Etage 2 | Zuschauer/Follower, Fan-Boxen | geplant |
+| Etage 3 | Rassen- & Klassenwahl (Klassen hängen vom Kampfstil ab!) | geplant |
+| Etage 9+ | NPC-Verträge | Engine-Hook vorhanden |
 
-### 3.4 Kampf & passives Skillsystem („Kampfstil-Erkennung“)
-Jede Aktion wird als Kombination aus **Körperteil/Waffe × Ausführung × Kontext** erfasst:
+### 3.4 Kampf: Technik = Körperteil × Ausführung ✅
+- **Körperteil/Mittel:** Faust, Tritt, Knie, Ellbogen, Kopfstoß, Waffe, Wurf
+- **Ausführung:** Normal, Sprung (+50 % Schaden, −10 % Treffer), Stampfen
+  (nur auf liegende/winzige Gegner, ×1,8), Anlauf (nur nach Bewegung auf das Ziel zu, ×1,4)
+- **Ausdauer** begrenzt starke Techniken.
+- Tritte, Sprünge und Anlauf können Gegner **umwerfen** → Stampfen möglich.
+- **Hinterhalt:** ahnungslose Gegner sind leichter zu treffen.
+- Wurfobjekte (Steine, Ziegel, Dosen) landen nach dem Wurf am Boden und
+  können wieder aufgehoben werden, Flaschen zerbrechen.
+- Kopfstoß tut auch dir weh – außer du bist geübt.
 
-- *Körperteil/Waffe:* Faust, Fuß, Knie, Ellbogen, Kopf, Wurfobjekt (Stein, Flasche…), improvisierte Waffe, echte Waffe
-- *Ausführung:* normal, Sprung, Stampfen, Anlauf, Schleichangriff, Konter, Wurf
-- *Kontext:* Gegner liegt / fliegt / ist größer, Umgebung (Wasser, Höhe), Gruppe
+### 3.5 Passives Skillsystem ✅
+Jede Aktion wird mitgezählt (z. B. `tritt+stampfen`). Ab einer Schwelle
+entsteht ein Skill, Nutzung levelt ihn (max. Stufe 15):
+Faustkampf, Treten, Stampfer, Sprungangriff, Sturmangriff,
+Ellbogengesellschaft, Kniestoß, Kopfnuss, Werfen, Improvisierte Waffen,
+Wuchtschlag (alle unbewaffneten), Meteor-Stampfer (Sprung-Tritt),
+Hinterhalt, Ausweichen (durch Ausweichen), Zähigkeit (durch Einstecken).
+Im Skills-Tab sieht man den Fortschritt („Du spürst Fortschritt …“) und
+die Verteilung des eigenen Kampfstils.
 
-Das System zählt die Nutzungen mit und vergibt/steigert **Skills automatisch**:
-- Schwellenwerte → Skill erscheint (z. B. 20 Stampfangriffe → *Stomp* Lvl 1)
-- Nutzung → Skill-XP → Levelaufstieg
-- Kombinationen → seltene Skills (z. B. Sprung + Stampfen → *Meteor-Stampfer*)
-- Der dominante Kampfstil beeinflusst die Klassenvorschläge auf Etage 3.
+### 3.6 Gegner ✅
+- 14 Mob-Typen auf Etage 1–2 (Kellerratte, Kobolde, Wolpertinger,
+  Tatzelwurm, Grauer Späher, Poltergeist, Hungriger Müllsack …) mit
+  Verhalten: Nahkampf, Fernkampf, feige, stationär (Mimics).
+- **Elite-Mobs** (stärkere Varianten, bessere Beute).
+- **4 Nachbarschafts-Bosse** (Die Sammlerin, Der Hausmeister, König der
+  Kanalratten, Muttis Mega-Mixer): verlassen ihre Kammer nicht, solange
+  sie leben spawnen im Viertel Mobs nach, droppen **Gebietskarte** (muss
+  aufgehoben werden → deckt das Viertel auf) + Boss-Box + Unikat.
+- **Borough-Boss** Oma Gulasch in der Arena, Treppe direkt dahinter.
+- Mobs fliehen bei wenig Leben, verlieren das Interesse, wenn man weit weg ist.
 
-### 3.5 Gegner
-- Normale Mobs · Elite-Mobs („Mini-Bosse“) · Nachbarschafts-/Gebietsbosse · Borough-Bosse · Etagenbosse
-- **Gebietsbosse:** droppen Loot + **Gebietskarte** (muss aufgehoben werden) → deckt Karte auf.
-- Riesiger Bestiarium-Katalog: Mythologie, Folklore, Aliens, Popkultur-Parodien – alles datengetrieben (JSON).
+### 3.7 Safe Rooms ✅
+- Keine Gewalt; Mobs, die angreifen, werden weggebeamt.
+- Zufällig **Gratis-Automat** (1 Gegenstand pro Crawler) oder **Restaurant**
+  mit NPC-Wirt und Buff-Essen.
+- Nur hier: **Lootboxen öffnen** und **schlafen** (8 h, heilt, Haustier kehrt zurück).
+- 1 h vor Einsturz wird man hinausgeworfen.
 
-### 3.6 Safe Rooms
-- Keine Gewalt; angreifende Mobs werden rausteleportiert.
-- Zufällige Variante: **Gratis-Gegenstand** *oder* **Restaurant** (NPC-geführt, Buff-Essen).
-- Einziger Ort, an dem **Lootboxen geöffnet** werden können.
-- Rauswurf kurz vor Etagen-Einsturz.
+### 3.8 Items ✅
+17 Ausrüstungsplätze inkl. 2 Ringe, **2 Fußringe** und Unterwäsche.
+Seltenheiten Gewöhnlich → Ungewöhnlich → Selten → Episch → Legendär → Himmlisch,
+zufällige Verzauberungen („Stahlkappenstiefel des Esels“), Unikate mit
+Spezialeffekten (Zweite-Chance-Klausel, Stiefel des ungebremsten Stampfens,
+Der Ziegel …), Verbrauchsgüter, Haustier-Leckerli.
 
-### 3.7 Items
-- Slots: Kopf, Gesicht, Hals, Schultern, Brust, Rücken, Arme, Hände, Ringe (×2+), Gürtel, Beine, Füße, **Fußringe**, Unterwäsche (!), Waffen, Pet-Ausrüstung.
-- Seltenheiten angelehnt an Box-Stufen (Gewöhnlich → Himmlisch).
-- Verzauberungen, Set-Boni, verfluchte Items, Items mit Humor-Beschreibungstext.
+### 3.9 Achievements & Lootboxen ✅
+- 57 Achievements mit sarkastischem Kommentar (z. B. *Komische Katzenlady*,
+  *Barfuß-Rambo*, *Podophilie*, *Steinzeit*, *Pazifist (vorläufig)*).
+- Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen (Schuh-, Wurf-,
+  Schläger-, Haustier-, Boss-Box …). Inhalt passt zum Thema.
+- **Wer ein Achievement zum ersten Mal in seiner Karriere schafft, bekommt eine Box-Stufe mehr.**
 
-### 3.8 Achievements & Lootboxen
-- Hunderte Achievements, jeweils mit sarkastischem KI-Kommentar.
-- Schwierigkeit/Seltenheit → Box-Stufe (Bronze … Himmlisch).
-- „Erster“-Achievements (z. B. *Komische Katzenlady*: als Erster mit einer Katze den Dungeon betreten). Im Singleplayer: „erster in diesem Spielstand/allen eigenen Runs“ bzw. später global.
-- Box-Typ hängt vom Achievement-Thema ab (Tritt-Achievement → Schuh-Box).
+### 3.10 Haustiere ✅ / Reittiere, Party (geplant)
+Katze oder Hund aus dem Interview: folgt, kämpft mit, levelt, wird bei 0 HP
+bewusstlos und kehrt nach dem Schlafen zurück. Reittiere und Party-System
+sind noch offen.
 
-### 3.9 Party, Reittiere, Pets
-- Party-System (zunächst mit NPC-Begleitern, später Spieler).
-- Reittiere und Pets **sehr selten**; Pets leveln mit, eigene Pet-Boxen.
+## 4. Tod & Hardcore ✅ (alle vier Konzepte)
 
-### 3.10 Zuschauer & Sponsoren (Vorschlag)
-Ersetzt im Singleplayer die „Welt“: spektakuläre, lustige oder brutale Aktionen
-erzeugen Zuschauer → Follower → Fan-Boxen & Sponsor-Angebote.
-Belohnt kreatives Spielen statt reines Grinden.
+1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben
+   Hall of Fame, Karriere-Achievements, Bestiarium.
+2. **Der Tote wird zum Mob:** Der gestorbene Crawler spukt in späteren Staffeln
+   als Geist auf seiner Todesetage – mit seiner Ausrüstung als Beute.
+3. **Vertrag als Rettung:** Wer (ab Etage 9) einen Vertrag unterschrieben hat,
+   stirbt nicht, sondern wird zum Guide der nächsten Staffel (+1 auf drei Stats).
+4. **Seltene Wiederbelebung:** Die legendäre *Zweite-Chance-Klausel* rettet
+   einmal vor dem Tod – mit dauerhaftem Fluch („Kleingedrucktes“).
 
----
+## 5. Technik
 
-## 4. Tod & Hardcore – Vorschläge
+```
+src/
+  engine/   Spiellogik, UI-unabhängig, deterministisch (Seed), JSON-Zustand
+  data/     Inhalte: Monster, Items, Skills, Achievements, Interview, Welttexte
+  ui/       Canvas-Karte, Panels, Dialoge
+tests/      Vitest: Engine-Tests + optionale Balance-Simulation (SIM=1)
+```
 
-Ziel: Tod muss wehtun, aber das Spiel soll sich trotzdem lohnen.
+## 6. Nächste Schritte (Vorschlag)
 
-1. **Permadeath + Staffel-System (Empfehlung):** Jeder Run ist eine „Staffel“.
-   Tod beendet die Staffel endgültig. Erhalten bleiben: Achievement-Liste,
-   Bestiarium-Wissen, freigeschaltete Start-Hintergründe („Hall of Fame“).
-2. **Der Tote wird zum Mob:** Dein gestorbener Crawler taucht in späteren Runs
-   als Boss/Geist auf der Etage auf, auf der er starb – mit seiner Ausrüstung.
-   Besiegst du ihn, bekommst du Teile davon zurück.
-3. **Vertrag als Rettung:** Wer vor dem Tod Etage 9+ erreicht hat und einen
-   NPC-Vertrag unterschrieben hatte, wird statt zu sterben zum NPC
-   (Gildenmeister/Game Guide) – und begleitet den **nächsten** Crawler als
-   Guide mit eigenen Boni. Das macht die Verträge zum Meta-Ziel.
-4. **Seltene Wiederbelebung:** Extrem seltene Items (Himmlisch) oder
-   Sponsor-Deals mit hohem Preis (z. B. dauerhafte Stat-Strafe, Fluch,
-   Sponsor-Pflichtquests).
-5. **Optionaler Modus „Normal“:** Rücksetzung zum letzten Treppenhaus mit
-   Verlust von Inventar – für Spieler, die kein Hardcore wollen.
+1. Zuschauer-System (Follower, Fan-Boxen) ab Etage 2
+2. Etage 3: Rassen- und Klassenwahl, abgeleitet vom Kampfstil
+3. Mehr Inhalte: Monster, Items, Achievements (Ziel: mehrere Hundert)
+4. Fallen, Quests, Party-System, Reittiere
+5. Sound, Grafik-Upgrade der Karte
 
----
-
-## 5. Technischer Vorschlag (zur Diskussion)
-
-- **Plattform:** Browser-Spiel (TypeScript), läuft überall, später leicht
-  grafisch erweiterbar (Canvas/Phaser) und multiplayerfähig (Server mit
-  derselben Engine).
-- **Engine:** Deterministische, UI-unabhängige Spiellogik (Event-basiert).
-- **Inhalte datengetrieben:** Monster, Items, Achievements, Skills, Etagen als
-  JSON/YAML → Inhalte wachsen ohne Code-Änderungen.
-- **Speichern:** lokal (IndexedDB), später Server.
-- **Tests:** Unit-Tests für Kampf, Skill-Erkennung, Loot-Tabellen.
-
-## 6. Vorgeschlagener erster Meilenstein („Vertical Slice“)
-Etage 1 komplett spielbar: Interview-Start, prozedurale Karte mit
-Mausbewegung, Nahkampf mit Stil-Erkennung, 10–15 Mob-Typen, Elite-Mobs,
-2 Nachbarschafts-Bosse + 1 Borough-Boss, Tutorial-Gilde → Inventar,
-Safe Rooms (beide Varianten), ~30 Achievements, Bronze/Silber-Boxen,
-Einsturz-Timer, Treppe nach Etage 2.
-
----
-
-## 7. Offene Fragen
-Siehe Unterhaltung / werden hier nach Klärung ergänzt.
-
-## 8. Rechtliches
-*Dungeon Crawler Carl* ist geistiges Eigentum von Matt Dinniman. Für ein
-privates Projekt unproblematisch; für eine Veröffentlichung sollten Namen,
-Figuren (Carl, Donut, Mordecai, Borant …) und Texte durch eigene ersetzt
-werden. Mechaniken selbst sind nicht geschützt.
+## 7. Rechtliches
+*Dungeon Crawler Carl* ist geistiges Eigentum von Matt Dinniman. Das Spiel
+nutzt eigene Namen, Figuren und Texte. Mechaniken sind nicht geschützt.
