@@ -26,7 +26,7 @@ import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   chooseThrowable, craftItem, disarmTrap, placeTrap,
-  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler,
+  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable } from '../engine/mapgen';
@@ -38,9 +38,10 @@ import {
 import { skillProgress } from '../engine/skills';
 import type { AttackMove, AttackPart, EquipSlot, GameState, Item, MetaState, Pos, StatKey } from '../engine/types';
 import { bindActions, esc, formatTime } from './dom';
-import { confirmBox, isModalOpen, showDialog, showHtml, showToast } from './modal';
+import { confirmBox, isModalOpen, showCustom, showDialog, showHtml, showToast } from './modal';
 import { render, tileFromMouse, type View } from './render';
-import { TypeQueue } from './typewriter';
+import { TypeQueue, typeText, type Typing } from './typewriter';
+import { TONE_NAMES } from '../data/talkshow';
 import { showSelection } from './selection';
 
 type Tab = 'crawler' | 'inventar' | 'handwerk' | 'skills' | 'erfolge';
@@ -186,7 +187,8 @@ export class GameView {
   flushDialogs() {
     while (this.s.pendingDialogs.length) {
       const d = this.s.pendingDialogs.shift()!;
-      showDialog(d.title, d.speaker, d.pages).then(() => {
+      const shown = d.kind === 'talkshow' ? this.runTalkShow(d.title, d.pages) : showDialog(d.title, d.speaker, d.pages);
+      shown.then(() => {
         this.refresh();
         this.maybeSelect();
       });
@@ -196,6 +198,75 @@ export class GameView {
   }
 
   private selecting = false;
+
+  /** Die Talkshow: Einleitung, dann Fragen mit Antwortmöglichkeiten – alles in einem Fenster. */
+  private runTalkShow(title: string, intro: string[]): Promise<void> {
+    const s = this.s;
+    return showCustom(
+      `<h2>${esc(title)}</h2><div class="speaker">Veronika Glanz</div><div class="page show-q"></div><div class="show-a"></div>
+       <div class="foot"><span class="muted small show-no"></span><span class="muted small show-f"></span></div>`,
+      (root, close) => {
+        const qEl = root.querySelector('.show-q') as HTMLElement;
+        const aEl = root.querySelector('.show-a') as HTMLElement;
+        const noEl = root.querySelector('.show-no') as HTMLElement;
+        const fEl = root.querySelector('.show-f') as HTMLElement;
+        let typing: Typing | null = null;
+        const type = (html: string) => {
+          typing?.finish();
+          typing = typeText(qEl, html, 18);
+        };
+        const button = (label: string, onClick: () => void) => {
+          aEl.innerHTML = `<button class="primary show-next">${esc(label)}</button>`;
+          const b = aEl.querySelector('.show-next') as HTMLButtonElement;
+          b.addEventListener('click', () => {
+            // Erster Klick zeigt den Text sofort ganz, zweiter geht weiter
+            if (typing && !typing.isDone()) typing.finish();
+            else onClick();
+          });
+          b.focus();
+        };
+        const follower = () => {
+          const d = s.talkShow?.followerDelta ?? 0;
+          fEl.textContent = `Follower ${s.viewers.follower.toLocaleString('de-DE')} (${d >= 0 ? '+' : ''}${d.toLocaleString('de-DE')} in dieser Sendung)`;
+        };
+        let page = 0;
+        const showIntro = () => {
+          noEl.textContent = `Einleitung ${page + 1} / ${intro.length}`;
+          type(esc(intro[page]));
+          button(page < intro.length - 1 ? 'Weiter' : 'Zur ersten Frage', () => {
+            page += 1;
+            if (page < intro.length) showIntro();
+            else ask();
+          });
+        };
+        const ask = () => {
+          const show = s.talkShow;
+          if (!show || show.done) return close();
+          const q = show.questions[show.index];
+          noEl.textContent = `Frage ${show.index + 1} von ${show.questions.length}`;
+          follower();
+          type(esc(q.text));
+          aEl.innerHTML = q.answers
+            .map((a, i) => `<button class="show-btn" data-i="${i}"><span class="muted small">${esc(TONE_NAMES[a.tone])}:</span> ${esc(a.label)}</button>`)
+            .join('');
+          aEl.querySelectorAll<HTMLButtonElement>('.show-btn').forEach((b) => b.addEventListener('click', () => answer(Number(b.dataset.i))));
+        };
+        const answer = (i: number) => {
+          const res = answerTalkShow(s, i);
+          if (!res.ok) return close();
+          follower();
+          const d = res.delta ?? 0;
+          type(`${esc(res.reaction ?? '')}\n\n<b style="color:${d >= 0 ? 'var(--ok)' : 'var(--danger)'}">${d >= 0 ? '+' : ''}${d.toLocaleString('de-DE')} Follower</b>${res.finished ? `\n\n${esc(res.outro ?? '')}` : ''}`);
+          button(res.finished ? 'Zurück in den Dungeon' : 'Nächste Frage', () => {
+            if (!res.finished) return ask();
+            close();
+            this.refresh();
+          });
+        };
+        showIntro();
+      },
+    );
+  }
 
   /** Öffnet die Rassen-/Klassenwahl, sobald keine anderen Dialoge mehr offen sind. */
   private maybeSelect() {

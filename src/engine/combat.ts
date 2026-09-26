@@ -318,6 +318,7 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
     log(s, `Der Geist zerfällt. Zurück bleibt, was ${m.ghostOf} einst getragen hat.`, 'system');
   }
   if (m.defId === 'abtruenniger_crawler') population(s).alive -= 1;
+  if (facets?.includes('t:falle') || facets?.includes('t:bombe')) s.counters.trapKills += 1;
   emit(s, { type: 'kill', monster: m, technique: t, byPet: !!byPet, facets });
   if (has(m, 'explodiert')) explode(s, m);
 }

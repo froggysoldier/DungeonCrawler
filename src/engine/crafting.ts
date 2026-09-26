@@ -70,6 +70,7 @@ export function craft(s: GameState, recipeId: string): { ok: boolean; message?: 
   const st = recipeStatus(s, r);
   if (st.missing.length) return { ok: false, message: `Dir fehlt: ${st.missing.join(', ')}.` };
   for (const ing of r.ingredients) consume(s, ing.ids, ing.n);
+  s.counters.crafted += 1;
 
   if (r.upgradeWeapon) {
     const w = s.player.equipment.waffe!;

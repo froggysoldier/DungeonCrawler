@@ -1,0 +1,117 @@
+import type { GameState, ShowTone } from '../engine/types';
+
+/**
+ * Die Talkshow zwischen den Etagen. Eigene Figuren: Moderatorin Veronika Glanz
+ * und ihr Co-Moderator Brummo, ein Außerirdischer, der nur aus Bass besteht.
+ */
+export const SHOW_TITLE = 'Glanz und Gloria – Die Crawler-Talkshow';
+export const SHOW_HOST = 'Veronika Glanz';
+
+export const SHOW_INTRO = [
+  'Scheinwerfer. Applaus vom Band. Ein Sofa, das nach Zitronenreiniger riecht. Du sitzt plötzlich in einem Fernsehstudio, zwischen zwei Etagen, irgendwo außerhalb von Raum und Zeit.',
+  '„Willkommen zurück bei Glanz und Gloria! Ich bin Veronika Glanz, und heute bei mir auf dem Sofa: {name}! Früher {background}, heute einer der Crawler, über die die Galaxis spricht!“',
+  'Brummo, der Co-Moderator, vibriert zustimmend. Die Gläser auf dem Tisch klirren. Das Publikum johlt. Die Kameras zoomen auf dein Gesicht. Jede Antwort zählt: Wer gut ankommt, gewinnt Follower. Wer nicht, verliert sie.',
+];
+
+export interface ShowAnswerDef {
+  label: string;
+  tone: ShowTone;
+  reaction: string;
+  /** Grundwirkung auf Follower (vor Charisma und Publikumsgröße). */
+  base: number;
+  /** Riskant: gelingt nur mit einer Charisma-Probe, sonst Verlust. */
+  risky?: boolean;
+  failReaction?: string;
+}
+
+export interface ShowQuestionDef {
+  id: string;
+  /** Wann die Frage gestellt werden kann; höhere Priorität zuerst. */
+  when: (s: GameState) => boolean;
+  priority: number;
+  text: string;
+  answers: ShowAnswerDef[];
+}
+
+export const TONE_NAMES: Record<ShowTone, string> = {
+  ehrlich: 'ehrlich', witzig: 'witzig', frech: 'frech', bescheiden: 'bescheiden', dramatisch: 'dramatisch',
+};
+
+export const SHOW_QUESTIONS: ShowQuestionDef[] = [
+  {
+    id: 'gefallen', priority: 10, when: (s) => (s.fallen?.length ?? 0) > 0,
+    text: '„{gefallen} hat es nicht geschafft. Wir haben die Aufnahmen gesehen. Möchtest du etwas sagen?“ Die Musik wird leise.',
+    answers: [
+      { label: 'Ein paar ehrliche Worte über {gefallen} sagen', tone: 'ehrlich', base: 40, reaction: 'Du sprichst leise. Das Studio ist totenstill. Irgendwo schnäuzt sich jemand. Veronika legt dir die Hand auf die Schulter. Die Follower-Zahl explodiert.' },
+      { label: '„Die Show muss weitergehen.“', tone: 'dramatisch', base: 15, reaction: '„Wie professionell!“, ruft Veronika. Ein Teil des Publikums klatscht, ein anderer findet dich kalt.' },
+      { label: 'Einen Witz machen, um nicht zu weinen', tone: 'witzig', base: -25, risky: true, reaction: 'Der Witz sitzt. Du lachst, das Publikum lacht, und alle weinen ein bisschen. Irgendwie hat es funktioniert.', failReaction: 'Stille. Eisige Stille. Jemand im Publikum buht. Das war der falsche Moment.' },
+    ],
+  },
+  {
+    id: 'haustier', priority: 7, when: (s) => !!s.player.pet,
+    text: '„Und {haustier}! Die Galaxis ist verrückt nach {haustier}. Was ist euer Geheimnis?“',
+    answers: [
+      { label: '„Ich bin nur der Assistent. {haustier} ist der Star.“', tone: 'bescheiden', base: 30, reaction: 'Das Publikum seufzt ein kollektives „Ooooh“. Brummo brummt gerührt in Moll.' },
+      { label: '„Leckerli. Sehr viele Leckerli.“', tone: 'witzig', base: 20, reaction: 'Gelächter. Veronika wirft ein Leckerli in die Kamera. Das Publikum liebt es.' },
+      { label: '„Ohne mich wäre das Vieh längst tot.“', tone: 'frech', base: 20, risky: true, reaction: 'Das Publikum buht erst, dann lacht es. Du hast Charme. Irgendwie.', failReaction: 'Die Tierfreunde der Galaxis sind nicht amüsiert. Einige schalten ab.' },
+    ],
+  },
+  {
+    id: 'party', priority: 6, when: (s) => (s.crawlers ?? []).some((c) => c.alive && c.party),
+    text: '„Du bist nicht allein da unten. Erzähl uns von deiner Truppe!“',
+    answers: [
+      { label: 'Jedes Mitglied einzeln loben', tone: 'ehrlich', base: 25, reaction: 'Du erzählst von deiner Gruppe. Die Zuschauer fangen an, Lieblinge zu wählen. Fanclubs gründen sich live.' },
+      { label: '„Ich bin der Kopf, die anderen sind die Hände.“', tone: 'frech', base: 25, risky: true, reaction: 'Selbstbewusst! Das Publikum mag Anführer.', failReaction: 'Das Publikum findet dich überheblich. „Buh!“ ruft jemand aus der dritten Reihe.' },
+      { label: '„Wir sind wie eine Familie. Eine sehr blutige Familie.“', tone: 'witzig', base: 18, reaction: 'Lacher im Saal. Veronika wischt sich eine Träne aus dem Augenwinkel. Oder Make-up.' },
+    ],
+  },
+  {
+    id: 'kampfstil', priority: 5, when: (s) => s.counters.kills >= 10,
+    text: '„{kills} Gegner! Und die meisten mit {lieblingsangriff}. Warum ausgerechnet so?“',
+    answers: [
+      { label: '„Es hat sich einfach so ergeben.“', tone: 'bescheiden', base: 12, reaction: 'Veronika nickt. „Natürlich begabt!“ Das Publikum applaudiert höflich.' },
+      { label: 'Aufstehen und es vorführen', tone: 'dramatisch', base: 30, risky: true, reaction: 'Du führst deinen Lieblingsangriff an einem Pappaufsteller vor. Der Pappaufsteller hat keine Chance. Das Studio tobt.', failReaction: 'Du rutschst auf dem Studioboden aus. Die Kamera hält drauf. Das Publikum lacht – über dich, nicht mit dir.' },
+      { label: '„Weil die Monster es verdient haben.“', tone: 'frech', base: 18, risky: true, reaction: 'Grimmiges Johlen. Genau das wollten sie hören.', failReaction: 'Einige Monster-Rechtler im Publikum pfeifen. Wer hätte gedacht, dass es die gibt?' },
+    ],
+  },
+  {
+    id: 'bomben', priority: 5, when: (s) => s.counters.crafted >= 2 || s.counters.trapKills >= 1,
+    text: '„Man hört, du baust Fallen und Bomben aus Müll. Ist das nicht gefährlich?“',
+    answers: [
+      { label: '„Nur für die anderen.“', tone: 'witzig', base: 20, reaction: 'Lacher. Brummo imitiert eine Explosion. Die Mikrofone übersteuern.' },
+      { label: 'Das Rezept für eine Brandflasche erklären', tone: 'ehrlich', base: 10, reaction: 'Die Regie blendet hektisch einen Warnhinweis ein. Das Publikum schreibt eifrig mit.' },
+      { label: 'Eine Nagelbombe aus der Tasche ziehen', tone: 'dramatisch', base: 35, risky: true, reaction: 'Panik, dann Begeisterung, als du sie wieder einsteckst. Bestes Fernsehen des Jahres.', failReaction: 'Der Sicherheitsdienst ringt dich zu Boden. Die Aufnahme wird in Zeitlupe wiederholt. Nicht gut für dein Image.' },
+    ],
+  },
+  {
+    id: 'systemstimme', priority: 3, when: () => true,
+    text: '„Die Systemstimme hat dir schon {achievements} Achievements verliehen. Was hältst du von ihr?“',
+    answers: [
+      { label: '„Sie ist … einzigartig.“', tone: 'bescheiden', base: 8, reaction: 'Diplomatisch. Veronika lächelt wissend. Das Publikum ist mäßig beeindruckt.' },
+      { label: '„Sie ist eine sadistische Buchhalterin mit Mikrofon.“', tone: 'frech', base: 35, risky: true, reaction: 'Das Studio explodiert vor Lachen. Irgendwo notiert sich die Systemstimme deinen Namen. Die Zuschauer lieben Rebellen.', failReaction: 'Stille. Das Licht flackert. Die Regie schaltet kurz auf Werbung. Das war vielleicht zu viel.' },
+      { label: '„Ich glaube, sie mag mich heimlich.“', tone: 'witzig', base: 18, reaction: 'Gelächter. Aus den Lautsprechern kommt ein Geräusch, das ein Räuspern sein könnte.' },
+    ],
+  },
+  {
+    id: 'heimat', priority: 2, when: () => true,
+    text: '„Deine Welt ist weg. Alles, was du kanntest. Wie hältst du das aus?“',
+    answers: [
+      { label: 'Ehrlich sagen, dass es wehtut', tone: 'ehrlich', base: 22, reaction: 'Das Publikum wird still. Dann Applaus. Echter Applaus. Veronika sagt eine ganze Weile nichts.' },
+      { label: '„Ich hatte eh keine Lust mehr auf Montage.“', tone: 'witzig', base: 15, risky: true, reaction: 'Lacher. Galgenhumor kommt an.', failReaction: 'Ein paar Lacher, viel betretenes Schweigen. Zu früh.' },
+      { label: '„Ich halte es nicht aus. Ich laufe nur weiter.“', tone: 'dramatisch', base: 18, reaction: 'Ein Raunen geht durchs Publikum. Die Kamera fährt dicht heran. Brummo spielt einen traurigen Ton.' },
+    ],
+  },
+  {
+    id: 'plan', priority: 1, when: () => true,
+    text: '„Letzte Frage: Was ist dein Plan für die nächste Etage?“',
+    answers: [
+      { label: '„Überleben. Das ist der ganze Plan.“', tone: 'ehrlich', base: 10, reaction: 'Veronika nickt. „Ein guter Plan.“ Das Publikum nickt mit.' },
+      { label: '„Ich hole mir den Boss. Alle Bosse.“', tone: 'dramatisch', base: 22, risky: true, reaction: 'Das Publikum springt auf. Wetten werden abgeschlossen. Auf dich.', failReaction: 'Gelächter – aber nicht die gute Sorte. Die Wettquoten gegen dich steigen.' },
+      { label: '„Mehr Kamera-Zeit für mich.“', tone: 'witzig', base: 14, reaction: 'Die Kamera zoomt noch näher. Das Publikum johlt.' },
+    ],
+  },
+];
+
+export const SHOW_OUTRO_GOOD = '„Was für ein Gast! Applaus für {name}!“ Das Publikum steht. Die Sponsoren schicken dir ein Geschenk.';
+export const SHOW_OUTRO_OK = '„Danke, {name}! Viel Glück da unten!“ Höflicher Applaus. Die Scheinwerfer gehen aus.';
+export const SHOW_OUTRO_BAD = '„Nun ja. Danke für … das.“ Vereinzeltes Klatschen. Veronika lächelt, aber ihre Augen nicht.';

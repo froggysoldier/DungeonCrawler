@@ -109,6 +109,7 @@ export function detectTraps(s: GameState, vis: Set<number>) {
     if (d > 2 || d === 0 || !vis.has(idx(s.map, t.pos.x, t.pos.y))) continue;
     if (!R.chance(s, detectChance(s, t, d))) continue;
     t.hidden = false;
+    s.counters.trapsFound += 1;
     log(s, `Du bemerkst eine ${trapName(t.kind)} im Boden. Das war knapp.`, 'gefahr');
     emit(s, { type: 'trapDetected', kind: t.kind });
   }
@@ -150,6 +151,7 @@ export function springOnPlayer(s: GameState, t: Trap) {
   const f = s.floor;
   t.hidden = false;
   removeTrap(s, t);
+  s.counters.trapsTriggered += 1;
   emit(s, { type: 'trapTriggered', kind: t.kind, onPlayer: true });
   switch (t.kind) {
     case 'pfeilplatte': {
@@ -231,6 +233,7 @@ export function disarm(s: GameState, uid: string): { ok: boolean; message?: stri
     removeTrap(s, t);
     const parts = createItem(s, 'fallenteile');
     addToInventory(s, parts);
+    s.counters.trapsDisarmed += 1;
     log(s, `Vorsichtig löst du die ${trapName(t.kind)}. Geschafft! Du nimmst die Fallenteile mit.`, 'loot');
     emit(s, { type: 'trapDisarmed', kind: t.kind, success: true });
     return { ok: true };

@@ -32,6 +32,7 @@ import { craft } from './crafting';
 import {
   announcePopulation, askTip, crawlerAt, crawlersTurn, dismiss, giveHealing, invite, populateCrawlers, populationOnDescend, talkTo,
 } from './crawlers';
+import { answerShow, floorRecap, snapshotFloor, startTalkShow, type ShowAnswerResult } from './talkshow';
 import type {
   ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique,
 } from './types';
@@ -104,6 +105,7 @@ export function newGame(opts: NewGameOptions): GameState {
       hitTakenStreak: 0, throws: 0, bossKills: 0, damageDealt: 0, damageTaken: 0,
       goldEarned: 0, goldStolen: 0, poisonDamage: 0, mealsEaten: 0, potionsDrunk: 0, sleeps: 0,
       crits: 0, knockdowns: 0, eliteKills: 0,
+      trapsFound: 0, trapsTriggered: 0, trapsDisarmed: 0, trapKills: 0, crafted: 0,
     },
     log: [],
     status: 'playing',
@@ -207,6 +209,7 @@ function enterFloor(s: GameState, floor: number, meta: Pick<MetaState, 'ghosts'>
     pet.pos = spot ?? { ...gen.start };
   }
   populateCrawlers(s, gen.start);
+  snapshotFloor(s);
   afterMove(s);
 }
 
@@ -866,6 +869,12 @@ export function healCrawler(s: GameState, uid: string, itemUid: string): ActionR
   });
 }
 
+// ================================================================ Talkshow
+
+export function answerTalkShow(s: GameState, answerIndex: number): ShowAnswerResult {
+  return answerShow(s, answerIndex);
+}
+
 // ================================================================ Laden
 
 function safeRoom(s: GameState) {
@@ -919,7 +928,11 @@ export function descend(s: GameState, meta: Pick<MetaState, 'ghosts'>): ActionRe
   }
   const next = s.floor + 1;
   populationOnDescend(s);
+  const recap = floorRecap(s);
+  const withShow = hasUnlock(s, 'zuschauer');
   enterFloor(s, next, meta);
+  s.pendingDialogs.push(recap);
+  if (withShow) s.pendingDialogs.push(startTalkShow(s));
   announcePopulation(s, true);
   const def = FLOORS.find((f) => f.floor === next)!;
   log(s, `Etage ${next}: ${def.name}.`, 'system');

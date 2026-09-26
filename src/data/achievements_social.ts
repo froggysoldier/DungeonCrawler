@@ -75,4 +75,22 @@ export const SOCIAL_ACHIEVEMENTS: AchievementDef[] = [
     comment: 'Der Mensch ist des Menschen Wolf. Heute warst du der größere Wolf.',
     check: (e) => e.type === 'kill' && e.monster.defId === 'abtruenniger_crawler',
   },
+  {
+    id: 'primetime', name: 'Primetime', tier: 'silber', box: 'fan',
+    description: 'Sei zu Gast in der Talkshow zwischen den Etagen.',
+    comment: 'Das Sofa ist bequemer als alles, worauf du in letzter Zeit gesessen hast. Genieß es. Es ist gemietet.',
+    check: (e) => e.type === 'talkShow',
+  },
+  {
+    id: 'publikumsliebling', name: 'Liebling der Galaxis', tier: 'gold', box: 'fan',
+    description: 'Gewinne in einer einzigen Talkshow mindestens 500 Follower.',
+    comment: 'Die Einschaltquote hat einen neuen Rekord. Die Sponsoren wollen deine Telefonnummer. Du hast kein Telefon mehr.',
+    check: (e) => e.type === 'talkShow' && e.delta >= 500,
+  },
+  {
+    id: 'shitstorm', name: 'Shitstorm', tier: 'bronze', box: 'kleidung',
+    description: 'Verliere in einer Talkshow Follower.',
+    comment: 'Das Internet vergisst nicht. Das galaktische Internet noch weniger.',
+    check: (e) => e.type === 'talkShow' && e.delta < 0,
+  },
 ];

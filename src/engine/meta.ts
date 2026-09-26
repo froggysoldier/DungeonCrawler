@@ -57,7 +57,7 @@ export function migrate(s: GameState): GameState {
   s.pendingSelection ??= false;
   s.player.traits ??= [];
   const counters = s.counters as unknown as Record<string, number>;
-  for (const k of ['goldEarned', 'goldStolen', 'poisonDamage', 'mealsEaten', 'potionsDrunk', 'sleeps', 'crits', 'knockdowns', 'eliteKills']) {
+  for (const k of ['goldEarned', 'goldStolen', 'poisonDamage', 'mealsEaten', 'potionsDrunk', 'sleeps', 'crits', 'knockdowns', 'eliteKills', 'trapsFound', 'trapsTriggered', 'trapsDisarmed', 'trapKills', 'crafted']) {
     counters[k] ??= 0;
   }
   // Wer mit altem Spielstand schon auf Etage 2 ist, bekommt das Publikum nachträglich

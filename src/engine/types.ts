@@ -438,6 +438,39 @@ export interface Counters {
   crits: number;
   knockdowns: number;
   eliteKills: number;
+  trapsFound: number;
+  trapsTriggered: number;
+  trapsDisarmed: number;
+  trapKills: number;
+  crafted: number;
+}
+
+/** Stand zu Beginn einer Etage – für den Rückblick beim Abstieg. */
+export interface FloorSnapshot {
+  turn: number;
+  counters: Omit<Counters, 'killsByDef'>;
+  achievements: number;
+  patterns: number;
+  follower: number;
+  fallen: number;
+  level: number;
+}
+
+export type ShowTone = 'ehrlich' | 'witzig' | 'frech' | 'bescheiden' | 'dramatisch';
+
+export interface ShowQuestion {
+  id: string;
+  text: string;
+  answers: { label: string; tone: ShowTone }[];
+}
+
+export interface TalkShow {
+  host: string;
+  title: string;
+  questions: ShowQuestion[];
+  index: number;
+  followerDelta: number;
+  done: boolean;
 }
 
 export interface GameState {
@@ -479,6 +512,8 @@ export interface GameState {
   population?: Population;
   /** Namen gefallener Party-Mitglieder (für Rückblicke). */
   fallen?: string[];
+  floorSnapshot?: FloorSnapshot;
+  talkShow?: TalkShow;
   dynAchievements?: DynAchievement[];
   /** Rassen- und Klassenwahl steht an (Etage 3). */
   pendingSelection: boolean;
@@ -492,6 +527,8 @@ export interface Toast {
 }
 
 export interface Dialog {
+  /** Sonderdialog: die Talkshow (Fragen mit Antworten). */
+  kind?: 'talkshow';
   title: string;
   speaker?: string;
   pages: string[];
@@ -538,6 +575,7 @@ export type GameEvent =
   | { type: 'partyLeft'; name: string }
   | { type: 'crawlerDied'; name: string; party: boolean }
   | { type: 'crawlerTurned'; name: string }
+  | { type: 'talkShow'; delta: number; tone: ShowTone }
   | { type: 'bought'; item: Item; price: number; haggled: boolean }
   | { type: 'sold'; item: Item; price: number }
   | { type: 'haggle'; success: boolean; percent: number }
