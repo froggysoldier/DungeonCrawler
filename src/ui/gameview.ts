@@ -7,6 +7,7 @@ import { CLASS_BY_ID } from '../data/classes';
 import { RACE_BY_ID } from '../data/races';
 import { currentAbility, useAbility } from '../engine/classes';
 import { maxMp, spellCost } from '../engine/magic';
+import { offerPrice, sellPrice } from '../engine/shop';
 import { SPELL_BY_ID } from '../data/spells';
 import { describeItem, describeMonster, INSIGHT_NAMES, itemName } from '../engine/identify';
 import { liveViewers } from '../engine/viewers';
@@ -19,7 +20,7 @@ import {
 import { chebyshev } from '../engine/fov';
 import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
-  cast, moveStep, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
+  buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable } from '../engine/mapgen';
@@ -495,6 +496,16 @@ export class GameView {
       }
       if (inside) {
         html += `<div class="row" style="margin-top:6px"><button data-action="sleep">Schlafen (8 Std.)</button><button data-action="toilet">Toilette benutzen</button></div>`;
+        if (room.shop) {
+          html += `<div class="section">Laden</div><div class="muted small">${esc(room.shop.keeper)}${room.shop.mood < 70 ? ' – wirkt verstimmt' : ''}</div>`;
+          html += room.shop.offers
+            .map((o, i) => {
+              const total = offerPrice(o.price, o.item);
+              return `<div class="row shoprow"><span style="flex:1;color:${RARITY_COLORS[o.item.rarity]}" title="${esc(describeItem(s, o.item).bonuses.join(', '))}">${esc(itemName(s, o.item))}${o.item.menge && o.item.menge > 1 ? ` ×${o.item.menge}` : ''}</span><span class="muted small">${total} G</span><button data-action="buy" data-i="${i}" ${s.player.gold < total ? 'disabled' : ''}>Kaufen</button><button data-action="haggle" data-i="${i}" ${o.haggled ? 'disabled' : ''}>Feilschen</button></div>`;
+            })
+            .join('');
+          html += '<div class="muted small">Verkaufen: im Inventar-Tab beim Gegenstand.</div>';
+        }
         if (s.player.boxes.length) {
           html += `<div class="muted small" style="margin-top:6px">Lootboxen öffnen:</div>`;
           html += s.player.boxes
@@ -520,6 +531,8 @@ export class GameView {
       meal: (b) => this.act(() => buyMeal(s, b.dataset.id!)),
       sleep: () => this.act(() => sleep(s)),
       toilet: () => this.act(() => toilet(s)),
+      buy: (b) => this.act(() => buyOffer(s, Number(b.dataset.i))),
+      haggle: (b) => this.act(() => haggleOffer(s, Number(b.dataset.i))),
       box: (b) => {
         const box = s.player.boxes.find((x) => x.uid === b.dataset.uid);
         let contents: Item[] | undefined;
@@ -562,6 +575,7 @@ export class GameView {
       if (it.kind === 'verbrauch') actions.push(`<button data-action="use" data-uid="${it.uid}">Benutzen</button>`);
       if (it.kind === 'buch') actions.push(`<button data-action="use" data-uid="${it.uid}">Lesen</button>`);
       actions.push(`<button data-action="drop" data-uid="${it.uid}">Ablegen</button>`);
+      if (from === 'inv' && currentRoom(this.s)?.kind === 'safe' && it.kind !== 'box') actions.push(`<button data-action="sell" data-uid="${it.uid}">Verkaufen (${sellPrice(it)} G)</button>`);
     }
     return `<div class="name" style="color:${color}">${esc(known.name)}${it.menge && it.menge > 1 && it.kind !== 'gold' ? ` ×${it.menge}` : ''}</div>
       <div class="meta">${esc(bits.join(' · '))}</div>
@@ -594,6 +608,7 @@ export class GameView {
       unequip: (b) => this.act(() => unequip(this.s, b.dataset.slot as EquipSlot)),
       use: (b) => this.act(() => useItem(this.s, b.dataset.uid!)),
       drop: (b) => this.act(() => dropItem(this.s, b.dataset.uid!)),
+      sell: (b) => this.act(() => sellItem(this.s, b.dataset.uid!)),
     });
   }
 

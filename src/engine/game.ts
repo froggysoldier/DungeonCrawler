@@ -25,6 +25,8 @@ import { learnSkill } from './skills';
 import { viewersTick } from './viewers';
 import { castSpell, learnSpell, magicTick, maxMp, readTome, type CastOptions } from './magic';
 import { addBladder, bladderTick, useToilet } from './bladder';
+import { eggTick, tryTame, useSpecial } from './extras';
+import { buy, ensureShop, haggle, sell } from './shop';
 import type {
   ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique,
 } from './types';
@@ -331,6 +333,7 @@ function tickTime(s: GameState, turns: number, before: number) {
 
   viewersTick(s, turns);
   magicTick(s, turns);
+  eggTick(s);
   if (p.potionCooldown) p.potionCooldown = Math.max(0, p.potionCooldown - turns);
   bladderTick(s, turns);
   if (s.status !== 'playing') return;
@@ -431,6 +434,7 @@ function onEnterRoom(s: GameState, room: NonNullable<ReturnType<typeof currentRo
   else log(s, `Du betrittst: ${room.name}.`, 'info');
 
   if (room.kind === 'guild' && !hasUnlock(s, 'inventar')) runTutorial(s);
+  if (room.kind === 'safe') ensureShop(s, room);
   if (room.kind === 'safe' && first) {
     if (room.safeVariant === 'restaurant') {
       const host = RESTAURANT_HOSTS[room.id % RESTAURANT_HOSTS.length];
@@ -587,6 +591,18 @@ export function useItem(s: GameState, uid: string): ActionResult {
     return OK;
   }
   if (it.kind !== 'verbrauch') return fail('Das kann man nicht benutzen.');
+  const special = useSpecial(s, it);
+  if (special) {
+    if (!special.ok) return fail(special.message ?? 'Geht nicht.');
+    removeOne(s, uid);
+    endTurn(s);
+    return OK;
+  }
+  if (it.baseId === 'leckerli' && tryTame(s).handled) {
+    removeOne(s, uid);
+    endTurn(s);
+    return OK;
+  }
   const isPotion = it.baseId.includes('trank');
   if (isPotion && (s.player.potionCooldown ?? 0) > 0) {
     return fail(`Dein Körper verträgt gerade keinen weiteren Trank. Noch ${s.player.potionCooldown} Züge.`);
@@ -756,6 +772,33 @@ export function toilet(s: GameState): ActionResult {
   if (!res.ok) return fail(res.message ?? 'Geht nicht.');
   endTurn(s);
   return OK;
+}
+
+// ================================================================ Laden
+
+function safeRoom(s: GameState) {
+  const room = currentRoom(s);
+  return room?.kind === 'safe' ? room : null;
+}
+
+export function buyOffer(s: GameState, index: number): ActionResult {
+  const room = safeRoom(s);
+  if (!room) return fail('Hier gibt es keinen Laden.');
+  const res = buy(s, room, index);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+export function haggleOffer(s: GameState, index: number): ActionResult {
+  const room = safeRoom(s);
+  if (!room) return fail('Hier gibt es keinen Laden.');
+  const res = haggle(s, room, index);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+export function sellItem(s: GameState, uid: string): ActionResult {
+  if (!safeRoom(s)) return fail('Verkaufen kannst du nur im Laden eines Safe Rooms.');
+  const res = sell(s, uid);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
 }
 
 // ================================================================ Werte

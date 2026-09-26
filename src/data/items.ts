@@ -11,6 +11,8 @@ export interface BaseItem {
   effekt?: ConsumableEffect;
   flavor: string;
   wert: number;
+  /** Pass/Talisman: diese Gegnerart greift nicht an. */
+  passFacet?: string;
   /** Erlaubt das Auftauchen als Bodenfund. */
   ground?: number;
 }
@@ -111,6 +113,18 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'leckerli', name: 'Verzaubertes Haustier-Leckerli', kind: 'verbrauch', effekt: {}, flavor: 'Lässt dein Haustier eine Stufe aufsteigen. Ohne Haustier: schmeckt nach Fisch und Reue.', wert: 20 },
   { id: 'dosenbrot', name: 'Dosenbrot', kind: 'verbrauch', effekt: { heal: 6 }, flavor: 'Brot. Aus der Dose. Warum?', wert: 2, ground: 2 },
 
+  // ---- Pässe (Tätowierungen) und Talismane: eine Gegnerart greift dich nicht an, solange du sie nicht angreifst
+  { id: 'tattoo_kobold', name: 'Kobold-Pass (Tätowierung)', kind: 'verbrauch', effekt: {}, flavor: 'Ein Tattoo auf dem Unterarm: ein grinsender Kobold. Kobolde halten dich für einen von ihnen – bis du zuschlägst.', wert: 60 },
+  { id: 'tattoo_ratte', name: 'Rattenkönig-Siegel (Tätowierung)', kind: 'verbrauch', effekt: {}, flavor: 'Sieben verknotete Schwänze auf deinem Handrücken. Ratten weichen dir aus.', wert: 50 },
+  { id: 'talisman_flug', name: 'Talisman der Flatterer', kind: 'ausruestung', slot: 'hals', passFacet: 'z:fliegend', flavor: 'Eine Feder an einem Lederband. Fliegende Wesen lassen dich in Ruhe, solange du sie in Ruhe lässt.', wert: 70 },
+  { id: 'talisman_untot', name: 'Grabstein-Anhänger', kind: 'ausruestung', slot: 'hals', passFacet: 'z:untot', flavor: 'Ein winziger Grabstein mit deinem Namen. Untote halten dich für einen Kollegen.', wert: 90 },
+  { id: 'talisman_insekt', name: 'Bernstein-Talisman', kind: 'ausruestung', slot: 'hals', passFacet: 'z:insekt', flavor: 'Eine Spinne in Bernstein. Krabbeltiere respektieren das.', wert: 60 },
+  // ---- Haustiere
+  { id: 'ei_raptor', name: 'Warmes, gesprenkeltes Ei', kind: 'verbrauch', effekt: {}, flavor: 'Es ist warm. Es bewegt sich. Trag es eine Weile mit dir herum.', wert: 120 },
+  { id: 'ei_drache', name: 'Schuppiges Ei', kind: 'verbrauch', effekt: {}, flavor: 'Es riecht nach Rauch. Manchmal hörst du ein Fauchen von drinnen.', wert: 200 },
+  { id: 'superkeks', name: 'Verzauberter Superkeks', kind: 'verbrauch', effekt: {}, flavor: 'Ein Haustierkeks, der leise summt. Wer ihn frisst, ist danach nicht mehr dasselbe Tier.', wert: 300 },
+  // ---- Glücksspiel
+  { id: 'rubbellos', name: 'Rubbellos „Goldrausch im Keller“', kind: 'verbrauch', effekt: {}, flavor: 'Drei Felder zum Freirubbeln. Die Gewinnchancen stehen klein gedruckt auf der Rückseite. Sehr klein.', wert: 5, ground: 1 },
   // ---- Boss-Beute (Etage 1)
   { id: 'handtasche_der_sammlerin', name: 'Handtasche der Sammlerin', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 7, bonuses: { stats: { cha: 1 } }, flavor: 'Enthält: drei Lippenstifte, 40 Kassenbons und das Gewicht eines Backsteins.', wert: 25 },
   { id: 'wischmopp', name: 'Wischmopp des Hausmeisters', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 8, bonuses: { ausweichen: 3 }, flavor: 'Nass. Immer nass. Egal was man tut.', wert: 25 },

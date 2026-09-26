@@ -7,6 +7,7 @@ import { idx, randomOpenTile, roomOf } from './mapgen';
 import { canStep, findPath } from './path';
 import { has, onMonsterHit, startOfTurn } from './abilities';
 import { handleLethal } from './death';
+import { passProtects, petCast } from './extras';
 import { dynDefenseBonus, targetFacets, trainDefense } from './observer';
 import { ausweichen, totalBonuses } from './player';
 import * as R from './rng';
@@ -171,6 +172,12 @@ export function monsterTurn(s: GameState, m: Monster) {
     if (m.behavior !== 'stationary' && m.homeRoom === undefined) wander(s, m);
     return;
   }
+  // Pässe und Talismane: diese Gegnerart lässt dich in Ruhe, solange du sie nicht angreifst
+  if (passProtects(s, m)) {
+    m.aware = false;
+    wander(s, m);
+    return;
+  }
 
   // Verliert das Interesse, wenn der Crawler weit weg ist
   if (d > 14 && m.homeRoom === undefined) {
@@ -219,6 +226,16 @@ export function petTurn(s: GameState) {
   const targets = s.monsters
     .filter((m) => chebyshev(m.pos, pet.pos) <= 1 && !isInSafeRoom(s, m.pos))
     .sort((a, b) => chebyshev(a.pos, p.pos) - chebyshev(b.pos, p.pos));
+  // Ein erwachtes Haustier zaubert Magische Geschosse
+  const spellTarget = petCast(s, pet);
+  if (spellTarget) {
+    const dmg = Math.max(1, Math.round(2 + pet.level * 1.5 - spellTarget.ruestung / 2));
+    spellTarget.hp -= dmg;
+    spellTarget.aware = true;
+    log(s, `${pet.name} schießt Magische Geschosse aus den Augen: ${dmg} Schaden an ${nameOf(s, spellTarget)}.`, 'kampf');
+    if (spellTarget.hp <= 0) killMonster(s, spellTarget, null, true);
+    return;
+  }
   const t = targets[0];
   if (t) {
     if (R.chance(s, 0.25)) {

@@ -274,3 +274,5 @@ h1, h2, h3 { margin: 0; }
 .bar.bl.urgent > div { background: linear-gradient(90deg, #b3261e, #ff8a4a); animation: pulse 1s infinite; }
 .actionbar .spells button.spell { border-color: #3d5a9e; color: #9ec0ff; }
 .actionbar .spells button.spell.sel { background: #1c2a4a; border-color: #6fa8ff; }
+.shoprow { margin: 3px 0; font-size: 12px; }
+.shoprow button { padding: 2px 6px; }

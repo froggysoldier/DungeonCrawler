@@ -29,7 +29,23 @@ export interface Room {
   safeVariant?: 'freebie' | 'restaurant';
   /** Crawler hat den Gratis-Gegenstand dieses Safe Rooms schon abgeholt. */
   freebieTaken?: boolean;
+  /** Laden im Safe Room (wird beim ersten Betreten gefüllt). */
+  shop?: Shop;
   visited?: boolean;
+}
+
+export interface ShopOffer {
+  item: Item;
+  price: number;
+  /** Bereits verhandelt (nur ein Versuch pro Angebot). */
+  haggled?: boolean;
+}
+
+export interface Shop {
+  keeper: string;
+  offers: ShopOffer[];
+  /** Laune der Ladenbesitzerin/des Ladenbesitzers: sinkt bei gescheiterten Verhandlungen. */
+  mood: number;
 }
 
 export interface Hood {
@@ -114,6 +130,11 @@ export interface Item {
   special?: SpecialEffect;
   /** Zauberbücher: welcher Zauber gelernt wird. */
   spell?: string;
+  /** Pass/Talisman: Gegner mit dieser Facette greifen nicht an (z. B. „z:kobold“). */
+  passFacet?: string;
+  /** Ei: schlüpft in diesem Zug (im Inventar). */
+  hatchAt?: number;
+  petSpecies?: string;
   wert: number;
 }
 
@@ -194,6 +215,8 @@ export interface Monster {
   summoned?: number;
   /** Gestohlenes Gold, das beim Tod zurückfällt. */
   stolenGold?: number;
+  /** Vom Crawler angegriffen – Pässe schützen dann nicht mehr. */
+  provoked?: boolean;
   /** Techniken, mit denen dieser Mob in diesem Kampf getroffen wurde. */
   hitBy?: string[];
 }
@@ -208,6 +231,8 @@ export interface Pet {
   dmg: [number, number];
   pos: Pos;
   alive: boolean;
+  /** Nach dem Superkeks: das Haustier zaubert Magische Geschosse. */
+  caster?: boolean;
 }
 
 export interface SkillState {
@@ -272,6 +297,8 @@ export interface Player {
   blase?: number;
   /** Abklingzeit für Tränke in Zügen. */
   potionCooldown?: number;
+  /** Dauerhafte Pässe (Tätowierungen), Facetten wie „z:kobold“. */
+  passes?: string[];
 }
 
 export interface SpellState {
@@ -440,6 +467,11 @@ export type GameEvent =
   | { type: 'followers'; follower: number }
   | { type: 'spellCast'; spell: string; kills: number }
   | { type: 'accident' }
+  | { type: 'bought'; item: Item; price: number; haggled: boolean }
+  | { type: 'sold'; item: Item; price: number }
+  | { type: 'haggle'; success: boolean; percent: number }
+  | { type: 'lottery'; outcome: string }
+  | { type: 'petGained'; species: string; how: 'ei' | 'zaehmen' }
   | { type: 'relief' }
   | { type: 'moved' }
   | { type: 'start' };

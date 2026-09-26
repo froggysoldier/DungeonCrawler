@@ -43,6 +43,7 @@ export function createItem(s: GameState, baseId: string, menge = 1): Item {
     menge: isStackable(base.kind) ? menge : undefined,
     flavor: base.flavor,
     special: unique?.special,
+    passFacet: base.passFacet,
     wert: base.wert,
   };
 }
@@ -165,7 +166,10 @@ export function rollBoxContents(s: GameState, type: BoxType, tier: BoxTier): Ite
 
 function rollThemedItem(s: GameState, type: BoxType, rarity: Rarity): Item {
   if (type === 'haustier') {
-    return R.chance(s, 0.6) ? createItem(s, 'leckerli', RARITY_ORDER.indexOf(rarity) + 1) : generateEquipment(s, rarity, ['hals']);
+    const r = RARITY_ORDER.indexOf(rarity);
+    if (r >= 4 && R.chance(s, 0.4)) return createItem(s, 'superkeks');
+    if (r >= 2 && R.chance(s, 0.3)) return createItem(s, R.chance(s, 0.3) ? 'ei_drache' : 'ei_raptor');
+    return R.chance(s, 0.6) ? createItem(s, 'leckerli', r + 1) : generateEquipment(s, rarity, ['hals']);
   }
   if (type === 'ueberlebens' && R.chance(s, 0.4)) {
     return createItem(s, 'heiltrank', 1 + RARITY_ORDER.indexOf(rarity));

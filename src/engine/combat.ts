@@ -122,6 +122,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   // --- Trefferchance
   // Kontext VOR dem Angriff festhalten – der Beobachter wertet ihn aus
   const facets = attackFacets(s, target, t);
+  target.provoked = true;
   const isHit = R.next(s) * 100 < hitChance(s, target, t);
 
   const name = techniqueName(t);
