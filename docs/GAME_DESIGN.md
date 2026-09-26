@@ -1,4 +1,4 @@
-# Der Große Abstieg – Game Design Dokument (v0.2)
+# Der Große Abstieg – Game Design Dokument (v0.3)
 
 > Inspiriert von der Buchreihe *Dungeon Crawler Carl* von Matt Dinniman.
 > **Spoiler-Regel:** Dieses Dokument enthält nur Buch-Details bis einschließlich
@@ -25,7 +25,8 @@ kämpft.
 | Namen | Eigene Namen (Show, Guide, Bosse …), damit eine spätere Veröffentlichung möglich bleibt |
 | Etagen | Themen dürfen sich am Buch orientieren, aber keine Spoiler |
 | Oberfläche | Klickbare Karte, Spieler = leuchtender Punkt, daneben Panels + Textlog |
-| Erster Meilenstein | Etage 1 komplett spielbar (+ Etage 2 als Ausblick) ✅ |
+| Erster Meilenstein | Etage 1 komplett spielbar ✅ |
+| Zweiter Meilenstein | Mehr Inhalte, Web-Link, Etage 2 (Publikum) und 3 (Rassen/Klassen) ✅ |
 
 Eigene Namen: Die Show heißt **„Der Große Abstieg“**, der Erzähler
 **„die Systemstimme“**, der Standard-Guide **Barnabas**.
@@ -51,8 +52,8 @@ Haustier (Katze/Hund) und versteckte Flags für die spätere Klassenwahl.
 |---|---|---|
 | Start | Nichts. Fäuste, Füße, ein Gegenstand in der Hand. | ✅ |
 | Tutorial-Gilde gefunden | Inventar, Werte, Skills-Übersicht, Kartengedächtnis, 2 Heiltränke | ✅ |
-| Etage 2 | Zuschauer/Follower, Fan-Boxen | geplant |
-| Etage 3 | Rassen- & Klassenwahl (Klassen hängen vom Kampfstil ab!) | geplant |
+| Etage 2 | Publikum: Zuschauer, Follower, Hype, Fan-Boxen, Geschenke | ✅ |
+| Etage 3 | Rassen- & Klassenwahl, Klassenfähigkeiten | ✅ |
 | Etage 9+ | NPC-Verträge | Engine-Hook vorhanden |
 
 ### 3.4 Kampf: Technik = Körperteil × Ausführung ✅
@@ -77,15 +78,24 @@ Im Skills-Tab sieht man den Fortschritt („Du spürst Fortschritt …“) und
 die Verteilung des eigenen Kampfstils.
 
 ### 3.6 Gegner ✅
-- 14 Mob-Typen auf Etage 1–2 (Kellerratte, Kobolde, Wolpertinger,
-  Tatzelwurm, Grauer Späher, Poltergeist, Hungriger Müllsack …) mit
-  Verhalten: Nahkampf, Fernkampf, feige, stationär (Mimics).
+- 49 Mob-Typen auf Etage 1–3 (Kellerratte, Kobolde, Wolpertinger,
+  Tatzelwurm, Grauer Späher, Blähkröte, Chupacabra, Kanal-Krokodil,
+  Mottenmann …) mit Verhalten: Nahkampf, Fernkampf, feige, stationär (Mimics).
+- **Fähigkeiten:** giftig (Gift-Schaden pro Zug, Gegengift hilft),
+  explodiert beim Tod, klaut Gold und flieht, ruft Verstärkung,
+  regeneriert, schnell (2 Schritte), fliegend (nicht umwerfbar, kein
+  Stampfen), gepanzert (halber Faustschaden).
+- Normale Monster betreten keine Boss-Kammern.
 - **Elite-Mobs** (stärkere Varianten, bessere Beute).
-- **4 Nachbarschafts-Bosse** (Die Sammlerin, Der Hausmeister, König der
-  Kanalratten, Muttis Mega-Mixer): verlassen ihre Kammer nicht, solange
+- **15 Bosse**, jede Etage zieht aus ihrem eigenen Pool (Etage 1: Die Sammlerin,
+  Der Hausmeister, König der Kanalratten, Muttis Mega-Mixer, Kammerjäger,
+  Mutter aller Motten, Pfandflaschen-Baron, Heizungsbestie; Etage 3:
+  Kanalkönigin, Kommandant Klärschlamm, Schwarzmarkt-Oger, Nixe vom Überlauf).
+  Nachbarschafts-Bosse verlassen ihre Kammer nicht, solange
   sie leben spawnen im Viertel Mobs nach, droppen **Gebietskarte** (muss
   aufgehoben werden → deckt das Viertel auf) + Boss-Box + Unikat.
-- **Borough-Boss** Oma Gulasch in der Arena, Treppe direkt dahinter.
+- **Borough-Bosse** je Etage: Oma Gulasch (1), Der Hausverwalter (2),
+  Der Rattenkaiser (3) – die Treppe liegt direkt dahinter.
 - Mobs fliehen bei wenig Leben, verlieren das Interesse, wenn man weit weg ist.
 
 ### 3.7 Safe Rooms ✅
@@ -96,20 +106,41 @@ die Verteilung des eigenen Kampfstils.
 - 1 h vor Einsturz wird man hinausgeworfen.
 
 ### 3.8 Items ✅
-17 Ausrüstungsplätze inkl. 2 Ringe, **2 Fußringe** und Unterwäsche.
+Rund 170 Gegenstände. 17 Ausrüstungsplätze inkl. 2 Ringe, **2 Fußringe** und Unterwäsche.
 Seltenheiten Gewöhnlich → Ungewöhnlich → Selten → Episch → Legendär → Himmlisch,
 zufällige Verzauberungen („Stahlkappenstiefel des Esels“), Unikate mit
 Spezialeffekten (Zweite-Chance-Klausel, Stiefel des ungebremsten Stampfens,
 Der Ziegel …), Verbrauchsgüter, Haustier-Leckerli.
 
 ### 3.9 Achievements & Lootboxen ✅
-- 57 Achievements mit sarkastischem Kommentar (z. B. *Komische Katzenlady*,
+- 143 Achievements mit sarkastischem Kommentar (z. B. *Komische Katzenlady*,
   *Barfuß-Rambo*, *Podophilie*, *Steinzeit*, *Pazifist (vorläufig)*).
 - Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen (Schuh-, Wurf-,
   Schläger-, Haustier-, Boss-Box …). Inhalt passt zum Thema.
 - **Wer ein Achievement zum ersten Mal in seiner Karriere schafft, bekommt eine Box-Stufe mehr.**
 
-### 3.10 Haustiere ✅ / Reittiere, Party (geplant)
+### 3.10 Publikum (ab Etage 2) ✅
+- Spektakel (Stampf-Kills, Sprungtritte, Bosse, Achievements, knappe
+  Rettungen, Explosionen …) erhöht **Hype** und bringt **Follower**.
+- Charisma und Hype multiplizieren den Zuwachs, Hype kühlt mit der Zeit ab.
+- Fan-Boxen bei 100 / 250 / 500 / 1.000 / 2.500 / 5.000 / 10.000 … Followern.
+- Große Momente bringen manchmal Geschenke aus dem Publikum.
+- Zuschauer-Kommentare im Log („💬 xX_Glorbnak_Xx: DRAUFGESTAMPFT HAHAHA“).
+
+### 3.11 Rassen & Klassen (ab Etage 3) ✅
+- Man wird in die Gilde geholt und wählt **Rasse** und **Klasse**.
+- 14 Rassen: 7 frei wählbar (Mensch mit +4 Stat-Punkten, Halbork, Kellerelf,
+  Zwerg, Gnom, Halbling, Echsenmensch), 7 **durch Verhalten freigeschaltet**
+  (Katzenmensch: mit Katze gestartet · Troll: 15 Gegner umgeworfen ·
+  Minotaurus: 25 Kopfstöße/Sturmangriffe · Golem: 150 Schaden eingesteckt ·
+  Pilzling: 20 Giftschaden · Vampir: 10 Krits · Kobold: 20 Würfe).
+- 18 Klassen, jede wird **nach deinem bisherigen Kampfstil bewertet**; 8
+  stehen zur Wahl, die 3 passendsten werden empfohlen.
+- Jede Klasse hat eine **aktive Fähigkeit** mit Abklingzeit (Taste F):
+  Wutanfall, Wirbelwind, Erdbeben, Kampfschrei, Bollwerk, Schattenschritt,
+  Steinhagel, Bombe, Zweite Luft, Showtime.
+
+### 3.12 Haustiere ✅ / Reittiere, Party (geplant)
 Katze oder Hund aus dem Interview: folgt, kämpft mit, levelt, wird bei 0 HP
 bewusstlos und kehrt nach dem Schlafen zurück. Reittiere und Party-System
 sind noch offen.
@@ -137,10 +168,10 @@ tests/      Vitest: Engine-Tests + optionale Balance-Simulation (SIM=1)
 
 ## 6. Nächste Schritte (Vorschlag)
 
-1. Zuschauer-System (Follower, Fan-Boxen) ab Etage 2
-2. Etage 3: Rassen- und Klassenwahl, abgeleitet vom Kampfstil
-3. Mehr Inhalte: Monster, Items, Achievements (Ziel: mehrere Hundert)
-4. Fallen, Quests, Party-System, Reittiere
+1. Balance von Etage 2–3 durch Testspielen
+2. Sponsoren, Quests und Fallen
+3. Etage 4+ mit neuen Themen, Klassen-Spezialisierung (Etage 6/9/12)
+4. Party-System, Reittiere
 5. Sound, Grafik-Upgrade der Karte
 
 ## 7. Rechtliches

@@ -166,9 +166,9 @@ export function endScreen(root: HTMLElement, s: GameState, meta: MetaState, onNe
   const victory = s.status === 'victory';
   const contract = !victory && s.contractSigned;
   const quip = DEATH_QUIPS[s.turn % DEATH_QUIPS.length];
-  const headline = victory ? 'Etage 2 überlebt!' : contract ? 'In den Dienst übernommen' : 'Staffel beendet';
+  const headline = victory ? `Etage ${s.floor} überlebt!` : contract ? 'In den Dienst übernommen' : 'Staffel beendet';
   const text = victory
-    ? 'Du hast es bis ans Ende dessen geschafft, was bisher gebaut ist. Die Systemstimme ist beeindruckt und leicht verärgert. Weitere Etagen (Rassen- und Klassenwahl!) folgen.'
+    ? 'Du hast es bis ans Ende dessen geschafft, was bisher gebaut ist. Die Systemstimme ist beeindruckt und leicht verärgert. Weitere Etagen folgen.'
     : contract
       ? `${s.player.name} ist nicht tot – sondern jetzt Personal. In der nächsten Staffel wartet ${s.player.name} als Guide in der Gilde der Einweisung.`
       : `${quip} Ursache: ${s.deathCause ?? 'unbekannt'}. Der Geist von ${s.player.name} wandert jetzt durch Etage ${s.floor} – mit der alten Ausrüstung. Vielleicht triffst du ihn in der nächsten Staffel.`;

@@ -1,3 +1,5 @@
+import { CLASS_BY_ID } from '../data/classes';
+import { RACE_BY_ID } from '../data/races';
 import { emit } from './events';
 import { chebyshev } from './fov';
 import { log } from './log';
@@ -20,7 +22,10 @@ export const ABILITY_NAMES: Record<MonsterAbility, string> = {
 export const has = (m: Monster, a: MonsterAbility) => !!m.abilities?.includes(a);
 
 export function hasSpecial(s: GameState, special: string): boolean {
-  return Object.values(s.player.equipment).some((i) => i?.special === special);
+  const p = s.player;
+  if (p.race && RACE_BY_ID[p.race]?.special === special) return true;
+  if (p.klass && CLASS_BY_ID[p.klass]?.special === special) return true;
+  return Object.values(p.equipment).some((i) => i?.special === special);
 }
 
 /** Vergiftet den Crawler (stapelt nicht, frischt aber auf). */

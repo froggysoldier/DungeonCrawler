@@ -2,6 +2,7 @@ import { ACHIEVEMENTS } from '../data/achievements';
 import { BOX_TIERS, BOX_TIER_NAMES, BOX_TYPE_NAMES } from '../data/world';
 import { createBox } from './items';
 import { log, toast } from './log';
+import { addSpectacle } from './viewers';
 import type { BoxTier, GameEvent, GameState } from './types';
 
 /**
@@ -28,6 +29,7 @@ export function checkAchievements(s: GameState, e: GameEvent) {
     log(s, `NEUES ACHIEVEMENT: ${a.name}! ${a.description}`, 'achievement');
     log(s, `${a.comment}`, 'achievement');
     log(s, `Belohnung: ${BOX_TIER_NAMES[tier]} ${BOX_TYPE_NAMES[a.box]}.${firstNote}`, 'loot');
+    addSpectacle(s, 4 + BOX_TIERS.indexOf(tier) * 4, 'achievement');
     toast(s, `🏆 ${a.name}`, `${a.description} → ${BOX_TIER_NAMES[tier]} ${BOX_TYPE_NAMES[a.box]}`, 'achievement');
   }
 }

@@ -44,11 +44,24 @@ export function loadRun(): GameState | null {
   try {
     const raw = storage()?.getItem(RUN_KEY);
     if (!raw) return null;
-    const s = JSON.parse(raw) as GameState;
+    const s = migrate(JSON.parse(raw) as GameState);
     return s.status === 'playing' ? s : null;
   } catch {
     return null;
   }
+}
+
+/** Ergänzt Felder, die ältere Spielstände noch nicht hatten. */
+export function migrate(s: GameState): GameState {
+  s.viewers ??= { follower: 0, hype: 0, nextFanBox: 0, lastSpectacle: 0 };
+  s.pendingSelection ??= false;
+  const counters = s.counters as unknown as Record<string, number>;
+  for (const k of ['goldEarned', 'goldStolen', 'poisonDamage', 'mealsEaten', 'potionsDrunk', 'sleeps', 'crits', 'knockdowns', 'eliteKills']) {
+    counters[k] ??= 0;
+  }
+  // Wer mit altem Spielstand schon auf Etage 2 ist, bekommt das Publikum nachträglich
+  if (s.floor >= 2 && !s.unlocks.includes('zuschauer')) s.unlocks.push('zuschauer');
+  return s;
 }
 
 export function deleteRun() {
@@ -90,7 +103,7 @@ export function recordRunEnd(meta: MetaState, s: GameState): MetaState {
     floor: s.floor,
     kills: s.counters.kills,
     achievements: s.achievements.length,
-    cause: s.status === 'victory' ? 'Etage 2 überlebt' : s.deathCause ?? 'unbekannt',
+    cause: s.status === 'victory' ? `Etage ${s.floor} überlebt` : s.deathCause ?? 'unbekannt',
     outcome,
   });
   meta.ghosts = meta.ghosts.filter((g) => !s.ghostsDefeated.includes(g.name));

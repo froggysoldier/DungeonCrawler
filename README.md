@@ -17,6 +17,7 @@ Weitere Befehle:
 ```bash
 npm test         # Engine-Tests
 npm run build    # Typecheck + Produktions-Build nach dist/
+npm run build:artifact   # eine einzige HTML-Datei für den Web-Link
 SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simulation (30 Bot-Runs)
 ```
 
@@ -31,6 +32,7 @@ SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simula
 | Warten | Klick auf dich selbst | Leertaste |
 | Aufheben | Klick auf dich selbst / Button | G |
 | Treppe nehmen | Button | Enter |
+| Klassenfähigkeit (ab Etage 3) | Button ★ | F |
 | Untersuchen | Rechtsklick | – |
 
 ## Dokumentation

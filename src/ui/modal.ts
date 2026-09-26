@@ -5,7 +5,7 @@ const queue: (() => void)[] = [];
 
 export const isModalOpen = () => open;
 
-function mount(html: string, onMount: (root: HTMLElement, close: () => void) => void): Promise<void> {
+export function showCustom(html: string, onMount: (root: HTMLElement, close: () => void) => void): Promise<void> {
   return new Promise((resolve) => {
     const run = () => {
       open = true;
@@ -28,7 +28,7 @@ function mount(html: string, onMount: (root: HTMLElement, close: () => void) => 
 /** Mehrseitiger Dialog (Systemstimme, Guide …). */
 export function showDialog(title: string, speaker: string | undefined, pages: string[]): Promise<void> {
   let page = 0;
-  return mount(
+  return showCustom(
     `<h2>${esc(title)}</h2>${speaker ? `<div class="speaker">${esc(speaker)}</div>` : ''}
      <div class="page"></div>
      <div class="foot"><span class="muted small pageno"></span><button class="primary next">Weiter</button></div>`,
@@ -66,7 +66,7 @@ export function showDialog(title: string, speaker: string | undefined, pages: st
 
 /** Freier HTML-Inhalt mit Schließen-Knopf. */
 export function showHtml(title: string, html: string, button = 'Schließen'): Promise<void> {
-  return mount(
+  return showCustom(
     `<h2>${esc(title)}</h2>${html}<div class="foot"><span></span><button class="primary ok">${esc(button)}</button></div>`,
     (root, close) => {
       const btn = root.querySelector('.ok') as HTMLButtonElement;
@@ -89,7 +89,7 @@ export function showHtml(title: string, html: string, button = 'Schließen'): Pr
 
 export function confirmBox(title: string, text: string, yes: string, no = 'Abbrechen'): Promise<boolean> {
   let result = false;
-  return mount(
+  return showCustom(
     `<h2>${esc(title)}</h2><div class="page">${esc(text)}</div>
      <div class="foot"><button class="cancel">${esc(no)}</button><button class="primary ok">${esc(yes)}</button></div>`,
     (root, close) => {

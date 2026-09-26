@@ -442,3 +442,61 @@ export const MORE_ACHIEVEMENTS: AchievementDef[] = [
     check: (e) => e.type === 'descend' && e.floor === 3,
   },
 ];
+
+// ------------------------------------------------------------ Publikum & Klassen
+MORE_ACHIEVEMENTS.push(
+  {
+    id: 'follower100', name: 'Hallo, Galaxis!', tier: 'bronze', box: 'fan',
+    description: 'Erreiche 100 Follower.',
+    comment: 'Hundert Wesen aus dem ganzen Universum finden dich interessant. Die Systemstimme kann es auch nicht erklären.',
+    check: (e) => e.type === 'followers' && e.follower >= 100,
+  },
+  {
+    id: 'follower1000', name: 'Influencer der Apokalypse', tier: 'silber', box: 'fan',
+    description: 'Erreiche 1.000 Follower.',
+    comment: 'Tausend Follower. Du könntest jetzt Energydrinks bewerben. Wenn es noch Werbung gäbe.',
+    check: (e) => e.type === 'followers' && e.follower >= 1000,
+  },
+  {
+    id: 'follower10000', name: 'Galaktischer Superstar', tier: 'platin', box: 'fan',
+    description: 'Erreiche 10.000 Follower.',
+    comment: 'Auf drei Planeten gibt es jetzt T-Shirts mit deinem Gesicht. Keines davon ist lizenziert.',
+    check: (e) => e.type === 'followers' && e.follower >= 10000,
+  },
+  {
+    id: 'hype100', name: 'Die Halle tobt', tier: 'gold', box: 'fan',
+    description: 'Bringe den Hype auf 100.',
+    comment: 'Maximaler Hype. Irgendwo in der Galaxis ist gerade ein Sofa zusammengebrochen.',
+    check: (e, s) => e.type === 'followers' && s.viewers.hype >= 100,
+  },
+  {
+    id: 'klasse', name: 'Berufswahl', tier: 'silber', box: 'abenteurer',
+    description: 'Wähle Rasse und Klasse.',
+    comment: 'Du bist jetzt offiziell jemand. Jemand, der in einer Kanalisation kämpft, aber immerhin jemand.',
+    check: (e) => e.type === 'classChosen',
+  },
+  {
+    id: 'mensch', name: 'Traditionalist', tier: 'silber', box: 'kleidung',
+    description: 'Bleib ein Mensch.',
+    comment: 'Hunderte Rassen, und du bleibst, was du bist. Konsequent. Und ein bisschen langweilig.',
+    check: (e) => e.type === 'classChosen' && e.race === 'mensch',
+  },
+  {
+    id: 'exot', name: 'Evolution per Mausklick', tier: 'gold', box: 'abenteurer',
+    description: 'Wähle eine Rasse, die du dir erst freischalten musstest.',
+    comment: 'Du hast dir dein neues Ich verdient. Mit Blut, Schweiß und sehr seltsamen Entscheidungen.',
+    check: (e) => e.type === 'classChosen' && ['katzenmensch', 'troll', 'minotaurus', 'golem', 'pilzling', 'vampir', 'kobold'].includes(e.race),
+  },
+  {
+    id: 'faehigkeit', name: 'Spezialmove!', tier: 'bronze', box: 'brawler',
+    description: 'Setze deine Klassenfähigkeit ein.',
+    comment: 'Die Zuschauer haben auf diesen Moment gewartet. Du auch, gib es zu.',
+    check: (e) => e.type === 'abilityUsed',
+  },
+  {
+    id: 'showtime', name: 'Rampensau', tier: 'silber', box: 'fan',
+    description: 'Nutze „Showtime!“.',
+    comment: 'Eine Pose mitten im Kampf. Mutig. Die Monster waren zu verwirrt, um anzugreifen.',
+    check: (e) => e.type === 'abilityUsed' && e.ability === 'showtime',
+  },
+);

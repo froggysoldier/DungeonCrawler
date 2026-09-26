@@ -247,3 +247,16 @@ h1, h2, h3 { margin: 0; }
 .here .row button { padding: 2px 8px; font-size: 12px; }
 
 .bar.hp.poison > div { background: linear-gradient(90deg, #3d7a1e, #8fe04a); }
+
+/* ------------------------------------------------------------ Rassen-/Klassenwahl */
+.modal.wide { width: min(980px, 100%); }
+.select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.choices { display: grid; gap: 6px; max-height: 52vh; overflow: auto; padding-right: 4px; }
+.choice { display: grid; gap: 3px; text-align: left; padding: 8px 10px; }
+.choice.sel { border-color: var(--accent); background: #3a2f12; }
+.choice .lockreq { color: var(--danger); }
+.choice .ab { color: var(--info); }
+.rec { font-size: 10px; background: var(--accent); color: #1a1408; border-radius: 4px; padding: 1px 5px; margin-left: 6px; }
+.viewers { color: var(--achv); }
+@media (max-width: 700px) { .select-grid { grid-template-columns: 1fr; } .choices { max-height: 32vh; } }
+.actionbar button.ability { border-color: var(--accent-2); color: var(--accent-2); }

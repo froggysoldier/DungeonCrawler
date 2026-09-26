@@ -3,7 +3,11 @@ import { RARITY_COLORS, RARITY_NAMES, SLOT_NAMES } from '../data/items';
 import { SKILLS, skillXpNeeded } from '../data/skills';
 import { BOX_TIER_COLORS, FLOORS, RESTAURANT_HOSTS, RESTAURANT_MENU, SHOW_NAME } from '../data/world';
 import { monsterAt } from '../engine/ai';
+import { CLASS_BY_ID } from '../data/classes';
+import { RACE_BY_ID } from '../data/races';
 import { ABILITY_NAMES } from '../engine/abilities';
+import { currentAbility, useAbility } from '../engine/classes';
+import { liveViewers } from '../engine/viewers';
 import { describeBonuses, PART_NAMES, STAT_NAMES } from '../engine/bonuses';
 import {
   ATTACK_MOVES, ATTACK_PARTS, MOVE_NAMES, attackCost, hitChance, isInSafeRoom, techniqueBlocker, techniqueName,
@@ -25,6 +29,7 @@ import type { AttackMove, AttackPart, EquipSlot, GameState, Item, MetaState, Pos
 import { bindActions, esc, formatTime } from './dom';
 import { confirmBox, isModalOpen, showDialog, showHtml, showToast } from './modal';
 import { render, tileFromMouse, type View } from './render';
+import { showSelection } from './selection';
 
 type Tab = 'crawler' | 'inventar' | 'skills' | 'erfolge';
 
@@ -158,9 +163,25 @@ export class GameView {
   flushDialogs() {
     while (this.s.pendingDialogs.length) {
       const d = this.s.pendingDialogs.shift()!;
-      showDialog(d.title, d.speaker, d.pages).then(() => this.refresh());
+      showDialog(d.title, d.speaker, d.pages).then(() => {
+        this.refresh();
+        this.maybeSelect();
+      });
     }
     saveRun(this.s);
+    this.maybeSelect();
+  }
+
+  private selecting = false;
+
+  /** Öffnet die Rassen-/Klassenwahl, sobald keine anderen Dialoge mehr offen sind. */
+  private maybeSelect() {
+    if (!this.s.pendingSelection || this.selecting || isModalOpen()) return;
+    this.selecting = true;
+    showSelection(this.s, () => {
+      this.selecting = false;
+      this.afterAction();
+    });
   }
 
   private technique() {
@@ -338,6 +359,8 @@ export class GameView {
     if (e.code === 'Space' || e.code === 'Numpad5') {
       e.preventDefault();
       this.act(() => wait(s));
+    } else if ((e.key === 'f' || e.key === 'F') && currentAbility(s)) {
+      this.act(() => useAbility(s, this.technique()));
     } else if (e.key === 'g' || e.key === 'G') {
       this.act(() => pickup(s));
     } else if (e.key === 'Enter' && onStairs(s)) {
@@ -399,6 +422,7 @@ export class GameView {
       <span class="timer ${left <= 120 ? 'warn' : ''}" title="Zeit bis zum Einsturz">⏳ Einsturz in ${formatTime(left)}</span>
       <span class="spacer"></span>
       <span>${esc(p.name)} · Lv <b>${p.level}</b></span>
+      ${hasUnlock(s, 'zuschauer') ? `<span class="viewers" title="Live-Zuschauer · Follower · Hype">👁 ${liveViewers(s).toLocaleString('de-DE')} · ❤ ${s.viewers.follower.toLocaleString('de-DE')} · 🔥 ${Math.round(s.viewers.hype)}</span>` : ''}
       <span style="color:#ffd700">● ${p.gold} Gold</span>
       <span title="Ungeöffnete Lootboxen">🎁 ${p.boxes.length}</span>
       ${pet ? `<span style="color:#ffb3e6" title="Haustier">🐾 ${esc(pet.name)} ${pet.alive ? `${pet.hp}/${pet.maxHp}` : '(bewusstlos)'}</span>` : ''}`;
@@ -536,7 +560,7 @@ export class GameView {
       <div class="bar st"><div style="width:${(100 * p.ausdauer) / ma}%"></div><span>Ausdauer ${p.ausdauer} / ${ma}</span></div>
       <div class="bar xp"><div style="width:${(100 * p.xp) / need}%"></div><span>XP ${p.xp} / ${need} (Level ${p.level})</span></div>
     </div>
-    <div class="muted small">${esc(p.name)} · früher: ${esc(p.background)}</div>`;
+    <div class="muted small">${esc(p.name)} · früher: ${esc(p.background)}${p.race ? ` · ${esc(RACE_BY_ID[p.race].name.replace(' (bleiben, wie du bist)', ''))}` : ''}${p.klass ? ` · <b style="color:var(--accent)">${esc(CLASS_BY_ID[p.klass].name)}</b>` : ''}</div>`;
     if (!hasUnlock(s, 'stats')) {
       return html + `<div class="locked" style="margin-top:12px">🔒 Deine Werte siehst du erst nach dem Tutorial.<br>Finde die <b>Gilde der Einweisung</b>.</div>
         <div class="section">In der Hand</div>${p.hand ? `<div class="item">${this.itemHtml(p.hand, true, 'hand')}</div>` : '<div class="muted">Nichts. Heb etwas auf (G).</div>'}`;
@@ -649,6 +673,8 @@ export class GameView {
     const s = this.s;
     const el = this.root.querySelector('.actionbar') as HTMLElement;
     const thr = throwables(s).reduce((a, i) => a + (i.menge ?? 1), 0);
+    const ability = currentAbility(s);
+    const cd = s.player.abilityCooldown ?? 0;
     const partBtn = (part: AttackPart) => {
       const disabled = (part === 'waffe' && !currentWeapon(s)) || (part === 'wurf' && thr === 0);
       const label = part === 'wurf' ? `Wurf (${thr})` : part === 'waffe' ? (currentWeapon(s)?.name ?? 'Waffe') : PART_NAMES[part];
@@ -661,6 +687,7 @@ export class GameView {
     el.innerHTML = `
       <div class="grp">${ATTACK_PARTS.map(partBtn).join('')}</div>
       <div class="grp">${ATTACK_MOVES.map(moveBtn).join('')}</div>
+      ${ability ? `<div class="grp"><button class="ability" data-action="ability" ${cd ? 'disabled' : ''} title="Taste F · ${esc(ability.description)}">★ ${esc(ability.name)}${cd ? ` (${cd})` : ''}<span class="key">F</span></button></div>` : ''}
       <div class="grp"><button data-action="wait" title="Leertaste">Warten</button><button data-action="pickup" title="G">Aufheben</button></div>
       <span class="muted small">Gewählt: <b style="color:var(--accent)">${esc(techniqueName(this.technique()))}</b> · ${attackCost(this.technique())} Ausdauer</span>`;
     bindActions(el, {
@@ -677,6 +704,7 @@ export class GameView {
       },
       wait: () => this.act(() => wait(s)),
       pickup: () => this.act(() => pickup(s)),
+      ability: () => this.act(() => useAbility(s, this.technique())),
     });
   }
 

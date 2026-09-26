@@ -13,6 +13,8 @@ export interface FloorDef {
   floor: number;
   name: string;
   intro: string;
+  /** Raumbeschreibungen dieser Etage (Standard: Keller). */
+  flavors?: RoomFlavor[];
   /** Dauer bis zum Einsturz in Zügen (1 Zug = 3 Minuten). */
   duration: number;
   mobLevel: [number, number];
@@ -31,9 +33,37 @@ export const FLOORS: FloorDef[] = [
     intro: 'Die zweite Etage sieht aus wie die erste – nur dunkler, feuchter und mit mehr Zähnen. Die Systemstimme verspricht „spannende neue Features“. Das klingt nicht gut.',
     duration: 2400, mobLevel: [3, 7],
   },
+  {
+    floor: 3, name: 'Die Kanalstadt',
+    intro: 'Unter den Kellern liegt die Kanalisation – und in ihr eine ganze Stadt. Brücken über Abwasserkanäle, Hütten aus Treibgut, Märkte in Pumpwerken. Hier leben Dinge, die das Tageslicht nie gesehen haben. Und sie haben Hunger.',
+    duration: 2400, mobLevel: [6, 11],
+    flavors: [
+      { name: 'Pumpwerk', description: 'Riesige Kolben stehen still. In ihren Schatten wohnt etwas, das bei jedem Geräusch zusammenzuckt. Oder zuschnappt.' },
+      { name: 'Überlaufbecken', description: 'Ein See aus trübem Wasser. Blasen steigen auf. Nicht alle davon sind Gas.' },
+      { name: 'Schwarzmarkt-Gasse', description: 'Verlassene Stände, handgemalte Schilder: „Nieren – fast neu“, „Hoffnung – ausverkauft“.' },
+      { name: 'Morlock-Siedlung', description: 'Hütten aus Mülltonnen und Autotüren. Ein Kochtopf blubbert. Du willst nicht wissen, was drin ist.' },
+      { name: 'Klärbecken', description: 'Der Gestank ist so dicht, dass man ihn anlehnen könnte.' },
+      { name: 'Gewölbe der Rohre', description: 'Tausende Rohre, die sich wie Adern durch die Wände ziehen. Manche pulsieren.' },
+      { name: 'Rattenmarkt', description: 'Kleine Stände, betrieben von Ratten in Westen. Sie sind geflohen, als du kamst. Ihre Ware liegt noch da.' },
+      { name: 'Alte U-Bahn-Wartungshalle', description: 'Ein verrosteter Waggon, halb im Wasser. Auf der Anzeige: „Zug fällt aus“. Für immer.' },
+      { name: 'Kanalkapelle', description: 'Ein Altar aus Gullydeckeln. Davor Opfergaben: Socken, Schlüssel, ein einzelner Ohrring.' },
+      { name: 'Schmugglerversteck', description: 'Kisten mit gestohlenen Waren und eine Karte mit roten Kreuzen. Eines davon ist hier.' },
+      { name: 'Krokodilnest', description: 'Eier, so groß wie Medizinbälle. Eines hat einen Riss. Etwas darin klopft.' },
+      { name: 'Wasserrad-Mühle', description: 'Ein Rad dreht sich im Abwasserstrom und mahlt… Knochen? Knochen.' },
+      { name: 'Pilzgarten', description: 'Riesige, bleiche Pilze, zwischen denen feiner Sporennebel hängt. Atme nicht zu tief.' },
+      { name: 'Taubenschlag', description: 'Tausende Federn, tausende Augen. Das Gurren klingt wie ein Knurren.' },
+      { name: 'Brücke über den Hauptkanal', description: 'Eine wackelige Konstruktion aus Paletten. Unter dir fließt etwas, das früher eine Stadt war.' },
+      { name: 'Verlassene Taverne „Zum Gully“', description: 'Stühle auf den Tischen, als hätte jemand gerade aufgeräumt. Hinter dem Tresen: ein Schatten.' },
+    ],
+  },
 ];
 
-export const LAST_PLAYABLE_FLOOR = 2;
+export const LAST_PLAYABLE_FLOOR = 3;
+
+export const ARRIVAL_ROOM: RoomFlavor = {
+  name: 'Am Fuß der Treppe',
+  description: 'Die Treppe hinter dir zerbröselt zu Staub. Kein Zurück. Vor dir: die neue Etage.',
+};
 
 // ------------------------------------------------------------------ Räume
 

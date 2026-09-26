@@ -5,6 +5,7 @@ import { maxHp } from '../src/engine/player';
 import { emptyMeta } from '../src/engine/meta';
 import type { GameState, Pos } from '../src/engine/types';
 import { isInSafeRoom, techniqueBlocker } from '../src/engine/combat';
+import { chooseRaceAndClass, classOptions, useAbility } from '../src/engine/classes';
 
 const cheb = (a: Pos, b: Pos) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y));
 const center = (r: { x: number; y: number; w: number; h: number }) => ({ x: r.x + Math.floor(r.w / 2), y: r.y + Math.floor(r.h / 2) });
@@ -39,14 +40,27 @@ function fight(s: GameState): boolean {
   return true;
 }
 
-function runBot(seed: number) {
+function runBot(seed: number, maxFloor = 3) {
   const s = newGame({ name: 'Bot', answers: [seed % 9, seed % 4, 3, seed % 5, seed % 4], seed, meta: emptyMeta() });
   s.pendingDialogs = [];
   let phase: 'guild' | 'clear' | 'stairs' = 'guild';
   let guard = 0;
-  while (s.status === 'playing' && guard++ < 6000) {
+  let floor = 1;
+  while (s.status === 'playing' && guard++ < 18000) {
     const p = s.player;
-    if (s.floor > 1) break;
+    if (s.floor > maxFloor) break;
+    if (s.floor !== floor) {
+      floor = s.floor;
+      phase = 'clear';
+      s.pendingDialogs = [];
+    }
+    if (s.pendingSelection) {
+      chooseRaceAndClass(s, 'mensch', classOptions(s)[0].klass.id);
+      continue;
+    }
+    if (p.klass && !p.abilityCooldown && s.monsters.some((m) => cheb(m.pos, p.pos) <= 1)) {
+      if (useAbility(s, { part: 'tritt', move: 'normal' }).ok) continue;
+    }
     // Heilen
     if (p.hp < maxHp(s) * 0.35) {
       const pot = p.inventory.find((i) => i.kind === 'verbrauch' && i.effekt?.heal);
@@ -84,7 +98,7 @@ function runBot(seed: number) {
         .filter((m) => (p.level < 5 ? m.rank === 'normal' || m.rank === 'elite' : m.rank === 'nachbarschaftsboss') && m.level <= p.level + 3)
         .sort((a, b) => cheb(a.pos, p.pos) - cheb(b.pos, p.pos));
       const t = targets[0];
-      if (!t || s.turn > 1700) {
+      if (!t || s.turn - s.floorStartTurn > 1700) {
         phase = 'stairs';
         continue;
       }
@@ -97,7 +111,7 @@ function runBot(seed: number) {
     stairs.sort((a, b) => cheb(a, p.pos) - cheb(b, p.pos));
     if (stairs.some((q) => q.x === p.pos.x && q.y === p.pos.y)) {
       descend(s, { ghosts: [] });
-      break;
+      continue;
     }
     if (!goTo(s, stairs[0])) wait(s);
   }
@@ -113,17 +127,18 @@ it.runIf(enabled)('Balance-Simulation Etage 1', () => {
     const s = runBot(seed);
     results.push({
       seed,
-      status: s.floor > 1 ? 'E2' : s.status,
+      status: s.status === 'victory' ? 'SIEG' : `E${s.floor} ${s.status}`,
       level: s.player.level,
       kills: s.counters.kills,
       turn: s.turn,
-      skills: s.player.skills.map((k) => `${k.id}:${k.level}`).join(','),
+      klasse: s.player.klass ?? '-',
+      follower: s.viewers.follower,
       ach: s.achievements.length,
       bosses: s.counters.bossKills,
       cause: s.deathCause ?? '',
     });
   }
   console.table(results);
-  const alive = results.filter((r) => r.status === 'E2').length;
-  console.log(`Etage 2 erreicht: ${alive}/30`);
+  for (const f of [2, 3]) console.log(`Etage ${f} erreicht: ${results.filter((r) => r.status === 'SIEG' || Number(r.status[1]) >= f).length}/30`);
+  console.log(`Etage 3 überlebt: ${results.filter((r) => r.status === 'SIEG').length}/30`);
 }, 120_000);

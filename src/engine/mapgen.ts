@@ -1,6 +1,6 @@
 import { HOOD_BOSSES } from '../data/monsters';
 import {
-  FLOORS, GUILD_ROOM, HOOD_NAMES, ROOM_FLAVORS, SAFE_ROOM_FREEBIE, SAFE_ROOM_RESTAURANT, START_ROOM,
+  ARRIVAL_ROOM, FLOORS, GUILD_ROOM, HOOD_NAMES, ROOM_FLAVORS, SAFE_ROOM_FREEBIE, SAFE_ROOM_RESTAURANT, START_ROOM,
 } from '../data/world';
 import { createItem, rollGroundItem } from './items';
 import { clampLevel, pickMonsterDef, spawnBoss, spawnGhost, spawnMonster } from './monsters';
@@ -164,7 +164,8 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
     y: startHood < 2 ? 0 : MAP_H,
   };
   const startRoom = hoodRooms(startHood).sort((a, b) => dist(center(a), corner) - dist(center(b), corner))[0];
-  assign(startRoom, 'start', START_ROOM.name, START_ROOM.description);
+  const arrival = floor === 1 ? START_ROOM : ARRIVAL_ROOM;
+  assign(startRoom, 'start', arrival.name, arrival.description);
 
   // Gilde: im Start-Viertel in mittlerer Entfernung, plus eine weitere woanders
   const byDistFromStart = (rs: Room[]) =>
@@ -254,7 +255,7 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
   }
 
   // Übrige Räume bekommen Namen und Beschreibungen
-  const flavors = R.shuffle(s, [...ROOM_FLAVORS]);
+  const flavors = R.shuffle(s, [...(def.flavors ?? ROOM_FLAVORS)]);
   let fi = 0;
   for (const r of m.rooms) {
     if (r.kind !== 'normal') continue;

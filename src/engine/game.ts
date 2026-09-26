@@ -6,19 +6,21 @@ import {
   SHOW_NAME, tutorialPages,
 } from '../data/world';
 import { monsterAt, monsterTurn, occupied, petLevelUp, petTurn } from './ai';
-import { cure, hasSpecial } from './abilities';
+import { cure } from './abilities';
 import { isInSafeRoom, playerAttack } from './combat';
 import { handleLethal } from './death';
 import { emit } from './events';
 import { chebyshev, computeFov } from './fov';
-import { createItem, generateEquipment, isStackable, rollBoxContents } from './items';
+import { createItem, generateEquipment, rollBoxContents } from './items';
 import { log, toast } from './log';
 import { MAP_H, MAP_W, generateFloor, hoodOf, idx, inBounds, isWalkable, roomOf, tileAt } from './mapgen';
 import { spawnForFloor } from './monsters';
 import { canStep, findPath } from './path';
 import { clampVitals, lichtradius, maxAusdauer, maxHp, skillLevel, totalBonuses } from './player';
 import * as R from './rng';
+import { addToInventory, giveItem } from './inventory';
 import { learnSkill } from './skills';
+import { viewersTick } from './viewers';
 import type {
   ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique,
 } from './types';
@@ -102,6 +104,8 @@ export function newGame(opts: NewGameOptions): GameState {
     contractSigned: false,
     firstEver: [...opts.meta.achievementsEver],
     ghostsDefeated: [],
+    viewers: { follower: 0, hype: 0, nextFanBox: 0, lastSpectacle: 0 },
+    pendingSelection: false,
     toasts: [],
   };
 
@@ -211,8 +215,11 @@ export function planPath(s: GameState, target: Pos): Pos[] | null {
 
 // ================================================================ Züge
 
+const SELECT_FIRST = 'Wähle zuerst deine Rasse und Klasse.';
+
 export function moveStep(s: GameState, to: Pos): ActionResult {
   if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  if (s.pendingSelection) return fail(SELECT_FIRST);
   const p = s.player;
   if (chebyshev(p.pos, to) !== 1) return fail('Nur ein Feld pro Zug.');
   if (!canStep(s.map, p.pos, to)) return fail('Da ist eine Wand.');
@@ -232,6 +239,7 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
 
 export function attack(s: GameState, targetUid: string, t: Technique): ActionResult {
   if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  if (s.pendingSelection) return fail(SELECT_FIRST);
   const m = s.monsters.find((x) => x.uid === targetUid);
   if (!m) return fail('Kein Ziel.');
   const res = playerAttack(s, m, t);
@@ -242,6 +250,7 @@ export function attack(s: GameState, targetUid: string, t: Technique): ActionRes
 
 export function wait(s: GameState): ActionResult {
   if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  if (s.pendingSelection) return fail(SELECT_FIRST);
   s.player.ausdauer = Math.min(maxAusdauer(s), s.player.ausdauer + 1);
   endTurn(s);
   return OK;
@@ -298,6 +307,9 @@ function tickTime(s: GameState, turns: number, before: number) {
   if (turns === 1 && calm && s.turn % 3 === 0) p.hp = Math.min(maxHp(s, bon), p.hp + 1);
   p.ausdauer = Math.min(maxAusdauer(s, bon), p.ausdauer + turns);
   clampVitals(s);
+
+  viewersTick(s, turns);
+  if (p.abilityCooldown) p.abilityCooldown = Math.max(0, p.abilityCooldown - turns);
 
   while (s.turn - s.lastSpawnTurn >= 30) {
     s.lastSpawnTurn += 30;
@@ -441,48 +453,6 @@ function runTutorial(s: GameState) {
 }
 
 // ================================================================ Items
-
-function addToInventory(s: GameState, item: Item) {
-  if (isStackable(item.kind)) {
-    const same = s.player.inventory.find((i) => i.baseId === item.baseId && i.rarity === item.rarity && i.name === item.name);
-    if (same) {
-      same.menge = (same.menge ?? 1) + (item.menge ?? 1);
-      return;
-    }
-  }
-  s.player.inventory.push(item);
-}
-
-/** Gibt dem Crawler ein Item: Inventar, oder vor dem Tutorial in die Hand. */
-function gainGold(s: GameState, amount: number) {
-  const bonus = hasSpecial(s, 'goldmagnet') ? Math.round(amount * 0.5) : 0;
-  s.player.gold += amount + bonus;
-  s.counters.goldEarned += amount + bonus;
-  if (bonus) log(s, `Der Goldmagnet zieht ${bonus} Extra-Gold an.`, 'loot');
-  emit(s, { type: 'goldGained', amount: amount + bonus });
-}
-
-function giveItem(s: GameState, item: Item) {
-  const p = s.player;
-  if (item.kind === 'gold') {
-    gainGold(s, item.menge ?? 0);
-    return;
-  }
-  if (item.kind === 'box') {
-    p.boxes.push(item);
-    return;
-  }
-  if (hasUnlock(s, 'inventar')) {
-    addToInventory(s, item);
-    return;
-  }
-  if (!p.hand) {
-    p.hand = item;
-    return;
-  }
-  s.items.push({ pos: { ...p.pos }, item });
-  log(s, `Deine Hände sind voll. ${item.name} fällt zu Boden.`, 'info');
-}
 
 export function pickup(s: GameState, uid?: string): ActionResult {
   const p = s.player;
@@ -738,14 +708,31 @@ export function descend(s: GameState, meta: Pick<MetaState, 'ghosts'>): ActionRe
   emit(s, { type: 'descend', floor: s.floor + 1 });
   if (s.floor + 1 > LAST_PLAYABLE_FLOOR) {
     s.status = 'victory';
-    log(s, `Du steigst hinab… und landest vor einer Tür mit einem Schild: „Etage ${s.floor + 1} – Baustelle. Rassen- und Klassenwahl bald verfügbar.“`, 'system');
+    log(s, `Du steigst hinab… und landest vor einer Tür mit einem Schild: „Etage ${s.floor + 1} – Baustelle. Bitte später wiederkommen.“`, 'system');
     return OK;
   }
   const next = s.floor + 1;
   enterFloor(s, next, meta);
   const def = FLOORS.find((f) => f.floor === next)!;
   log(s, `Etage ${next}: ${def.name}.`, 'system');
-  s.pendingDialogs.push({ title: `Etage ${next}: ${def.name}`, speaker: 'Die Systemstimme', pages: [def.intro] });
+  const pages = [def.intro];
+  if (next === 2 && !hasUnlock(s, 'zuschauer')) {
+    s.unlocks.push('zuschauer');
+    pages.push(
+      'NEU: DAS PUBLIKUM! Ab sofort schaut dir die ganze Galaxis live zu. Spektakuläre Aktionen – Stampfer, Sprungtritte, Bosskills, knappe Rettungen, Achievements – bringen Hype und Follower.',
+      'Mehr Follower bedeuten Fan-Boxen (bei 100, 250, 500, 1000 … Followern) und ab und zu Geschenke aus dem Publikum. Charisma hilft. Langeweile nicht. Die Zuschauer schalten nicht gerne bei jemandem ein, der nur wartet.',
+    );
+    log(s, 'FREIGESCHALTET: Zuschauer, Follower und Fan-Boxen.', 'system');
+  }
+  if (next === 3 && !hasUnlock(s, 'klasse')) {
+    s.pendingSelection = true;
+    pages.push(
+      `Kaum hast du die Treppe verlassen, zieht dich ein Lichtstrahl zurück in die Gilde der Einweisung. ${s.guideName} wartet schon. „Es ist so weit. Etage 3. Zeit, dich zu entscheiden, was du sein willst.“`,
+      '„Du darfst deine RASSE wählen – oder Mensch bleiben. Einige Rassen hast du dir durch dein Verhalten erst freigeschaltet. Und die Systemstimme hat dir eine persönliche KLASSENLISTE erstellt – basierend darauf, wie du bisher gekämpft hast. Die drei Empfehlungen oben passen am besten zu dir.“',
+      '„Jede Klasse bringt eine besondere Fähigkeit mit. Überleg gut. Das kannst du nicht rückgängig machen.“',
+    );
+  }
+  s.pendingDialogs.push({ title: `Etage ${next}: ${def.name}`, speaker: 'Die Systemstimme', pages });
   return OK;
 }
 

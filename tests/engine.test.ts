@@ -195,16 +195,20 @@ describe('Tutorial, Etagen und Tod', () => {
     expect(s.deathCause).toMatch(/einstürzenden/);
   });
 
-  it('Treppe führt auf Etage 2, danach ist die Demo geschafft', () => {
+  it('Treppen führen bis Etage 3, danach ist die Demo geschafft', () => {
     const s = make(102);
     const stairsIdx = s.map.tiles.indexOf('stairs');
     teleport(s, { x: stairsIdx % s.map.width, y: Math.floor(stairsIdx / s.map.width) });
     expect(descend(s, { ghosts: [] }).ok).toBe(true);
     expect(s.floor).toBe(2);
     expect(s.achievements).toContain('absteiger');
-    const i2 = s.map.tiles.indexOf('stairs');
-    teleport(s, { x: i2 % s.map.width, y: Math.floor(i2 / s.map.width) });
-    descend(s, { ghosts: [] });
+    for (const floor of [3, 4]) {
+      const i2 = s.map.tiles.indexOf('stairs');
+      teleport(s, { x: i2 % s.map.width, y: Math.floor(i2 / s.map.width) });
+      s.pendingSelection = false;
+      descend(s, { ghosts: [] });
+      if (floor === 3) expect(s.floor).toBe(3);
+    }
     expect(s.status).toBe('victory');
   });
 

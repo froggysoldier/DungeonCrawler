@@ -245,11 +245,26 @@ export interface Player {
   pet: Pet | null;
   flags: string[];
   curses: string[];
+  /** Ab Etage 3 gewählt. */
+  race?: string;
+  klass?: string;
+  abilityCooldown?: number;
+}
+
+export interface Viewers {
+  follower: number;
+  /** Kurzfristige Begeisterung (0–100): steigt mit Spektakel, sinkt mit Langeweile. */
+  hype: number;
+  /** Index der nächsten Fan-Box-Schwelle. */
+  nextFanBox: number;
+  /** Zug der letzten spektakulären Aktion. */
+  lastSpectacle: number;
+  lastCloseCall?: number;
 }
 
 // ---------------------------------------------------------------- Spiel
 
-export type Unlock = 'inventar' | 'stats' | 'minimap' | 'skills';
+export type Unlock = 'inventar' | 'stats' | 'minimap' | 'skills' | 'zuschauer' | 'klasse';
 
 export interface LogEntry {
   turn: number;
@@ -311,6 +326,9 @@ export interface GameState {
   /** Achievements, die vor diesem Run schon einmal erreicht wurden. */
   firstEver: string[];
   ghostsDefeated: string[];
+  viewers: Viewers;
+  /** Rassen- und Klassenwahl steht an (Etage 3). */
+  pendingSelection: boolean;
   toasts: Toast[];
 }
 
@@ -352,6 +370,9 @@ export type GameEvent =
   | { type: 'robbed'; amount: number; source: string }
   | { type: 'explosion'; damage: number; source: string }
   | { type: 'goldGained'; amount: number }
+  | { type: 'classChosen'; race: string; klass: string }
+  | { type: 'abilityUsed'; ability: string }
+  | { type: 'followers'; follower: number }
   | { type: 'moved' }
   | { type: 'start' };
 
