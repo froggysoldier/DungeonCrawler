@@ -5,6 +5,7 @@ import { itemName, nameOf } from './identify';
 import { giveItem } from './inventory';
 import { createBox, createGold, generateEquipment } from './items';
 import { log, toast } from './log';
+import { isWalkable } from './mapgen';
 import { randomTome } from './magic';
 import { checkEvolve } from './petevo';
 import { targetFacets } from './observer';
@@ -52,7 +53,7 @@ function freeNeighbor(s: GameState, p: Pos): Pos {
   for (let dy = -1; dy <= 1; dy++) {
     for (let dx = -1; dx <= 1; dx++) {
       const q = { x: p.x + dx, y: p.y + dy };
-      if ((dx || dy) && s.map.tiles[q.y * s.map.width + q.x] !== 'wall' && !s.monsters.some((m) => m.pos.x === q.x && m.pos.y === q.y)) return q;
+      if ((dx || dy) && isWalkable(s.map, q.x, q.y) && !s.monsters.some((m) => m.pos.x === q.x && m.pos.y === q.y)) return q;
     }
   }
   return { ...p };

@@ -22,7 +22,8 @@ function reachable(s: GameState, from: Pos): Set<number> {
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
       const n = { x: c.x + dx, y: c.y + dy };
       const i = idx(s.map, n.x, n.y);
-      if (!isWalkable(s.map, n.x, n.y) || seen.has(i)) continue;
+      // Geschlossene Türen zählen als Durchgang (man kann sie öffnen)
+      if ((!isWalkable(s.map, n.x, n.y) && s.map.tiles[i] !== 'door') || seen.has(i)) continue;
       seen.add(i);
       q.push(n);
     }

@@ -1,4 +1,4 @@
-import { idx, inBounds, isWalkable, tileAt } from './mapgen';
+import { blocksSight, idx, inBounds } from './mapgen';
 import type { FloorMap, Pos } from './types';
 
 /** Sichtfeld per Strahlenwurf. Gibt eine Menge von Kachel-Indizes zurück. */
@@ -19,7 +19,7 @@ export function computeFov(m: FloorMap, origin: Pos, radius: number): Set<number
       const ty = Math.floor(y);
       if (!inBounds(m, tx, ty)) break;
       visible.add(idx(m, tx, ty));
-      if (tileAt(m, tx, ty) === 'wall') break;
+      if (blocksSight(m, tx, ty)) break;
     }
   }
   return visible;
@@ -35,7 +35,7 @@ export function hasLineOfSight(m: FloorMap, a: Pos, b: Pos): boolean {
   const sy = y0 < b.y ? 1 : -1;
   let err = dx + dy;
   while (!(x0 === b.x && y0 === b.y)) {
-    if (!(x0 === a.x && y0 === a.y) && !isWalkable(m, x0, y0)) return false;
+    if (!(x0 === a.x && y0 === a.y) && blocksSight(m, x0, y0)) return false;
     const e2 = 2 * err;
     if (e2 >= dy) {
       err += dy;

@@ -17,7 +17,7 @@ function goTo(s: GameState, target: Pos): boolean {
     const r = s.map.roomAt[y * s.map.width + x];
     if (r >= 0 && lairs.has(r) && r !== targetRoom) return false;
     return !s.monsters.some((m) => m.pos.x === x && m.pos.y === y);
-  }, 8000);
+  }, 8000, true);
   if (!path?.length) return false;
   return moveStep(s, path[0]).ok;
 }

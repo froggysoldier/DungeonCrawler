@@ -32,11 +32,11 @@ import type { Quest } from '../engine/types';
 import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
-  chooseThrowable, craftItem, disarmTrap, placeTrap,
+  chooseThrowable, craftItem, disarmTrap, placeTrap, closeDoor, adjacentOpenDoors,
   askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff, rideToggle, refuelMount,
   type ActionResult,
 } from '../engine/game';
-import { idx, isWalkable } from '../engine/mapgen';
+import { idx, isWalkable, tileAt } from '../engine/mapgen';
 import { saveRun, syncMeta, saveMeta } from '../engine/meta';
 import { canStep } from '../engine/path';
 import {
@@ -309,8 +309,16 @@ export class GameView {
     if (this.traveling) return;
     this.traveling = true;
     const seenBefore = new Set(this.visibleMonsters().map((m) => m.uid));
-    for (const step of path) {
+    for (let k = 0; k < path.length; k++) {
+      const step = path[k];
       if (!this.traveling || this.s.status !== 'playing' || isModalOpen()) break;
+      // Tür auf dem Weg: erst öffnen, dann hindurch
+      if (tileAt(this.s.map, step.x, step.y) === 'door') {
+        if (!this.act(() => moveStep(this.s, step))) break;
+        k -= 1;
+        await new Promise((r) => setTimeout(r, 120));
+        continue;
+      }
       const hpBefore = this.s.player.hp;
       const roomBefore = this.s.currentRoom;
       const trapsBefore = (this.s.traps ?? []).filter((x) => !x.hidden).length;
@@ -372,7 +380,8 @@ export class GameView {
       else this.act(() => wait(s));
       return;
     }
-    if (chebyshev(t, s.player.pos) === 1 && canStep(s.map, s.player.pos, t)) {
+    const isClosedDoor = tileAt(s.map, t.x, t.y) === 'door';
+    if (chebyshev(t, s.player.pos) === 1 && (canStep(s.map, s.player.pos, t) || isClosedDoor)) {
       this.act(() => moveStep(s, t));
       return;
     }
@@ -582,6 +591,10 @@ export class GameView {
         .join('')}`);
     }
     if (onStairs(s)) blocks.push('<div class="row" style="margin:6px 0"><button class="primary" data-action="descend">Hinabsteigen (Enter)</button></div>');
+    const doors = adjacentOpenDoors(s);
+    if (doors.length) {
+      blocks.push(`<div class="row" style="margin:6px 0;gap:4px">${doors.map((d) => `<button data-action="closedoor" data-x="${d.x}" data-y="${d.y}">Tür schließen</button>`).join('')}</div>`);
+    }
     const people = talkableCrawlers(s);
     if (people.length) {
       const healer = s.player.inventory.find((i) => i.kind === 'verbrauch' && (i.effekt?.heal || i.effekt?.healPct));
@@ -643,6 +656,7 @@ export class GameView {
     bindActions(el, {
       pick: (b) => this.act(() => pickup(s, b.dataset.uid)),
       disarm: (b) => this.act(() => disarmTrap(s, b.dataset.uid!)),
+      closedoor: (b) => this.act(() => closeDoor(s, { x: Number(b.dataset.x), y: Number(b.dataset.y) })),
       talk: (b) => this.act(() => talkCrawler(s, b.dataset.uid!)),
       invite: (b) => this.act(() => inviteCrawler(s, b.dataset.uid!)),
       dismiss: (b) => this.act(() => dismissCrawler(s, b.dataset.uid!)),

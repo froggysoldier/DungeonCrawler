@@ -1,4 +1,4 @@
-import { idx, inBounds, isWalkable } from './mapgen';
+import { idx, inBounds, isWalkable, tileAt } from './mapgen';
 import type { FloorMap, Pos } from './types';
 
 const DIRS: Pos[] = [
@@ -16,7 +16,10 @@ export function findPath(
   to: Pos,
   passable: (x: number, y: number) => boolean = () => true,
   maxNodes = 4000,
+  /** Geschlossene Türen als begehbar planen (der Crawler öffnet sie unterwegs). */
+  throughDoors = false,
 ): Pos[] | null {
+  const walk = (x: number, y: number) => isWalkable(m, x, y) || (throughDoors && tileAt(m, x, y) === 'door');
   if (!inBounds(m, to.x, to.y)) return null;
   const startI = idx(m, from.x, from.y);
   const goalI = idx(m, to.x, to.y);
@@ -48,9 +51,9 @@ export function findPath(
     for (const d of DIRS) {
       const nx = x + d.x;
       const ny = y + d.y;
-      if (!inBounds(m, nx, ny) || !isWalkable(m, nx, ny)) continue;
-      // Keine Diagonale durch Wandecken
-      if (d.x && d.y && (!isWalkable(m, x + d.x, y) || !isWalkable(m, x, y + d.y))) continue;
+      if (!inBounds(m, nx, ny) || !walk(nx, ny)) continue;
+      // Keine Diagonale durch Wandecken und nicht schräg durch Türrahmen
+      if (d.x && d.y && (!walk(x + d.x, y) || !walk(x, y + d.y) || isDoor(m, x, y) || isDoor(m, nx, ny))) continue;
       const ni = idx(m, nx, ny);
       if (ni !== goalI && !passable(nx, ny)) continue;
       const ng = g.get(i)! + (d.x && d.y ? 1.01 : 1);
@@ -64,10 +67,16 @@ export function findPath(
   return null;
 }
 
+export function isDoor(m: FloorMap, x: number, y: number): boolean {
+  const t = tileAt(m, x, y);
+  return t === 'door' || t === 'dooropen';
+}
+
 export function canStep(m: FloorMap, from: Pos, to: Pos): boolean {
   if (!isWalkable(m, to.x, to.y)) return false;
   const dx = to.x - from.x;
   const dy = to.y - from.y;
   if (dx && dy && (!isWalkable(m, from.x + dx, from.y) || !isWalkable(m, from.x, from.y + dy))) return false;
+  if (dx && dy && (isDoor(m, from.x, from.y) || isDoor(m, to.x, to.y))) return false;
   return true;
 }

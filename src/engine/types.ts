@@ -11,7 +11,8 @@ export interface Pos {
 
 // ---------------------------------------------------------------- Karte
 
-export type Tile = 'wall' | 'floor' | 'stairs';
+/** door = geschlossene Tür (blockiert Weg und Sicht), dooropen = offene Tür. */
+export type Tile = 'wall' | 'floor' | 'stairs' | 'door' | 'dooropen';
 
 export type RoomKind = 'start' | 'normal' | 'guild' | 'safe' | 'boss' | 'arena';
 
@@ -654,6 +655,7 @@ export type GameEvent =
   | { type: 'talkShow'; delta: number; tone: ShowTone }
   | { type: 'petLevel'; level: number }
   | { type: 'petEvolved'; form: string; stage: number }
+  | { type: 'doorOpened'; pos: Pos }
   | { type: 'mountGained'; id: string }
   | { type: 'rammed'; kill: boolean }
   | { type: 'mountLost'; id: string }

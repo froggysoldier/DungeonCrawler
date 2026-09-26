@@ -16,7 +16,7 @@ import { createItem, generateEquipment, rollBoxContents } from './items';
 import { log, toast } from './log';
 import { MAP_H, MAP_W, generateFloor, hoodOf, idx, inBounds, isWalkable, roomOf, tileAt } from './mapgen';
 import { spawnForFloor } from './monsters';
-import { canStep, findPath } from './path';
+import { canStep, findPath, isDoor } from './path';
 import { clampVitals, lichtradius, maxAusdauer, maxHp, skillLevel, totalBonuses } from './player';
 import * as R from './rng';
 import { addToInventory, giveItem } from './inventory';
@@ -252,9 +252,9 @@ export function planPath(s: GameState, target: Pos): Pos[] | null {
   if (!known(target.x, target.y)) return null;
   const isTarget = (x: number, y: number) => x === target.x && y === target.y;
   const ok = (x: number, y: number) => known(x, y) && !monsterAt(s, { x, y });
-  // Bekannte Fallen umgehen – wenn es gar nicht anders geht, eben mitten durch
-  return findPath(s.map, s.player.pos, target, (x, y) => ok(x, y) && (isTarget(x, y) || !avoidTile(s, x, y)), 6000)
-    ?? findPath(s.map, s.player.pos, target, ok, 6000);
+  // Bekannte Fallen umgehen – wenn es gar nicht anders geht, eben mitten durch. Türen werden unterwegs geöffnet.
+  return findPath(s.map, s.player.pos, target, (x, y) => ok(x, y) && (isTarget(x, y) || !avoidTile(s, x, y)), 6000, true)
+    ?? findPath(s.map, s.player.pos, target, ok, 6000, true);
 }
 
 // ================================================================ Züge
@@ -266,7 +266,8 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
   if (s.pendingSelection) return fail(SELECT_FIRST);
   const p = s.player;
   if (chebyshev(p.pos, to) !== 1) return fail('Nur ein Feld pro Zug.');
-  if (!canStep(s.map, p.pos, to)) return fail('Da ist eine Wand.');
+  if (tileAt(s.map, to.x, to.y) === 'door') return openDoor(s, to);
+  if (!canStep(s.map, p.pos, to)) return fail(isDoor(s.map, to.x, to.y) || isDoor(s.map, p.pos.x, p.pos.y) ? 'Durch einen Türrahmen geht es nur gerade hindurch.' : 'Da ist eine Wand.');
   if (monsterAt(s, to)) return fail('Da steht ein Gegner.');
   const other = crawlerAt(s, to);
   if (other && !other.party) return fail(`Da steht ${other.name}.`);
@@ -288,6 +289,43 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
   // Reiten: mehrere Schritte pro Zug
   if (mountStep(s)) endTurn(s, { keepMoveDir: true });
   return OK;
+}
+
+/** Eine geschlossene Tür öffnen (kostet einen Zug). */
+export function openDoor(s: GameState, at: Pos): ActionResult {
+  if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  const p = s.player;
+  if (tileAt(s.map, at.x, at.y) !== 'door') return fail('Hier ist keine geschlossene Tür.');
+  if (Math.abs(at.x - p.pos.x) + Math.abs(at.y - p.pos.y) !== 1) return fail('Türen öffnet man von vorne, nicht schräg.');
+  s.map.tiles[idx(s.map, at.x, at.y)] = 'dooropen';
+  const behind = [[1, 0], [-1, 0], [0, 1], [0, -1]].map(([dx, dy]) => roomOf(s.map, { x: at.x + dx, y: at.y + dy })).find((r) => r && r.kind !== 'normal');
+  const label = behind?.kind === 'safe' ? 'die Tür zum Safe Room' : behind?.kind === 'guild' ? 'die schwere Tür der Gilde' : 'die Tür';
+  log(s, `Du drückst die Klinke und öffnest ${label}.`, 'info');
+  emit(s, { type: 'doorOpened', pos: { ...at } });
+  afterMove(s);
+  endTurn(s);
+  return OK;
+}
+
+/** Eine offene Tür neben dir wieder schließen. */
+export function closeDoor(s: GameState, at: Pos): ActionResult {
+  if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  if (tileAt(s.map, at.x, at.y) !== 'dooropen') return fail('Hier ist keine offene Tür.');
+  if (chebyshev(at, s.player.pos) !== 1) return fail('Dafür musst du direkt daneben stehen.');
+  if (occupied(s, at) || itemsAt(s, at).length) return fail('Etwas steht in der Tür.');
+  s.map.tiles[idx(s.map, at.x, at.y)] = 'door';
+  log(s, 'Du ziehst die Tür hinter dir zu. Klick.', 'info');
+  afterMove(s);
+  endTurn(s);
+  return OK;
+}
+
+/** Offene Türen direkt neben dem Crawler. */
+export function adjacentOpenDoors(s: GameState): Pos[] {
+  const p = s.player.pos;
+  return [[1, 0], [-1, 0], [0, 1], [0, -1]]
+    .map(([dx, dy]) => ({ x: p.x + dx, y: p.y + dy }))
+    .filter((q) => tileAt(s.map, q.x, q.y) === 'dooropen');
 }
 
 export function attack(s: GameState, targetUid: string, t: Technique): ActionResult {
@@ -429,7 +467,10 @@ function kickFromSafeRoom(s: GameState) {
     }
     for (const n of neighbors(cur)) {
       const i = idx(s.map, n.x, n.y);
-      if (!inBounds(s.map, n.x, n.y) || seen.has(i) || !isWalkable(s.map, n.x, n.y)) continue;
+      if (!inBounds(s.map, n.x, n.y) || seen.has(i)) continue;
+      // Der Türsteher öffnet geschlossene Türen einfach
+      if (tileAt(s.map, n.x, n.y) === 'door') s.map.tiles[i] = 'dooropen';
+      if (!isWalkable(s.map, n.x, n.y)) continue;
       seen.add(i);
       queue.push(n);
     }

@@ -28,7 +28,80 @@ export function tileAt(m: FloorMap, x: number, y: number): Tile {
 }
 
 export function isWalkable(m: FloorMap, x: number, y: number): boolean {
-  return tileAt(m, x, y) !== 'wall';
+  const t = tileAt(m, x, y);
+  return t === 'floor' || t === 'stairs' || t === 'dooropen';
+}
+
+/** Blockiert die Sicht (Wände und geschlossene Türen). */
+export function blocksSight(m: FloorMap, x: number, y: number): boolean {
+  const t = tileAt(m, x, y);
+  return t === 'wall' || t === 'door';
+}
+
+/**
+ * Gilden und Safe Rooms bekommen echte Wände mit Türen: Der Rand des Raums
+ * wird zur Mauer, und wo ein Gang ankommt, sitzt eine geschlossene Tür.
+ * Mehrere Zugänge nebeneinander teilen sich eine Tür.
+ */
+function addWallsAndDoors(m: FloorMap, r: Room) {
+  const inside = (x: number, y: number) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
+  const edge = (x: number, y: number) => x === r.x || y === r.y || x === r.x + r.w - 1 || y === r.y + r.h - 1;
+  const corner = (x: number, y: number) => (x === r.x || x === r.x + r.w - 1) && (y === r.y || y === r.y + r.h - 1);
+  const candidates: Pos[] = [];
+  for (let y = r.y; y < r.y + r.h; y++) {
+    for (let x = r.x; x < r.x + r.w; x++) {
+      if (!edge(x, y)) continue;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const q = { x: x + dx, y: y + dy };
+        if (inside(q.x, q.y) || !inBounds(m, q.x, q.y)) continue;
+        if (m.tiles[idx(m, q.x, q.y)] === 'wall' || m.roomAt[idx(m, q.x, q.y)] !== -1) continue;
+        if (!corner(x, y)) {
+          candidates.push({ x, y });
+          continue;
+        }
+        // Gang trifft genau auf eine Ecke: Tür eins weiter setzen und den Gang anschließen
+        const along = dx !== 0 ? { x, y: y === r.y ? y + 1 : y - 1 } : { x: x === r.x ? x + 1 : x - 1, y };
+        if (corner(along.x, along.y)) continue;
+        const outside = { x: along.x + dx, y: along.y + dy };
+        if (inBounds(m, outside.x, outside.y) && m.roomAt[idx(m, outside.x, outside.y)] === -1) {
+          m.tiles[idx(m, outside.x, outside.y)] = 'floor';
+          candidates.push(along);
+        }
+      }
+    }
+  }
+  // Rand zu Wänden machen
+  for (let y = r.y; y < r.y + r.h; y++) {
+    for (let x = r.x; x < r.x + r.w; x++) {
+      if (!edge(x, y)) continue;
+      m.tiles[idx(m, x, y)] = 'wall';
+      m.roomAt[idx(m, x, y)] = -1;
+    }
+  }
+  // Benachbarte Zugänge zusammenfassen: eine Tür pro Gruppe
+  const used = new Set<string>();
+  for (const c of candidates) {
+    const key = `${c.x},${c.y}`;
+    if (used.has(key)) continue;
+    const group = [c];
+    used.add(key);
+    for (let k = 0; k < group.length; k++) {
+      for (const o of candidates) {
+        const ok = `${o.x},${o.y}`;
+        if (!used.has(ok) && Math.abs(o.x - group[k].x) + Math.abs(o.y - group[k].y) === 1) {
+          used.add(ok);
+          group.push(o);
+        }
+      }
+    }
+    const door = group[Math.floor(group.length / 2)];
+    m.tiles[idx(m, door.x, door.y)] = 'door';
+  }
+  // Der Raum selbst ist jetzt das Innere
+  r.x += 1;
+  r.y += 1;
+  r.w -= 2;
+  r.h -= 2;
 }
 
 export function roomOf(m: FloorMap, p: Pos): Room | null {
@@ -253,6 +326,9 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
     const to = center(m.rooms[b]);
     if (!carveCorridor(m, from, to, forbiddenFor([a, b]))) carveCorridor(m, from, to, new Set());
   }
+
+  // Gilden und Safe Rooms: Mauern und Türen
+  for (const r of m.rooms) if (r.kind === 'guild' || r.kind === 'safe') addWallsAndDoors(m, r);
 
   // Übrige Räume bekommen Namen und Beschreibungen
   const flavors = R.shuffle(s, [...(def.flavors ?? ROOM_FLAVORS)]);
