@@ -2,6 +2,7 @@ import { ACHIEVEMENTS } from '../data/achievements';
 import { BOX_TIERS, BOX_TIER_NAMES, BOX_TYPE_NAMES } from '../data/world';
 import { createBox } from './items';
 import { log, toast } from './log';
+import { sound } from './fx';
 import { addSpectacle } from './viewers';
 import type { BoxTier, GameEvent, GameState } from './types';
 
@@ -23,6 +24,7 @@ export function checkAchievements(s: GameState, e: GameEvent) {
     s.achievements.push(a.id);
     const first = !s.firstEver.includes(a.id);
     const tier: BoxTier = first ? upgrade(a.tier) : a.tier;
+    sound(s, { kind: 'achievement', tier });
     const box = createBox(s, a.box, tier);
     s.player.boxes.push(box);
     const firstNote = first ? ' ERSTMALIG IN DEINER KARRIERE – Box-Stufe erhöht!' : '';

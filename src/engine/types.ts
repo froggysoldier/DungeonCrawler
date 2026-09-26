@@ -600,6 +600,7 @@ export interface GameState {
   fallen?: string[];
   floorSnapshot?: FloorSnapshot;
   fx?: Fx[];
+  sfx?: Sfx[];
   sponsors?: SponsorState[];
   quests?: Quest[];
   talkShow?: TalkShow;
@@ -607,6 +608,12 @@ export interface GameState {
   /** Rassen- und Klassenwahl steht an (Etage 3). */
   pendingSelection: boolean;
   toasts: Toast[];
+}
+
+/** Klang für die Oberfläche. */
+export interface Sfx {
+  kind: 'box' | 'levelup' | 'achievement' | 'skill';
+  tier?: BoxTier;
 }
 
 /** Sichtbarer Effekt für die Oberfläche (wird nicht gespeichert). */

@@ -33,7 +33,7 @@ import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   chooseThrowable, craftItem, disarmTrap, placeTrap, closeDoor, adjacentOpenDoors,
-  drainFx, defend, askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff, rideToggle, refuelMount,
+  drainFx, drainSfx, defend, askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff, rideToggle, refuelMount,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable, tileAt } from '../engine/mapgen';
@@ -49,6 +49,7 @@ import { confirmBox, isModalOpen, showCustom, showDialog, showHtml, showToast } 
 import { render, tileFromMouse, type View } from './render';
 import { TypeQueue, typeText, type Typing } from './typewriter';
 import { Animator, STEP_MS } from './animator';
+import { playSfx, setSoundEnabled, soundEnabled } from './sound';
 import { TONE_NAMES } from '../data/talkshow';
 import { showSelection } from './selection';
 
@@ -110,6 +111,9 @@ export class GameView {
     private meta: MetaState,
     private onEnd: (s: GameState) => void,
   ) {
+    // Klänge vom Spielstart nicht nachträglich abspielen
+    drainSfx(this.s);
+    drainFx(this.s);
     this.build();
     document.addEventListener('keydown', this.keyHandler);
     document.addEventListener('keyup', this.keyUpHandler);
@@ -222,6 +226,7 @@ export class GameView {
     const res = fn();
     if (this.s.floor !== floor) this.anim.reset();
     else this.anim.after(this.s, before, drainFx(this.s));
+    playSfx(drainSfx(this.s));
     if (!res.ok && res.message) this.s.log.push({ turn: this.s.turn, text: res.message, kind: 'info' });
     this.afterAction();
     return res.ok;
@@ -654,8 +659,16 @@ export class GameView {
       ${hasUnlock(s, 'zuschauer') ? `<span class="viewers">Zuschauer ${liveViewers(s).toLocaleString('de-DE')} · Follower ${s.viewers.follower.toLocaleString('de-DE')} · Hype ${Math.round(s.viewers.hype)}</span>` : ''}
       ${hasUnlock(s, 'inventar') ? `<span class="muted" title="Lebende Crawler laut letzter Zählung">Crawler übrig ${population(s).alive.toLocaleString('de-DE')}</span>` : ''}
       <span style="color:#ffd700">Gold ${p.gold}</span>
+      <button class="soundtoggle" data-action="sound" title="Klänge für Lootboxen, Level-Aufstieg und Achievements">Ton: ${soundEnabled() ? 'an' : 'aus'}</button>
       <span>Lootboxen ${p.boxes.length}</span>
       ${pet ? `<span style="color:#ffb3e6">Haustier ${esc(pet.name)} ${pet.alive ? `${pet.hp}/${pet.maxHp}` : '(bewusstlos)'}</span>` : ''}`;
+    bindActions(this.root.querySelector('.topbar') as HTMLElement, {
+      sound: () => {
+        setSoundEnabled(!soundEnabled());
+        if (soundEnabled()) playSfx([{ kind: 'skill' }]);
+        this.refreshTop();
+      },
+    });
   }
 
   private refreshHere() {

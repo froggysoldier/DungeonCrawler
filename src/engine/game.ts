@@ -30,7 +30,7 @@ import { buy, ensureShop, haggle, sell } from './shop';
 import { avoidTile, detectTraps, disarm, onMonsterStep, onPlayerStep, placeOwnTrap, placeTraps, struggle } from './traps';
 import { craft } from './crafting';
 import { FX_COLORS, floatText } from './fx';
-export { drainFx } from './fx';
+export { drainFx, drainSfx } from './fx';
 import {
   announcePopulation, askTip, crawlerAt, crawlersTurn, dismiss, giveHealing, invite, populateCrawlers, populationOnDescend, talkTo,
 } from './crawlers';

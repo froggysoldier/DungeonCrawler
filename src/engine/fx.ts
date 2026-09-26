@@ -1,4 +1,4 @@
-import type { Fx, GameState, Pos } from './types';
+import type { Fx, GameState, Pos, Sfx } from './types';
 
 /**
  * Sichtbare Effekte für die Oberfläche: Geschosse und aufsteigende Zahlen.
@@ -32,3 +32,16 @@ export const FX_COLORS = {
   info: '#c8c0b0',
   mana: '#9fb8ff',
 };
+
+/** Klänge für die Oberfläche anmelden (Lootbox, Level, Achievement, Skill). */
+export function sound(s: GameState, sfx: Sfx) {
+  s.sfx ??= [];
+  s.sfx.push(sfx);
+  if (s.sfx.length > 10) s.sfx.splice(0, s.sfx.length - 10);
+}
+
+export function drainSfx(s: GameState): Sfx[] {
+  const out = s.sfx ?? [];
+  s.sfx = [];
+  return out;
+}

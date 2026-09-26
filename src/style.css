@@ -304,3 +304,5 @@ h1, h2, h3 { margin: 0; }
 @media (max-width: 1100px) { .combat { grid-template-columns: 1fr 1fr; } }
 
 .combat button:disabled, .combat button.primary:disabled { opacity: 0.4; background: var(--panel-2); color: var(--muted); border-color: var(--line); cursor: not-allowed; }
+
+.topbar .soundtoggle { padding: 2px 8px; font-size: 12px; }

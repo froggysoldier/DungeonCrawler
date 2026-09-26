@@ -7,6 +7,7 @@ import { BOX_TIERS, BOX_TIER_NAMES, BOX_TYPE_NAMES } from '../data/world';
 import { chebyshev } from './fov';
 import { createBox } from './items';
 import { log, toast } from './log';
+import { sound } from './fx';
 import { roomOf } from './mapgen';
 import { currentWeapon, maxHp } from './player';
 import * as R from './rng';
@@ -250,6 +251,7 @@ function grantPattern(s: GameState, fs: string[], stage: number, score: number, 
   s.player.boxes.push(createBox(s, box, tier));
   s.achievements.push(id);
   (s.dynAchievements ??= []).push({ id, name, description, comment, tier, box, turn: s.turn, floor: s.floor });
+  sound(s, { kind: 'achievement', tier });
   log(s, `DIE SYSTEMSTIMME HAT ETWAS BEMERKT: ${name} – ${description}`, 'achievement');
   log(s, comment, 'achievement');
   log(s, `Belohnung: ${BOX_TIER_NAMES[tier]} ${BOX_TYPE_NAMES[box]}.${first ? ' Zum ersten Mal in deiner Karriere – Box-Stufe erhöht!' : ''}`, 'loot');
