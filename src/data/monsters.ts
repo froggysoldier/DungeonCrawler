@@ -272,6 +272,15 @@ export const MONSTERS: MonsterDef[] = [
     tags: ['untot'], abilities: ['schnell'],
   },
 
+  // ------------------------------------------------ Sonderfall: Wer die Toiletten-Regel bricht
+  {
+    id: 'wutelementar', name: 'Wutelementar', glyph: 'W', color: '#ff2020',
+    levels: [15, 30], floors: [], hp: 250, hpPerLevel: 20, dmg: [18, 30], dmgPerLevel: 2,
+    treffer: 95, ruestung: 6, ausweichen: 10, size: 'gross', behavior: 'melee', xp: 500, weight: 0,
+    flavor: 'Ein Wirbel aus purem Zorn, herbeigerufen von deinem Fehltritt. Die Regel war eindeutig. Nur in Toiletten.',
+    tags: ['elementar'], abilities: ['schnell', 'regeneriert'],
+  },
+
   // ------------------------------------------------ Etage 3 (Kanalstadt)
   {
     id: 'kanalkroko', name: 'Kanal-Krokodil', glyph: 'C', color: '#608040',

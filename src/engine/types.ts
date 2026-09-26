@@ -87,9 +87,10 @@ export interface Bonuses {
   xpBonus?: number;
   dornen?: number;
   lichtradius?: number;
+  maxMp?: number;
 }
 
-export type ItemKind = 'ausruestung' | 'wurf' | 'verbrauch' | 'box' | 'karte' | 'gold' | 'schrott';
+export type ItemKind = 'ausruestung' | 'wurf' | 'verbrauch' | 'box' | 'karte' | 'gold' | 'schrott' | 'buch';
 
 export interface Item {
   uid: string;
@@ -111,6 +112,8 @@ export interface Item {
   menge?: number;
   flavor: string;
   special?: SpecialEffect;
+  /** Zauberbücher: welcher Zauber gelernt wird. */
+  spell?: string;
   wert: number;
 }
 
@@ -120,6 +123,12 @@ export type SpecialEffect =
 
 export interface ConsumableEffect {
   heal?: number;
+  /** Heilung in Prozent der max. HP. */
+  healPct?: number;
+  mana?: number;
+  manaPct?: number;
+  /** Füllt die Blase (Getränke). */
+  blase?: number;
   /** Heilt Vergiftung. */
   cure?: boolean;
   ausdauer?: number;
@@ -211,6 +220,8 @@ export interface Buff {
   name: string;
   turns: number;
   bonuses: Bonuses;
+  /** Schild, der Schaden abfängt (verbraucht sich). */
+  absorb?: number;
   /** Schaden pro Zug (Gift). */
   dot?: number;
   debuff?: boolean;
@@ -253,6 +264,20 @@ export interface Player {
   dynSkills?: DynSkill[];
   /** Eigenschaften aus dem Vorleben (Ängste, Laster, Stärken). */
   traits?: string[];
+  /** Mana (ab dem Tutorial sichtbar). */
+  mp?: number;
+  spells?: SpellState[];
+  spellCooldowns?: Record<string, number>;
+  /** Blase 0–100: Erleichtern darf man sich nur in Toiletten. */
+  blase?: number;
+  /** Abklingzeit für Tränke in Zügen. */
+  potionCooldown?: number;
+}
+
+export interface SpellState {
+  id: string;
+  level: number;
+  xp: number;
 }
 
 export interface DynSkill {
@@ -413,6 +438,9 @@ export type GameEvent =
   | { type: 'classChosen'; race: string; klass: string }
   | { type: 'abilityUsed'; ability: string }
   | { type: 'followers'; follower: number }
+  | { type: 'spellCast'; spell: string; kills: number }
+  | { type: 'accident' }
+  | { type: 'relief' }
   | { type: 'moved' }
   | { type: 'start' };
 

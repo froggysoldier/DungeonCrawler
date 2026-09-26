@@ -269,3 +269,8 @@ h1, h2, h3 { margin: 0; }
 .progressline > div { height: 100%; background: var(--accent); }
 .traitlist, .answerlist { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
 .answerlist { font-size: 12px; }
+.bar.mp > div { background: linear-gradient(90deg, #1e4fb3, #6fa8ff); }
+.bar.bl > div { background: linear-gradient(90deg, #8a7a1e, #e0d04a); }
+.bar.bl.urgent > div { background: linear-gradient(90deg, #b3261e, #ff8a4a); animation: pulse 1s infinite; }
+.actionbar .spells button.spell { border-color: #3d5a9e; color: #9ec0ff; }
+.actionbar .spells button.spell.sel { background: #1c2a4a; border-color: #6fa8ff; }

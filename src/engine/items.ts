@@ -4,6 +4,7 @@ import {
 import { HOOD_BOSSES } from '../data/monsters';
 import { BOX_CONTENTS, BOX_TIERS, BOX_TIER_NAMES, BOX_TYPE_NAMES, HOOD_NAMES } from '../data/world';
 import { addBonuses } from './bonuses';
+import { randomTome } from './magic';
 import * as R from './rng';
 import type { Bonuses, BoxTier, BoxType, GameState, Item, Rarity, Slot } from './types';
 
@@ -153,6 +154,11 @@ export function rollBoxContents(s: GameState, type: BoxType, tier: BoxTier): Ite
   }
   if (type === 'wurf') out.push(createItem(s, tierIdx >= 2 ? 'ziegel' : 'stein', 5 + tierIdx * 3));
   if (type === 'ueberlebens') out.push(createItem(s, 'gegengift', 1 + Math.floor(tierIdx / 2)));
+  // Zauberbücher: selten in einfachen Boxen, häufiger in guten
+  if ((type === 'abenteurer' || type === 'fan' || type === 'boss') && R.chance(s, 0.12 + tierIdx * 0.1)) {
+    out.push(randomTome(s, RARITY_ORDER[Math.min(4, tierIdx + 1)]));
+  }
+  if (tierIdx >= 1 && R.chance(s, 0.3)) out.push(createItem(s, 'kleiner_manatrank', 1 + Math.floor(tierIdx / 2)));
   if (type === 'brawler') out.push(createItem(s, 'energydrink', 1 + Math.floor(tierIdx / 2)));
   return out;
 }

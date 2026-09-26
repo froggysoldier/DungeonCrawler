@@ -1,4 +1,4 @@
-import type { AttackMove, AttackPart, BoxType } from '../engine/types';
+import type { AttackMove, BoxType } from '../engine/types';
 
 /**
  * Facetten sind die Merkmale, die der Beobachter an jeder Aktion erkennt.
@@ -19,7 +19,8 @@ export interface FacetDef {
   box?: BoxType;
 }
 
-export const PART_PLURAL: Record<AttackPart, string> = {
+export const PART_PLURAL: Record<string, string> = {
+  zauber: 'Zauber',
   faust: 'Faustschläge', tritt: 'Tritte', knie: 'Kniestöße', ellbogen: 'Ellbogenchecks',
   kopf: 'Kopfstöße', waffe: 'Waffenhiebe', wurf: 'Würfe',
 };
@@ -28,7 +29,8 @@ export const MOVE_PLURAL: Record<Exclude<AttackMove, 'normal'>, string> = {
   sprung: 'Sprungangriffe', stampfen: 'Stampfer', anlauf: 'Sturmangriffe',
 };
 
-export const PART_BOX: Record<AttackPart, BoxType> = {
+export const PART_BOX: Record<string, BoxType> = {
+  zauber: 'abenteurer',
   faust: 'brawler', tritt: 'schuh', knie: 'brawler', ellbogen: 'brawler', kopf: 'kleidung', waffe: 'waffen', wurf: 'wurf',
 };
 

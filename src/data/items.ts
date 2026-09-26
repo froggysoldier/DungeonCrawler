@@ -101,9 +101,12 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'hausschuhe', name: 'Plüsch-Hausschuhe', kind: 'ausruestung', slot: 'fuesse', bonuses: { ausweichen: 1 }, flavor: 'Hasenohren. Leise.', wert: 1 },
 
   // ---- Verbrauchsgüter
-  { id: 'heiltrank', name: 'Heiltrank', kind: 'verbrauch', effekt: { heal: 20 }, flavor: 'Schmeckt nach Kirsche und Verzweiflung.', wert: 10 },
-  { id: 'kleiner_heiltrank', name: 'Kleiner Heiltrank', kind: 'verbrauch', effekt: { heal: 10 }, flavor: 'Ein Schluck Hoffnung.', wert: 5, ground: 3 },
-  { id: 'energydrink', name: 'Energydrink', kind: 'verbrauch', effekt: { ausdauer: 10, buff: { name: 'Koffeinschock', turns: 30, bonuses: { treffer: 5 } } }, flavor: 'Herzrasen ist ein Feature.', wert: 5, ground: 2 },
+  { id: 'heiltrank', name: 'Heiltrank', kind: 'verbrauch', effekt: { healPct: 50, blase: 5 }, flavor: 'Heilt die Hälfte deiner HP. Hilft nicht gegen Gift. Schmeckt nach Kirsche und Verzweiflung.', wert: 10 },
+  { id: 'manatrank', name: 'Manatrank', kind: 'verbrauch', effekt: { manaPct: 100, blase: 5 }, flavor: 'Blau, sprudelnd, riecht nach Gewitter. Füllt dein Mana komplett.', wert: 15 },
+  { id: 'kleiner_manatrank', name: 'Kleiner Manatrank', kind: 'verbrauch', effekt: { mana: 4, blase: 3 }, flavor: 'Ein Schluck Konzentration.', wert: 6, ground: 1 },
+  { id: 'manatoast', name: 'Manatoast', kind: 'verbrauch', effekt: { mana: 3, heal: 2 }, flavor: 'Toast mit leuchtender Butter. Warum leuchtet die Butter?', wert: 3, ground: 1 },
+  { id: 'kleiner_heiltrank', name: 'Kleiner Heiltrank', kind: 'verbrauch', effekt: { healPct: 25, blase: 3 }, flavor: 'Heilt ein Viertel deiner HP. Ein Schluck Hoffnung.', wert: 5, ground: 3 },
+  { id: 'energydrink', name: 'Energydrink', kind: 'verbrauch', effekt: { ausdauer: 10, blase: 15, buff: { name: 'Koffeinschock', turns: 30, bonuses: { treffer: 5 } } }, flavor: 'Herzrasen ist ein Feature.', wert: 5, ground: 2 },
   { id: 'schokoriegel', name: 'Schokoriegel', kind: 'verbrauch', effekt: { heal: 4, ausdauer: 4 }, flavor: 'Du bist nicht du, wenn du hungrig bist.', wert: 2, ground: 3 },
   { id: 'leckerli', name: 'Verzaubertes Haustier-Leckerli', kind: 'verbrauch', effekt: {}, flavor: 'Lässt dein Haustier eine Stufe aufsteigen. Ohne Haustier: schmeckt nach Fisch und Reue.', wert: 20 },
   { id: 'dosenbrot', name: 'Dosenbrot', kind: 'verbrauch', effekt: { heal: 6 }, flavor: 'Brot. Aus der Dose. Warum?', wert: 2, ground: 2 },
@@ -200,11 +203,11 @@ export const BASE_ITEMS: BaseItem[] = [
   // ================= Erweiterung: Verbrauchsgüter
   { id: 'gegengift', name: 'Gegengift', kind: 'verbrauch', effekt: { cure: true, heal: 3 }, flavor: 'Schmeckt nach Kreide. Rettet Leben.', wert: 8, ground: 2 },
   { id: 'pflaster', name: 'Pflaster', kind: 'verbrauch', effekt: { heal: 5 }, flavor: 'Mit Dinos drauf.', wert: 1, ground: 3 },
-  { id: 'ausdauertrank', name: 'Ausdauertrank', kind: 'verbrauch', effekt: { ausdauer: 20 }, flavor: 'Grün und sprudelnd. Wie ein Energydrink, nur legal.', wert: 6 },
-  { id: 'grosser_heiltrank', name: 'Großer Heiltrank', kind: 'verbrauch', effekt: { heal: 40 }, flavor: 'Eine ganze Flasche Hoffnung.', wert: 25 },
+  { id: 'ausdauertrank', name: 'Ausdauertrank', kind: 'verbrauch', effekt: { ausdauer: 20, blase: 10 }, flavor: 'Grün und sprudelnd. Wie ein Energydrink, nur legal.', wert: 6 },
+  { id: 'grosser_heiltrank', name: 'Großer Heiltrank', kind: 'verbrauch', effekt: { healPct: 100, blase: 5 }, flavor: 'Eine ganze Flasche Hoffnung.', wert: 25 },
   { id: 'mettbroetchen', name: 'Mettbrötchen', kind: 'verbrauch', effekt: { heal: 8 }, flavor: 'Mit Zwiebeln. Wie lange lag das hier? Egal.', wert: 2, ground: 1 },
   { id: 'apfel', name: 'Apfel', kind: 'verbrauch', effekt: { heal: 3 }, flavor: 'Ein Apfel am Tag hält das Monster nicht fern.', wert: 1, ground: 3 },
-  { id: 'dosenbier', name: 'Warmes Dosenbier', kind: 'verbrauch', effekt: { heal: 3, buff: { name: 'Mut angetrunken', turns: 40, bonuses: { stats: { str: 1 }, treffer: -3 } } }, flavor: 'Warm. Aber Bier.', wert: 1, ground: 2 },
+  { id: 'dosenbier', name: 'Warmes Dosenbier', kind: 'verbrauch', effekt: { heal: 3, blase: 20, buff: { name: 'Mut angetrunken', turns: 40, bonuses: { stats: { str: 1 }, treffer: -3 } } }, flavor: 'Warm. Aber Bier.', wert: 1, ground: 2 },
   { id: 'traubenzucker', name: 'Traubenzucker', kind: 'verbrauch', effekt: { ausdauer: 6 }, flavor: 'Für die schnelle Energie.', wert: 1, ground: 2 },
   { id: 'wutpille', name: 'Rote Wutpille', kind: 'verbrauch', effekt: { buff: { name: 'Rasende Wut', turns: 30, bonuses: { schaden: { alle: 25 }, ausweichen: -5 } } }, flavor: 'Nebenwirkungen: Wut.', wert: 15 },
 

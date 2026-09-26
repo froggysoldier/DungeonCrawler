@@ -23,6 +23,8 @@ import { addToInventory, giveItem } from './inventory';
 import { describeMonster, itemName } from './identify';
 import { learnSkill } from './skills';
 import { viewersTick } from './viewers';
+import { castSpell, learnSpell, magicTick, maxMp, readTome, type CastOptions } from './magic';
+import { addBladder, bladderTick, useToilet } from './bladder';
 import type {
   ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique,
 } from './types';
@@ -328,6 +330,10 @@ function tickTime(s: GameState, turns: number, before: number) {
   clampVitals(s);
 
   viewersTick(s, turns);
+  magicTick(s, turns);
+  if (p.potionCooldown) p.potionCooldown = Math.max(0, p.potionCooldown - turns);
+  bladderTick(s, turns);
+  if (s.status !== 'playing') return;
   if (p.abilityCooldown) p.abilityCooldown = Math.max(0, p.abilityCooldown - turns);
 
   while (s.turn - s.lastSpawnTurn >= 30) {
@@ -460,6 +466,9 @@ function runTutorial(s: GameState) {
     p.hand = null;
   }
   addToInventory(s, createItem(s, 'kleiner_heiltrank', 2));
+  learnSpell(s, 'heilen', true);
+  p.mp = maxMp(s);
+  p.blase = p.blase ?? 10;
   log(s, `${s.guideName} schiebt dir zwei kleine Heiltränke über den Tresen. „Geht aufs Haus.“`, 'loot');
   if (formerCrawler) {
     p.stats.str += 1;
@@ -467,7 +476,7 @@ function runTutorial(s: GameState) {
     p.stats.kon += 1;
     log(s, `${s.guideName} bringt dir ein paar Tricks aus der eigenen Staffel bei: +1 Stärke, +1 Geschick, +1 Konstitution.`, 'system');
   }
-  log(s, 'FREIGESCHALTET: Inventar, Werte, Skills und automatische Kartierung.', 'system');
+  log(s, 'FREIGESCHALTET: Inventar, Werte, Skills, automatische Kartierung, Mana und der Zauber „Heilen“.', 'system');
   toast(s, 'Tutorial abgeschlossen', 'Inventar, Werte, Skills und Karte freigeschaltet!', 'level');
   emit(s, { type: 'tutorialDone' });
 }
@@ -544,12 +553,18 @@ const FOOD = FOOD_IDS;
 
 function applyEffect(s: GameState, e: ConsumableEffect, isFood: boolean) {
   const p = s.player;
-  if (e.heal) {
+  if (e.heal || e.healPct) {
     const boost = isFood ? 1 + 0.15 * skillLevel(s, 'kochen') : 1;
-    const amount = Math.round(e.heal * boost);
+    const amount = Math.round(((e.heal ?? 0) + ((e.healPct ?? 0) / 100) * maxHp(s)) * boost);
     p.hp = Math.min(maxHp(s), p.hp + amount);
     log(s, `+${amount} HP.`, 'info');
   }
+  if (e.mana || e.manaPct) {
+    const amount = Math.round((e.mana ?? 0) + ((e.manaPct ?? 0) / 100) * maxMp(s));
+    p.mp = Math.min(maxMp(s), (p.mp ?? 0) + amount);
+    log(s, `+${amount} Mana.`, 'info');
+  }
+  if (e.blase) addBladder(s, e.blase);
   if (e.ausdauer) p.ausdauer = Math.min(maxAusdauer(s), p.ausdauer + e.ausdauer);
   if (e.cure) cure(s);
   if (e.buff) {
@@ -563,7 +578,20 @@ export function useItem(s: GameState, uid: string): ActionResult {
   const owned = findOwned(s, uid);
   if (!owned) return fail('Nicht gefunden.');
   const it = owned.item;
+  if (it.kind === 'buch') {
+    if (!hasUnlock(s, 'inventar')) return fail('Ohne Tutorial verstehst du die Schrift in diesem Buch nicht. Finde die Gilde.');
+    const res = readTome(s, it);
+    if (!res.ok) return fail(res.message ?? 'Geht nicht.');
+    removeOne(s, uid);
+    endTurn(s);
+    return OK;
+  }
   if (it.kind !== 'verbrauch') return fail('Das kann man nicht benutzen.');
+  const isPotion = it.baseId.includes('trank');
+  if (isPotion && (s.player.potionCooldown ?? 0) > 0) {
+    return fail(`Dein Körper verträgt gerade keinen weiteren Trank. Noch ${s.player.potionCooldown} Züge.`);
+  }
+  if (isPotion) s.player.potionCooldown = 20;
   if (it.baseId === 'leckerli') {
     const pet = s.player.pet;
     if (pet) {
@@ -691,6 +719,9 @@ export function sleep(s: GameState): ActionResult {
   const healPct = 0.6 + 0.1 * skillLevel(s, 'erste_hilfe');
   p.hp = Math.min(maxHp(s), p.hp + Math.round(maxHp(s) * healPct));
   p.ausdauer = maxAusdauer(s);
+  if (p.spells?.length) p.mp = maxMp(s);
+  // Vor dem Schlafen geht man auf die Toilette – danach füllt sich die Blase über Nacht
+  if (hasUnlock(s, 'inventar')) p.blase = 25;
   if (p.pet) {
     if (!p.pet.alive) log(s, `${p.pet.name} taucht in einem Lichtblitz wieder auf und rollt sich neben dir zusammen.`, 'info');
     p.pet.alive = true;
@@ -704,6 +735,26 @@ export function sleep(s: GameState): ActionResult {
   cure(s);
   emit(s, { type: 'sleep' });
   tickTime(s, duration, before);
+  return OK;
+}
+
+// ================================================================ Magie und Toilette
+
+export function cast(s: GameState, spellId: string, opts: CastOptions = {}): ActionResult {
+  if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  if (s.pendingSelection) return fail(SELECT_FIRST);
+  const res = castSpell(s, spellId, opts);
+  if (!res.ok) return fail(res.message ?? 'Das geht nicht.');
+  if (spellId === 'pfuetzensprung') afterMove(s);
+  endTurn(s);
+  return OK;
+}
+
+export function toilet(s: GameState): ActionResult {
+  if (currentRoom(s)?.kind !== 'safe') return fail('Hier gibt es keine Toilette. Die gibt es nur in Safe Rooms. Und die Regel gilt.');
+  const res = useToilet(s);
+  if (!res.ok) return fail(res.message ?? 'Geht nicht.');
+  endTurn(s);
   return OK;
 }
 

@@ -95,7 +95,20 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     emit(s, { type: 'dodged', source: m.name, facets: source });
     return;
   }
-  const raw = R.int(s, m.dmg[0], m.dmg[1]);
+  let raw = R.int(s, m.dmg[0], m.dmg[1]);
+  // Schilde (z. B. Irrlichtrüstung) fangen zuerst ab
+  for (const buff of p.buffs) {
+    if (!buff.absorb || raw <= 0) continue;
+    const taken = Math.min(buff.absorb, raw);
+    buff.absorb -= taken;
+    raw -= taken;
+    log(s, `${buff.name} fängt ${taken} Schaden ab.`, 'kampf');
+    if (buff.absorb <= 0) buff.turns = 0;
+  }
+  if (raw <= 0) {
+    emit(s, { type: 'dodged', source: m.name, facets: source });
+    return;
+  }
   const dmg = Math.max(1, Math.round((raw - Math.floor(b.ruestung ?? 0)) * (1 - defense.reduktion / 100)));
   if (defense.reduktion) trainDefense(s, source, 'abhaertung');
   p.hp -= dmg;

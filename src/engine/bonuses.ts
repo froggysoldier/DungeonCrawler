@@ -15,7 +15,7 @@ export function addBonuses(a: Bonuses, b: Bonuses | undefined, factor = 1): Bonu
       a.schaden[k] = (a.schaden[k] ?? 0) + v * factor;
     }
   }
-  const scalar = ['maxHp', 'maxAusdauer', 'ruestung', 'ausweichen', 'treffer', 'krit', 'hpRegen', 'xpBonus', 'dornen', 'lichtradius'] as const;
+  const scalar = ['maxHp', 'maxMp', 'maxAusdauer', 'ruestung', 'ausweichen', 'treffer', 'krit', 'hpRegen', 'xpBonus', 'dornen', 'lichtradius'] as const;
   for (const key of scalar) {
     const v = b[key];
     if (v) a[key] = (a[key] ?? 0) + v * factor;
@@ -24,7 +24,7 @@ export function addBonuses(a: Bonuses, b: Bonuses | undefined, factor = 1): Bonu
 }
 
 const LABELS: Record<string, string> = {
-  maxHp: 'max. HP', maxAusdauer: 'max. Ausdauer', ruestung: 'Rüstung', ausweichen: '% Ausweichen',
+  maxHp: 'max. HP', maxMp: 'max. Mana', maxAusdauer: 'max. Ausdauer', ruestung: 'Rüstung', ausweichen: '% Ausweichen',
   treffer: '% Treffer', krit: '% Krit', hpRegen: 'HP-Regeneration', xpBonus: '% XP', dornen: 'Dornenschaden',
   lichtradius: 'Sichtweite',
 };

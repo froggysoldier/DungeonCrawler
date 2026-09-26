@@ -151,9 +151,9 @@ export interface MenuItem {
 }
 
 export const RESTAURANT_MENU: MenuItem[] = [
-  { id: 'menue_suppe', name: 'Tagessuppe', price: 3, effekt: { heal: 12 }, flavor: 'Undefinierbar, aber heiß.' },
+  { id: 'menue_suppe', name: 'Tagessuppe', price: 3, effekt: { heal: 12, blase: 10 }, flavor: 'Undefinierbar, aber heiß.' },
   { id: 'menue_schnitzel', name: 'Schnitzel mit Pommes', price: 8, effekt: { heal: 25, buff: { name: 'Satt & zufrieden', turns: 120, bonuses: { maxHp: 5, stats: { str: 1 } } } }, flavor: 'Paniert. Das Tier dahinter: unbekannt.' },
-  { id: 'menue_kaffee', name: 'Starker Kaffee', price: 2, effekt: { ausdauer: 15, buff: { name: 'Wach', turns: 80, bonuses: { treffer: 5 } } }, flavor: 'Schwarz wie deine Zukunft.' },
+  { id: 'menue_kaffee', name: 'Starker Kaffee', price: 2, effekt: { ausdauer: 15, blase: 15, buff: { name: 'Wach', turns: 80, bonuses: { treffer: 5 } } }, flavor: 'Schwarz wie deine Zukunft.' },
   { id: 'menue_salat', name: 'Kellerpilz-Salat', price: 5, effekt: { heal: 10, buff: { name: 'Pilzkraft', turns: 120, bonuses: { ausweichen: 5, stats: { ges: 1 } } } }, flavor: 'Die Pilze leuchten leicht. Das ist normal. Sagt der Koch.' },
   { id: 'menue_gulasch', name: 'Monster-Gulasch', price: 10, effekt: { heal: 30, buff: { name: 'Monsterkraft', turns: 150, bonuses: { schaden: { alle: 15 } } } }, flavor: 'Aus Zutaten, die du heute selbst erschlagen hast. Vielleicht.' },
 ];
@@ -205,6 +205,8 @@ export function tutorialPages(guideName: string, guideDescription: string, forme
     '„Bosse: Jedes Viertel hat einen Nachbarschafts-Boss. Solange er lebt, spawnen dort neue Monster nach. Er verlässt seine Kammer nicht. Wenn du ihn tötest, lässt er eine Gebietskarte fallen – heb sie auf. Und in der Mitte der Etage haust etwas Größeres. Die Treppe liegt direkt hinter ihm.“',
     '„Safe Rooms erkennst du am grünen Schimmern. Dort darf niemand Gewalt anwenden. Monster, die dich dort angreifen, werden weggebeamt. Nur dort kannst du Lootboxen öffnen. Und schlafen. Schlaf ist wichtig. Tot sein ist schlimmer.“',
     '„Achievements bekommst du für… alles Mögliche. Je verrückter oder schwieriger, desto besser die Box. Die Systemstimme hat einen, äh, speziellen Humor. Gewöhn dich dran.“',
+    '„Du hast jetzt auch Mana – so viel, wie du Intelligenz hast. Ich schenke dir den Zauber Heilen. Weitere Zauber lernst du aus Zauberbüchern. Das Buch zerfällt beim Lesen, der Zauber bleibt. Tränke helfen auch, aber dein Körper verträgt nur alle paar Minuten einen.“',
+    '„Und jetzt die wichtigste Regel des ganzen Dungeons. Ich meine das ernst. Du darfst dich NUR in einer Toilette erleichtern. In jedem Safe Room gibt es eine. Wer es nicht rechtzeitig schafft, ruft ein Wutelementar herbei. Die haben noch nie jemanden am Leben gelassen. Behalte deine Blase im Auge.“',
     '„Letzte Sache. Wenn du stirbst, ist es vorbei. Keine zweite Runde für dich. Aber… die Show merkt sich alles. Und wer weiß, vielleicht begegnest du dir irgendwann selbst wieder. Viel Glück. Du wirst es brauchen.“',
   ];
 }

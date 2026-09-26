@@ -6,6 +6,8 @@ import { monsterAt } from '../engine/ai';
 import { CLASS_BY_ID } from '../data/classes';
 import { RACE_BY_ID } from '../data/races';
 import { currentAbility, useAbility } from '../engine/classes';
+import { maxMp, spellCost } from '../engine/magic';
+import { SPELL_BY_ID } from '../data/spells';
 import { describeItem, describeMonster, INSIGHT_NAMES, itemName } from '../engine/identify';
 import { liveViewers } from '../engine/viewers';
 import { dynXpNeeded, skillHints } from '../engine/observer';
@@ -17,7 +19,7 @@ import {
 import { chebyshev } from '../engine/fov';
 import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
-  moveStep, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, unequip, useItem, wait,
+  cast, moveStep, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable } from '../engine/mapgen';
@@ -58,6 +60,9 @@ const DIR_KEYS: Record<string, Pos> = {
 export class GameView {
   private tab: Tab = 'crawler';
   private part: AttackPart = 'faust';
+  /** Zauber, der auf ein Ziel wartet (nächster Klick auf die Karte). */
+  private pendingSpell: string | null = null;
+  private missileMana = 4;
   private move: AttackMove = 'normal';
   private hover: Pos | null = null;
   private view: View | null = null;
@@ -252,6 +257,14 @@ export class GameView {
     const t = tileFromMouse(this.view, this.canvas, e);
     const s = this.s;
     const mon = monsterAt(s, t);
+    // Zauber mit Ziel: der nächste Klick bestimmt das Ziel
+    if (this.pendingSpell) {
+      const sp = this.pendingSpell;
+      this.pendingSpell = null;
+      const target = mon && this.visible.has(idx(s.map, t.x, t.y)) ? mon : undefined;
+      this.act(() => cast(s, sp, { targetUid: target?.uid, pos: t, mana: this.missileMana }));
+      return;
+    }
     if (mon && this.visible.has(idx(s.map, t.x, t.y))) {
       const blocker = techniqueBlocker(s, mon, this.technique());
       if (!blocker) return this.attackMonster(mon.uid);
@@ -390,6 +403,11 @@ export class GameView {
       this.askDescend();
     } else if (e.key === 'Escape') {
       this.traveling = false;
+      if (this.pendingSpell) {
+        this.pendingSpell = null;
+        this.say('Zauber abgebrochen.');
+        this.refreshActions();
+      }
     }
   }
 
@@ -476,7 +494,7 @@ export class GameView {
         ).join('');
       }
       if (inside) {
-        html += `<div class="row" style="margin-top:6px"><button data-action="sleep">Schlafen (8 Std.)</button></div>`;
+        html += `<div class="row" style="margin-top:6px"><button data-action="sleep">Schlafen (8 Std.)</button><button data-action="toilet">Toilette benutzen</button></div>`;
         if (s.player.boxes.length) {
           html += `<div class="muted small" style="margin-top:6px">Lootboxen öffnen:</div>`;
           html += s.player.boxes
@@ -501,6 +519,7 @@ export class GameView {
       },
       meal: (b) => this.act(() => buyMeal(s, b.dataset.id!)),
       sleep: () => this.act(() => sleep(s)),
+      toilet: () => this.act(() => toilet(s)),
       box: (b) => {
         const box = s.player.boxes.find((x) => x.uid === b.dataset.uid);
         let contents: Item[] | undefined;
@@ -530,12 +549,18 @@ export class GameView {
     const bon = [...known.bonuses];
     const eff = it.effekt;
     if (eff?.heal) bon.push(`Heilt ${eff.heal} HP`);
+    if (eff?.healPct) bon.push(`Heilt ${eff.healPct} % der HP`);
+    if (eff?.mana) bon.push(`+${eff.mana} Mana`);
+    if (eff?.manaPct) bon.push(`Füllt ${eff.manaPct} % Mana`);
+    if (eff?.cure) bon.push('Heilt Vergiftung');
+    if (it.kind === 'buch' && it.spell) bon.push(`Lehrt den Zauber: ${SPELL_BY_ID[it.spell].name}`);
     if (eff?.ausdauer) bon.push(`+${eff.ausdauer} Ausdauer`);
     if (eff?.buff) bon.push(`${eff.buff.name}: ${describeBonuses(eff.buff.bonuses).join(', ')}`);
     const actions: string[] = [];
     if (withActions) {
       if (it.kind === 'ausruestung' && from === 'inv' && hasUnlock(this.s, 'inventar')) actions.push(`<button data-action="equip" data-uid="${it.uid}">Anlegen</button>`);
       if (it.kind === 'verbrauch') actions.push(`<button data-action="use" data-uid="${it.uid}">Benutzen</button>`);
+      if (it.kind === 'buch') actions.push(`<button data-action="use" data-uid="${it.uid}">Lesen</button>`);
       actions.push(`<button data-action="drop" data-uid="${it.uid}">Ablegen</button>`);
     }
     return `<div class="name" style="color:${color}">${esc(known.name)}${it.menge && it.menge > 1 && it.kind !== 'gold' ? ` ×${it.menge}` : ''}</div>
@@ -583,6 +608,8 @@ export class GameView {
     let html = `<div class="bars">
       <div class="bar hp ${poisoned ? 'poison' : ''}"><div style="width:${(100 * Math.max(0, p.hp)) / mh}%"></div><span>HP ${Math.max(0, p.hp)} / ${mh}${poisoned ? ' · vergiftet' : ''}</span></div>
       <div class="bar st"><div style="width:${(100 * p.ausdauer) / ma}%"></div><span>Ausdauer ${p.ausdauer} / ${ma}</span></div>
+      ${p.spells?.length ? `<div class="bar mp"><div style="width:${(100 * (p.mp ?? 0)) / maxMp(s, b)}%"></div><span>Mana ${p.mp ?? 0} / ${maxMp(s, b)}</span></div>` : ''}
+      ${hasUnlock(s, 'inventar') ? `<div class="bar bl ${(p.blase ?? 0) >= 80 ? 'urgent' : ''}"><div style="width:${p.blase ?? 0}%"></div><span>Blase ${Math.round(p.blase ?? 0)} %${(p.blase ?? 0) >= 80 ? ' – such eine Toilette!' : ''}</span></div>` : ''}
       <div class="bar xp"><div style="width:${(100 * p.xp) / need}%"></div><span>XP ${p.xp} / ${need} (Level ${p.level})</span></div>
     </div>
     <div class="muted small">${esc(p.name)} · früher: ${esc(p.background)}${p.race ? ` · ${esc(RACE_BY_ID[p.race].name.replace(' (bleiben, wie du bist)', ''))}` : ''}${p.klass ? ` · <b style="color:var(--accent)">${esc(CLASS_BY_ID[p.klass].name)}</b>` : ''}</div>`;
@@ -748,6 +775,7 @@ export class GameView {
       <div class="grp">${ATTACK_MOVES.map(moveBtn).join('')}</div>
       ${ability ? `<div class="grp"><button class="ability" data-action="ability" ${cd ? 'disabled' : ''} title="Taste F · ${esc(ability.description)}"Fähigkeit: ${esc(ability.name)}${cd ? ` (${cd})` : ''}<span class="key">F</span></button></div>` : ''}
       <div class="grp"><button data-action="wait" title="Leertaste">Warten</button><button data-action="pickup" title="G">Aufheben</button></div>
+      ${this.spellBar()}
       <span class="muted small">Gewählt: <b style="color:var(--accent)">${esc(techniqueName(this.technique()))}</b> · ${attackCost(this.technique())} Ausdauer</span>`;
     bindActions(el, {
       part: (b) => {
@@ -764,10 +792,44 @@ export class GameView {
       wait: () => this.act(() => wait(s)),
       pickup: () => this.act(() => pickup(s)),
       ability: () => this.act(() => useAbility(s, this.technique())),
+      spell: (b) => {
+        const id = b.dataset.spell!;
+        const def = SPELL_BY_ID[id];
+        if (def.target === 'selbst') {
+          this.pendingSpell = null;
+          this.act(() => cast(s, id));
+          return;
+        }
+        this.pendingSpell = this.pendingSpell === id ? null : id;
+        this.refreshActions();
+      },
+      mana: (b) => {
+        this.missileMana = Number(b.dataset.mana);
+        this.refreshActions();
+      },
     });
   }
 
   /** Neue Log-Zeilen werden angehängt und Zeichen für Zeichen getippt. */
+  /** Zauberleiste: jeder bekannte Zauber als Knopf, mit Kosten und Abklingzeit. */
+  private spellBar(): string {
+    const p = this.s.player;
+    if (!p.spells?.length) return '';
+    const btns = p.spells.map((k) => {
+      const def = SPELL_BY_ID[k.id];
+      const cd = p.spellCooldowns?.[k.id] ?? 0;
+      const cost = spellCost(k.id, this.missileMana);
+      const pending = this.pendingSpell === k.id;
+      const disabled = cd > 0 || (p.mp ?? 0) < cost;
+      return `<button class="spell ${pending ? 'sel' : ''}" data-action="spell" data-spell="${k.id}" ${disabled && !pending ? 'disabled' : ''} title="${esc(def.description)}">${esc(def.name)} (${cost} MP)${cd ? ` – ${cd}` : ''}</button>`;
+    });
+    const missile = p.spells.some((k) => k.id === 'geschoss')
+      ? `<span class="muted small">Geschoss-Mana:</span>${[3, 4, 5, 6].map((m) => `<button class="${this.missileMana === m ? 'sel' : ''}" data-action="mana" data-mana="${m}">${m}</button>`).join('')}`
+      : '';
+    const hint = this.pendingSpell ? `<span class="small" style="color:var(--accent)">Klicke auf ${SPELL_BY_ID[this.pendingSpell].target === 'feld' ? 'ein freies Feld' : 'einen Gegner'} (Esc bricht ab)</span>` : '';
+    return `<div class="grp spells">${btns.join('')}${missile}${hint}</div>`;
+  }
+
   private refreshLog() {
     const el = this.root.querySelector('.log') as HTMLElement;
     const entries = this.s.log;
