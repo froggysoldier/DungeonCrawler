@@ -34,6 +34,7 @@ import {
 } from './crawlers';
 import { acceptSponsor, declineSponsor } from './sponsors';
 import { equipPetGear, evolvePet, removePetGear } from './petevo';
+import { dismountForSafeRoom, gainMount, isMountItem, mountStep, refuel, restMount, toggleRide } from './mounts';
 import { acceptQuest, declineQuest, offerQuest, questOf, questsOnDescend, questsTick, turnIn } from './quests';
 import { answerShow, floorRecap, snapshotFloor, startTalkShow, type ShowAnswerResult } from './talkshow';
 import type {
@@ -282,7 +283,8 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
   emit(s, { type: 'moved' });
   afterMove(s);
   onPlayerStep(s);
-  endTurn(s, { keepMoveDir: true });
+  // Reiten: mehrere Schritte pro Zug
+  if (mountStep(s)) endTurn(s, { keepMoveDir: true });
   return OK;
 }
 
@@ -471,6 +473,7 @@ function onEnterRoom(s: GameState, room: NonNullable<ReturnType<typeof currentRo
 
   if (room.kind === 'guild' && !hasUnlock(s, 'inventar')) runTutorial(s);
   if (room.kind === 'safe') {
+    dismountForSafeRoom(s);
     const shop = ensureShop(s, room);
     if (!room.questOffered && hasUnlock(s, 'inventar') && !questOf(s, String(room.id))) {
       room.questOffered = true;
@@ -635,6 +638,13 @@ export function useItem(s: GameState, uid: string): ActionResult {
     return OK;
   }
   if (it.kind !== 'verbrauch') return fail('Das kann man nicht benutzen.');
+  if (isMountItem(it)) {
+    const res = gainMount(s, it);
+    if (!res.ok) return fail(res.message ?? 'Geht nicht.');
+    removeOne(s, uid);
+    endTurn(s);
+    return OK;
+  }
   const special = useSpecial(s, it);
   if (special) {
     if (!special.ok) return fail(special.message ?? 'Geht nicht.');
@@ -788,6 +798,7 @@ export function sleep(s: GameState): ActionResult {
     p.pet.hp = p.pet.maxHp;
     p.pet.pos = { ...(neighbors(p.pos).find((q) => isWalkable(s.map, q.x, q.y) && !occupied(s, q)) ?? p.pos) };
   }
+  restMount(s);
   // Wache Monster verlieren das Interesse.
   for (const m of s.monsters) if (m.homeRoom === undefined) m.aware = false;
   log(s, `Du schläfst ${Math.round((duration * 3) / 60)} Stunden. Du fühlst dich erholt (${Math.round(healPct * 100)} % Heilung).`, 'info');
@@ -908,6 +919,21 @@ export function petGearOn(s: GameState, uid: string): ActionResult {
 export function petGearOff(s: GameState): ActionResult {
   const res = removePetGear(s);
   return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+// ================================================================ Reittiere
+
+export function rideToggle(s: GameState): ActionResult {
+  if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  const res = toggleRide(s);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+export function refuelMount(s: GameState): ActionResult {
+  const res = refuel(s);
+  if (!res.ok) return fail(res.message ?? 'Geht nicht.');
+  endTurn(s);
+  return OK;
 }
 
 // ================================================================ Aufträge

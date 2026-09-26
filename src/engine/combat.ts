@@ -9,6 +9,7 @@ import { chebyshev, hasLineOfSight } from './fov';
 import { createAreaMap, createBox, createGold, createItem, rollMobDrop } from './items';
 import { log } from './log';
 import { blast } from './traps';
+import { ramBonus } from './mounts';
 import { population } from './crawlers';
 import { roomOf } from './mapgen';
 import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, totalBonuses } from './player';
@@ -66,14 +67,17 @@ export function techniqueBlocker(s: GameState, target: Monster, t: Technique): s
   }
   if (t.move === 'stampfen' && t.part !== 'tritt') return 'Stampfen geht nur mit dem Fuß.';
   if (t.move === 'stampfen' && has(target, 'fliegend')) return `${NameOf(s, target)} fliegt – draufstampfen unmöglich.`;
-  if (t.move === 'anlauf') {
+  const mounted = !!p.riding && !!p.mount && !p.mount.down;
+  if (t.move === 'anlauf' && mounted) {
+    // Beritten braucht man keinen Anlauf zu Fuß – das Reittier rammt.
+  } else if (t.move === 'anlauf') {
     const dir = p.lastMoveDir;
     if (!dir) return 'Für Anlauf musst du dich im letzten Zug auf den Gegner zubewegt haben.';
     const dx = Math.sign(target.pos.x - p.pos.x);
     const dy = Math.sign(target.pos.y - p.pos.y);
     if (dir.x * dx + dir.y * dy <= 0) return 'Für Anlauf musst du dich im letzten Zug auf den Gegner zubewegt haben.';
   }
-  if (p.ausdauer < attackCost(t)) return 'Nicht genug Ausdauer.';
+  if (p.ausdauer < (mounted && t.move === 'anlauf' ? 1 : attackCost(t))) return 'Nicht genug Ausdauer.';
   return null;
 }
 
@@ -104,7 +108,8 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   const st = effectiveStats(s, b);
   const skills = matchingSkills(s, t);
   const ambush = !target.aware;
-  p.ausdauer -= attackCost(t);
+  const ram = t.move === 'anlauf' ? ramBonus(s) : 0;
+  p.ausdauer -= ram ? 1 : attackCost(t);
 
   // --- Wurfobjekt bestimmen und verbrauchen
   let thrown: Item | null = null;
@@ -145,6 +150,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   if (t.part === 'waffe') base = (currentWeapon(s)?.waffenSchaden ?? 2) + st.str / 2;
   else if (t.part === 'wurf') base = (thrown?.wurfSchaden ?? 2) + st.ges / 3;
   else base = BASE_DAMAGE[t.part] + st.str / 2;
+  base += ram;
   let pct = (b.schaden?.[t.part] ?? 0) + (b.schaden?.alle ?? 0) + dynAttackBonus(s, facets, t).dmg + traitAttackBonus(s, facets).dmg;
   for (const { st: sk, def } of skills) pct += (def.matchDamage ?? 0) * sk.level;
   if (ambush) {
@@ -181,6 +187,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     let kd = t.part === 'tritt' ? 12 : 6;
     if (t.move === 'sprung') kd += 13;
     if (t.move === 'anlauf') kd += 12;
+    if (ram) kd += 15;
     for (const { st: sk, def } of skills) kd += (def.knockdown ?? 0) * sk.level;
     if (target.size === 'gross') kd /= 2;
     if (target.size === 'riesig' || has(target, 'fliegend')) kd = 0;
@@ -220,6 +227,10 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   }
 
   emit(s, { type: 'attack', technique: t, hit: true, crit, damage: final, target, thrown: thrown ?? undefined, facets });
+  if (ram) {
+    log(s, `${p.mount!.name} rammt mit voller Wucht!`, 'kampf');
+    emit(s, { type: 'rammed', kill: target.hp <= 0 });
+  }
   const at = { ...target.pos };
   if (target.hp <= 0) killMonster(s, target, t, false, facets);
   if (thrown?.explosion) detonate(s, thrown, at);

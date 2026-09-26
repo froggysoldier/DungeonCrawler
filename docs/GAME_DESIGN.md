@@ -1,4 +1,4 @@
-# Der Große Abstieg – Game Design Dokument (v0.6)
+# Der Große Abstieg – Game Design Dokument (v0.7)
 
 > Inspiriert von der Buchreihe *Dungeon Crawler Carl* von Matt Dinniman.
 > **Spoiler-Regel:** Dieses Dokument enthält nur Buch-Details bis einschließlich
@@ -140,7 +140,7 @@ Der Ziegel …), Verbrauchsgüter, Haustier-Leckerli.
   Gegner, gegen Bosse) wird sofort erkannt, Gewöhnliches erst bei vielen
   Wiederholungen. Die Box-Stufe richtet sich danach, wie ungewöhnlich es war.
   Beispiele: „Vergiftet: Tritte gegen Giftige I“, „Revier: Waschküche II“.
-- 158 feste Achievements mit sarkastischem Kommentar kommen hinzu.
+- 170 feste Achievements mit sarkastischem Kommentar kommen hinzu.
 - Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen.
 - **Wer ein Achievement zum ersten Mal in seiner Karriere schafft, bekommt eine Box-Stufe mehr.**
 
@@ -191,6 +191,11 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
 - **Zähmen:** geschwächte Tiere (unter 40 % HP) mit einem Leckerli füttern,
   Chance mit Charisma.
 - **Superkeks:** das Haustier erwacht, spricht und wirkt Magische Geschosse.
+- **Entwicklung:** Auf Stufe 4 wählt man einen von zwei Wegen je Art, auf
+  Stufe 8 folgt die Endform. Jede Form bringt HP, Schaden und eine Fähigkeit:
+  Einschüchtern, Pflegen, Giftbiss, Feueratem, Doppelschlag, Umreißen,
+  Netzfalle, Beschützer (+2 Rüstung für dich), Späher (+1 Sichtweite).
+- **Halsbänder** aus Haustier-Boxen geben dem Haustier HP und Schaden.
 
 ### 3.14 Magie
 - Mana = Intelligenz (plus Boni), regeneriert langsam. Zauber lernt man aus
@@ -252,6 +257,36 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
   vom Charisma ab und können Follower kosten. Eine gute Sendung bringt eine
   Fan-Box.
 
+### 3.20 Sponsoren
+- Sechs erfundene Sponsoren (Kristallhaus Vornex, Brennstoffwerke Pyrrax,
+  Gräfin Oolu vom Nebelmond, Konsortium Grimmzahn, Die Schleimbrüder GmbH,
+  Galaktische Mode AG) mit eigenem Geschmack: Stil, Explosionen, Haustiere,
+  Mut, schmutzige Tricks, absurde Mode.
+- Passende Aktionen wecken Interesse (mehr Hype = schneller). Ab 100 Interesse
+  und genug Followern kommt ein Angebot; bis zu drei Sponsoren gleichzeitig.
+- Aktive Sponsoren haben Wünsche; jeder erfüllte Wunsch bringt eine
+  Sponsorenbox (mit steigender Stufe). Wer tut, was sie nicht mögen, verliert
+  Gunst – bei 0 ist das Sponsoring vorbei.
+
+### 3.21 Aufträge
+- Andere Crawler (manchmal beim ersten Gespräch) und jeder Laden bieten
+  Aufträge an: **Jagd** (Gegner einer Art), **Finden** (verlorenes Andenken
+  in einem anderen Viertel), **Liefern** (Tränke, Essen, Lappen …),
+  **Retten** (eingeschlossener Crawler, von Monstern bewacht) und **Boss**.
+- Belohnung: Gold, XP, oft eine Lootbox; Ladenbesitzer geben danach 15 %
+  Freundschaftsrabatt. Aufträge scheitern, wenn der Auftraggeber stirbt oder
+  die Etage verlassen wird. Bis zu fünf offene Aufträge.
+
+### 3.22 Reittiere und Fahrzeuge
+- Motorisierter Einkaufswagen, Aufsitzrasenmäher, Raketen-Bobbycar (Fahrzeuge,
+  brauchen Benzin) sowie Kellerpony, Sattelschnecke und Kampfeber (Tiere).
+  Man bekommt sie über Zündschlüssel und Pfeifen aus Läden und guten Boxen.
+- Beritten: 2–3 Schritte pro Zug (Schnecke: 1, dafür +3 Rüstung),
+  **Anlauf rammt** mit Zusatzschaden und Umwerf-Chance, ohne vorher laufen zu
+  müssen. Ein Teil der Treffer geht auf das Reittier; Fahrzeuge können
+  zerstört werden, Tiere erholen sich beim Schlafen. Im Safe Room steigt man ab.
+  Taste M zum Auf- und Absteigen.
+
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
 1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben
@@ -276,13 +311,12 @@ tests/      Vitest: Engine-Tests + optionale Balance-Simulation (SIM=1)
 ## 6. Nächste Schritte (Vorschlag)
 
 1. Balance von Etage 2–3 durch Testspielen
-2. Quests von NPCs
-3. Etage 4+ mit neuen Themen, Klassen-Spezialisierung (Etage 6/9/12)
-4. Reittiere
-5. Sound, Grafik-Upgrade der Karte
+2. Etage 4+ mit neuen Themen, Klassen-Spezialisierung (Etage 6/9/12)
+3. Sound, Grafik-Upgrade der Karte
 
-Bewusst ausgelassen: Inhalte, die in den Büchern erst nach Band 1 vorkommen
-(keine Spoiler).
+Spoiler-Grenze: Band 1 vollständig; aus Band 2 nur allgemeine Mechaniken
+(Sponsoren, Aufträge, Haustier-Entwicklung, Reittiere), keine Handlung,
+Figuren oder Orte. Ab Band 3 nichts.
 
 ## 7. Rechtliches
 *Dungeon Crawler Carl* ist geistiges Eigentum von Matt Dinniman. Das Spiel

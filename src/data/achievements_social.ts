@@ -147,4 +147,22 @@ export const SOCIAL_ACHIEVEMENTS: AchievementDef[] = [
     comment: 'Die Monster haben jetzt mehr Angst vor deinem Haustier als vor dir. Zu Recht.',
     check: (e) => e.type === 'petEvolved' && e.stage >= 2,
   },
+  {
+    id: 'fahrzeughalter', name: 'Führerschein? Nie gehabt.', tier: 'silber', box: 'abenteurer',
+    description: 'Besorge dir ein Reittier oder Fahrzeug.',
+    comment: 'Endlich musst du nicht mehr laufen. Die Monster übrigens auch nicht – sie fliegen jetzt.',
+    check: (e) => e.type === 'mountGained',
+  },
+  {
+    id: 'ueberrollt', name: 'Verkehrsunfall', tier: 'silber', box: 'brawler',
+    description: 'Erledige einen Gegner, indem du ihn mit deinem Reittier rammst.',
+    comment: 'Die Versicherung zahlt nicht. Es gibt keine Versicherung mehr.',
+    check: (e) => e.type === 'rammed' && e.kill,
+  },
+  {
+    id: 'totalschaden', name: 'Totalschaden', tier: 'bronze', box: 'ueberlebens',
+    description: 'Verliere dein Reittier im Kampf.',
+    comment: 'Es war schön, solange es fuhr. Oder lief. Oder kroch.',
+    check: (e) => e.type === 'mountLost',
+  },
 ];

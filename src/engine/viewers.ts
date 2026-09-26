@@ -95,6 +95,9 @@ export function viewersOnEvent(s: GameState, e: GameEvent) {
     case 'crawlerDied':
       if (e.party) addSpectacle(s, 10, 'drama');
       break;
+    case 'rammed':
+      addSpectacle(s, e.kill ? 7 : 4, 'stomp');
+      break;
     case 'partyJoined':
       addSpectacle(s, 3, 'party');
       break;

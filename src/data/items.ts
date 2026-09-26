@@ -237,6 +237,15 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'halsband_glocke', name: 'Halsband mit Goldglöckchen', kind: 'schrott', petBonus: { hp: 10 }, flavor: 'Bimmelt. Die Zuschauer finden es süß, die Monster finden das Haustier sofort.', wert: 10 },
   { id: 'halsband_stachel', name: 'Stachelhalsband des Wachhundes', kind: 'schrott', petBonus: { dmg: 3, hp: 8 }, flavor: 'Wer da reinbeißt, bereut es.', wert: 25 },
 
+  // ================= Reittiere und Fahrzeuge
+  { id: 'zuendschluessel_wagen', name: 'Zündschlüssel (Einkaufswagen)', kind: 'verbrauch', flavor: 'Am Schlüsselbund hängt ein Chip für den Einkaufswagen. Benutzen, und er steht bereit.', wert: 30 },
+  { id: 'zuendschluessel_traktor', name: 'Zündschlüssel (Aufsitzrasenmäher)', kind: 'verbrauch', flavor: 'Mit Anhänger: „Papas Heiligtum“.', wert: 60 },
+  { id: 'zuendschluessel_bobbycar', name: 'Zündschnur (Raketen-Bobbycar)', kind: 'verbrauch', flavor: 'Eine Zündschnur und ein Zettel: „Nicht für Kinder unter 3 Jahren. Oder über 3 Jahren.“', wert: 40 },
+  { id: 'pfeife_pony', name: 'Pfeife des Kellerponys', kind: 'verbrauch', flavor: 'Einmal pfeifen, und irgendwo wiehert es.', wert: 35 },
+  { id: 'pfeife_schnecke', name: 'Schneckenhorn', kind: 'verbrauch', flavor: 'Ein Horn aus einem Schneckenhaus. Die Antwort kommt. Langsam.', wert: 45 },
+  { id: 'pfeife_eber', name: 'Eberhorn', kind: 'verbrauch', flavor: 'Klingt wie ein wütendes Schwein. Genau das kommt dann auch.', wert: 70 },
+  { id: 'benzinkanister', name: 'Benzinkanister', kind: 'schrott', flavor: 'Halb voll. Riecht nach Abenteuer und Kopfschmerzen.', wert: 5, ground: 1 },
+
   // ================= Aufträge
   { id: 'andenken', name: 'Andenken', kind: 'schrott', flavor: 'Jemandem ist das sehr wichtig.', wert: 0 },
 

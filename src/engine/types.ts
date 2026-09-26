@@ -403,8 +403,24 @@ export interface Player {
   passes?: string[];
   /** Festgehalten (z. B. Bärenfalle): so viele Züge keine Bewegung. */
   immobile?: number;
+  /** Reittier oder Fahrzeug. */
+  mount?: Mount;
+  /** Sitzt gerade auf dem Reittier. */
+  riding?: boolean;
+  /** Zähler für Extraschritte beim Reiten. */
+  mountSteps?: number;
   /** Bevorzugtes Wurfobjekt (Basis-ID). */
   wurfWahl?: string;
+}
+
+export interface Mount {
+  id: string;
+  name: string;
+  hp: number;
+  maxHp: number;
+  fuel?: number;
+  /** Bewusstlos (Tier) oder kaputt (Fahrzeug, dann weg). */
+  down?: boolean;
 }
 
 export interface SpellState {
@@ -630,6 +646,9 @@ export type GameEvent =
   | { type: 'talkShow'; delta: number; tone: ShowTone }
   | { type: 'petLevel'; level: number }
   | { type: 'petEvolved'; form: string; stage: number }
+  | { type: 'mountGained'; id: string }
+  | { type: 'rammed'; kill: boolean }
+  | { type: 'mountLost'; id: string }
   | { type: 'questAccepted'; kind: QuestKind }
   | { type: 'questDone'; kind: QuestKind; done: number }
   | { type: 'questFailed'; kind: QuestKind }

@@ -40,6 +40,8 @@ export function ensureShop(s: GameState, room: Room): Shop {
   if (R.chance(s, 0.4)) offers.push(randomTome(s, s.floor >= 2 ? 'selten' : 'ungewoehnlich'));
   if (R.chance(s, 0.15)) offers.push(createItem(s, R.pick(s, ['tattoo_kobold', 'tattoo_ratte', 'talisman_flug', 'talisman_insekt'])));
   if (R.chance(s, 0.08)) offers.push(createItem(s, 'ei_raptor'));
+  if (R.chance(s, 0.12 + s.floor * 0.04)) offers.push(createItem(s, R.pick(s, ['zuendschluessel_wagen', 'pfeife_pony', 'zuendschluessel_bobbycar', 'pfeife_schnecke'])));
+  if (R.chance(s, 0.5)) offers.push(createItem(s, 'benzinkanister', 2));
   room.shop = {
     keeper: R.pick(s, KEEPERS),
     offers: offers.map((item) => ({ item, price: basePrice(item) * (isStackable(item.kind) ? 1 : 1) })),

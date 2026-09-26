@@ -25,6 +25,7 @@ import { PERSONALITIES } from '../data/crawlers';
 import { SPONSOR_BY_ID } from '../data/sponsors';
 import { sponsorStates } from '../engine/sponsors';
 import { evolveOptions, petFormName } from '../engine/petevo';
+import { MOUNTS } from '../data/mounts';
 import { PET_ABILITIES, type PetAbility } from '../data/pets';
 import { activeQuests, canTurnIn, hint, questOf, quests } from '../engine/quests';
 import type { Quest } from '../engine/types';
@@ -32,7 +33,7 @@ import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   chooseThrowable, craftItem, disarmTrap, placeTrap,
-  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff,
+  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff, rideToggle, refuelMount,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable } from '../engine/mapgen';
@@ -494,6 +495,8 @@ export class GameView {
       this.act(() => wait(s));
     } else if ((e.key === 'f' || e.key === 'F') && currentAbility(s)) {
       this.act(() => useAbility(s, this.technique()));
+    } else if ((e.key === 'm' || e.key === 'M') && s.player.mount) {
+      this.act(() => rideToggle(s));
     } else if (e.key === 'g' || e.key === 'G') {
       this.act(() => pickup(s));
     } else if (e.key === 'Enter' && onStairs(s)) {
@@ -755,6 +758,8 @@ export class GameView {
       drop: (b) => this.act(() => dropItem(this.s, b.dataset.uid!)),
       sell: (b) => this.act(() => sellItem(this.s, b.dataset.uid!)),
       place: (b) => this.act(() => placeTrap(this.s, b.dataset.uid!)),
+      ride: () => this.act(() => rideToggle(this.s)),
+      refuel: () => this.act(() => refuelMount(this.s)),
       evolve: (b) => this.act(() => evolvePetTo(this.s, b.dataset.id!)),
       'petgear-on': (b) => this.act(() => petGearOn(this.s, b.dataset.uid!)),
       'petgear-off': () => this.act(() => petGearOff(this.s)),
@@ -884,6 +889,12 @@ export class GameView {
     if (p.immobile) html += `<div class="small" style="color:var(--danger)">Festgehalten: noch ${p.immobile} Züge (oder losreißen, indem du dich bewegst)</div>`;
     if (p.curses.length) html += `<div class="section">Flüche</div>${p.curses.map((c) => `<div class="small" style="color:var(--danger)">${esc(c)}</div>`).join('')}`;
     if (p.pet) html += this.petHtml();
+    if (p.mount) {
+      const md = MOUNTS[p.mount.id];
+      html += `<div class="section">Reittier</div><div class="small"><b>${esc(p.mount.name)}</b> · ${p.mount.down ? 'erholt sich (schlafen)' : `HP ${p.mount.hp}/${p.mount.maxHp}`}${p.mount.fuel !== undefined ? ` · Tank ${p.mount.fuel}/${md.fuel}` : ''} · Tempo ${md.speed} Schritte pro Zug · Rammen +${md.ram} Schaden${md.ruestung ? ` · +${md.ruestung} Rüstung` : ''}</div>
+        <div class="muted small">Beritten: Anlauf rammt ohne Anlauf zu Fuß und kostet nur 1 Ausdauer. Ein Teil der Treffer geht auf das Reittier.</div>
+        <div class="row" style="gap:4px;margin:4px 0"><button data-action="ride">${p.riding ? 'Absteigen (M)' : 'Aufsitzen (M)'}</button>${md.kind === 'fahrzeug' ? '<button data-action="refuel">Tanken</button>' : ''}</div>`;
+    }
     const members = party(s);
     if (members.length) {
       html += `<div class="section">Party (${members.length + 1} von 4)</div>${members

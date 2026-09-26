@@ -62,6 +62,7 @@ describe('Aufträge', () => {
     giverNextToMe(s);
     const q = offerOf(s, 'liefern');
     acceptQuestOffer(s, q.id);
+    s.player.inventory = [];
     expect(turnInQuest(s, q.id).ok).toBe(false);
     s.player.inventory.push(createItem(s, q.itemIds![0], q.count));
     expect(turnInQuest(s, q.id).ok).toBe(true);

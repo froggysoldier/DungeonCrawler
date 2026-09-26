@@ -10,6 +10,7 @@ import { handleLethal } from './death';
 import { passProtects, petCast } from './extras';
 import { crawlerAt, monsterHitsCrawler } from './crawlers';
 import { checkEvolve, petAbilityTurn, petBiteBonus } from './petevo';
+import { mountAbsorbs } from './mounts';
 import { dynDefenseBonus, targetFacets, trainDefense } from './observer';
 import { ausweichen, totalBonuses } from './player';
 import * as R from './rng';
@@ -114,6 +115,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     return;
   }
   const dmg = Math.max(1, Math.round((raw - Math.floor(b.ruestung ?? 0)) * (1 - defense.reduktion / 100)));
+  if (mountAbsorbs(s, dmg, NameOf(s, m))) return;
   if (defense.reduktion) trainDefense(s, source, 'abhaertung');
   p.hp -= dmg;
   s.counters.damageTaken += dmg;

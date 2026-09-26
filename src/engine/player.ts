@@ -1,6 +1,7 @@
 import { CLASS_BY_ID } from '../data/classes';
 import { RACE_BY_ID } from '../data/races';
 import { SKILL_BY_ID } from '../data/skills';
+import { MOUNTS } from '../data/mounts';
 import { LEVEL_UP_QUIPS } from '../data/world';
 import { addBonuses } from './bonuses';
 import { traitBonuses } from './traits';
@@ -27,6 +28,8 @@ export function totalBonuses(s: GameState): Bonuses {
   const pet = s.player.pet;
   if (pet?.alive && pet.abilities?.includes('schutz')) addBonuses(b, { ruestung: 2 });
   if (pet?.alive && pet.abilities?.includes('spaeher')) addBonuses(b, { lichtradius: 1 });
+  const mount = s.player.mount;
+  if (s.player.riding && mount && !mount.down) addBonuses(b, { ruestung: MOUNTS[mount.id]?.ruestung ?? 0 });
   return b;
 }
 

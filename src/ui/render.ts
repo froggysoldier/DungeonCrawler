@@ -251,6 +251,15 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
   ctx.strokeStyle = '#fff5cc';
   ctx.lineWidth = 2;
   ctx.stroke();
+  // Beritten: ein zweiter Ring als Reittier
+  if (s.player.riding && s.player.mount && !s.player.mount.down) {
+    ctx.strokeStyle = '#c98a4b';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(px, py, 9.5, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.lineWidth = 1;
 
   // --- Hover-Rahmen
   if (extras.hover) {

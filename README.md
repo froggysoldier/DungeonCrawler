@@ -36,6 +36,7 @@ SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simula
 | Mit Crawlern reden | Klick auf den Crawler | – |
 | Falle entschärfen / aufstellen | Button im Seitenbereich / im Inventar | – |
 | Handwerk | Tab „Handwerk“ | – |
+| Reittier auf- / absteigen | Button im Crawler-Tab | M |
 | Untersuchen | Rechtsklick | – |
 
 ## Dokumentation

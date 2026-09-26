@@ -164,6 +164,11 @@ export function rollBoxContents(s: GameState, type: BoxType, tier: BoxTier): Ite
   }
   if (type === 'wurf' && tierIdx >= 1) out.push(createItem(s, R.chance(s, 0.5) ? 'brandflasche' : 'nagelbombe', tierIdx));
   if (tierIdx >= 2 && R.chance(s, 0.1)) out.push(createItem(s, 'klappwerkbank'));
+  // Reittiere: selten, in guten Boxen häufiger
+  if ((type === 'abenteurer' || type === 'fan' || type === 'boss' || type === 'haustier') && tierIdx >= 1 && R.chance(s, 0.05 + tierIdx * 0.04)) {
+    const pool = tierIdx >= 3 ? ['zuendschluessel_traktor', 'pfeife_eber', 'pfeife_schnecke'] : ['zuendschluessel_wagen', 'pfeife_pony', 'zuendschluessel_bobbycar'];
+    out.push(createItem(s, R.pick(s, pool)));
+  }
   // Zauberbücher: selten in einfachen Boxen, häufiger in guten
   if ((type === 'abenteurer' || type === 'fan' || type === 'boss') && R.chance(s, 0.12 + tierIdx * 0.1)) {
     out.push(randomTome(s, RARITY_ORDER[Math.min(4, tierIdx + 1)]));
