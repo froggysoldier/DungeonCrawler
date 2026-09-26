@@ -30,7 +30,7 @@ export function checkAchievements(s: GameState, e: GameEvent) {
     log(s, `${a.comment}`, 'achievement');
     log(s, `Belohnung: ${BOX_TIER_NAMES[tier]} ${BOX_TYPE_NAMES[a.box]}.${firstNote}`, 'loot');
     addSpectacle(s, 4 + BOX_TIERS.indexOf(tier) * 4, 'achievement');
-    toast(s, `🏆 ${a.name}`, `${a.description} → ${BOX_TIER_NAMES[tier]} ${BOX_TYPE_NAMES[a.box]}`, 'achievement');
+    toast(s, `Achievement: ${a.name}`, `${a.description} Belohnung: ${BOX_TIER_NAMES[tier]} ${BOX_TYPE_NAMES[a.box]}`, 'achievement');
   }
 }
 

@@ -16,11 +16,11 @@ function hallOfFame(meta: MetaState): string {
     .reverse()
     .slice(0, 12)
     .map((h) => {
-      const icon = h.outcome === 'ueberlebt' ? '🏁' : h.outcome === 'vertrag' ? '📜' : '💀';
-      return `<tr><td>${h.season}</td><td>${icon} ${esc(h.name)}</td><td>${esc(h.background)}</td><td>Lv ${h.level}</td><td>E${h.floor}</td><td>${h.kills}</td><td>${h.achievements}</td><td class="muted">${esc(h.cause)}</td></tr>`;
+      const icon = h.outcome === 'ueberlebt' ? 'Überlebt' : h.outcome === 'vertrag' ? 'Vertrag' : 'Tot';
+      return `<tr><td>${h.season}</td><td>${esc(h.name)}</td><td>${esc(h.background)}</td><td>Lv ${h.level}</td><td>E${h.floor}</td><td>${h.kills}</td><td>${h.achievements}</td><td>${icon}</td><td class="muted">${esc(h.cause)}</td></tr>`;
     })
     .join('');
-  return `<table class="hof"><tr><th>#</th><th>Crawler</th><th>Vorher</th><th>Level</th><th>Etage</th><th>Kills</th><th>🏆</th><th>Ende</th></tr>${rows}</table>`;
+  return `<table class="hof"><tr><th>#</th><th>Crawler</th><th>Vorher</th><th>Level</th><th>Etage</th><th>Kills</th><th>Erfolge</th><th>Ausgang</th><th>Ende</th></tr>${rows}</table>`;
 }
 
 export function titleScreen(

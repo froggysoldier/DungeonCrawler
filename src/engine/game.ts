@@ -19,6 +19,7 @@ import { canStep, findPath } from './path';
 import { clampVitals, lichtradius, maxAusdauer, maxHp, skillLevel, totalBonuses } from './player';
 import * as R from './rng';
 import { addToInventory, giveItem } from './inventory';
+import { describeMonster, itemName } from './identify';
 import { learnSkill } from './skills';
 import { viewersTick } from './viewers';
 import type {
@@ -393,7 +394,7 @@ function afterMove(s: GameState) {
   }
 
   const here = itemsAt(s, s.player.pos);
-  if (here.length) log(s, `Hier liegt: ${here.map((e) => e.item.name).join(', ')}.`, 'loot');
+  if (here.length) log(s, `Hier liegt: ${here.map((e) => itemName(s, e.item)).join(', ')}.`, 'loot');
   if (tileAt(s.map, s.player.pos.x, s.player.pos.y) === 'stairs') {
     log(s, 'Du stehst an einem Treppenhaus. Hier kannst du auf die nächste Etage hinabsteigen.', 'system');
   }
@@ -420,7 +421,8 @@ function onEnterRoom(s: GameState, room: NonNullable<ReturnType<typeof currentRo
     const def = boss && HOOD_BOSSES.find((b) => b.id === boss.defId);
     if (def) {
       log(s, def.intro, 'gefahr');
-      log(s, `BOSS: ${def.name} (Level ${boss!.level}). ${def.flavor}`, 'gefahr');
+      const info = describeMonster(s, boss!);
+      log(s, info.insight <= 2 ? `BOSS: ${def.name} (${info.level}). ${def.flavor}` : `BOSS: ${info.name}. ${info.level}. Du kannst nicht einschätzen, womit du es zu tun hast.`, 'gefahr');
     }
   }
   emit(s, { type: 'enterRoom', room });
@@ -473,7 +475,7 @@ export function pickup(s: GameState, uid?: string): ActionResult {
       }
       p.hand = it;
       s.items = s.items.filter((e) => e !== entry);
-      log(s, `Du nimmst ${it.name} in die Hand.`, 'loot');
+      log(s, `Du nimmst ${itemName(s, it)} in die Hand.`, 'loot');
       s.counters.itemsPicked += 1;
       emit(s, { type: 'pickup', item: it });
       break; // nur ein Gegenstand in der Hand
@@ -481,7 +483,7 @@ export function pickup(s: GameState, uid?: string): ActionResult {
     s.items = s.items.filter((e) => e !== entry);
     giveItem(s, it);
     s.counters.itemsPicked += 1;
-    log(s, `Aufgehoben: ${it.name}${it.menge && it.menge > 1 && it.kind !== 'gold' ? ` ×${it.menge}` : ''}.`, 'loot');
+    log(s, `Aufgehoben: ${itemName(s, it)}${it.menge && it.menge > 1 && it.kind !== 'gold' ? ` ×${it.menge}` : ''}.`, 'loot');
     emit(s, { type: 'pickup', item: it });
   }
   return OK;
@@ -554,7 +556,7 @@ export function useItem(s: GameState, uid: string): ActionResult {
       log(s, 'Du isst das Haustier-Leckerli. Es schmeckt nach Fisch und Reue. Die Zuschauer sind verstört.', 'info');
     }
   } else {
-    log(s, `Du benutzt: ${it.name}.`, 'info');
+    log(s, `Du benutzt: ${itemName(s, it)}.`, 'info');
     if (it.baseId.includes('trank') || it.baseId === 'gegengift') s.counters.potionsDrunk += 1;
     applyEffect(s, it.effekt ?? {}, FOOD.has(it.baseId));
     if (FOOD.has(it.baseId)) emit(s, { type: 'eat', item: it });
@@ -583,7 +585,7 @@ export function equip(s: GameState, uid: string): ActionResult {
   p.inventory = p.inventory.filter((i) => i.uid !== uid);
   if (old) p.inventory.push(old);
   p.equipment[slot] = it;
-  log(s, `Angelegt: ${it.name}.`, 'info');
+  log(s, `Angelegt: ${itemName(s, it)}.`, 'info');
   emit(s, { type: 'equip', item: it });
   clampVitals(s);
   endTurn(s);
@@ -598,7 +600,7 @@ export function unequip(s: GameState, slot: EquipSlot): ActionResult {
   delete p.equipment[slot];
   p.inventory.push(it);
   clampVitals(s);
-  log(s, `Abgelegt: ${it.name}.`, 'info');
+  log(s, `Abgelegt: ${itemName(s, it)}.`, 'info');
   return OK;
 }
 
@@ -609,7 +611,7 @@ export function dropItem(s: GameState, uid: string): ActionResult {
   if (owned.from === 'hand') p.hand = null;
   else p.inventory = p.inventory.filter((i) => i.uid !== uid);
   s.items.push({ pos: { ...p.pos }, item: owned.item });
-  log(s, `Du lässt ${owned.item.name} fallen.`, 'info');
+  log(s, `Du lässt ${itemName(s, owned.item)} fallen.`, 'info');
   return OK;
 }
 
@@ -625,7 +627,7 @@ export function openBox(s: GameState, uid: string): { ok: boolean; message?: str
   const contents = rollBoxContents(s, box.box.type, box.box.tier);
   for (const it of contents) giveItem(s, it);
   s.counters.boxesOpened += 1;
-  log(s, `Du öffnest: ${box.name}. Inhalt: ${contents.map((c) => c.name + (c.menge && c.menge > 1 && c.kind !== 'gold' ? ` ×${c.menge}` : '')).join(', ')}.`, 'loot');
+  log(s, `Du öffnest: ${box.name}. Inhalt: ${contents.map((c) => itemName(s, c) + (c.menge && c.menge > 1 && c.kind !== 'gold' ? ` ×${c.menge}` : '')).join(', ')}.`, 'loot');
   emit(s, { type: 'boxOpened', item: box, contents });
   return { ok: true, contents };
 }
@@ -638,7 +640,7 @@ export function takeFreebie(s: GameState): { ok: boolean; message?: string; item
   const rarity = R.weighted<Rarity>(s, [['ungewoehnlich', 60], ['selten', 35], ['episch', 5]]);
   const item = R.chance(s, 0.25) ? createItem(s, 'heiltrank', 2) : generateEquipment(s, rarity);
   giveItem(s, item);
-  log(s, `Der Automat spuckt aus: ${item.name}${item.menge && item.menge > 1 ? ` ×${item.menge}` : ''}.`, 'loot');
+  log(s, `Der Automat spuckt aus: ${itemName(s, item)}${item.menge && item.menge > 1 ? ` ×${item.menge}` : ''}.`, 'loot');
   return { ok: true, item };
 }
 

@@ -31,7 +31,7 @@ export function showSelection(s: GameState, onDone: () => void): Promise<void> {
             <button class="choice ${r.id === race ? 'sel' : ''}" data-race="${r.id}" ${available ? '' : 'disabled'}>
               <b>${esc(r.name)}</b>
               <span class="small">${esc(r.description)}</span>
-              ${available ? '' : `<span class="small lockreq">🔒 ${esc(r.requirement?.text ?? '')}</span>`}
+              ${available ? '' : `<span class="small lockreq">Gesperrt – Bedingung: ${esc(r.requirement?.text ?? '')}</span>`}
             </button>`)
           .join('');
         classEl.innerHTML = classes

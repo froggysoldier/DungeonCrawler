@@ -1,6 +1,7 @@
 import { FAN_GIFTS, FAN_THRESHOLDS, VIEWER_COMMENTS, VIEWER_NAMES } from '../data/viewers';
 import { BOX_TIER_NAMES } from '../data/world';
 import { emit } from './events';
+import { itemName } from './identify';
 import { giveItem } from './inventory';
 import { createBox, createItem } from './items';
 import { log, toast } from './log';
@@ -33,7 +34,7 @@ export function addSpectacle(s: GameState, points: number, kind: string) {
 
   const comments = VIEWER_COMMENTS[kind];
   if (comments && points >= 4 && R.chance(s, 0.35)) {
-    log(s, `💬 ${R.pick(s, VIEWER_NAMES)}: ${R.pick(s, comments)}`, 'dialog');
+    log(s, `Zuschauer ${R.pick(s, VIEWER_NAMES)}: „${R.pick(s, comments)}“`, 'dialog');
   }
   // Große Momente: Geschenk aus dem Publikum
   if (points >= 15 && R.chance(s, Math.min(0.6, 0.15 + (cha - 5) * 0.03))) fanGift(s);
@@ -51,7 +52,7 @@ export function addSpectacle(s: GameState, points: number, kind: string) {
 export function fanGift(s: GameState) {
   const item = createItem(s, R.pick(s, FAN_GIFTS));
   giveItem(s, item);
-  log(s, `🎁 ${R.pick(s, VIEWER_NAMES)} schickt dir ein Geschenk: ${item.name}!`, 'loot');
+  log(s, `Zuschauer ${R.pick(s, VIEWER_NAMES)} schickt dir ein Geschenk: ${itemName(s, item)}!`, 'loot');
 }
 
 /** Zeit vergeht: Hype kühlt ab, bei Langeweile murrt das Publikum. */
@@ -60,7 +61,7 @@ export function viewersTick(s: GameState, turns: number) {
   const v = s.viewers;
   v.hype = Math.max(0, v.hype - turns * 0.4);
   if (turns === 1 && s.turn - v.lastSpectacle > 80 && R.chance(s, 0.02)) {
-    log(s, `💬 ${R.pick(s, VIEWER_NAMES)}: ${R.pick(s, VIEWER_COMMENTS.boring)}`, 'dialog');
+    log(s, `Zuschauer ${R.pick(s, VIEWER_NAMES)}: „${R.pick(s, VIEWER_COMMENTS.boring)}“`, 'dialog');
   }
 }
 

@@ -5,8 +5,8 @@ import { BOX_TIER_COLORS, FLOORS, RESTAURANT_HOSTS, RESTAURANT_MENU, SHOW_NAME }
 import { monsterAt } from '../engine/ai';
 import { CLASS_BY_ID } from '../data/classes';
 import { RACE_BY_ID } from '../data/races';
-import { ABILITY_NAMES } from '../engine/abilities';
 import { currentAbility, useAbility } from '../engine/classes';
+import { describeItem, describeMonster, INSIGHT_NAMES, itemName } from '../engine/identify';
 import { liveViewers } from '../engine/viewers';
 import { describeBonuses, PART_NAMES, STAT_NAMES } from '../engine/bonuses';
 import {
@@ -284,17 +284,22 @@ export class GameView {
     if (mon) {
       const tech = this.technique();
       const blocker = techniqueBlocker(s, mon, tech);
-      const rank = mon.rank === 'normal' ? '' : ` · ${mon.rank === 'elite' ? 'Elite' : mon.rank === 'geist' ? 'Geist' : 'BOSS'}`;
-      parts.push(`<b style="color:${mon.color}">${esc(mon.name)}</b> <span class="muted">Lv ${mon.level}${rank}</span>`);
-      if (mon.abilities?.length) parts.push(`<span style="color:#ff9dff">${esc(mon.abilities.map((a) => ABILITY_NAMES[a]).join(' · '))}</span>`);
-      parts.push(`HP ${Math.max(0, mon.hp)}/${mon.maxHp}${mon.downed > 0 ? ' · <span style="color:#7cc4ff">am Boden</span>' : ''}${!mon.aware ? ' · <span style="color:#6ee07a">ahnungslos</span>' : ''}`);
-      parts.push(blocker ? `<span class="muted">${esc(techniqueName(tech))}: ${esc(blocker)}</span>` : `${esc(techniqueName(tech))}: <b>${hitChance(s, mon, tech)} %</b> Trefferchance`);
-      parts.push(`<span class="muted small">${esc(mon.flavor)}</span>`);
+      const info = describeMonster(s, mon);
+      const color = info.insight >= 3 ? '#b0a898' : mon.color;
+      parts.push(`<b style="color:${color}">${esc(info.name)}</b>${info.rank ? ` <span class="muted">${info.rank}</span>` : ''}`);
+      parts.push(`<span class="muted">${esc(info.level)} · ${esc(INSIGHT_NAMES[info.insight])}</span>`);
+      parts.push(`${esc(info.health)}${mon.downed > 0 ? ' · <span style="color:#7cc4ff">am Boden</span>' : ''}${!mon.aware ? ' · <span style="color:#6ee07a">ahnungslos</span>' : ''}`);
+      if (info.combat) parts.push(esc(info.combat));
+      if (info.abilities) parts.push(`<span style="color:#ff9dff">${esc(info.abilities)}</span>`);
+      if (blocker) parts.push(`<span class="muted">${esc(techniqueName(tech))}: ${esc(blocker)}</span>`);
+      else if (info.showHitChance) parts.push(`${esc(techniqueName(tech))}: <b>${hitChance(s, mon, tech)} %</b> Trefferchance`);
+      else parts.push(`${esc(techniqueName(tech))}: Trefferchance nicht einschätzbar`);
+      if (info.flavor) parts.push(`<span class="muted small">${esc(info.flavor)}</span>`);
     }
     const items = itemsAt(s, t);
-    if (items.length) parts.push(items.map((e) => `<span style="color:${RARITY_COLORS[e.item.rarity]}">◆ ${esc(e.item.name)}</span>`).join('<br>'));
+    if (items.length) parts.push(items.map((e) => `<span style="color:${RARITY_COLORS[e.item.rarity]}">${esc(itemName(s, e.item))}</span>`).join('<br>'));
     const room = s.map.roomAt[i] >= 0 ? s.map.rooms[s.map.roomAt[i]] : null;
-    if (s.map.tiles[i] === 'stairs') parts.push('<b style="color:#ffcc33">▼ Treppenhaus</b>');
+    if (s.map.tiles[i] === 'stairs') parts.push('<b style="color:#ffcc33">Treppenhaus nach unten</b>');
     if (room && room.visited) parts.push(`<span class="muted small">${esc(room.name)}</span>`);
     return parts.length ? parts.join('<br>') : null;
   }
@@ -321,9 +326,17 @@ export class GameView {
     if (!this.view) return;
     const t = tileFromMouse(this.view, this.canvas, e);
     const mon = this.visible.has(idx(this.s.map, t.x, t.y)) ? monsterAt(this.s, t) : undefined;
-    if (mon) return this.say(`${mon.name} (Level ${mon.level}): ${mon.flavor}`);
+    if (mon) {
+      const info = describeMonster(this.s, mon);
+      return this.say([`${info.name} (${info.level}, ${INSIGHT_NAMES[info.insight]})`, info.health, info.combat, info.abilities, info.flavor].filter(Boolean).join('. '));
+    }
     const items = itemsAt(this.s, t);
-    if (items.length) return this.say(items.map((i) => `${i.item.name}: ${i.item.flavor}`).join(' | '));
+    if (items.length) {
+      return this.say(items.map((i) => {
+        const d = describeItem(this.s, i.item);
+        return `${d.name}: ${d.flavor ?? d.note ?? ''}`;
+      }).join(' | '));
+    }
     const room = this.s.map.roomAt[idx(this.s.map, t.x, t.y)];
     if (room >= 0 && this.s.map.rooms[room].visited) this.say(`${this.s.map.rooms[room].name}: ${this.s.map.rooms[room].description}`);
   }
@@ -419,13 +432,13 @@ export class GameView {
       <span class="show">${esc(SHOW_NAME)}</span>
       <span class="muted">Staffel ${s.season}</span>
       <span>Etage <b>${s.floor}</b>: ${esc(def?.name ?? '')}</span>
-      <span class="timer ${left <= 120 ? 'warn' : ''}" title="Zeit bis zum Einsturz">⏳ Einsturz in ${formatTime(left)}</span>
+      <span class="timer ${left <= 120 ? 'warn' : ''}" title="Zeit bis zum Einsturz">Einsturz in ${formatTime(left)}</span>
       <span class="spacer"></span>
       <span>${esc(p.name)} · Lv <b>${p.level}</b></span>
-      ${hasUnlock(s, 'zuschauer') ? `<span class="viewers" title="Live-Zuschauer · Follower · Hype">👁 ${liveViewers(s).toLocaleString('de-DE')} · ❤ ${s.viewers.follower.toLocaleString('de-DE')} · 🔥 ${Math.round(s.viewers.hype)}</span>` : ''}
-      <span style="color:#ffd700">● ${p.gold} Gold</span>
-      <span title="Ungeöffnete Lootboxen">🎁 ${p.boxes.length}</span>
-      ${pet ? `<span style="color:#ffb3e6" title="Haustier">🐾 ${esc(pet.name)} ${pet.alive ? `${pet.hp}/${pet.maxHp}` : '(bewusstlos)'}</span>` : ''}`;
+      ${hasUnlock(s, 'zuschauer') ? `<span class="viewers">Zuschauer ${liveViewers(s).toLocaleString('de-DE')} · Follower ${s.viewers.follower.toLocaleString('de-DE')} · Hype ${Math.round(s.viewers.hype)}</span>` : ''}
+      <span style="color:#ffd700">Gold ${p.gold}</span>
+      <span>Lootboxen ${p.boxes.length}</span>
+      ${pet ? `<span style="color:#ffb3e6">Haustier ${esc(pet.name)} ${pet.alive ? `${pet.hp}/${pet.maxHp}` : '(bewusstlos)'}</span>` : ''}`;
   }
 
   private refreshHere() {
@@ -436,15 +449,15 @@ export class GameView {
     const blocks: string[] = [];
     if (items.length) {
       blocks.push(`<div class="section">Hier liegt</div>${items
-        .map((e) => `<div class="row" style="margin-bottom:4px"><span style="color:${RARITY_COLORS[e.item.rarity]};flex:1">◆ ${esc(e.item.name)}</span><button data-action="pick" data-uid="${e.item.uid}">Aufheben</button></div>`)
+        .map((e) => `<div class="row" style="margin-bottom:4px"><span style="color:${RARITY_COLORS[e.item.rarity]};flex:1">${esc(itemName(s, e.item))}</span><button data-action="pick" data-uid="${e.item.uid}">Aufheben</button></div>`)
         .join('')}`);
     }
-    if (onStairs(s)) blocks.push('<div class="row" style="margin:6px 0"><button class="primary" data-action="descend">▼ Hinabsteigen (Enter)</button></div>');
+    if (onStairs(s)) blocks.push('<div class="row" style="margin:6px 0"><button class="primary" data-action="descend">Hinabsteigen (Enter)</button></div>');
     if (room?.kind === 'safe') {
       const inside = isInSafeRoom(s, s.player.pos);
       let html = `<div class="section">Safe Room</div>`;
       if (room.safeVariant === 'freebie') {
-        html += `<div class="row" style="margin-bottom:6px"><button data-action="freebie" ${room.freebieTaken ? 'disabled' : ''}>${room.freebieTaken ? 'Gratis-Gegenstand abgeholt' : '🎁 Gratis-Gegenstand abholen'}</button></div>`;
+        html += `<div class="row" style="margin-bottom:6px"><button data-action="freebie" ${room.freebieTaken ? 'disabled' : ''}>${room.freebieTaken ? 'Gratis-Gegenstand abgeholt' : 'Gratis-Gegenstand abholen'}</button></div>`;
       } else {
         const host = RESTAURANT_HOSTS[room.id % RESTAURANT_HOSTS.length];
         html += `<div class="muted small">${esc(host.name)} (${esc(host.race)}) serviert:</div>`;
@@ -453,11 +466,11 @@ export class GameView {
         ).join('');
       }
       if (inside) {
-        html += `<div class="row" style="margin-top:6px"><button data-action="sleep">😴 Schlafen (8 Std.)</button></div>`;
+        html += `<div class="row" style="margin-top:6px"><button data-action="sleep">Schlafen (8 Std.)</button></div>`;
         if (s.player.boxes.length) {
           html += `<div class="muted small" style="margin-top:6px">Lootboxen öffnen:</div>`;
           html += s.player.boxes
-            .map((b) => `<div class="row" style="margin:3px 0"><span style="flex:1;color:${BOX_TIER_COLORS[b.box!.tier]}">🎁 ${esc(b.name)}</span><button data-action="box" data-uid="${b.uid}">Öffnen</button></div>`)
+            .map((b) => `<div class="row" style="margin:3px 0"><span style="flex:1;color:${BOX_TIER_COLORS[b.box!.tier]}">${esc(b.name)}</span><button data-action="box" data-uid="${b.uid}">Öffnen</button></div>`)
             .join('');
         }
       }
@@ -503,7 +516,8 @@ export class GameView {
     if (it.kind === 'wurf') bits.push(`Wurfschaden ${it.wurfSchaden}`);
     if (it.waffenSchaden) bits.push(`Waffenschaden ${it.waffenSchaden}`);
     if (it.kind !== 'gold') bits.push(RARITY_NAMES[it.rarity]);
-    const bon = describeBonuses(it.bonuses);
+    const known = describeItem(this.s, it);
+    const bon = [...known.bonuses];
     const eff = it.effekt;
     if (eff?.heal) bon.push(`Heilt ${eff.heal} HP`);
     if (eff?.ausdauer) bon.push(`+${eff.ausdauer} Ausdauer`);
@@ -514,10 +528,11 @@ export class GameView {
       if (it.kind === 'verbrauch') actions.push(`<button data-action="use" data-uid="${it.uid}">Benutzen</button>`);
       actions.push(`<button data-action="drop" data-uid="${it.uid}">Ablegen</button>`);
     }
-    return `<div class="name" style="color:${color}">${esc(it.name)}${it.menge && it.menge > 1 && it.kind !== 'gold' ? ` ×${it.menge}` : ''}</div>
+    return `<div class="name" style="color:${color}">${esc(known.name)}${it.menge && it.menge > 1 && it.kind !== 'gold' ? ` ×${it.menge}` : ''}</div>
       <div class="meta">${esc(bits.join(' · '))}</div>
       ${bon.length ? `<div class="bon">${esc(bon.join(', '))}</div>` : ''}
-      <div class="meta"><i>${esc(it.flavor)}</i></div>
+      ${known.flavor ? `<div class="meta"><i>${esc(known.flavor)}</i></div>` : ''}
+      ${known.note ? `<div class="meta" style="color:var(--danger)">${esc(known.note)}</div>` : ''}
       ${actions.length ? `<div class="actions">${actions.join('')}</div>` : ''}`;
   }
 
@@ -562,7 +577,7 @@ export class GameView {
     </div>
     <div class="muted small">${esc(p.name)} · früher: ${esc(p.background)}${p.race ? ` · ${esc(RACE_BY_ID[p.race].name.replace(' (bleiben, wie du bist)', ''))}` : ''}${p.klass ? ` · <b style="color:var(--accent)">${esc(CLASS_BY_ID[p.klass].name)}</b>` : ''}</div>`;
     if (!hasUnlock(s, 'stats')) {
-      return html + `<div class="locked" style="margin-top:12px">🔒 Deine Werte siehst du erst nach dem Tutorial.<br>Finde die <b>Gilde der Einweisung</b>.</div>
+      return html + `<div class="locked" style="margin-top:12px">Gesperrt: Deine Werte siehst du erst nach dem Tutorial.<br>Finde die <b>Gilde der Einweisung</b>.</div>
         <div class="section">In der Hand</div>${p.hand ? `<div class="item">${this.itemHtml(p.hand, true, 'hand')}</div>` : '<div class="muted">Nichts. Heb etwas auf (G).</div>'}`;
     }
     const st = effectiveStats(s, b);
@@ -579,11 +594,11 @@ export class GameView {
     </div>`;
     if (p.buffs.length) {
       html += `<div class="section">Effekte</div>${p.buffs
-        .map((x) => `<div class="small" style="color:${x.debuff ? 'var(--danger)' : 'inherit'}">${x.debuff ? '☣' : '✨'} ${esc(x.name)}${x.dot ? ` (−${x.dot} HP/Zug)` : ''} <span class="muted">(${x.turns} Züge)</span></div>`)
+        .map((x) => `<div class="small" style="color:${x.debuff ? 'var(--danger)' : 'inherit'}">${x.debuff ? 'Negativ:' : 'Positiv:'} ${esc(x.name)}${x.dot ? ` (−${x.dot} HP/Zug)` : ''} <span class="muted">(${x.turns} Züge)</span></div>`)
         .join('')}`;
     }
-    if (p.curses.length) html += `<div class="section">Flüche</div>${p.curses.map((c) => `<div class="small" style="color:var(--danger)">☠ ${esc(c)}</div>`).join('')}`;
-    const hoods = s.map.hoods.map((h) => `<div class="small">${h.bossAlive ? '👹' : '✅'} ${esc(h.name)}${h.mapFound ? ' 🗺' : ''}</div>`).join('');
+    if (p.curses.length) html += `<div class="section">Flüche</div>${p.curses.map((c) => `<div class="small" style="color:var(--danger)">${esc(c)}</div>`).join('')}`;
+    const hoods = s.map.hoods.map((h) => `<div class="small">${esc(h.name)}: ${h.bossAlive ? 'Boss lebt' : 'Boss besiegt'}${h.mapFound ? ', Karte gefunden' : ''}</div>`).join('');
     html += `<div class="section">Viertel</div>${hoods}`;
     return html;
   }
@@ -593,20 +608,20 @@ export class GameView {
     const p = s.player;
     let html = '';
     if (!hasUnlock(s, 'inventar')) {
-      html += `<div class="locked">🔒 Kein Inventar. Du kannst nur einen Gegenstand in der Hand halten.<br>Finde die <b>Gilde der Einweisung</b>.</div>
+      html += `<div class="locked">Gesperrt: Kein Inventar. Du kannst nur einen Gegenstand in der Hand halten.<br>Finde die <b>Gilde der Einweisung</b>.</div>
         <div class="section">In der Hand</div>${p.hand ? `<div class="item">${this.itemHtml(p.hand, true, 'hand')}</div>` : '<div class="muted">Nichts.</div>'}`;
     } else {
       html += `<div class="section">Ausrüstung</div><div class="eqgrid">`;
       for (const slot of EQUIP_ORDER) {
         const it = p.equipment[slot];
-        html += `<span class="muted">${EQUIP_NAMES[slot]}</span><span style="color:${it ? RARITY_COLORS[it.rarity] : 'inherit'}" title="${esc(it ? [it.flavor, ...describeBonuses(it.bonuses)].join(' | ') : '')}">${it ? esc(it.name) : '<span class="muted">–</span>'}</span>${it ? `<button data-action="unequip" data-slot="${slot}">✕</button>` : '<span></span>'}`;
+        html += `<span class="muted">${EQUIP_NAMES[slot]}</span><span style="color:${it ? RARITY_COLORS[it.rarity] : 'inherit'}" title="${esc(it ? [describeItem(this.s, it).flavor ?? '', ...describeItem(this.s, it).bonuses].join(' | ') : '')}">${it ? esc(itemName(this.s, it)) : '<span class="muted">–</span>'}</span>${it ? `<button data-action="unequip" data-slot="${slot}">Ablegen</button>` : '<span></span>'}`;
       }
       html += `</div><div class="section">Rucksack (${p.inventory.length})</div>`;
       html += p.inventory.length ? p.inventory.map((it) => `<div class="item">${this.itemHtml(it, true)}</div>`).join('') : '<div class="muted">Leer.</div>';
     }
     html += `<div class="section">Lootboxen (${p.boxes.length})</div>`;
     html += p.boxes.length
-      ? p.boxes.map((b) => `<div class="small" style="color:${BOX_TIER_COLORS[b.box!.tier]}">🎁 ${esc(b.name)}</div>`).join('') + '<div class="muted small" style="margin-top:4px">Öffnen nur in einem Safe Room.</div>'
+      ? p.boxes.map((b) => `<div class="small" style="color:${BOX_TIER_COLORS[b.box!.tier]}">${esc(b.name)}</div>`).join('') + '<div class="muted small" style="margin-top:4px">Öffnen nur in einem Safe Room.</div>'
       : '<div class="muted">Keine. Achievements bringen Boxen!</div>';
     return html;
   }
@@ -615,7 +630,7 @@ export class GameView {
     const s = this.s;
     const p = s.player;
     let html = '';
-    if (!hasUnlock(s, 'skills')) html += '<div class="locked" style="margin-bottom:8px">🔒 Die Skill-Übersicht gibt’s nach dem Tutorial. Gelernt wird trotzdem schon!</div>';
+    if (!hasUnlock(s, 'skills')) html += '<div class="locked" style="margin-bottom:8px">Gesperrt: Die Skill-Übersicht gibt’s nach dem Tutorial. Gelernt wird trotzdem schon!</div>';
     html += `<div class="section">Gelernte Skills</div>`;
     if (!p.skills.length) html += '<div class="muted">Noch keine. Kämpfe – der Dungeon beobachtet dich.</div>';
     for (const st of p.skills) {
@@ -658,7 +673,7 @@ export class GameView {
     html += done
       .slice()
       .reverse()
-      .map((a) => `<div class="achv"><div class="n">🏆 ${esc(a.name)}</div><div class="small">${esc(a.description)}</div><div class="muted small"><i>${esc(a.comment)}</i></div></div>`)
+      .map((a) => `<div class="achv"><div class="n">${esc(a.name)}</div><div class="small">${esc(a.description)}</div><div class="muted small"><i>${esc(a.comment)}</i></div></div>`)
       .join('');
     if (everOnly.length) {
       html += `<div class="section">Aus früheren Staffeln</div>`;
@@ -687,7 +702,7 @@ export class GameView {
     el.innerHTML = `
       <div class="grp">${ATTACK_PARTS.map(partBtn).join('')}</div>
       <div class="grp">${ATTACK_MOVES.map(moveBtn).join('')}</div>
-      ${ability ? `<div class="grp"><button class="ability" data-action="ability" ${cd ? 'disabled' : ''} title="Taste F · ${esc(ability.description)}">★ ${esc(ability.name)}${cd ? ` (${cd})` : ''}<span class="key">F</span></button></div>` : ''}
+      ${ability ? `<div class="grp"><button class="ability" data-action="ability" ${cd ? 'disabled' : ''} title="Taste F · ${esc(ability.description)}"Fähigkeit: ${esc(ability.name)}${cd ? ` (${cd})` : ''}<span class="key">F</span></button></div>` : ''}
       <div class="grp"><button data-action="wait" title="Leertaste">Warten</button><button data-action="pickup" title="G">Aufheben</button></div>
       <span class="muted small">Gewählt: <b style="color:var(--accent)">${esc(techniqueName(this.technique()))}</b> · ${attackCost(this.technique())} Ausdauer</span>`;
     bindActions(el, {

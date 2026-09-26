@@ -1,3 +1,4 @@
+import { NameOf, nameOf } from './identify';
 import { CLASS_BY_ID } from '../data/classes';
 import { RACE_BY_ID } from '../data/races';
 import { emit } from './events';
@@ -64,7 +65,7 @@ export function onMonsterHit(s: GameState, m: Monster) {
     m.stolenGold = amount;
     m.fleeing = true;
     s.counters.goldStolen += amount;
-    log(s, `${m.name} klaut dir ${amount} Gold und rennt davon!`, 'gefahr');
+    log(s, `${NameOf(s, m)} klaut dir ${amount} Gold und rennt davon!`, 'gefahr');
     emit(s, { type: 'robbed', amount, source: m.name });
   }
 }
@@ -97,7 +98,7 @@ function summon(s: GameState, m: Monster) {
   if (m.homeRoom !== undefined) minion.homeRoom = m.homeRoom;
   s.monsters.push(minion);
   m.summoned = (m.summoned ?? 0) + 1;
-  log(s, `${m.name} ruft Verstärkung: ${minion.name} taucht auf!`, 'gefahr');
+  log(s, `${NameOf(s, m)} ruft Verstärkung: ${nameOf(s, minion)} taucht auf!`, 'gefahr');
 }
 
 function isTaken(s: GameState, p: Pos): boolean {

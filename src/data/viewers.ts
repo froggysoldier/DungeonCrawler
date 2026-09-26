@@ -20,16 +20,16 @@ export const VIEWER_NAMES = [
 ];
 
 export const VIEWER_COMMENTS: Record<string, string[]> = {
-  kill: ['LOL', 'weiter so!!', 'noch einer 😂', 'ez', 'mehr Blut bitte', 'mein Kind schaut zu, danke dafür'],
-  stomp: ['DRAUFGESTAMPFT HAHAHA', 'der Stampfer!!!', 'Clip it!', 'Ich kann nicht mehr 😂😂', 'SMUSH'],
+  kill: ['LOL', 'weiter so!!', 'noch einer, hahaha', 'ez', 'mehr Blut bitte', 'mein Kind schaut zu, danke dafür'],
+  stomp: ['DRAUFGESTAMPFT HAHAHA', 'der Stampfer!!!', 'Clip it!', 'Ich kann nicht mehr vor Lachen', 'SMUSH'],
   jump: ['FLIEGENDER TRITT', 'was für ein Sprung', 'Physik: 0, Crawler: 1'],
   crit: ['KRITISCH!!', 'das tat sogar mir weh', 'AUTSCH'],
   boss: ['BOSS DOWN!!!', 'GG', 'Legende.', 'Ich hab 50 Credits auf dich gesetzt und gewonnen!!', 'Abonniert.'],
-  achievement: ['Achievement-Jäger 👀', 'was für ein Name für ein Achievement', 'Sammelt alle!'],
+  achievement: ['Achievement-Jäger, ich seh dich', 'was für ein Name für ein Achievement', 'Sammelt alle!'],
   closecall: ['KNAPP!!!', 'mein Herz', 'ich dachte, das wars', 'LEBT NOCH!!'],
-  boring: ['langweilig', 'mach mal was', '*schnarch*', 'schaltet um…', 'ist der eingeschlafen?'],
+  boring: ['langweilig', 'mach mal was', '*schnarch*', 'schaltet um…', 'schläft da jemand?'],
   item: ['OMG das Teil', 'Neid.', 'steht dir!'],
-  pet: ['DAS HAUSTIER!!! 😍', 'gib dem Tier eine eigene Show', 'bestes Haustier der Staffel'],
+  pet: ['DAS HAUSTIER!!! So süß!', 'gib dem Tier eine eigene Show', 'bestes Haustier der Staffel'],
 };
 
 export const FAN_GIFTS = ['heiltrank', 'energydrink', 'gegengift', 'schokoriegel', 'grosser_heiltrank', 'wutpille', 'ausdauertrank'];

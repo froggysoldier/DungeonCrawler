@@ -1,3 +1,4 @@
+import { nameOf } from './identify';
 import { ABILITIES, CLASSES, CLASS_BY_ID, type ClassDef } from '../data/classes';
 import { RACES, RACE_BY_ID, type RaceDef } from '../data/races';
 import { has } from './abilities';
@@ -97,7 +98,7 @@ function hurt(s: GameState, m: Monster, dmg: number, verb: string) {
   m.hp -= final;
   m.aware = true;
   s.counters.damageDealt += final;
-  log(s, `${verb} trifft ${m.name} für ${final} Schaden.`, 'kampf');
+  log(s, `${verb} trifft ${nameOf(s, m)} für ${final} Schaden.`, 'kampf');
   if (m.hp <= 0) killMonster(s, m, null);
 }
 

@@ -1,3 +1,4 @@
+import { NameOf, nameOf } from './identify';
 import { isInSafeRoom, killMonster } from './combat';
 import { emit } from './events';
 import { chebyshev, hasLineOfSight } from './fov';
@@ -76,7 +77,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     if (dest) {
       m.pos = dest;
       m.aware = false;
-      log(s, `${m.name} will dich im Safe Room angreifen – und wird mit einem lauten *PLOPP* weggebeamt.`, 'system');
+      log(s, `${NameOf(s, m)} will dich im Safe Room angreifen – und wird mit einem lauten *PLOPP* weggebeamt.`, 'system');
     }
     return;
   }
@@ -85,7 +86,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
   const verb = ranged ? 'schießt auf dich' : 'greift an';
   if (R.next(s) * 100 >= hit) {
     s.counters.hitTakenStreak = 0;
-    log(s, `${m.name} ${verb} – du weichst aus.`, 'kampf');
+    log(s, `${NameOf(s, m)} ${verb} – du weichst aus.`, 'kampf');
     emit(s, { type: 'dodged', source: m.name });
     return;
   }
@@ -94,14 +95,14 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
   p.hp -= dmg;
   s.counters.damageTaken += dmg;
   s.counters.hitTakenStreak += 1;
-  log(s, `${m.name} ${verb} und trifft dich für ${dmg} Schaden.`, 'gefahr');
+  log(s, `${NameOf(s, m)} ${verb} und trifft dich für ${dmg} Schaden.`, 'gefahr');
   if (b.dornen && !ranged) {
     m.hp -= b.dornen;
-    log(s, `Deine Dornen stechen ${m.name} für ${b.dornen} Schaden.`, 'kampf');
+    log(s, `Deine Dornen stechen ${nameOf(s, m)} für ${b.dornen} Schaden.`, 'kampf');
     if (m.hp <= 0) killMonster(s, m, null);
   }
   if (p.hp <= 0) {
-    handleLethal(s, `getötet von ${m.name}`);
+    handleLethal(s, `getötet von ${nameOf(s, m)}`);
     return;
   }
   emit(s, { type: 'damageTaken', amount: dmg, source: m.name });
@@ -111,12 +112,12 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
 function attackPet(s: GameState, m: Monster) {
   const pet = s.player.pet!;
   if (R.chance(s, 0.3)) {
-    log(s, `${m.name} schnappt nach ${pet.name}, verfehlt aber.`, 'kampf');
+    log(s, `${NameOf(s, m)} schnappt nach ${pet.name}, verfehlt aber.`, 'kampf');
     return;
   }
   const dmg = Math.max(1, R.int(s, m.dmg[0], m.dmg[1]) - 1);
   pet.hp -= dmg;
-  log(s, `${m.name} trifft ${pet.name} für ${dmg} Schaden.`, 'gefahr');
+  log(s, `${NameOf(s, m)} trifft ${pet.name} für ${dmg} Schaden.`, 'gefahr');
   if (pet.hp <= 0) {
     pet.hp = 0;
     pet.alive = false;
@@ -128,7 +129,7 @@ export function monsterTurn(s: GameState, m: Monster) {
   if (s.status !== 'playing' || !s.monsters.includes(m)) return;
   if (m.downed > 0) {
     m.downed -= 1;
-    if (m.downed === 0) log(s, `${m.name} rappelt sich wieder auf.`, 'kampf');
+    if (m.downed === 0) log(s, `${NameOf(s, m)} rappelt sich wieder auf.`, 'kampf');
     return;
   }
   startOfTurn(s, m);
@@ -140,11 +141,11 @@ export function monsterTurn(s: GameState, m: Monster) {
     if (m.homeRoom !== undefined) {
       if (roomOf(s.map, p.pos)?.id === m.homeRoom) {
         m.aware = true;
-        log(s, `${m.name} bemerkt dich!`, 'gefahr');
+        log(s, `${NameOf(s, m)} bemerkt dich!`, 'gefahr');
       }
     } else if (canSeePlayer(s, m, 7) && R.chance(s, d <= 1 ? 1 : d <= 3 ? 0.7 : 0.35)) {
       m.aware = true;
-      log(s, `${m.name} hat dich bemerkt!`, 'gefahr');
+      log(s, `${NameOf(s, m)} hat dich bemerkt!`, 'gefahr');
     }
   }
   if (!m.aware) {
@@ -164,7 +165,7 @@ export function monsterTurn(s: GameState, m: Monster) {
   // Fliehen bei wenig Leben (keine Bosse)
   if (m.rank === 'normal' && m.hp < m.maxHp * 0.25 && !m.fleeing && R.chance(s, 0.3)) {
     m.fleeing = true;
-    log(s, `${m.name} versucht zu fliehen!`, 'kampf');
+    log(s, `${NameOf(s, m)} versucht zu fliehen!`, 'kampf');
   }
   if (m.behavior === 'coward' && d <= 4) m.fleeing = true;
   if (m.fleeing) {
@@ -202,14 +203,14 @@ export function petTurn(s: GameState) {
   const t = targets[0];
   if (t) {
     if (R.chance(s, 0.25)) {
-      log(s, `${pet.name} faucht ${t.name} an, verfehlt aber.`, 'kampf');
+      log(s, `${pet.name} faucht ${nameOf(s, t)} an, verfehlt aber.`, 'kampf');
       return;
     }
     let dmg = R.int(s, pet.dmg[0], pet.dmg[1]);
     if (Object.values(p.equipment).some((i) => i?.special === 'katzenfreund')) dmg = Math.round(dmg * 1.5);
     t.hp -= Math.max(1, dmg - t.ruestung);
     t.aware = true;
-    log(s, `${pet.name} beißt ${t.name} für ${Math.max(1, dmg - t.ruestung)} Schaden.`, 'kampf');
+    log(s, `${pet.name} beißt ${nameOf(s, t)} für ${Math.max(1, dmg - t.ruestung)} Schaden.`, 'kampf');
     if (t.hp <= 0) {
       pet.xp += t.xp;
       while (pet.xp >= pet.level * 60) {

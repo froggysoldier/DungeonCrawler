@@ -1,5 +1,6 @@
 import { RARITY_COLORS } from '../data/items';
 import { hasUnlock, visibleTiles } from '../engine/game';
+import { describeMonster } from '../engine/identify';
 import { idx, isWalkable } from '../engine/mapgen';
 import type { GameState, Pos, RoomKind } from '../engine/types';
 
@@ -96,7 +97,7 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
         ctx.font = `bold ${TILE - 4}px JetBrains Mono, monospace`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('▼', px + TILE / 2, py + TILE / 2 + 1);
+        ctx.fillText('>', px + TILE / 2, py + TILE / 2 + 1);
       }
       if (!seen) {
         ctx.fillStyle = 'rgba(0,0,0,0.55)';
@@ -141,18 +142,21 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
     const cx = sx(mo.pos.x) + TILE / 2;
     const cy = sy(mo.pos.y) + TILE / 2;
     const boss = mo.rank !== 'normal' && mo.rank !== 'elite';
+    const info = describeMonster(s, mo);
+    const unknown = info.insight >= 3;
+    const color = unknown ? '#9a9080' : mo.color;
     const r = boss ? TILE / 2 : TILE / 2 - 3;
     ctx.fillStyle = '#140d0a';
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = mo.color;
+    ctx.strokeStyle = color;
     ctx.lineWidth = boss ? 3 : 2;
     ctx.stroke();
-    ctx.fillStyle = mo.color;
+    ctx.fillStyle = color;
     ctx.font = `bold ${boss ? 13 : 12}px JetBrains Mono, monospace`;
-    ctx.fillText(mo.glyph, cx, cy + 1);
-    if (mo.hp < mo.maxHp) {
+    ctx.fillText(unknown ? '?' : mo.glyph, cx, cy + 1);
+    if (mo.hp < mo.maxHp && info.showHealthBar) {
       ctx.fillStyle = '#000';
       ctx.fillRect(sx(mo.pos.x) + 2, sy(mo.pos.y) - 3, TILE - 4, 3);
       ctx.fillStyle = '#ff5a4a';

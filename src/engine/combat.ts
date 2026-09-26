@@ -1,3 +1,4 @@
+import { NameOf, nameOf } from './identify';
 import { has, hasSpecial } from './abilities';
 import { PART_NAMES } from './bonuses';
 import { handleLethal } from './death';
@@ -60,7 +61,7 @@ export function techniqueBlocker(s: GameState, target: Monster, t: Technique): s
     return 'Stampfen geht nur auf Gegner, die am Boden liegen (oder winzig sind).';
   }
   if (t.move === 'stampfen' && t.part !== 'tritt') return 'Stampfen geht nur mit dem Fuß.';
-  if (t.move === 'stampfen' && has(target, 'fliegend')) return `${target.name} fliegt – draufstampfen unmöglich.`;
+  if (t.move === 'stampfen' && has(target, 'fliegend')) return `${NameOf(s, target)} fliegt – draufstampfen unmöglich.`;
   if (t.move === 'anlauf') {
     const dir = p.lastMoveDir;
     if (!dir) return 'Für Anlauf musst du dich im letzten Zug auf den Gegner zubewegt haben.';
@@ -120,7 +121,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   const name = techniqueName(t);
   if (!isHit) {
     s.counters.missStreak += 1;
-    log(s, `Dein ${name} verfehlt ${target.name}.`, 'kampf');
+    log(s, `Dein ${name} verfehlt ${nameOf(s, target)}.`, 'kampf');
     target.aware = true;
     if (thrown?.special === 'bumerang') returnThrown(s, thrown);
     else if (thrown) dropNear(s, thrown, target.pos);
@@ -156,7 +157,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   target.hitBy = [...new Set([...(target.hitBy ?? []), t.part])];
   s.counters.damageDealt += final;
   const critTxt = crit ? ' KRITISCH!' : '';
-  log(s, `${ambush ? 'Überraschungsangriff! ' : ''}Dein ${name} trifft ${target.name} für ${final} Schaden.${critTxt}`, 'kampf');
+  log(s, `${ambush ? 'Überraschungsangriff! ' : ''}Dein ${name} trifft ${nameOf(s, target)} für ${final} Schaden.${critTxt}`, 'kampf');
 
   // Kopfstoß tut auch dir weh – außer du bist geübt darin.
   if (t.part === 'kopf' && R.chance(s, Math.max(0, 0.5 - skillLevel(s, 'kopfnuss') * 0.1))) {
@@ -176,7 +177,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     if (R.next(s) * 100 < kd) {
       target.downed = 2;
       s.counters.knockdowns += 1;
-      log(s, `${target.name} geht zu Boden!`, 'kampf');
+      log(s, `${NameOf(s, target)} geht zu Boden!`, 'kampf');
     }
   }
 
@@ -187,7 +188,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
       const quake = Math.max(1, Math.round(final / 2) - m.ruestung);
       m.hp -= quake;
       m.aware = true;
-      log(s, `Das Beben erwischt ${m.name} für ${quake} Schaden.`, 'kampf');
+      log(s, `Das Beben erwischt ${nameOf(s, m)} für ${quake} Schaden.`, 'kampf');
       if (m.hp <= 0) killMonster(s, m, t);
     }
   }
@@ -226,11 +227,11 @@ function returnThrown(s: GameState, item: Item) {
 /** Explosion beim Tod: trifft alles in direkter Nähe – auch dich. */
 function explode(s: GameState, m: Monster) {
   const dmg = R.int(s, 3, 6) + Math.floor(m.level / 2);
-  log(s, `${m.name} explodiert mit einem feuchten KNALL!`, 'gefahr');
+  log(s, `${NameOf(s, m)} explodiert mit einem feuchten KNALL!`, 'gefahr');
   for (const o of [...s.monsters]) {
     if (chebyshev(o.pos, m.pos) > 1) continue;
     o.hp -= dmg;
-    log(s, `Die Explosion trifft ${o.name} für ${dmg} Schaden.`, 'kampf');
+    log(s, `Die Explosion trifft ${nameOf(s, o)} für ${dmg} Schaden.`, 'kampf');
     if (o.hp <= 0) killMonster(s, o, null);
   }
   const pet = s.player.pet;
@@ -247,7 +248,7 @@ function explode(s: GameState, m: Monster) {
     s.player.hp -= taken;
     s.counters.damageTaken += taken;
     log(s, `Die Explosion erwischt dich für ${taken} Schaden.`, 'gefahr');
-    if (s.player.hp <= 0) handleLethal(s, `von einer explodierenden ${m.name} zerfetzt`);
+    if (s.player.hp <= 0) handleLethal(s, `durch die Explosion von ${nameOf(s, m)} zerfetzt`);
     else emit(s, { type: 'explosion', damage: taken, source: m.name });
   }
 }
@@ -263,7 +264,7 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
     s.player.techniqueKills[key] = (s.player.techniqueKills[key] ?? 0) + 1;
   }
   const killer = byPet && s.player.pet ? s.player.pet.name : 'Du';
-  log(s, `${killer === 'Du' ? 'Du tötest' : `${killer} tötet`} ${m.name}!`, 'kampf');
+  log(s, `${killer === 'Du' ? 'Du tötest' : `${killer} tötet`} ${nameOf(s, m)}!`, 'kampf');
   const xp = gainXp(s, m.xp);
   log(s, `+${xp} XP`, 'info');
 
