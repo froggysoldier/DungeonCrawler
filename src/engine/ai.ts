@@ -7,6 +7,7 @@ import { idx, randomOpenTile, roomOf } from './mapgen';
 import { canStep, findPath } from './path';
 import { has, onMonsterHit, startOfTurn } from './abilities';
 import { handleLethal } from './death';
+import { dynDefenseBonus, targetFacets, trainDefense } from './observer';
 import { ausweichen, totalBonuses } from './player';
 import * as R from './rng';
 import type { GameState, Monster, Pos } from './types';
@@ -82,16 +83,21 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     return;
   }
   const b = totalBonuses(s);
-  const hit = Math.max(5, Math.min(95, m.treffer - ausweichen(s, b) - (ranged ? 5 : 0)));
+  const source = targetFacets(s, m).filter((f) => f !== 'z:ahnungslos');
+  if (ranged && !source.includes('z:fernkampf')) source.push('z:fernkampf');
+  const defense = dynDefenseBonus(s, source);
+  const hit = Math.max(5, Math.min(95, m.treffer - ausweichen(s, b) - defense.ausweichen - (ranged ? 5 : 0)));
   const verb = ranged ? 'schießt auf dich' : 'greift an';
   if (R.next(s) * 100 >= hit) {
     s.counters.hitTakenStreak = 0;
     log(s, `${NameOf(s, m)} ${verb} – du weichst aus.`, 'kampf');
-    emit(s, { type: 'dodged', source: m.name });
+    trainDefense(s, source, 'ausweichen');
+    emit(s, { type: 'dodged', source: m.name, facets: source });
     return;
   }
   const raw = R.int(s, m.dmg[0], m.dmg[1]);
-  const dmg = Math.max(1, raw - Math.floor(b.ruestung ?? 0));
+  const dmg = Math.max(1, Math.round((raw - Math.floor(b.ruestung ?? 0)) * (1 - defense.reduktion / 100)));
+  if (defense.reduktion) trainDefense(s, source, 'abhaertung');
   p.hp -= dmg;
   s.counters.damageTaken += dmg;
   s.counters.hitTakenStreak += 1;
@@ -105,7 +111,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     handleLethal(s, `getötet von ${nameOf(s, m)}`);
     return;
   }
-  emit(s, { type: 'damageTaken', amount: dmg, source: m.name });
+  emit(s, { type: 'damageTaken', amount: dmg, source: m.name, facets: source });
   onMonsterHit(s, m);
 }
 

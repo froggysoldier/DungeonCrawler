@@ -55,6 +55,7 @@ export function loadRun(): GameState | null {
 export function migrate(s: GameState): GameState {
   s.viewers ??= { follower: 0, hype: 0, nextFanBox: 0, lastSpectacle: 0 };
   s.pendingSelection ??= false;
+  s.player.traits ??= [];
   const counters = s.counters as unknown as Record<string, number>;
   for (const k of ['goldEarned', 'goldStolen', 'poisonDamage', 'mealsEaten', 'potionsDrunk', 'sleeps', 'crits', 'knockdowns', 'eliteKills']) {
     counters[k] ??= 0;

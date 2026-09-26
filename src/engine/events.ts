@@ -1,5 +1,7 @@
 import { checkAchievements } from './achievements';
 import { skillsOnEvent } from './skills';
+import { observe } from './observer';
+import { traitsOnEvent } from './traits';
 import { viewersOnEvent } from './viewers';
 import type { GameEvent, GameState } from './types';
 
@@ -11,4 +13,6 @@ export function emit(s: GameState, e: GameEvent) {
   skillsOnEvent(s, e);
   checkAchievements(s, e);
   viewersOnEvent(s, e);
+  observe(s, e);
+  traitsOnEvent(s, e);
 }

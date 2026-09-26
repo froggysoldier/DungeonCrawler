@@ -3,6 +3,7 @@ import { RACE_BY_ID } from '../data/races';
 import { SKILL_BY_ID } from '../data/skills';
 import { LEVEL_UP_QUIPS } from '../data/world';
 import { addBonuses } from './bonuses';
+import { traitBonuses } from './traits';
 import { emit } from './events';
 import { log, toast } from './log';
 import * as R from './rng';
@@ -21,6 +22,7 @@ export function totalBonuses(s: GameState): Bonuses {
   for (const c of s.player.curses) addBonuses(b, CURSE_EFFECTS[c]);
   if (s.player.race) addBonuses(b, RACE_BY_ID[s.player.race]?.bonuses);
   if (s.player.klass) addBonuses(b, CLASS_BY_ID[s.player.klass]?.bonuses);
+  addBonuses(b, traitBonuses(s));
   return b;
 }
 

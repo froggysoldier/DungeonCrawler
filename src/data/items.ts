@@ -86,6 +86,13 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'feinripp', name: 'Feinripp-Unterhemd', kind: 'ausruestung', slot: 'unterwaesche', bonuses: { maxHp: 1 }, flavor: 'Deutsches Kulturgut.', wert: 2 },
 
   // ---- Startkleidung (Interview)
+  { id: 'brille', name: 'Deine Brille', kind: 'ausruestung', slot: 'gesicht', bonuses: { treffer: 3 }, flavor: 'Ohne sie ist die Welt verschwommen. Mit ihr leider auch nicht schöner.', wert: 2 },
+  { id: 'rohrzange', name: 'Rohrzange', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 5, flavor: 'Aus deinem Werkzeugkoffer. Hat schon viele Rohre gesehen. Jetzt sieht sie Schädel.', wert: 5 },
+  { id: 'handy', name: 'Handy ohne Netz', kind: 'wurf', wurfSchaden: 2, flavor: 'Kein Netz. Kein Akku bald. Aber es fliegt ganz gut.', wert: 0 },
+  { id: 'fernbedienung', name: 'Fernbedienung', kind: 'wurf', wurfSchaden: 2, flavor: 'Hat noch nie funktioniert, wenn man sie brauchte. Jetzt auch nicht.', wert: 0 },
+  { id: 'schluesselbund', name: 'Schlüsselbund', kind: 'wurf', wurfSchaden: 3, flavor: 'Schlüssel für ein Haus, das es nicht mehr gibt.', wert: 0 },
+  { id: 'kochmesser', name: 'Kochmesser', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 5, bonuses: { krit: 5 }, flavor: 'Scharf. Sehr scharf. Du hast damit Zwiebeln geschnitten. Früher.', wert: 6 },
+  { id: 'trillerpfeife', name: 'Trillerpfeife', kind: 'ausruestung', slot: 'hals', bonuses: { stats: { cha: 1 } }, flavor: 'Vom Sportunterricht. Pfeifen hilft nicht gegen Monster. Aber es fühlt sich gut an.', wert: 1 },
   { id: 'bademantel', name: 'Bademantel', kind: 'ausruestung', slot: 'brust', bonuses: { ruestung: 0, stats: { cha: 1 } }, flavor: 'Flauschig. Offen. Leider.', wert: 1 },
   { id: 'schlafanzug', name: 'Dino-Schlafanzug', kind: 'ausruestung', slot: 'brust', bonuses: { maxHp: 1 }, flavor: 'Mit Kapuze. Die Kapuze hat Zähne.', wert: 1 },
   { id: 'anzug', name: 'Zerknitterter Anzug', kind: 'ausruestung', slot: 'brust', bonuses: { stats: { cha: 2 } }, flavor: 'Du warst auf dem Weg zu einem Meeting. Das Meeting wurde abgesagt. Die Erde auch.', wert: 3 },

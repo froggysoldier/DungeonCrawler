@@ -1,4 +1,4 @@
-# Der Große Abstieg – Game Design Dokument (v0.4)
+# Der Große Abstieg – Game Design Dokument (v0.5)
 
 > Inspiriert von der Buchreihe *Dungeon Crawler Carl* von Matt Dinniman.
 > **Spoiler-Regel:** Dieses Dokument enthält nur Buch-Details bis einschließlich
@@ -36,10 +36,19 @@ Eigene Namen: Die Show heißt **„Der Große Abstieg“**, der Erzähler
 ## 3. Systeme im aktuellen Stand
 
 ### 3.1 Spielstart: Das Vorher-Interview
-Fünf Fragen (Beruf, Fitness, Haustier, Kleidung beim Weltuntergang,
-Konfliktverhalten) bestimmen Start-Stats, Start-Skills (z. B. Pflege →
-*Erste Hilfe*, Gamer → *Spielerfahrung*), Startkleidung, ein mögliches
-Haustier (Katze/Hund) und versteckte Flags für die spätere Klassenwahl.
+Ein verzweigtes Interview mit 23 Fragen (je nach Antworten werden 15–20
+gestellt): Berufsbereich und genauer Beruf, Alter, Fitness, Freizeitsport und
+Kampfsport, Sehkraft, Schlaf, Haustier, Ort und Gegenstand in der Hand beim
+Weltuntergang, Kleidung, Konfliktverhalten, Charakter, Sozialverhalten,
+größte Angst, Laster, Glück. Daraus ergeben sich Werte, Start-Skills,
+Ausrüstung, der Gegenstand in der Hand, versteckte Flags für die Klassenwahl
+und **Eigenschaften**:
+- Ängste (Krabbeltiere, Ratten, Dunkelheit, Höhe, Enge) wirken als Malus und
+  lassen sich im Dungeon überwinden – dann werden sie zu Stärken.
+- Laster, Eigenarten und Berufserfahrung (z. B. Schädlingsbekämpfer: +15 %
+  gegen Ratten und Krabbeltiere; Klempner: gegen Schleime und Wasserwesen).
+- Antwort-Kombinationen verstärken sich (z. B. Boxen als Beruf und Hobby →
+  Profi-Schläger).
 
 ### 3.2 Welt & Karte
 - Etage = 72×52 Kacheln, vier **Viertel** (Nachbarschaften) + zentrales Gewölbe.
@@ -69,15 +78,19 @@ Haustier (Katze/Hund) und versteckte Flags für die spätere Klassenwahl.
   können wieder aufgehoben werden, Flaschen zerbrechen.
 - Kopfstoß tut auch dir weh – außer du bist geübt.
 
-### 3.5 Passives Skillsystem
-Jede Aktion wird mitgezählt (z. B. `tritt+stampfen`). Ab einer Schwelle
-entsteht ein Skill, Nutzung levelt ihn (max. Stufe 15):
-Faustkampf, Treten, Stampfer, Sprungangriff, Sturmangriff,
-Ellbogengesellschaft, Kniestoß, Kopfnuss, Werfen, Improvisierte Waffen,
-Wuchtschlag (alle unbewaffneten), Meteor-Stampfer (Sprung-Tritt),
-Hinterhalt, Ausweichen (durch Ausweichen), Zähigkeit (durch Einstecken).
-Im Skills-Tab sieht man den Fortschritt („Du spürst Fortschritt …“) und
-die Verteilung des eigenen Kampfstils.
+### 3.5 Passive Skills und der Beobachter
+**Der Beobachter** zeichnet jede Aktion mit vollem Kontext auf: Technik,
+Ausführung, Gegnerart, Größe, Fähigkeiten, Rang, Level-Abstand, ob der Gegner
+liegt, flieht oder ahnungslos ist, dein Zustand (vergiftet, fast tot, barfuß,
+fast nackt, im Bademantel, umzingelt, angetrunken, erschöpft, mit Haustier,
+letzte Stunde) und der Raum. Er zählt alle Kombinationen.
+
+- **Dynamische Skills:** Wiederholte Muster werden zu maßgeschneiderten Skills,
+  z. B. „Tritte gegen Flieger“ (+Schaden und +Treffer nur in genau dieser
+  Situation), „Barfuß: Tritte“, „Ausweichen gegen Fernkämpfer“,
+  „Abgehärtet gegen Giftige“. Sie leveln mit Nutzung (max. Stufe 10).
+- **Grundskills** entstehen weiterhin aus der Technik allein (Faustkampf,
+  Treten, Stampfer, Wuchtschlag …).
 
 ### 3.6 Gegner
 - 49 Mob-Typen auf Etage 1–3 (Kellerratte, Kobolde, Wolpertinger,
@@ -115,10 +128,14 @@ Spezialeffekten (Zweite-Chance-Klausel, Stiefel des ungebremsten Stampfens,
 Der Ziegel …), Verbrauchsgüter, Haustier-Leckerli.
 
 ### 3.9 Achievements & Lootboxen
-- 143 Achievements mit sarkastischem Kommentar (z. B. *Komische Katzenlady*,
-  *Barfuß-Rambo*, *Podophilie*, *Steinzeit*, *Pazifist (vorläufig)*).
-- Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen (Schuh-, Wurf-,
-  Schläger-, Haustier-, Boss-Box …). Inhalt passt zum Thema.
+- **Entdeckte Muster (dynamisch):** Der Beobachter vergibt Achievements für
+  Kombinationen, die tatsächlich passieren, in Stufen I–V (1, 5, 15, 40, 100).
+  Ungewöhnliches (Kopfstoß gegen einen Ghul, barfuß, vergiftet, gegen stärkere
+  Gegner, gegen Bosse) wird sofort erkannt, Gewöhnliches erst bei vielen
+  Wiederholungen. Die Box-Stufe richtet sich danach, wie ungewöhnlich es war.
+  Beispiele: „Vergiftet: Tritte gegen Giftige I“, „Revier: Waschküche II“.
+- 143 feste Achievements mit sarkastischem Kommentar kommen hinzu.
+- Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen.
 - **Wer ein Achievement zum ersten Mal in seiner Karriere schafft, bekommt eine Box-Stufe mehr.**
 
 ### 3.10 Publikum (ab Etage 2)

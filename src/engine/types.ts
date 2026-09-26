@@ -249,6 +249,41 @@ export interface Player {
   race?: string;
   klass?: string;
   abilityCooldown?: number;
+  /** Vom Beobachter entdeckte, maßgeschneiderte Skills. */
+  dynSkills?: DynSkill[];
+  /** Eigenschaften aus dem Vorleben (Ängste, Laster, Stärken). */
+  traits?: string[];
+}
+
+export interface DynSkill {
+  key: string;
+  name: string;
+  description: string;
+  kind: 'angriff' | 'ausweichen' | 'abhaertung';
+  part?: AttackPart;
+  move?: AttackMove;
+  facet: string;
+  level: number;
+  xp: number;
+}
+
+export interface DynAchievement {
+  id: string;
+  name: string;
+  description: string;
+  comment: string;
+  tier: BoxTier;
+  box: BoxType;
+  turn: number;
+  floor: number;
+}
+
+/** Aufzeichnung des Beobachters: wie oft welche Merkmals-Kombination vorkam. */
+export interface Chronicle {
+  counts: Record<string, number>;
+  /** Nächste noch nicht belohnte Stufe je Kombination. */
+  stages: Record<string, number>;
+  lastAward: number;
 }
 
 export interface Viewers {
@@ -330,6 +365,8 @@ export interface GameState {
   ghostsDefeated: string[];
   viewers: Viewers;
   logCounter?: number;
+  chronicle?: Chronicle;
+  dynAchievements?: DynAchievement[];
   /** Rassen- und Klassenwahl steht an (Etage 3). */
   pendingSelection: boolean;
   toasts: Toast[];
@@ -350,10 +387,10 @@ export interface Dialog {
 // ---------------------------------------------------------------- Events
 
 export type GameEvent =
-  | { type: 'kill'; monster: Monster; technique: Technique | null; byPet?: boolean }
-  | { type: 'attack'; technique: Technique; hit: boolean; crit: boolean; damage: number; target: Monster; thrown?: Item }
-  | { type: 'damageTaken'; amount: number; source: string }
-  | { type: 'dodged'; source: string }
+  | { type: 'kill'; monster: Monster; technique: Technique | null; byPet?: boolean; facets?: string[] }
+  | { type: 'attack'; technique: Technique; hit: boolean; crit: boolean; damage: number; target: Monster; thrown?: Item; facets?: string[] }
+  | { type: 'damageTaken'; amount: number; source: string; facets?: string[] }
+  | { type: 'dodged'; source: string; facets?: string[] }
   | { type: 'enterRoom'; room: Room }
   | { type: 'pickup'; item: Item }
   | { type: 'equip'; item: Item }

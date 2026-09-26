@@ -3,6 +3,7 @@ import { BOX_TIER_NAMES } from '../data/world';
 import { emit } from './events';
 import { itemName } from './identify';
 import { giveItem } from './inventory';
+import { traitFollowerMult } from './traits';
 import { createBox, createItem } from './items';
 import { log, toast } from './log';
 import { effectiveStats, maxHp } from './player';
@@ -26,7 +27,7 @@ export function addSpectacle(s: GameState, points: number, kind: string) {
   if (!viewersActive(s) || points <= 0) return;
   const v = s.viewers;
   const cha = effectiveStats(s).cha;
-  const mult = Math.max(0.3, 1 + (cha - 5) * 0.08) * (0.5 + v.hype / 50) * (s.player.klass === 'showstar' ? 2 : 1);
+  const mult = Math.max(0.3, 1 + (cha - 5) * 0.08) * (0.5 + v.hype / 50) * (s.player.klass === 'showstar' ? 2 : 1) * traitFollowerMult(s);
   v.hype = Math.min(100, v.hype + points * 1.5);
   v.lastSpectacle = s.turn;
   const gained = Math.max(1, Math.round(points * 3 * mult));

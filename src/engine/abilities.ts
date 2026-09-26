@@ -2,6 +2,7 @@ import { NameOf, nameOf } from './identify';
 import { CLASS_BY_ID } from '../data/classes';
 import { RACE_BY_ID } from '../data/races';
 import { emit } from './events';
+import { traitSpecial } from './traits';
 import { chebyshev } from './fov';
 import { log } from './log';
 import { isWalkable } from './mapgen';
@@ -26,6 +27,7 @@ export function hasSpecial(s: GameState, special: string): boolean {
   const p = s.player;
   if (p.race && RACE_BY_ID[p.race]?.special === special) return true;
   if (p.klass && CLASS_BY_ID[p.klass]?.special === special) return true;
+  if (traitSpecial(s, special)) return true;
   return Object.values(p.equipment).some((i) => i?.special === special);
 }
 

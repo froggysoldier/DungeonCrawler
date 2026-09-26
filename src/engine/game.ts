@@ -1,4 +1,5 @@
-import { INTERVIEW, BASE_STATS } from '../data/interview';
+import { BASE_STATS, INTERVIEW_COMBOS, LEGACY_ORDER, visibleQuestions, type Answers } from '../data/interview';
+import { TRAIT_BY_ID } from '../data/traits';
 import { FOOD_IDS } from '../data/items';
 import { HOOD_BOSSES } from '../data/monsters';
 import {
@@ -30,7 +31,8 @@ export const SAVE_VERSION = 1;
 
 export interface NewGameOptions {
   name: string;
-  answers: number[];
+  /** Antworten je Fragen-ID (ältere Aufrufer: Liste in LEGACY_ORDER). */
+  answers: Answers | number[];
   petName?: string;
   seed?: number;
   meta: MetaState;
@@ -112,9 +114,15 @@ export function newGame(opts: NewGameOptions): GameState {
 
   // --- Interview auswerten
   const p = s.player;
-  INTERVIEW.forEach((q, qi) => {
-    const a = q.answers[opts.answers[qi] ?? 0];
-    if (!a) return;
+  const answers: Answers = Array.isArray(opts.answers)
+    ? Object.fromEntries(opts.answers.map((v, i) => [LEGACY_ORDER[i], v]))
+    : opts.answers;
+  p.traits = [];
+  let hand: Item | null = null;
+  for (const q of visibleQuestions(answers)) {
+    if (answers[q.id] === undefined) continue;
+    const a = q.answers[answers[q.id]];
+    if (!a) continue;
     if (a.background) p.background = a.background;
     if (a.stats) for (const [k, v] of Object.entries(a.stats) as [StatKey, number][]) p.stats[k] = Math.max(1, p.stats[k] + v);
     for (const sk of a.skills ?? []) learnSkill(s, sk, 1, true);
@@ -127,7 +135,18 @@ export function newGame(opts: NewGameOptions): GameState {
       const petName = opts.petName?.trim() || a.pet.defaultName;
       p.pet = makePet(a.pet.species, petName);
     }
-  });
+    for (const t of a.traits ?? []) if (!p.traits.includes(t)) p.traits.push(t);
+    if (a.hand) hand = createItem(s, a.hand, a.handMenge ?? 1);
+    if (a.gold) p.gold += a.gold;
+  }
+  const comboNotes: string[] = [];
+  for (const c of INTERVIEW_COMBOS) {
+    if (!c.when(answers)) continue;
+    for (const t of c.traits) if (!p.traits.includes(t)) p.traits.push(t);
+    comboNotes.push(c.text);
+  }
+  p.hand = hand;
+  if (p.traits.includes('tierarzt') && p.pet) petLevelUp(s);
 
   enterFloor(s, 1, opts.meta);
   p.hp = maxHp(s);
@@ -140,6 +159,8 @@ export function newGame(opts: NewGameOptions): GameState {
     pages: [
       `Crawler ${p.name}! Deine Welt wurde soeben… sagen wir: „umgenutzt“. Die gute Nachricht: Du darfst an der beliebtesten Show der Galaxis teilnehmen. Die schlechte: Du hast keine Wahl.`,
       `${FLOORS[0].intro}`,
+      ...comboNotes,
+      ...(p.traits.length ? [`Die Systemstimme hat dich analysiert. Deine Eigenschaften: ${p.traits.map((t) => TRAIT_BY_ID[t]?.name ?? t).join(', ')}. Details findest du im Crawler-Tab.`] : []),
       'Du hast nichts. Kein Inventar, keine Karte, keine Ahnung. Irgendwo auf dieser Etage gibt es eine Gilde der Einweisung – such sie. Bis dahin kannst du genau einen Gegenstand in der Hand halten. Und deine Fäuste. Und Füße. Viel Spaß!',
     ],
   });

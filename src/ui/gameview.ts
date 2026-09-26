@@ -8,6 +8,8 @@ import { RACE_BY_ID } from '../data/races';
 import { currentAbility, useAbility } from '../engine/classes';
 import { describeItem, describeMonster, INSIGHT_NAMES, itemName } from '../engine/identify';
 import { liveViewers } from '../engine/viewers';
+import { dynXpNeeded, skillHints } from '../engine/observer';
+import { TRAIT_BY_ID, TRAIT_KIND_NAMES } from '../data/traits';
 import { describeBonuses, PART_NAMES, STAT_NAMES } from '../engine/bonuses';
 import {
   ATTACK_MOVES, ATTACK_PARTS, MOVE_NAMES, attackCost, hitChance, isInSafeRoom, techniqueBlocker, techniqueName,
@@ -606,6 +608,13 @@ export class GameView {
         .map((x) => `<div class="small" style="color:${x.debuff ? 'var(--danger)' : 'inherit'}">${x.debuff ? 'Negativ:' : 'Positiv:'} ${esc(x.name)}${x.dot ? ` (−${x.dot} HP/Zug)` : ''} <span class="muted">(${x.turns} Züge)</span></div>`)
         .join('')}`;
     }
+    if (p.traits?.length) {
+      html += `<div class="section">Eigenschaften</div>${p.traits
+        .map((id) => TRAIT_BY_ID[id])
+        .filter(Boolean)
+        .map((t) => `<div class="small" style="margin-bottom:4px"><b>${esc(t.name)}</b> <span class="muted">(${esc(TRAIT_KIND_NAMES[t.kind])})</span><br><span class="muted">${esc(t.description)}</span></div>`)
+        .join('')}`;
+    }
     if (p.curses.length) html += `<div class="section">Flüche</div>${p.curses.map((c) => `<div class="small" style="color:var(--danger)">${esc(c)}</div>`).join('')}`;
     const hoods = s.map.hoods.map((h) => `<div class="small">${esc(h.name)}: ${h.bossAlive ? 'Boss lebt' : 'Boss besiegt'}${h.mapFound ? ', Karte gefunden' : ''}</div>`).join('');
     html += `<div class="section">Viertel</div>${hoods}`;
@@ -649,6 +658,22 @@ export class GameView {
         <div class="muted small">${esc(def.description)}</div>
         ${hasUnlock(s, 'skills') ? `<div class="progress"><div style="width:${(100 * st.xp) / need}%"></div></div>` : ''}</div>`;
     }
+    const dyn = p.dynSkills ?? [];
+    html += `<div class="section">Vom Beobachter entdeckt</div>`;
+    if (!dyn.length) html += '<div class="muted small">Noch nichts. Die Systemstimme beobachtet, gegen wen, wie und in welcher Lage du kämpfst, und formt daraus eigene Skills.</div>';
+    for (const k of dyn) {
+      const need = dynXpNeeded(k.level);
+      html += `<div class="skill"><div class="top"><b>${esc(k.name)}</b><span>Stufe ${k.level}/10</span></div>
+        <div class="muted small">${esc(k.description)}</div>
+        <div class="progress"><div style="width:${(100 * k.xp) / need}%"></div></div></div>`;
+    }
+    const dynHints = skillHints(s);
+    if (dynHints.length) {
+      html += `<div class="section">Die Systemstimme beobachtet …</div>`;
+      for (const h of dynHints) {
+        html += `<div class="skill"><div class="top"><span>${esc(h.name)}</span><span class="muted">${h.progress}/${h.needed}</span></div><div class="progress"><div style="width:${(100 * h.progress) / h.needed}%"></div></div></div>`;
+      }
+    }
     const hints = SKILLS.filter((d) => !p.skills.some((k) => k.id === d.id) && d.unlockAt < 9999)
       .map((d) => ({ d, prog: skillProgress(s, d) }))
       .filter((x) => x.prog > 0)
@@ -678,7 +703,17 @@ export class GameView {
     const s = this.s;
     const done = ACHIEVEMENTS.filter((a) => s.achievements.includes(a.id));
     const everOnly = ACHIEVEMENTS.filter((a) => !s.achievements.includes(a.id) && this.meta.achievementsEver.includes(a.id));
-    let html = `<div class="muted small">Diese Staffel: ${done.length} · Karriere: ${this.meta.achievementsEver.length}/${ACHIEVEMENTS.length}</div>`;
+    const patterns = s.dynAchievements ?? [];
+    let html = `<div class="muted small">Diese Staffel: ${done.length + patterns.length} · Karriere insgesamt: ${this.meta.achievementsEver.length}</div>`;
+    if (patterns.length) {
+      html += `<div class="section">Entdeckte Muster</div>`;
+      html += patterns
+        .slice()
+        .reverse()
+        .map((a) => `<div class="achv"><div class="n">${esc(a.name)}</div><div class="small">${esc(a.description)}</div><div class="muted small"><i>${esc(a.comment)}</i></div></div>`)
+        .join('');
+      html += `<div class="section">Feste Achievements</div>`;
+    }
     html += done
       .slice()
       .reverse()

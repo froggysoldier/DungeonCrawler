@@ -1,5 +1,5 @@
-import { ACHIEVEMENTS } from '../data/achievements';
-import { INTERVIEW } from '../data/interview';
+import { INTERVIEW_COMBOS, visibleQuestions, type Answers } from '../data/interview';
+import { TRAIT_BY_ID, TRAIT_KIND_NAMES } from '../data/traits';
 import { DEATH_QUIPS, SHOW_NAME } from '../data/world';
 import type { GameState, MetaState } from '../engine/types';
 import { bindActions, esc } from './dom';
@@ -21,7 +21,7 @@ function typeQuote(root: HTMLElement) {
 
 export interface InterviewResult {
   name: string;
-  answers: number[];
+  answers: Answers;
   petName?: string;
 }
 
@@ -56,7 +56,7 @@ export function titleScreen(
       </div>
       ${hasSave ? '<p class="muted small">Achtung: Eine neue Staffel beendet den laufenden Crawl endgültig.</p>' : ''}
       <div class="section">Karriere</div>
-      <div class="muted">Staffeln gespielt: <b>${meta.season}</b> · Achievements jemals: <b>${meta.achievementsEver.length}/${ACHIEVEMENTS.length}</b>
+      <div class="muted">Staffeln gespielt: <b>${meta.season}</b> · Achievements jemals: <b>${meta.achievementsEver.length}</b>
       · Geister im Dungeon: <b>${ghosts}</b>${guide ? ` · Aktueller Guide: <b>${esc(guide.name)}</b>` : ''}</div>
       <div class="section">Hall of Fame</div>
       ${hallOfFame(meta)}
@@ -72,72 +72,95 @@ export function titleScreen(
 }
 
 export function interviewScreen(root: HTMLElement, onDone: (r: InterviewResult) => void) {
-  const answers: number[] = [];
+  const answers: Answers = {};
+  const order: string[] = [];
   let name = '';
   let petName = '';
-  let step = -1;
+  let stage: 'name' | 'question' | 'summary' = 'name';
+
+  const nextQuestion = () => visibleQuestions(answers).find((q) => answers[q.id] === undefined);
+  const total = () => visibleQuestions(answers).length;
 
   const draw = () => {
-    if (step === -1) {
+    if (stage === 'name') {
       root.innerHTML = `
         <div class="screen"><div class="card stack">
-          <div class="systemquote">„Hallo! Hier spricht die Systemstimme. Bevor du in den Dungeon darfst, müssen wir ein paar Formalitäten klären. Wie heißt du?“</div>
-          <input id="name" maxlength="24" placeholder="Dein Name" value="${esc(name)}" autofocus />
+          <div class="systemquote">„Hallo! Hier spricht die Systemstimme. Bevor du in den Dungeon darfst, müssen wir ein paar Formalitäten klären. Es sind einige Fragen. Antworte ehrlich – es wirkt sich aus. Wie heißt du?“</div>
+          <input id="name" maxlength="24" placeholder="Dein Name" value="${esc(name)}" />
           <div class="row"><button class="primary" data-action="next">Weiter</button></div>
         </div></div>`;
       const input = root.querySelector('#name') as HTMLInputElement;
-      input.focus();
+      const go = () => {
+        name = input.value.trim() || 'Namenlos';
+        stage = 'question';
+        draw();
+      };
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') go();
       });
-      const go = () => {
-        name = input.value.trim() || 'Namenlos';
-        step = 0;
-        draw();
-      };
       bindActions(root, { next: go });
       typeQuote(root);
       return;
     }
-    if (step < INTERVIEW.length) {
-      const q = INTERVIEW[step];
+    const q = stage === 'question' ? nextQuestion() : undefined;
+    if (q) {
+      const done = order.length;
       root.innerHTML = `
         <div class="screen"><div class="card stack">
-          <div class="muted small">Frage ${step + 1} von ${INTERVIEW.length} · Crawler ${esc(name)}</div>
+          <div class="muted small">Frage ${done + 1} von ${total()} · Crawler ${esc(name)}</div>
+          <div class="progressline"><div style="width:${(100 * done) / total()}%"></div></div>
           <div class="systemquote">„${esc(q.question)}“</div>
           <div class="answers">${q.answers.map((a, i) => `<button data-action="answer" data-i="${i}">${esc(a.label)}</button>`).join('')}</div>
+          ${order.length ? '<div class="row"><button data-action="back">Zurück</button></div>' : ''}
         </div></div>`;
       typeQuote(root);
       bindActions(root, {
         answer: (el) => {
           const i = Number(el.dataset.i);
-          answers[step] = i;
+          answers[q.id] = i;
+          order.push(q.id);
           const a = q.answers[i];
-          if (a.pet) {
-            askPetName(a.pet.species, a.pet.defaultName, a.reaction);
-            return;
-          }
-          showReaction(a.reaction);
+          if (a.pet) askPetName(a.pet.species, a.pet.defaultName, a.reaction);
+          else showReaction(a.reaction);
+        },
+        back: () => {
+          const last = order.pop();
+          if (last) delete answers[last];
+          // Antworten auf Folgefragen, die jetzt nicht mehr gestellt würden, verwerfen
+          for (const id of Object.keys(answers)) if (!visibleQuestions(answers).some((x) => x.id === id)) delete answers[id];
+          draw();
         },
       });
       return;
     }
     // Zusammenfassung
-    const lines = INTERVIEW.map((q, i) => `<li>${esc(q.answers[answers[i]].label)}</li>`).join('');
+    stage = 'summary';
+    const lines = visibleQuestions(answers)
+      .filter((x) => answers[x.id] !== undefined)
+      .map((x) => `<li><span class="muted">${esc(x.question)}</span><br>${esc(x.answers[answers[x.id]].label)}</li>`)
+      .join('');
+    const traitIds = new Set<string>();
+    for (const x of visibleQuestions(answers)) for (const t of x.answers[answers[x.id]]?.traits ?? []) traitIds.add(t);
+    for (const c of INTERVIEW_COMBOS) if (c.when(answers)) for (const t of c.traits) traitIds.add(t);
+    const traits = [...traitIds].map((t) => TRAIT_BY_ID[t]).filter(Boolean);
     root.innerHTML = `
       <div class="screen"><div class="card stack">
         <div class="systemquote">„Wunderbar, ${esc(name)}. Die Formalitäten sind erledigt. Deine Werte wurden berechnet. Deine Überlebenschance wurde auch berechnet. Die sagen wir dir lieber nicht.“</div>
-        <ul class="muted">${lines}</ul>
-        <div class="row"><button data-action="back">Nochmal von vorn</button><button class="primary" data-action="go">In den Dungeon!</button></div>
+        <div class="section">Deine Eigenschaften</div>
+        ${traits.length ? `<ul class="traitlist">${traits.map((t) => `<li><b>${esc(t.name)}</b> <span class="muted">(${esc(TRAIT_KIND_NAMES[t.kind])})</span><br><span class="small">${esc(t.description)}</span></li>`).join('')}</ul>` : '<p class="muted">Keine besonderen Eigenschaften.</p>'}
+        <div class="section">Deine Antworten</div>
+        <ul class="answerlist">${lines}</ul>
+        <div class="row"><button data-action="restart">Nochmal von vorn</button><button class="primary" data-action="go">In den Dungeon!</button></div>
       </div></div>`;
     typeQuote(root);
     bindActions(root, {
-      back: () => {
-        step = -1;
-        answers.length = 0;
+      restart: () => {
+        for (const k of Object.keys(answers)) delete answers[k];
+        order.length = 0;
+        stage = 'name';
         draw();
       },
-      go: () => onDone({ name, answers, petName: petName || undefined }),
+      go: () => onDone({ name, answers: { ...answers }, petName: petName || undefined }),
     });
   };
 
@@ -148,12 +171,7 @@ export function interviewScreen(root: HTMLElement, onDone: (r: InterviewResult) 
         <div class="row"><button class="primary" data-action="next">Weiter</button></div>
       </div></div>`;
     typeQuote(root);
-    bindActions(root, {
-      next: () => {
-        step += 1;
-        draw();
-      },
-    });
+    bindActions(root, { next: draw });
   };
 
   const askPetName = (species: string, def: string, reaction: string) => {
@@ -167,7 +185,6 @@ export function interviewScreen(root: HTMLElement, onDone: (r: InterviewResult) 
     typeQuote(root);
     const go = () => {
       petName = input.value.trim() || def;
-      step += 1;
       draw();
     };
     input.addEventListener('keydown', (e) => {

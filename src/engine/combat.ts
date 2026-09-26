@@ -2,6 +2,8 @@ import { NameOf, nameOf } from './identify';
 import { has, hasSpecial } from './abilities';
 import { PART_NAMES } from './bonuses';
 import { handleLethal } from './death';
+import { attackFacets, dynAttackBonus } from './observer';
+import { traitAttackBonus } from './traits';
 import { emit } from './events';
 import { chebyshev, hasLineOfSight } from './fov';
 import { createAreaMap, createBox, createGold, createItem, rollMobDrop } from './items';
@@ -82,6 +84,8 @@ export function hitChance(s: GameState, target: Monster, t: Technique): number {
   if (t.part === 'wurf') hit -= 5 + chebyshev(s.player.pos, target.pos) * 2;
   if (!target.aware) hit += 20;
   if (target.downed > 0) hit += 25;
+  const facets = attackFacets(s, target, t);
+  hit += dynAttackBonus(s, facets, t).hit + traitAttackBonus(s, facets).hit;
   return Math.max(5, Math.min(95, Math.round(hit)));
 }
 
@@ -116,6 +120,8 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   }
 
   // --- Trefferchance
+  // Kontext VOR dem Angriff festhalten – der Beobachter wertet ihn aus
+  const facets = attackFacets(s, target, t);
   const isHit = R.next(s) * 100 < hitChance(s, target, t);
 
   const name = techniqueName(t);
@@ -125,7 +131,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     target.aware = true;
     if (thrown?.special === 'bumerang') returnThrown(s, thrown);
     else if (thrown) dropNear(s, thrown, target.pos);
-    emit(s, { type: 'attack', technique: t, hit: false, crit: false, damage: 0, target, thrown: thrown ?? undefined });
+    emit(s, { type: 'attack', technique: t, hit: false, crit: false, damage: 0, target, thrown: thrown ?? undefined, facets });
     return { ok: true };
   }
   s.counters.missStreak = 0;
@@ -135,7 +141,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   if (t.part === 'waffe') base = (currentWeapon(s)?.waffenSchaden ?? 2) + st.str / 2;
   else if (t.part === 'wurf') base = (thrown?.wurfSchaden ?? 2) + st.ges / 3;
   else base = BASE_DAMAGE[t.part] + st.str / 2;
-  let pct = (b.schaden?.[t.part] ?? 0) + (b.schaden?.alle ?? 0);
+  let pct = (b.schaden?.[t.part] ?? 0) + (b.schaden?.alle ?? 0) + dynAttackBonus(s, facets, t).dmg + traitAttackBonus(s, facets).dmg;
   for (const { st: sk, def } of skills) pct += (def.matchDamage ?? 0) * sk.level;
   if (ambush) {
     pct += 25 * skillLevel(s, 'hinterhalt');
@@ -207,8 +213,8 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     p.hp = Math.min(maxHp(s), p.hp + heal);
   }
 
-  emit(s, { type: 'attack', technique: t, hit: true, crit, damage: final, target, thrown: thrown ?? undefined });
-  if (target.hp <= 0) killMonster(s, target, t);
+  emit(s, { type: 'attack', technique: t, hit: true, crit, damage: final, target, thrown: thrown ?? undefined, facets });
+  if (target.hp <= 0) killMonster(s, target, t, false, facets);
   return { ok: true };
 }
 
@@ -253,7 +259,7 @@ function explode(s: GameState, m: Monster) {
   }
 }
 
-export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet = false) {
+export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet = false, facets?: string[]) {
   if (!s.monsters.includes(m)) return;
   s.monsters = s.monsters.filter((x) => x !== m);
   s.counters.kills += 1;
@@ -294,6 +300,6 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
     for (const it of m.ghostItems) dropNear(s, { ...it, uid: `${it.uid}g${s.turn}` }, m.pos);
     log(s, `Der Geist zerfällt. Zurück bleibt, was ${m.ghostOf} einst getragen hat.`, 'system');
   }
-  emit(s, { type: 'kill', monster: m, technique: t, byPet });
+  emit(s, { type: 'kill', monster: m, technique: t, byPet, facets });
   if (has(m, 'explodiert')) explode(s, m);
 }
