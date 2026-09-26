@@ -77,6 +77,7 @@ export function sell(s: GameState, uid: string): { ok: boolean; message?: string
   const it = p.inventory.find((i) => i.uid === uid);
   if (!it) return { ok: false, message: 'Das hast du nicht.' };
   if (it.kind === 'box') return { ok: false, message: 'Lootboxen kann man nicht verkaufen.' };
+  if (it.questId) return { ok: false, message: 'Das gehört jemandem, der darauf wartet.' };
   const price = sellPrice(it);
   p.inventory = p.inventory.filter((i) => i.uid !== uid);
   p.gold += price;

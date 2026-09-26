@@ -31,6 +31,8 @@ export interface Room {
   freebieTaken?: boolean;
   /** Laden im Safe Room (wird beim ersten Betreten gefüllt). */
   shop?: Shop;
+  /** Der Laden hat schon einen Auftrag angeboten. */
+  questOffered?: boolean;
   visited?: boolean;
 }
 
@@ -149,6 +151,8 @@ export interface Item {
   explosion?: number;
   /** Eigene Falle zum Aufstellen. */
   trapKind?: TrapKind;
+  /** Gehört zu einem Auftrag (nicht verkäuflich). */
+  questId?: string;
   /** Wie oft die Waffe schon verbessert wurde (Handwerk). */
   upgrades?: number;
   /** Ei: schlüpft in diesem Zug (im Inventar). */
@@ -285,6 +289,28 @@ export interface Population {
   /** Stand zu Beginn der Etage (für den Rückgang). */
   floorStart: number;
   lastAnnounce: number;
+}
+
+export type QuestKind = 'jagd' | 'finden' | 'liefern' | 'retten' | 'boss';
+
+export interface Quest {
+  id: string;
+  kind: QuestKind;
+  floor: number;
+  /** Wer den Auftrag gibt: ein Crawler (uid) oder ein Laden (Raum-ID). */
+  giver: { kind: 'crawler' | 'laden'; ref: string; name: string };
+  title: string;
+  text: string;
+  status: 'angebot' | 'aktiv' | 'erledigt' | 'gescheitert';
+  /** jagd: Ziel-Facette (z. B. „z:ratte“); boss: Viertel; liefern: Basis-IDs. */
+  facet?: string;
+  hood?: number;
+  itemIds?: string[];
+  /** finden: das gesuchte Item; retten: die gesuchte Person. */
+  targetUid?: string;
+  count: number;
+  progress: number;
+  reward: { gold: number; xp: number; box?: boolean };
 }
 
 export interface SponsorState {
@@ -526,6 +552,7 @@ export interface GameState {
   fallen?: string[];
   floorSnapshot?: FloorSnapshot;
   sponsors?: SponsorState[];
+  quests?: Quest[];
   talkShow?: TalkShow;
   dynAchievements?: DynAchievement[];
   /** Rassen- und Klassenwahl steht an (Etage 3). */
@@ -590,6 +617,9 @@ export type GameEvent =
   | { type: 'crawlerTurned'; name: string }
   | { type: 'talkShow'; delta: number; tone: ShowTone }
   | { type: 'petLevel'; level: number }
+  | { type: 'questAccepted'; kind: QuestKind }
+  | { type: 'questDone'; kind: QuestKind; done: number }
+  | { type: 'questFailed'; kind: QuestKind }
   | { type: 'sponsorJoined'; id: string; count: number }
   | { type: 'sponsorWish'; id: string; completed: number }
   | { type: 'sponsorDropped'; id: string }

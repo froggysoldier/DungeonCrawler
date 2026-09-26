@@ -24,11 +24,13 @@ import { crawlerAt, describeCrawler, joinChance, party, population, talkableCraw
 import { PERSONALITIES } from '../data/crawlers';
 import { SPONSOR_BY_ID } from '../data/sponsors';
 import { sponsorStates } from '../engine/sponsors';
+import { activeQuests, canTurnIn, hint, questOf, quests } from '../engine/quests';
+import type { Quest } from '../engine/types';
 import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   chooseThrowable, craftItem, disarmTrap, placeTrap,
-  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer,
+  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable } from '../engine/mapgen';
@@ -586,7 +588,7 @@ export class GameView {
           else if (!c.met) btns.push(`<button data-action="invite" data-uid="${c.uid}">In die Party einladen</button>`);
           if (!c.tipGiven && !c.party) btns.push(`<button data-action="tip" data-uid="${c.uid}">Nach Tipps fragen</button>`);
           if (healer && c.hp < c.maxHp) btns.push(`<button data-action="heal" data-uid="${c.uid}" data-item="${healer.uid}">${esc(itemName(s, healer))} geben</button>`);
-          return `<div style="margin-bottom:6px"><div class="small" style="color:${c.party ? '#8fe38f' : '#7cc4ff'}">${esc(describeCrawler(c))} · HP ${c.hp}/${c.maxHp}</div><div class="row" style="flex-wrap:wrap;gap:4px">${btns.join('')}</div></div>`;
+          return `<div style="margin-bottom:6px"><div class="small" style="color:${c.party ? '#8fe38f' : '#7cc4ff'}">${esc(describeCrawler(c))} · HP ${c.hp}/${c.maxHp}</div><div class="row" style="flex-wrap:wrap;gap:4px">${btns.join('')}</div>${this.questHtml(questOf(s, c.uid))}</div>`;
         })
         .join('')}`);
     }
@@ -621,6 +623,7 @@ export class GameView {
             })
             .join('');
           html += '<div class="muted small">Verkaufen: im Inventar-Tab beim Gegenstand.</div>';
+          html += this.questHtml(questOf(s, String(room.id)));
         }
         if (s.player.boxes.length) {
           html += `<div class="muted small" style="margin-top:6px">Lootboxen öffnen:</div>`;
@@ -640,6 +643,9 @@ export class GameView {
       dismiss: (b) => this.act(() => dismissCrawler(s, b.dataset.uid!)),
       tip: (b) => this.act(() => askCrawlerTip(s, b.dataset.uid!)),
       heal: (b) => this.act(() => healCrawler(s, b.dataset.uid!, b.dataset.item!)),
+      'quest-yes': (b) => this.act(() => acceptQuestOffer(s, b.dataset.id!)),
+      'quest-no': (b) => this.act(() => declineQuestOffer(s, b.dataset.id!)),
+      'quest-turnin': (b) => this.act(() => turnInQuest(s, b.dataset.id!)),
       descend: () => this.askDescend(),
       freebie: () => {
         let item: Item | undefined;
@@ -707,7 +713,7 @@ export class GameView {
           : `<button data-action="throwpick" data-id="${it.baseId}">Als Nächstes werfen</button>`);
       }
       actions.push(`<button data-action="drop" data-uid="${it.uid}">Ablegen</button>`);
-      if (from === 'inv' && currentRoom(this.s)?.kind === 'safe' && it.kind !== 'box') actions.push(`<button data-action="sell" data-uid="${it.uid}">Verkaufen (${sellPrice(it)} G)</button>`);
+      if (from === 'inv' && currentRoom(this.s)?.kind === 'safe' && it.kind !== 'box' && !it.questId) actions.push(`<button data-action="sell" data-uid="${it.uid}">Verkaufen (${sellPrice(it)} G)</button>`);
     }
     return `<div class="name" style="color:${color}">${esc(known.name)}${it.menge && it.menge > 1 && it.kind !== 'gold' ? ` ×${it.menge}` : ''}</div>
       <div class="meta">${esc(bits.join(' · '))}</div>
@@ -750,6 +756,18 @@ export class GameView {
       craft: (b) => this.act(() => craftItem(this.s, b.dataset.id!)),
       throwpick: (b) => this.act(() => chooseThrowable(this.s, b.dataset.id || null)),
     });
+  }
+
+  /** Angebot oder Abgabe eines Auftrags beim Auftraggeber. */
+  private questHtml(q: Quest | undefined): string {
+    if (!q) return '';
+    if (q.status === 'angebot') {
+      return `<div class="item"><div class="name" style="color:var(--accent)">Auftrag: ${esc(q.title)}</div><div class="meta">${esc(q.text)}</div>
+        <div class="bon">Belohnung: ${q.reward.gold} Gold, ${q.reward.xp} XP${q.reward.box ? ', eine Lootbox' : ''}</div>
+        <div class="actions"><button data-action="quest-yes" data-id="${q.id}">Annehmen</button><button data-action="quest-no" data-id="${q.id}">Ablehnen</button></div></div>`;
+    }
+    if (canTurnIn(this.s, q)) return `<div class="row" style="margin:4px 0"><button class="primary" data-action="quest-turnin" data-id="${q.id}">Auftrag abgeben: ${esc(q.title)}</button></div>`;
+    return `<div class="small muted">Offener Auftrag: ${esc(q.title)} – ${esc(hint(this.s, q))}</div>`;
   }
 
   private sponsorHtml(): string {
@@ -845,6 +863,13 @@ export class GameView {
       html += `<div class="section">Party (${members.length + 1} von 4)</div>${members
         .map((c) => `<div class="small" style="margin-bottom:3px"><b style="color:#8fe38f">${esc(c.name)}</b> · Level ${c.level} · HP ${c.hp}/${c.maxHp} · ${c.kills} Kills <span class="muted">(früher ${esc(c.background)})</span></div>`)
         .join('')}`;
+    }
+    const open = activeQuests(s);
+    const doneCount = quests(s).filter((q) => q.status === 'erledigt').length;
+    if (open.length || doneCount) {
+      html += `<div class="section">Aufträge (${doneCount} erledigt)</div>${open
+        .map((q) => `<div class="small" style="margin-bottom:4px"><b>${esc(q.title)}</b> <span class="muted">von ${esc(q.giver.name)}</span><br>${esc(hint(s, q))}${q.kind === 'jagd' ? ` <span class="muted">(${q.progress}/${q.count})</span>` : ''}</div>`)
+        .join('') || '<div class="muted small">Keine offenen Aufträge.</div>'}`;
     }
     if (hasUnlock(s, 'zuschauer')) html += this.sponsorHtml();
     if (s.fallen?.length) html += `<div class="muted small">Gefallen: ${esc(s.fallen.join(', '))}</div>`;

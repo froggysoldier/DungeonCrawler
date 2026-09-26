@@ -33,6 +33,7 @@ import {
   announcePopulation, askTip, crawlerAt, crawlersTurn, dismiss, giveHealing, invite, populateCrawlers, populationOnDescend, talkTo,
 } from './crawlers';
 import { acceptSponsor, declineSponsor } from './sponsors';
+import { acceptQuest, declineQuest, offerQuest, questOf, questsOnDescend, questsTick, turnIn } from './quests';
 import { answerShow, floorRecap, snapshotFloor, startTalkShow, type ShowAnswerResult } from './talkshow';
 import type {
   ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique,
@@ -323,6 +324,7 @@ export function endTurn(s: GameState, opts: EndTurnOpts = {}) {
   }
   petTurn(s);
   crawlersTurn(s);
+  questsTick(s);
   if (s.status !== 'playing') return;
   tickTime(s, 1, before);
 }
@@ -467,7 +469,15 @@ function onEnterRoom(s: GameState, room: NonNullable<ReturnType<typeof currentRo
   else log(s, `Du betrittst: ${room.name}.`, 'info');
 
   if (room.kind === 'guild' && !hasUnlock(s, 'inventar')) runTutorial(s);
-  if (room.kind === 'safe') ensureShop(s, room);
+  if (room.kind === 'safe') {
+    const shop = ensureShop(s, room);
+    if (!room.questOffered && hasUnlock(s, 'inventar') && !questOf(s, String(room.id))) {
+      room.questOffered = true;
+      const keeper = shop.keeper.split(',')[0];
+      const q = offerQuest(s, { kind: 'laden', ref: String(room.id), name: keeper });
+      if (q) log(s, `${keeper} hat einen Auftrag für dich: ${q.text}`, 'dialog');
+    }
+  }
   if (room.kind === 'safe' && first) {
     if (room.safeVariant === 'restaurant') {
       const host = RESTAURANT_HOSTS[room.id % RESTAURANT_HOSTS.length];
@@ -882,6 +892,23 @@ export function declineSponsorOffer(s: GameState, id: string): ActionResult {
   return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
 }
 
+// ================================================================ Aufträge
+
+export function acceptQuestOffer(s: GameState, id: string): ActionResult {
+  const res = acceptQuest(s, id);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+export function declineQuestOffer(s: GameState, id: string): ActionResult {
+  const res = declineQuest(s, id);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+export function turnInQuest(s: GameState, id: string): ActionResult {
+  const res = turnIn(s, id);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
 // ================================================================ Talkshow
 
 export function answerTalkShow(s: GameState, answerIndex: number): ShowAnswerResult {
@@ -941,6 +968,7 @@ export function descend(s: GameState, meta: Pick<MetaState, 'ghosts'>): ActionRe
   }
   const next = s.floor + 1;
   populationOnDescend(s);
+  questsOnDescend(s);
   const recap = floorRecap(s);
   const withShow = hasUnlock(s, 'zuschauer');
   enterFloor(s, next, meta);

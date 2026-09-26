@@ -117,4 +117,22 @@ export const SOCIAL_ACHIEVEMENTS: AchievementDef[] = [
     comment: 'Die Anwälte der Galaxis haben schon angerufen. Die Systemstimme hat aufgelegt.',
     check: (e) => e.type === 'sponsorDropped',
   },
+  {
+    id: 'auftrag_erster', name: 'Dienstleister', tier: 'bronze', box: 'abenteurer',
+    description: 'Erledige einen Auftrag.',
+    comment: 'Die Apokalypse hat eine Gig-Economy. Wer hätte das gedacht.',
+    check: (e) => e.type === 'questDone',
+  },
+  {
+    id: 'auftrag_fuenf', name: 'Mädchen für alles', tier: 'silber', box: 'abenteurer',
+    description: 'Erledige fünf Aufträge.',
+    comment: 'Alle wollen etwas von dir. Das nennt man Beliebtheit. Oder Ausbeutung.',
+    check: (e) => e.type === 'questDone' && e.done >= 5,
+  },
+  {
+    id: 'retter', name: 'Held des Tages', tier: 'gold', box: 'ueberlebens',
+    description: 'Rette einen eingeschlossenen Crawler.',
+    comment: 'Ein Leben gerettet. Die Systemstimme zählt das nicht mit. Du schon.',
+    check: (e) => e.type === 'questDone' && e.kind === 'retten',
+  },
 ];

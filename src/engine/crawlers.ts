@@ -3,6 +3,7 @@ import {
   PERSONALITIES, START_POPULATION, TIP_LINES,
 } from '../data/crawlers';
 import { FLOORS } from '../data/world';
+import { offerQuest, questOf } from './quests';
 import { monsterDefById, spawnMonster } from './monsters';
 import { isInSafeRoom, killMonster } from './combat';
 import { emit } from './events';
@@ -89,7 +90,7 @@ export function populationOnDescend(s: GameState) {
 
 // ================================================================ Erzeugen
 
-function makeCrawler(s: GameState, pos: Pos, personality?: Personality): NpcCrawler {
+export function makeCrawler(s: GameState, pos: Pos, personality?: Personality): NpcCrawler {
   const def = FLOORS.find((f) => f.floor === s.floor) ?? FLOORS[0];
   const pers = personality ?? R.weighted(s, (Object.entries(PERSONALITIES) as [Personality, { weight: number }][]).map(([k, d]) => [k, d.weight]));
   const level = Math.max(1, R.int(s, def.mobLevel[0], def.mobLevel[1] + 1) - 1);
@@ -165,7 +166,15 @@ export function talkTo(s: GameState, uid: string): Res {
   c.met = true;
   log(s, `${c.name}: „${R.pick(s, pd.greetings)}“`, 'dialog');
   if (first) emit(s, { type: 'crawlerMet', name: c.name, personality: c.personality });
-  if (c.personality === 'feindselig' && !isInSafeRoom(s, s.player.pos)) turnHostile(s, c);
+  if (c.personality === 'feindselig' && !isInSafeRoom(s, s.player.pos)) {
+    turnHostile(s, c);
+    return { ok: true };
+  }
+  // Manche haben ein Anliegen
+  if (first && !c.party && c.personality !== 'feindselig' && s.unlocks.includes('inventar') && !questOf(s, c.uid) && R.chance(s, 0.6)) {
+    const q = offerQuest(s, { kind: 'crawler', ref: c.uid, name: c.name });
+    if (q) log(s, `${c.name} hat ein Anliegen: ${q.text}`, 'dialog');
+  }
   return { ok: true };
 }
 

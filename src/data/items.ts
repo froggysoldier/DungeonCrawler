@@ -229,6 +229,9 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'traubenzucker', name: 'Traubenzucker', kind: 'verbrauch', effekt: { ausdauer: 6 }, flavor: 'Für die schnelle Energie.', wert: 1, ground: 2 },
   { id: 'wutpille', name: 'Rote Wutpille', kind: 'verbrauch', effekt: { buff: { name: 'Rasende Wut', turns: 30, bonuses: { schaden: { alle: 25 }, ausweichen: -5 } } }, flavor: 'Nebenwirkungen: Wut.', wert: 15 },
 
+  // ================= Aufträge
+  { id: 'andenken', name: 'Andenken', kind: 'schrott', flavor: 'Jemandem ist das sehr wichtig.', wert: 0 },
+
   // ================= Handwerk: Materialien
   { id: 'lappen', name: 'Schmutziger Lappen', kind: 'schrott', flavor: 'Riecht nach Frittierfett. Brennt bestimmt gut.', wert: 0, ground: 5 },
   { id: 'naegel', name: 'Handvoll Nägel', kind: 'schrott', flavor: 'Krumm, rostig, spitz. Genau richtig.', wert: 1, ground: 4 },
