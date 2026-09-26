@@ -267,6 +267,8 @@ export interface Viewers {
 export type Unlock = 'inventar' | 'stats' | 'minimap' | 'skills' | 'zuschauer' | 'klasse';
 
 export interface LogEntry {
+  /** Fortlaufende Nummer, damit die Oberfläche neue Zeilen erkennt. */
+  id?: number;
   turn: number;
   text: string;
   kind: 'info' | 'kampf' | 'system' | 'loot' | 'achievement' | 'gefahr' | 'dialog';
@@ -327,6 +329,7 @@ export interface GameState {
   firstEver: string[];
   ghostsDefeated: string[];
   viewers: Viewers;
+  logCounter?: number;
   /** Rassen- und Klassenwahl steht an (Etage 3). */
   pendingSelection: boolean;
   toasts: Toast[];

@@ -1,4 +1,5 @@
 import { esc } from './dom';
+import { typeText, type Typing } from './typewriter';
 
 let open = false;
 const queue: (() => void)[] = [];
@@ -36,12 +37,18 @@ export function showDialog(title: string, speaker: string | undefined, pages: st
       const pageEl = root.querySelector('.page') as HTMLElement;
       const no = root.querySelector('.pageno') as HTMLElement;
       const btn = root.querySelector('.next') as HTMLButtonElement;
+      let typing: Typing | null = null;
       const draw = () => {
-        pageEl.innerHTML = esc(pages[page]).replace(/\*(.+?)\*/g, '<em>$1</em>');
+        typing = typeText(pageEl, esc(pages[page]).replace(/\*(.+?)\*/g, '<em>$1</em>'), 22);
         no.textContent = `${page + 1} / ${pages.length}`;
         btn.textContent = page === pages.length - 1 ? 'Los geht’s' : 'Weiter';
       };
       const advance = () => {
+        // Erster Klick: Text sofort vollständig zeigen. Zweiter Klick: weiter.
+        if (typing && !typing.isDone()) {
+          typing.finish();
+          return;
+        }
         if (page < pages.length - 1) {
           page += 1;
           draw();

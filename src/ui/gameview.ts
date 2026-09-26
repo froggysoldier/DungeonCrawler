@@ -29,6 +29,7 @@ import type { AttackMove, AttackPart, EquipSlot, GameState, Item, MetaState, Pos
 import { bindActions, esc, formatTime } from './dom';
 import { confirmBox, isModalOpen, showDialog, showHtml, showToast } from './modal';
 import { render, tileFromMouse, type View } from './render';
+import { TypeQueue } from './typewriter';
 import { showSelection } from './selection';
 
 type Tab = 'crawler' | 'inventar' | 'skills' | 'erfolge';
@@ -61,7 +62,11 @@ export class GameView {
   private visible = new Set<number>();
   private traveling = false;
   private canvas!: HTMLCanvasElement;
-  private logCount = -1;
+  private lastLogId = -1;
+  private typer = new TypeQueue(9, () => {
+    const el = this.root.querySelector('.log') as HTMLElement | null;
+    if (el) el.scrollTop = el.scrollHeight;
+  });
   private ended = false;
   private keyHandler = (e: KeyboardEvent) => this.onKey(e);
 
@@ -112,6 +117,7 @@ export class GameView {
         </div>
       </div>`;
     this.canvas = this.root.querySelector('canvas')!;
+    this.root.querySelector('.log')!.addEventListener('click', () => this.typer.finishAll());
     this.root.querySelectorAll<HTMLButtonElement>('.tabs button').forEach((b) =>
       b.addEventListener('click', () => {
         this.tab = b.dataset.tab as Tab;
@@ -143,7 +149,8 @@ export class GameView {
   }
 
   private afterAction() {
-    for (const t of drainToasts(this.s)) showToast(t.title, t.text, t.kind);
+    // Einblendungen nur noch für Warnungen – alles andere steht im Log (sonst stünde es doppelt da)
+    for (const t of drainToasts(this.s)) if (t.kind === 'warnung') showToast(t.title, t.text, t.kind);
     syncMeta(this.meta, this.s);
     saveMeta(this.meta);
     if (this.s.status === 'playing') saveRun(this.s);
@@ -155,7 +162,8 @@ export class GameView {
       const s = this.s;
       const title = s.status === 'victory' ? 'Geschafft!' : 'Tot.';
       setTimeout(() => {
-        showHtml(title, `<div class="page">${esc(s.log.slice(-3).map((l) => l.text).join('\n'))}</div>`, 'Weiter').then(() => this.onEnd(s));
+        const text = s.status === 'victory' ? 'Du hast alle bisher gebauten Etagen überlebt.' : `Todesursache: ${s.deathCause ?? 'unbekannt'}.`;
+        showHtml(title, `<div class="page">${esc(text)}</div>`, 'Weiter').then(() => this.onEnd(s));
       }, 300);
     }
   }
@@ -724,14 +732,28 @@ export class GameView {
     });
   }
 
+  /** Neue Log-Zeilen werden angehängt und Zeichen für Zeichen getippt. */
   private refreshLog() {
     const el = this.root.querySelector('.log') as HTMLElement;
-    if (this.logCount === this.s.log.length && el.childElementCount) return;
-    this.logCount = this.s.log.length;
-    el.innerHTML = this.s.log
-      .slice(-120)
-      .map((l) => `<p class="${l.kind}"><span class="t">${formatTime(l.turn)}</span>${esc(l.text)}</p>`)
-      .join('');
+    const entries = this.s.log;
+    const firstRender = this.lastLogId < 0;
+    const fresh = entries.filter((l) => (l.id ?? 0) > this.lastLogId);
+    if (!fresh.length && !firstRender) return;
+    const toShow = firstRender ? entries.slice(-120) : fresh;
+    for (const l of toShow) {
+      const p = document.createElement('p');
+      p.className = l.kind;
+      const time = document.createElement('span');
+      time.className = 't';
+      time.textContent = formatTime(l.turn);
+      const text = document.createElement('span');
+      p.append(time, text);
+      el.append(p);
+      if (firstRender) text.textContent = l.text;
+      else this.typer.push(text, esc(l.text));
+    }
+    this.lastLogId = entries[entries.length - 1]?.id ?? this.lastLogId;
+    while (el.childElementCount > 150) el.firstElementChild?.remove();
     el.scrollTop = el.scrollHeight;
   }
 }

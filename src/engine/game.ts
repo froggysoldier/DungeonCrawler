@@ -112,11 +112,9 @@ export function newGame(opts: NewGameOptions): GameState {
 
   // --- Interview auswerten
   const p = s.player;
-  const reactions: string[] = [];
   INTERVIEW.forEach((q, qi) => {
     const a = q.answers[opts.answers[qi] ?? 0];
     if (!a) return;
-    reactions.push(a.reaction);
     if (a.background) p.background = a.background;
     if (a.stats) for (const [k, v] of Object.entries(a.stats) as [StatKey, number][]) p.stats[k] = Math.max(1, p.stats[k] + v);
     for (const sk of a.skills ?? []) learnSkill(s, sk, 1, true);
@@ -141,7 +139,6 @@ export function newGame(opts: NewGameOptions): GameState {
     speaker: 'Die Systemstimme',
     pages: [
       `Crawler ${p.name}! Deine Welt wurde soeben… sagen wir: „umgenutzt“. Die gute Nachricht: Du darfst an der beliebtesten Show der Galaxis teilnehmen. Die schlechte: Du hast keine Wahl.`,
-      ...reactions.map((r) => `„${r}“`),
       `${FLOORS[0].intro}`,
       'Du hast nichts. Kein Inventar, keine Karte, keine Ahnung. Irgendwo auf dieser Etage gibt es eine Gilde der Einweisung – such sie. Bis dahin kannst du genau einen Gegenstand in der Hand halten. Und deine Fäuste. Und Füße. Viel Spaß!',
     ],

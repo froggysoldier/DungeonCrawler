@@ -26,7 +26,7 @@ export function checkAchievements(s: GameState, e: GameEvent) {
     const box = createBox(s, a.box, tier);
     s.player.boxes.push(box);
     const firstNote = first ? ' ERSTMALIG IN DEINER KARRIERE – Box-Stufe erhöht!' : '';
-    log(s, `NEUES ACHIEVEMENT: ${a.name}! ${a.description}`, 'achievement');
+    log(s, `NEUES ACHIEVEMENT: ${a.name} – ${a.description}`, 'achievement');
     log(s, `${a.comment}`, 'achievement');
     log(s, `Belohnung: ${BOX_TIER_NAMES[tier]} ${BOX_TYPE_NAMES[a.box]}.${firstNote}`, 'loot');
     addSpectacle(s, 4 + BOX_TIERS.indexOf(tier) * 4, 'achievement');

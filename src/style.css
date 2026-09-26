@@ -260,3 +260,7 @@ h1, h2, h3 { margin: 0; }
 .viewers { color: var(--achv); }
 @media (max-width: 700px) { .select-grid { grid-template-columns: 1fr; } .choices { max-height: 32vh; } }
 .actionbar button.ability { border-color: var(--accent-2); color: var(--accent-2); }
+
+.caret { display: inline-block; width: 0.55em; height: 1em; margin-left: 1px; vertical-align: -0.12em; background: currentColor; animation: blink 0.8s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.systemquote { cursor: pointer; }

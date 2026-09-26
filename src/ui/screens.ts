@@ -3,6 +3,21 @@ import { INTERVIEW } from '../data/interview';
 import { DEATH_QUIPS, SHOW_NAME } from '../data/world';
 import type { GameState, MetaState } from '../engine/types';
 import { bindActions, esc } from './dom';
+import { typeText } from './typewriter';
+
+/** Tippt das Zitat der Systemstimme; Antworten erscheinen erst danach. */
+function typeQuote(root: HTMLElement) {
+  const q = root.querySelector<HTMLElement>('.systemquote');
+  if (!q) return;
+  const rest = [...root.querySelectorAll<HTMLElement>('.answers, .row, input')];
+  for (const el of rest) el.style.visibility = 'hidden';
+  const t = typeText(q, q.innerHTML, 20);
+  q.addEventListener('click', () => t.finish());
+  t.done.then(() => {
+    for (const el of rest) el.style.visibility = '';
+    root.querySelector<HTMLElement>('input, .answers button, .row button.primary')?.focus();
+  });
+}
 
 export interface InterviewResult {
   name: string;
@@ -81,6 +96,7 @@ export function interviewScreen(root: HTMLElement, onDone: (r: InterviewResult) 
         draw();
       };
       bindActions(root, { next: go });
+      typeQuote(root);
       return;
     }
     if (step < INTERVIEW.length) {
@@ -91,6 +107,7 @@ export function interviewScreen(root: HTMLElement, onDone: (r: InterviewResult) 
           <div class="systemquote">„${esc(q.question)}“</div>
           <div class="answers">${q.answers.map((a, i) => `<button data-action="answer" data-i="${i}">${esc(a.label)}</button>`).join('')}</div>
         </div></div>`;
+      typeQuote(root);
       bindActions(root, {
         answer: (el) => {
           const i = Number(el.dataset.i);
@@ -113,6 +130,7 @@ export function interviewScreen(root: HTMLElement, onDone: (r: InterviewResult) 
         <ul class="muted">${lines}</ul>
         <div class="row"><button data-action="back">Nochmal von vorn</button><button class="primary" data-action="go">In den Dungeon!</button></div>
       </div></div>`;
+    typeQuote(root);
     bindActions(root, {
       back: () => {
         step = -1;
@@ -129,8 +147,7 @@ export function interviewScreen(root: HTMLElement, onDone: (r: InterviewResult) 
         <div class="systemquote">„${esc(text)}“</div>
         <div class="row"><button class="primary" data-action="next">Weiter</button></div>
       </div></div>`;
-    const btn = root.querySelector('button') as HTMLButtonElement;
-    btn.focus();
+    typeQuote(root);
     bindActions(root, {
       next: () => {
         step += 1;
@@ -147,7 +164,7 @@ export function interviewScreen(root: HTMLElement, onDone: (r: InterviewResult) 
         <div class="row"><button class="primary" data-action="next">Weiter</button></div>
       </div></div>`;
     const input = root.querySelector('#pet') as HTMLInputElement;
-    input.focus();
+    typeQuote(root);
     const go = () => {
       petName = input.value.trim() || def;
       step += 1;
