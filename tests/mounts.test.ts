@@ -57,11 +57,15 @@ describe('Reittiere und Fahrzeuge', () => {
     const m = spawnMonster(s, monsterDefById('ghul')!, 3, spot, 0);
     m.hp = m.maxHp = 999;
     m.ausweichen = -200;
+    m.abilities = []; // ohne Regeneration
     s.monsters = [m];
     const t = { part: 'faust' as const, move: 'anlauf' as const };
     expect(attack(s, m.uid, t).ok).toBe(false); // zu Fuß ohne Anlauf nicht möglich
     rideToggle(s);
-    expect(attack(s, m.uid, t).ok).toBe(true);
+    for (let i = 0; i < 5 && m.hp === 999; i++) {
+      s.player.ausdauer = 20;
+      expect(attack(s, m.uid, t).ok).toBe(true);
+    }
     expect(m.hp).toBeLessThan(999 - 10);
     expect(s.log.some((l) => l.text.includes('rammt'))).toBe(true);
   });

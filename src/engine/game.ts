@@ -144,7 +144,9 @@ export function newGame(opts: NewGameOptions): GameState {
     for (const f of a.flags ?? []) p.flags.push(f);
     for (const id of a.items ?? []) {
       const it = createItem(s, id);
-      if (it.slot) p.equipment[it.slot as EquipSlot] = it;
+      if (!it.slot) continue;
+      const slot = (it.slot === 'ring' ? 'ring1' : it.slot === 'fussring' ? 'fussring1' : it.slot) as EquipSlot;
+      p.equipment[slot] = it;
     }
     if (a.pet) {
       const petName = opts.petName?.trim() || a.pet.defaultName;

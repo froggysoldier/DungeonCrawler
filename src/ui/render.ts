@@ -206,7 +206,7 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
     ctx.lineWidth = boss ? 3 : 2;
     ctx.stroke();
     ctx.fillStyle = color;
-    ctx.font = `bold ${boss ? 13 : 12}px JetBrains Mono, monospace`;
+    ctx.font = `bold ${boss ? 13 : 12}px Montserrat, sans-serif`;
     ctx.fillText(unknown ? '?' : mo.glyph, cx, cy + 1);
     if (mo.hp < mo.maxHp && info.showHealthBar) {
       ctx.fillStyle = '#000';
@@ -216,11 +216,11 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
     }
     if (mo.downed > 0) {
       ctx.fillStyle = '#7cc4ff';
-      ctx.font = 'bold 10px JetBrains Mono, monospace';
+      ctx.font = 'bold 10px Montserrat, sans-serif';
       ctx.fillText('z', sx(mo.pos.x) + TILE - 3, sy(mo.pos.y) + 5);
     } else if (mo.aware) {
       ctx.fillStyle = '#ff5a4a';
-      ctx.font = 'bold 11px JetBrains Mono, monospace';
+      ctx.font = 'bold 11px Montserrat, sans-serif';
       ctx.fillText('!', sx(mo.pos.x) + TILE - 3, sy(mo.pos.y) + 5);
     }
   }

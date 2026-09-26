@@ -13,7 +13,7 @@ const BASE_BY_ID: Record<string, BaseItem> = Object.fromEntries(
 );
 
 const BOSS_LOOT = new Set(HOOD_BOSSES.flatMap((b) => b.loot));
-const START_ONLY = new Set(['bademantel', 'schlafanzug', 'anzug', 'arbeitsjacke', 'sportshirt', 'hausschuhe']);
+const START_ONLY = new Set(['bademantel', 'schlafanzug', 'anzug', 'arbeitsjacke', 'sportshirt', 'hausschuhe', 'eigener_ehering', 'uniformjacke', 'kasack', 'kochjacke', 'schlafanzughose']);
 
 export function uid(s: GameState): string {
   s.uidCounter += 1;

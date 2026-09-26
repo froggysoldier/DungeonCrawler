@@ -110,7 +110,7 @@ export function interviewScreen(root: HTMLElement, onDone: (r: InterviewResult) 
           <div class="muted small">Frage ${done + 1} von ${total()} · Crawler ${esc(name)}</div>
           <div class="progressline"><div style="width:${(100 * done) / total()}%"></div></div>
           <div class="systemquote">„${esc(q.question)}“</div>
-          <div class="answers">${q.answers.map((a, i) => `<button data-action="answer" data-i="${i}">${esc(a.label)}</button>`).join('')}</div>
+          <div class="answers${q.answers.length > 7 ? ' many' : ''}">${q.answers.map((a, i) => `<button data-action="answer" data-i="${i}">${esc(a.label)}</button>`).join('')}</div>
           ${order.length ? '<div class="row"><button data-action="back">Zurück</button></div>' : ''}
         </div></div>`;
       typeQuote(root);

@@ -89,8 +89,10 @@ describe('Kampf und Skills', () => {
     const rat = withRat(s);
     rat.hp = 1;
     rat.ausweichen = -200;
-    const res = attack(s, rat.uid, { part: 'faust', move: 'normal' });
-    expect(res.ok).toBe(true);
+    // Trefferchance ist höchstens 95 % – ein paar Versuche erlauben
+    for (let i = 0; i < 5 && s.monsters.includes(rat); i++) {
+      expect(attack(s, rat.uid, { part: 'faust', move: 'normal' }).ok).toBe(true);
+    }
     expect(s.monsters).not.toContain(rat);
     expect(s.counters.kills).toBe(1);
     expect(s.achievements).toContain('erstes_blut');
