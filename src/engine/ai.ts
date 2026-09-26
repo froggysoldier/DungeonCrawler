@@ -9,6 +9,7 @@ import { has, onMonsterHit, startOfTurn } from './abilities';
 import { handleLethal } from './death';
 import { passProtects, petCast } from './extras';
 import { crawlerAt, monsterHitsCrawler } from './crawlers';
+import { checkEvolve, petAbilityTurn, petBiteBonus } from './petevo';
 import { dynDefenseBonus, targetFacets, trainDefense } from './observer';
 import { ausweichen, totalBonuses } from './player';
 import * as R from './rng';
@@ -239,24 +240,30 @@ export function petTurn(s: GameState) {
     if (spellTarget.hp <= 0) killMonster(s, spellTarget, null, true);
     return;
   }
+  const petKill = (m: Monster) => {
+    pet.xp += m.xp;
+    while (pet.xp >= pet.level * 60) {
+      pet.xp -= pet.level * 60;
+      petLevelUp(s);
+    }
+    killMonster(s, m, null, true);
+  };
+  if (petAbilityTurn(s, pet, petKill)) return;
   const t = targets[0];
   if (t) {
-    if (R.chance(s, 0.25)) {
-      log(s, `${pet.name} faucht ${nameOf(s, t)} an, verfehlt aber.`, 'kampf');
-      return;
-    }
-    let dmg = R.int(s, pet.dmg[0], pet.dmg[1]);
-    if (Object.values(p.equipment).some((i) => i?.special === 'katzenfreund')) dmg = Math.round(dmg * 1.5);
-    t.hp -= Math.max(1, dmg - t.ruestung);
-    t.aware = true;
-    log(s, `${pet.name} beißt ${nameOf(s, t)} für ${Math.max(1, dmg - t.ruestung)} Schaden.`, 'kampf');
-    if (t.hp <= 0) {
-      pet.xp += t.xp;
-      while (pet.xp >= pet.level * 60) {
-        pet.xp -= pet.level * 60;
-        petLevelUp(s);
+    const bites = pet.abilities?.includes('doppelbiss') ? 2 : 1;
+    for (let i = 0; i < bites && s.monsters.includes(t); i++) {
+      if (R.chance(s, 0.25)) {
+        log(s, `${pet.name} schnappt nach ${nameOf(s, t)}, verfehlt aber.`, 'kampf');
+        continue;
       }
-      killMonster(s, t, null, true);
+      let dmg = R.int(s, pet.dmg[0], pet.dmg[1]) + petBiteBonus(s);
+      if (Object.values(p.equipment).some((i) => i?.special === 'katzenfreund')) dmg = Math.round(dmg * 1.5);
+      const dealt = Math.max(1, dmg - t.ruestung);
+      t.hp -= dealt;
+      t.aware = true;
+      log(s, `${pet.name} beißt ${nameOf(s, t)} für ${dealt} Schaden.`, 'kampf');
+      if (t.hp <= 0) petKill(t);
     }
     return;
   }
@@ -284,4 +291,5 @@ export function petLevelUp(s: GameState) {
   pet.dmg = [pet.dmg[0] + 1, pet.dmg[1] + 1];
   log(s, `${pet.name} steigt auf Stufe ${pet.level} auf!`, 'system');
   emit(s, { type: 'petLevel', level: pet.level });
+  checkEvolve(s);
 }

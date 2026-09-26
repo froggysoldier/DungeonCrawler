@@ -6,6 +6,7 @@ import { giveItem } from './inventory';
 import { createBox, createGold, generateEquipment } from './items';
 import { log, toast } from './log';
 import { randomTome } from './magic';
+import { checkEvolve } from './petevo';
 import { targetFacets } from './observer';
 import { effectiveStats } from './player';
 import * as R from './rng';
@@ -135,6 +136,7 @@ export function useSpecial(s: GameState, it: Item): { ok: boolean; message?: str
       pet.dmg = [pet.dmg[0] + 1, pet.dmg[1] + 2];
     }
     pet.hp = pet.maxHp;
+    checkEvolve(s);
     log(s, `${pet.name} frisst den Superkeks. Die Augen leuchten auf. ${pet.name} schaut dich an – und SPRICHT: „Na endlich. Ich dachte schon, du fragst nie.“ ${pet.name} kann jetzt zaubern.`, 'system');
     toast(s, `${pet.name} ist erwacht`, 'Das Haustier spricht und wirkt Magische Geschosse.', 'skill');
     return { ok: true };

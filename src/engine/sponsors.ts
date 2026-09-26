@@ -49,6 +49,8 @@ export function signalsOf(e: GameEvent): string[] {
       return ['petGained'];
     case 'petLevel':
       return ['pet|level'];
+    case 'petEvolved':
+      return ['pet|evolve'];
     case 'talkShow':
       return [`talk|${e.tone}`];
     case 'sleep':

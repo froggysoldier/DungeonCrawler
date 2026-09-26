@@ -23,6 +23,10 @@ export function totalBonuses(s: GameState): Bonuses {
   if (s.player.race) addBonuses(b, RACE_BY_ID[s.player.race]?.bonuses);
   if (s.player.klass) addBonuses(b, CLASS_BY_ID[s.player.klass]?.bonuses);
   addBonuses(b, traitBonuses(s));
+  // Fähigkeiten eines entwickelten Haustiers
+  const pet = s.player.pet;
+  if (pet?.alive && pet.abilities?.includes('schutz')) addBonuses(b, { ruestung: 2 });
+  if (pet?.alive && pet.abilities?.includes('spaeher')) addBonuses(b, { lichtradius: 1 });
   return b;
 }
 

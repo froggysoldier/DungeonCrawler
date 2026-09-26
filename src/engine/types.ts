@@ -151,6 +151,8 @@ export interface Item {
   explosion?: number;
   /** Eigene Falle zum Aufstellen. */
   trapKind?: TrapKind;
+  /** Halsband für das Haustier. */
+  petBonus?: { hp?: number; dmg?: number };
   /** Gehört zu einem Auftrag (nicht verkäuflich). */
   questId?: string;
   /** Wie oft die Waffe schon verbessert wurde (Handwerk). */
@@ -256,6 +258,16 @@ export interface Pet {
   alive: boolean;
   /** Nach dem Superkeks: das Haustier zaubert Magische Geschosse. */
   caster?: boolean;
+  /** Entwicklungsform (siehe PET_FORMS). */
+  form?: string;
+  /** Eine Entwicklung steht zur Wahl. */
+  evolveReady?: boolean;
+  /** Fähigkeiten aus den Entwicklungen. */
+  abilities?: string[];
+  /** Halsband des Haustiers. */
+  gear?: Item;
+  /** Zug der letzten Pflege (Fähigkeit „Pflegen“). */
+  lastHeal?: number;
 }
 
 export type Personality = 'freundlich' | 'vorsichtig' | 'eigenbroetler' | 'feindselig' | 'verzweifelt';
@@ -617,6 +629,7 @@ export type GameEvent =
   | { type: 'crawlerTurned'; name: string }
   | { type: 'talkShow'; delta: number; tone: ShowTone }
   | { type: 'petLevel'; level: number }
+  | { type: 'petEvolved'; form: string; stage: number }
   | { type: 'questAccepted'; kind: QuestKind }
   | { type: 'questDone'; kind: QuestKind; done: number }
   | { type: 'questFailed'; kind: QuestKind }

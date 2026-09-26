@@ -33,6 +33,7 @@ import {
   announcePopulation, askTip, crawlerAt, crawlersTurn, dismiss, giveHealing, invite, populateCrawlers, populationOnDescend, talkTo,
 } from './crawlers';
 import { acceptSponsor, declineSponsor } from './sponsors';
+import { equipPetGear, evolvePet, removePetGear } from './petevo';
 import { acceptQuest, declineQuest, offerQuest, questOf, questsOnDescend, questsTick, turnIn } from './quests';
 import { answerShow, floorRecap, snapshotFloor, startTalkShow, type ShowAnswerResult } from './talkshow';
 import type {
@@ -889,6 +890,23 @@ export function acceptSponsorOffer(s: GameState, id: string): ActionResult {
 
 export function declineSponsorOffer(s: GameState, id: string): ActionResult {
   const res = declineSponsor(s, id);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+// ================================================================ Haustier-Entwicklung
+
+export function evolvePetTo(s: GameState, formId: string): ActionResult {
+  const res = evolvePet(s, formId);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+export function petGearOn(s: GameState, uid: string): ActionResult {
+  const res = equipPetGear(s, uid);
+  return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
+}
+
+export function petGearOff(s: GameState): ActionResult {
+  const res = removePetGear(s);
   return res.ok ? OK : fail(res.message ?? 'Geht nicht.');
 }
 

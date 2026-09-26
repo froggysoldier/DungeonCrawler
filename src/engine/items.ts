@@ -46,6 +46,7 @@ export function createItem(s: GameState, baseId: string, menge = 1): Item {
     passFacet: base.passFacet,
     explosion: base.explosion,
     trapKind: base.trapKind,
+    petBonus: base.petBonus,
     wert: base.wert,
   };
 }
@@ -177,6 +178,7 @@ function rollThemedItem(s: GameState, type: BoxType, rarity: Rarity): Item {
     const r = RARITY_ORDER.indexOf(rarity);
     if (r >= 4 && R.chance(s, 0.4)) return createItem(s, 'superkeks');
     if (r >= 2 && R.chance(s, 0.3)) return createItem(s, R.chance(s, 0.3) ? 'ei_drache' : 'ei_raptor');
+    if (R.chance(s, 0.35)) return createItem(s, r >= 3 ? 'halsband_stachel' : r >= 2 ? R.pick(s, ['halsband_nieten', 'halsband_glocke']) : 'halsband_leder');
     return R.chance(s, 0.6) ? createItem(s, 'leckerli', r + 1) : generateEquipment(s, rarity, ['hals']);
   }
   if (type === 'ueberlebens' && R.chance(s, 0.4)) {

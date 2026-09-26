@@ -60,12 +60,13 @@ export const SPONSORS: SponsorDef[] = [
   {
     id: 'oolu', name: 'Gräfin Oolu vom Nebelmond', box: 'haustier', minFollower: 100,
     description: 'Eine uralte Adlige mit sieben Zoos. Sie liebt Tiere – vor allem die, die für dich kämpfen.',
-    likes: { 'kill|pet': 6, petGained: 20, 'pet|level': 8 },
+    likes: { 'kill|pet': 6, petGained: 20, 'pet|level': 8, 'pet|evolve': 30 },
     dislike: { signal: 'kill|z:tier', text: 'Sie haben ein Tier getötet. Die Gräfin weint in ihr Spitzentuch.' },
     offer: '„Ihr Haustier ist entzückend. Die Gräfin Oolu wünscht, es zu fördern. Und Sie, meinetwegen, auch.“',
     wishes: [
       { text: 'Lass dein Haustier 4 Gegner erledigen.', signals: ['kill|pet'], count: 4 },
       { text: 'Lass dein Haustier eine Stufe aufsteigen.', signals: ['pet|level'], count: 1 },
+      { text: 'Lass dein Haustier sich entwickeln.', signals: ['pet|evolve'], count: 1 },
       { text: 'Lass dein Haustier 10 Gegner erledigen.', signals: ['kill|pet'], count: 10 },
     ],
   },

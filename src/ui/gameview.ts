@@ -24,13 +24,15 @@ import { crawlerAt, describeCrawler, joinChance, party, population, talkableCraw
 import { PERSONALITIES } from '../data/crawlers';
 import { SPONSOR_BY_ID } from '../data/sponsors';
 import { sponsorStates } from '../engine/sponsors';
+import { evolveOptions, petFormName } from '../engine/petevo';
+import { PET_ABILITIES, type PetAbility } from '../data/pets';
 import { activeQuests, canTurnIn, hint, questOf, quests } from '../engine/quests';
 import type { Quest } from '../engine/types';
 import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   chooseThrowable, craftItem, disarmTrap, placeTrap,
-  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest,
+  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable } from '../engine/mapgen';
@@ -700,11 +702,13 @@ export class GameView {
     if (it.explosion) bon.push(`Explodiert: etwa ${it.explosion} Schaden an allem im Umkreis von einem Feld`);
     if (it.trapKind) bon.push(`Falle zum Aufstellen: ${trapName(it.trapKind)}`);
     if (it.upgrades) bon.push(`${it.upgrades}x benagelt`);
+    if (it.petBonus) bon.push(`Haustier: ${[it.petBonus.hp ? `+${it.petBonus.hp} HP` : '', it.petBonus.dmg ? `+${it.petBonus.dmg} Schaden` : ''].filter(Boolean).join(', ')}`);
     const actions: string[] = [];
     if (withActions) {
       if (it.kind === 'ausruestung' && from === 'inv' && hasUnlock(this.s, 'inventar')) actions.push(`<button data-action="equip" data-uid="${it.uid}">Anlegen</button>`);
       if (it.kind === 'verbrauch') actions.push(`<button data-action="use" data-uid="${it.uid}">Benutzen</button>`);
       if (it.kind === 'buch') actions.push(`<button data-action="use" data-uid="${it.uid}">Lesen</button>`);
+      if (it.petBonus && from === 'inv' && this.s.player.pet) actions.push(`<button data-action="petgear-on" data-uid="${it.uid}">Dem Haustier anlegen</button>`);
       if (it.trapKind && from === 'inv') actions.push(`<button data-action="place" data-uid="${it.uid}">Hier aufstellen</button>`);
       if (it.kind === 'wurf' && from === 'inv') {
         const picked = throwables(this.s)[0]?.baseId === it.baseId;
@@ -751,11 +755,32 @@ export class GameView {
       drop: (b) => this.act(() => dropItem(this.s, b.dataset.uid!)),
       sell: (b) => this.act(() => sellItem(this.s, b.dataset.uid!)),
       place: (b) => this.act(() => placeTrap(this.s, b.dataset.uid!)),
+      evolve: (b) => this.act(() => evolvePetTo(this.s, b.dataset.id!)),
+      'petgear-on': (b) => this.act(() => petGearOn(this.s, b.dataset.uid!)),
+      'petgear-off': () => this.act(() => petGearOff(this.s)),
       'sponsor-yes': (b) => this.act(() => acceptSponsorOffer(this.s, b.dataset.id!)),
       'sponsor-no': (b) => this.act(() => declineSponsorOffer(this.s, b.dataset.id!)),
       craft: (b) => this.act(() => craftItem(this.s, b.dataset.id!)),
       throwpick: (b) => this.act(() => chooseThrowable(this.s, b.dataset.id || null)),
     });
+  }
+
+  private petHtml(): string {
+    const pet = this.s.player.pet!;
+    let html = `<div class="section">Haustier</div><div class="small"><b style="color:#ffb3e6">${esc(pet.name)}</b> · ${esc(petFormName(pet))} · Stufe ${pet.level} · ${pet.alive ? `HP ${pet.hp}/${pet.maxHp}` : 'bewusstlos'} · Schaden ${pet.dmg[0]}–${pet.dmg[1]}</div>`;
+    for (const a of pet.abilities ?? []) {
+      const d = PET_ABILITIES[a as PetAbility];
+      if (d) html += `<div class="small"><b>${esc(d.name)}:</b> <span class="muted">${esc(d.text)}</span></div>`;
+    }
+    html += pet.gear
+      ? `<div class="row small" style="margin:4px 0"><span style="flex:1">Halsband: ${esc(itemName(this.s, pet.gear))}</span><button data-action="petgear-off">Abnehmen</button></div>`
+      : '<div class="muted small">Kein Halsband. Halsbänder gibt es in Haustier-Boxen.</div>';
+    if (pet.evolveReady) {
+      html += `<div class="item"><div class="name" style="color:var(--accent)">Entwicklung möglich</div>${evolveOptions(pet)
+        .map((f) => `<div class="small" style="margin:4px 0"><b>${esc(f.name)}</b>: ${esc(f.flavor)}<br><span class="muted">+${f.hp} HP, +${f.dmg[0]}–${f.dmg[1]} Schaden, Fähigkeit: ${esc(PET_ABILITIES[f.ability].name)} – ${esc(PET_ABILITIES[f.ability].text)}</span><br><button data-action="evolve" data-id="${f.id}">${esc(f.name)} wählen</button></div>`)
+        .join('')}</div>`;
+    }
+    return html;
   }
 
   /** Angebot oder Abgabe eines Auftrags beim Auftraggeber. */
@@ -858,6 +883,7 @@ export class GameView {
     }
     if (p.immobile) html += `<div class="small" style="color:var(--danger)">Festgehalten: noch ${p.immobile} Züge (oder losreißen, indem du dich bewegst)</div>`;
     if (p.curses.length) html += `<div class="section">Flüche</div>${p.curses.map((c) => `<div class="small" style="color:var(--danger)">${esc(c)}</div>`).join('')}`;
+    if (p.pet) html += this.petHtml();
     const members = party(s);
     if (members.length) {
       html += `<div class="section">Party (${members.length + 1} von 4)</div>${members

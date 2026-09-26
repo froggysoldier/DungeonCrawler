@@ -135,4 +135,16 @@ export const SOCIAL_ACHIEVEMENTS: AchievementDef[] = [
     comment: 'Ein Leben gerettet. Die Systemstimme zählt das nicht mit. Du schon.',
     check: (e) => e.type === 'questDone' && e.kind === 'retten',
   },
+  {
+    id: 'evolution', name: 'Es entwickelt sich!', tier: 'silber', box: 'haustier',
+    description: 'Lass dein Haustier sich entwickeln.',
+    comment: 'Es ist gewachsen. Es hat eine neue Fähigkeit. Es hält dich immer noch für sein Personal.',
+    check: (e) => e.type === 'petEvolved',
+  },
+  {
+    id: 'endform', name: 'Endgegner auf vier Pfoten', tier: 'gold', box: 'haustier',
+    description: 'Bring dein Haustier in seine Endform.',
+    comment: 'Die Monster haben jetzt mehr Angst vor deinem Haustier als vor dir. Zu Recht.',
+    check: (e) => e.type === 'petEvolved' && e.stage >= 2,
+  },
 ];

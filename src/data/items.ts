@@ -19,6 +19,8 @@ export interface BaseItem {
   explosion?: number;
   /** Eigene Falle zum Aufstellen. */
   trapKind?: TrapKind;
+  /** Halsband: Bonus für das Haustier. */
+  petBonus?: { hp?: number; dmg?: number };
 }
 
 export const RARITY_ORDER: Rarity[] = ['gewoehnlich', 'ungewoehnlich', 'selten', 'episch', 'legendaer', 'himmlisch'];
@@ -228,6 +230,12 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'dosenbier', name: 'Warmes Dosenbier', kind: 'verbrauch', effekt: { heal: 3, blase: 20, buff: { name: 'Mut angetrunken', turns: 40, bonuses: { stats: { str: 1 }, treffer: -3 } } }, flavor: 'Warm. Aber Bier.', wert: 1, ground: 2 },
   { id: 'traubenzucker', name: 'Traubenzucker', kind: 'verbrauch', effekt: { ausdauer: 6 }, flavor: 'Für die schnelle Energie.', wert: 1, ground: 2 },
   { id: 'wutpille', name: 'Rote Wutpille', kind: 'verbrauch', effekt: { buff: { name: 'Rasende Wut', turns: 30, bonuses: { schaden: { alle: 25 }, ausweichen: -5 } } }, flavor: 'Nebenwirkungen: Wut.', wert: 15 },
+
+  // ================= Haustier-Halsbänder
+  { id: 'halsband_leder', name: 'Lederhalsband', kind: 'schrott', petBonus: { hp: 6 }, flavor: 'Mit Namensschild. Du kannst den Namen eingravieren. Mit einem Nagel.', wert: 4, ground: 1 },
+  { id: 'halsband_nieten', name: 'Nietenhalsband', kind: 'schrott', petBonus: { dmg: 1, hp: 3 }, flavor: 'Macht jedes Haustier ein bisschen gefährlicher. Und viel cooler.', wert: 8 },
+  { id: 'halsband_glocke', name: 'Halsband mit Goldglöckchen', kind: 'schrott', petBonus: { hp: 10 }, flavor: 'Bimmelt. Die Zuschauer finden es süß, die Monster finden das Haustier sofort.', wert: 10 },
+  { id: 'halsband_stachel', name: 'Stachelhalsband des Wachhundes', kind: 'schrott', petBonus: { dmg: 3, hp: 8 }, flavor: 'Wer da reinbeißt, bereut es.', wert: 25 },
 
   // ================= Aufträge
   { id: 'andenken', name: 'Andenken', kind: 'schrott', flavor: 'Jemandem ist das sehr wichtig.', wert: 0 },
