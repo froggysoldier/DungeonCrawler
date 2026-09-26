@@ -15,7 +15,8 @@ import { playerSees } from './sight';
 import { dynDefenseBonus, targetFacets, trainDefense } from './observer';
 import { ausweichen, totalBonuses } from './player';
 import * as R from './rng';
-import type { GameState, Monster, Pos } from './types';
+import type { Fx, GameState, Monster, Pos } from './types';
+import { FX_COLORS, floatText, shot } from './fx';
 
 const DIRS: Pos[] = [
   { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 },
@@ -75,6 +76,16 @@ function canSeePlayer(s: GameState, m: Monster, range: number): boolean {
   return d <= range && hasLineOfSight(s.map, m.pos, s.player.pos);
 }
 
+/** Wie das Geschoss eines Fernkämpfers aussieht. */
+function shotStyle(s: GameState, m: Monster): Extract<Fx, { kind: 'shot' }>['style'] {
+  const f = targetFacets(s, m);
+  if (f.includes('z:schleim')) return 'schleim';
+  if (m.defId.includes('schleuder') || f.includes('z:kobold')) return 'stein';
+  if (f.includes('z:elementar') || f.includes('z:hexe') || f.includes('z:alien') || f.includes('z:geist')) return 'magie';
+  if (f.includes('z:konstrukt')) return 'blitz';
+  return 'pfeil';
+}
+
 /** Ein Monster greift den Crawler an. */
 function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
   const p = s.player;
@@ -94,7 +105,9 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
   const defense = dynDefenseBonus(s, source);
   const hit = Math.max(5, Math.min(95, m.treffer - ausweichen(s, b) - defense.ausweichen - (ranged ? 5 : 0)));
   const verb = ranged ? 'schießt auf dich' : 'greift an';
+  if (ranged) shot(s, m.pos, p.pos, shotStyle(s, m));
   if (R.next(s) * 100 >= hit) {
+    floatText(s, p.pos, 'ausgewichen', FX_COLORS.info);
     s.counters.hitTakenStreak = 0;
     log(s, `${NameOf(s, m)} ${verb} – du weichst aus.`, 'kampf');
     trainDefense(s, source, 'ausweichen');
@@ -119,6 +132,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
   if (mountAbsorbs(s, dmg, NameOf(s, m))) return;
   if (defense.reduktion) trainDefense(s, source, 'abhaertung');
   p.hp -= dmg;
+  floatText(s, p.pos, `-${dmg}`, FX_COLORS.gegenSpieler);
   s.counters.damageTaken += dmg;
   s.counters.hitTakenStreak += 1;
   log(s, `${NameOf(s, m)} ${verb} und trifft dich für ${dmg} Schaden.`, 'gefahr');
@@ -323,6 +337,7 @@ export function petTurn(s: GameState) {
   const spellTarget = petCast(s, pet);
   if (spellTarget) {
     const dmg = Math.max(1, Math.round(2 + pet.level * 1.5 - spellTarget.ruestung / 2));
+    shot(s, pet.pos, spellTarget.pos, 'magie');
     spellTarget.hp -= dmg;
     spellTarget.aware = true;
     log(s, `${pet.name} schießt Magische Geschosse aus den Augen: ${dmg} Schaden an ${nameOf(s, spellTarget)}.`, 'kampf');

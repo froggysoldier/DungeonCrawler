@@ -33,7 +33,7 @@ import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   chooseThrowable, craftItem, disarmTrap, placeTrap, closeDoor, adjacentOpenDoors,
-  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff, rideToggle, refuelMount,
+  drainFx, askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff, rideToggle, refuelMount,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable, tileAt } from '../engine/mapgen';
@@ -48,6 +48,7 @@ import { bindActions, esc, formatTime } from './dom';
 import { confirmBox, isModalOpen, showCustom, showDialog, showHtml, showToast } from './modal';
 import { render, tileFromMouse, type View } from './render';
 import { TypeQueue, typeText, type Typing } from './typewriter';
+import { Animator, STEP_MS } from './animator';
 import { TONE_NAMES } from '../data/talkshow';
 import { showSelection } from './selection';
 
@@ -91,6 +92,13 @@ export class GameView {
   });
   private ended = false;
   private keyHandler = (e: KeyboardEvent) => this.onKey(e);
+  private keyUpHandler = (e: KeyboardEvent) => this.onKeyUp(e);
+  private anim = new Animator();
+  private raf = 0;
+  /** Gehaltene Richtungstaste: außerhalb von Kämpfen läuft man flüssig weiter. */
+  private held: { code: string; dir: Pos } | null = null;
+  private lastStep = 0;
+  private pathCache: { key: string; path: Pos[] | null } = { key: '', path: null };
 
   constructor(
     private root: HTMLElement,
@@ -100,8 +108,46 @@ export class GameView {
   ) {
     this.build();
     document.addEventListener('keydown', this.keyHandler);
-    window.addEventListener('resize', () => this.draw());
+    document.addEventListener('keyup', this.keyUpHandler);
+    window.addEventListener('blur', () => (this.held = null));
     this.refresh();
+    const loop = (now: number) => {
+      if (this.ended && !this.anim.busy(now)) return;
+      this.tick(now);
+      this.raf = requestAnimationFrame(loop);
+    };
+    this.raf = requestAnimationFrame(loop);
+  }
+
+  /** Ein Bild der Animationsschleife: gehaltene Tasten bewegen, dann zeichnen. */
+  private tick(now: number) {
+    if (this.held && !isModalOpen() && this.s.status === 'playing' && now - this.lastStep >= STEP_MS) {
+      if (this.inCombat()) {
+        // Im Kampf zählt jeder Schritt einzeln – nichts läuft automatisch weiter
+        this.held = null;
+      } else {
+        this.lastStep = now;
+        this.stepDir(this.held.dir);
+      }
+    }
+    this.draw(now);
+  }
+
+  /** Kampf läuft, sobald ein wacher Gegner, der dich bemerkt hat, in Sicht ist. */
+  inCombat(): boolean {
+    return this.s.monsters.some((m) => m.aware && !m.asleep && this.visible.has(idx(this.s.map, m.pos.x, m.pos.y)));
+  }
+
+  private stepDir(dir: Pos) {
+    const s = this.s;
+    const to = { x: s.player.pos.x + dir.x, y: s.player.pos.y + dir.y };
+    const mon = monsterAt(s, to);
+    if (mon) this.attackMonster(mon.uid);
+    else this.act(() => moveStep(s, to));
+  }
+
+  private onKeyUp(e: KeyboardEvent) {
+    if (this.held?.code === e.code) this.held = null;
   }
 
   get state() {
@@ -109,6 +155,8 @@ export class GameView {
   }
 
   destroy() {
+    cancelAnimationFrame(this.raf);
+    document.removeEventListener('keyup', this.keyUpHandler);
     document.removeEventListener('keydown', this.keyHandler);
   }
 
@@ -165,7 +213,11 @@ export class GameView {
   /** Führt eine Engine-Aktion aus und kümmert sich um alles danach. */
   private act(fn: () => ActionResult | { ok: boolean; message?: string }): boolean {
     if (this.s.status !== 'playing' || isModalOpen()) return false;
+    const before = this.anim.snapshot(this.s);
+    const floor = this.s.floor;
     const res = fn();
+    if (this.s.floor !== floor) this.anim.reset();
+    else this.anim.after(this.s, before, drainFx(this.s));
     if (!res.ok && res.message) this.s.log.push({ turn: this.s.turn, text: res.message, kind: 'info' });
     this.afterAction();
     return res.ok;
@@ -316,7 +368,7 @@ export class GameView {
       if (tileAt(this.s.map, step.x, step.y) === 'door') {
         if (!this.act(() => moveStep(this.s, step))) break;
         k -= 1;
-        await new Promise((r) => setTimeout(r, 120));
+        await new Promise((r) => setTimeout(r, STEP_MS));
         continue;
       }
       const hpBefore = this.s.player.hp;
@@ -334,7 +386,7 @@ export class GameView {
       if (this.s.player.hp < hpBefore) break;
       if (this.s.currentRoom !== roomBefore) break;
       if (itemsAt(this.s, this.s.player.pos).length || onStairs(this.s)) break;
-      await new Promise((r) => setTimeout(r, 55));
+      await new Promise((r) => setTimeout(r, STEP_MS));
     }
     this.traveling = false;
   }
@@ -479,10 +531,10 @@ export class GameView {
     if (dir) {
       e.preventDefault();
       this.traveling = false;
-      const to = { x: s.player.pos.x + dir.x, y: s.player.pos.y + dir.y };
-      const mon = monsterAt(s, to);
-      if (mon) this.attackMonster(mon.uid);
-      else this.act(() => moveStep(s, to));
+      if (e.repeat) return; // Weiterlaufen übernimmt die Animationsschleife
+      this.held = { code: e.code, dir };
+      this.lastStep = performance.now();
+      this.stepDir(dir);
       return;
     }
     const part = (Object.entries(PART_KEYS) as [AttackPart, string][]).find(([, k]) => k === e.key)?.[0];
@@ -543,16 +595,20 @@ export class GameView {
     this.refreshLog();
   }
 
-  private draw() {
+  private draw(now = performance.now()) {
     const pathTarget = this.hover;
     let path: Pos[] | null = null;
-    if (pathTarget && !this.traveling && !monsterAt(this.s, pathTarget) && this.s.status === 'playing') {
-      const i = idx(this.s.map, pathTarget.x, pathTarget.y);
-      if (pathTarget.x >= 0 && pathTarget.y >= 0 && pathTarget.x < this.s.map.width && pathTarget.y < this.s.map.height && this.s.map.explored[i] && isWalkable(this.s.map, pathTarget.x, pathTarget.y)) {
-        path = planPath(this.s, pathTarget);
+    if (pathTarget && !this.traveling && !this.held && !monsterAt(this.s, pathTarget) && this.s.status === 'playing') {
+      const key = `${pathTarget.x},${pathTarget.y}|${this.s.player.pos.x},${this.s.player.pos.y}|${this.s.turn}`;
+      if (this.pathCache.key !== key) {
+        const i = idx(this.s.map, pathTarget.x, pathTarget.y);
+        const inside = pathTarget.x >= 0 && pathTarget.y >= 0 && pathTarget.x < this.s.map.width && pathTarget.y < this.s.map.height;
+        const ok = inside && this.s.map.explored[i] && (isWalkable(this.s.map, pathTarget.x, pathTarget.y) || tileAt(this.s.map, pathTarget.x, pathTarget.y) === 'door');
+        this.pathCache = { key, path: ok ? planPath(this.s, pathTarget) : null };
       }
+      path = this.pathCache.path;
     }
-    const res = render(this.s, this.canvas, { hover: this.hover, path });
+    const res = render(this.s, this.canvas, { hover: this.hover, path }, this.anim.frame(this.s, now));
     this.view = res.view;
     this.visible = res.visible;
     const room = currentRoom(this.s);

@@ -2,6 +2,7 @@ import { SPELLS, SPELL_BY_ID, SPELL_MAX_LEVEL, spellXpNeeded } from '../data/spe
 import { cure, has } from './abilities';
 import { isInSafeRoom, killMonster } from './combat';
 import { emit } from './events';
+import { FX_COLORS, floatText, shot } from './fx';
 import { chebyshev, hasLineOfSight } from './fov';
 import { itemName, nameOf } from './identify';
 import { uid } from './items';
@@ -93,6 +94,7 @@ function spellHurt(s: GameState, m: Monster, dmg: number, label: string): boolea
   const final = Math.max(1, Math.round(dmg - m.ruestung / 2));
   m.hp -= final;
   m.aware = true;
+  floatText(s, m.pos, String(final), FX_COLORS.mana);
   s.counters.damageDealt += final;
   log(s, `${label} trifft ${nameOf(s, m)} für ${final} Schaden.`, 'kampf');
   if (m.hp <= 0) {
@@ -134,11 +136,13 @@ export function castSpell(s: GameState, id: string, opts: CastOptions = {}): { o
     case 'heilen': {
       const amount = Math.round(maxHp(s) * (0.2 + 0.03 * (level - 1)));
       p.hp = Math.min(maxHp(s), p.hp + amount);
+      floatText(s, p.pos, `+${amount}`, FX_COLORS.heilung);
       log(s, `Warmes Licht umhüllt dich. +${amount} HP.`, 'info');
       break;
     }
     case 'geschoss': {
       const dmg = cost * 2.5 + st.int * 0.5 + level * (0.8 + R.next(s) * 0.4);
+      shot(s, p.pos, target!.pos, 'magie');
       if (spellHurt(s, target!, dmg, `Dein Magisches Geschoss (${cost} Mana)`)) kills++;
       break;
     }
@@ -161,6 +165,7 @@ export function castSpell(s: GameState, id: string, opts: CastOptions = {}): { o
     case 'feuerball': {
       const center = { ...target!.pos };
       const dmg = 10 + st.int + level * 2;
+      shot(s, p.pos, center, 'feuer');
       log(s, 'Ein Feuerball rast los und explodiert!', 'kampf');
       for (const m of s.monsters.filter((x) => chebyshev(x.pos, center) <= 1)) if (spellHurt(s, m, dmg, 'Der Feuerball')) kills++;
       if (chebyshev(p.pos, center) <= 1) {
@@ -189,6 +194,8 @@ export function castSpell(s: GameState, id: string, opts: CastOptions = {}): { o
     }
     case 'schattenmantel':
       for (const m of s.monsters) if (m.homeRoom === undefined) m.aware = false;
+      p.buffs = p.buffs.filter((b) => b.name !== 'Schattenmantel');
+      p.buffs.push({ name: 'Schattenmantel', turns: 10 + level * 2, bonuses: { ausweichen: 5 } });
       log(s, 'Du ziehst die Schatten um dich. Niemand weiß mehr, wo du bist.', 'info');
       break;
     case 'entgiften':

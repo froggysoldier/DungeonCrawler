@@ -13,6 +13,7 @@ import { ramBonus } from './mounts';
 import { population } from './crawlers';
 import { playerSees } from './sight';
 import { makeNoise } from './ai';
+import { FX_COLORS, floatText, shot } from './fx';
 import { roomOf } from './mapgen';
 import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, totalBonuses } from './player';
 import * as R from './rng';
@@ -137,7 +138,9 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   const isHit = R.next(s) * 100 < hitChance(s, target, t);
 
   const name = techniqueName(t);
+  if (thrown) shot(s, p.pos, target.pos, thrown.explosion ? 'bombe' : 'stein');
   if (!isHit) {
+    floatText(s, target.pos, 'daneben', FX_COLORS.info);
     s.counters.missStreak += 1;
     log(s, `Dein ${name} verfehlt ${nameOf(s, target)}.`, 'kampf');
     target.aware = true;
@@ -174,6 +177,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
 
   target.hp -= final;
   target.aware = true;
+  floatText(s, target.pos, crit ? `${final}!` : String(final), crit ? FX_COLORS.krit : FX_COLORS.schaden);
   target.hitBy = [...new Set([...(target.hitBy ?? []), t.part])];
   s.counters.damageDealt += final;
   const critTxt = crit ? ' KRITISCH!' : '';

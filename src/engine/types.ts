@@ -588,6 +588,7 @@ export interface GameState {
   /** Namen gefallener Party-Mitglieder (für Rückblicke). */
   fallen?: string[];
   floorSnapshot?: FloorSnapshot;
+  fx?: Fx[];
   sponsors?: SponsorState[];
   quests?: Quest[];
   talkShow?: TalkShow;
@@ -596,6 +597,11 @@ export interface GameState {
   pendingSelection: boolean;
   toasts: Toast[];
 }
+
+/** Sichtbarer Effekt für die Oberfläche (wird nicht gespeichert). */
+export type Fx =
+  | { kind: 'shot'; from: Pos; to: Pos; style: 'stein' | 'pfeil' | 'magie' | 'feuer' | 'schleim' | 'bombe' | 'blitz' }
+  | { kind: 'text'; at: Pos; text: string; color: string };
 
 export interface Toast {
   title: string;

@@ -29,6 +29,8 @@ import { eggTick, tryTame, useSpecial } from './extras';
 import { buy, ensureShop, haggle, sell } from './shop';
 import { avoidTile, detectTraps, disarm, onMonsterStep, onPlayerStep, placeOwnTrap, placeTraps, struggle } from './traps';
 import { craft } from './crafting';
+import { FX_COLORS, floatText } from './fx';
+export { drainFx } from './fx';
 import {
   announcePopulation, askTip, crawlerAt, crawlersTurn, dismiss, giveHealing, invite, populateCrawlers, populationOnDescend, talkTo,
 } from './crawlers';
@@ -651,6 +653,7 @@ function applyEffect(s: GameState, e: ConsumableEffect, isFood: boolean) {
     const boost = isFood ? 1 + 0.15 * skillLevel(s, 'kochen') : 1;
     const amount = Math.round(((e.heal ?? 0) + ((e.healPct ?? 0) / 100) * maxHp(s)) * boost);
     p.hp = Math.min(maxHp(s), p.hp + amount);
+    floatText(s, p.pos, `+${amount}`, FX_COLORS.heilung);
     log(s, `+${amount} HP.`, 'info');
   }
   if (e.mana || e.manaPct) {
