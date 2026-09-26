@@ -32,7 +32,10 @@ SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simula
 | Warten | Klick auf dich selbst | Leertaste |
 | Aufheben | Klick auf dich selbst / Button | G |
 | Treppe nehmen | Button | Enter |
-| Klassenfähigkeit (ab Etage 3) | Button ★ | F |
+| Klassenfähigkeit (ab Etage 3) | Button | F |
+| Mit Crawlern reden | Klick auf den Crawler | – |
+| Falle entschärfen / aufstellen | Button im Seitenbereich / im Inventar | – |
+| Handwerk | Tab „Handwerk“ | – |
 | Untersuchen | Rechtsklick | – |
 
 ## Dokumentation

@@ -1,4 +1,4 @@
-# Der Große Abstieg – Game Design Dokument (v0.5)
+# Der Große Abstieg – Game Design Dokument (v0.6)
 
 > Inspiriert von der Buchreihe *Dungeon Crawler Carl* von Matt Dinniman.
 > **Spoiler-Regel:** Dieses Dokument enthält nur Buch-Details bis einschließlich
@@ -118,6 +118,12 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
 - Zufällig **Gratis-Automat** (1 Gegenstand pro Crawler) oder **Restaurant**
   mit NPC-Wirt und Buff-Essen.
 - Nur hier: **Lootboxen öffnen** und **schlafen** (8 h, heilt, Haustier kehrt zurück).
+- **Toilette:** Erleichtern darf man sich nur hier (siehe Blase).
+- **Laden** mit wechselnder Besitzerin oder wechselndem Besitzer: kaufen,
+  verkaufen (40 % des Werts) und **feilschen** – einmal pro Angebot, Chance
+  mit Charisma und Laune; Erfolg bis 25 % Rabatt, Misserfolg +10 % und
+  schlechtere Laune.
+- Zählt als Werkbank fürs Handwerk.
 - 1 h vor Einsturz wird man hinausgeworfen.
 
 ### 3.8 Items
@@ -134,7 +140,7 @@ Der Ziegel …), Verbrauchsgüter, Haustier-Leckerli.
   Gegner, gegen Bosse) wird sofort erkannt, Gewöhnliches erst bei vielen
   Wiederholungen. Die Box-Stufe richtet sich danach, wie ungewöhnlich es war.
   Beispiele: „Vergiftet: Tritte gegen Giftige I“, „Revier: Waschküche II“.
-- 143 feste Achievements mit sarkastischem Kommentar kommen hinzu.
+- 158 feste Achievements mit sarkastischem Kommentar kommen hinzu.
 - Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen.
 - **Wer ein Achievement zum ersten Mal in seiner Karriere schafft, bekommt eine Box-Stufe mehr.**
 
@@ -177,10 +183,74 @@ Episch 6, Legendär 10, Himmlisch 15). Knapp darunter sieht man, *was*
 verzaubert ist, aber nicht wie stark; weit darunter nur „Unbekannte magische
 Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
 
-### 3.13 Haustiere / Reittiere, Party (geplant)
-Katze oder Hund aus dem Interview: folgt, kämpft mit, levelt, wird bei 0 HP
-bewusstlos und kehrt nach dem Schlafen zurück. Reittiere und Party-System
-sind noch offen.
+### 3.13 Haustiere
+- Katze oder Hund aus dem Interview: folgt, kämpft mit, levelt, wird bei 0 HP
+  bewusstlos und kehrt nach dem Schlafen zurück.
+- **Eier** (Kellerraptor, Minidrache) schlüpfen nach 160 Zügen im Inventar,
+  wenn man noch kein Haustier hat.
+- **Zähmen:** geschwächte Tiere (unter 40 % HP) mit einem Leckerli füttern,
+  Chance mit Charisma.
+- **Superkeks:** das Haustier erwacht, spricht und wirkt Magische Geschosse.
+
+### 3.14 Magie
+- Mana = Intelligenz (plus Boni), regeneriert langsam. Zauber lernt man aus
+  **Zauberbüchern** (Boxen, Läden) und verbessert sie durch Benutzen.
+- Heilen, Magisches Geschoss (Mana frei wählbar 3–6), Fackel, Irrlichtrüstung
+  (Schild), Pfützensprung (Teleport), Feuerball, Schutzhülle, Schattenmantel,
+  Entgiften.
+
+### 3.15 Tränke und Blase
+- **Trank-Abklingzeit:** nach jedem Trank 20 Züge Pause.
+- **Blase:** Getränke und Tränke füllen sie, die Zeit auch. Erleichtern nur in
+  Safe-Room-Toiletten. Wer es nicht schafft, beschwört einen Wutelementar.
+
+### 3.16 Pässe und Talismane
+- Tätowierungen (Kobold, Ratte) und Talismane (Flieger, Untote, Insekten):
+  diese Gegnerart greift nicht an – bis man sie selbst angreift.
+- **Rubbellose:** Niete, Gold, Gegenstände, Boxen, Zauberbücher, selten ein Jackpot.
+
+### 3.17 Fallen und Handwerk
+- Jede Etage hat **versteckte Fallen** (6 + 4 je Etage) in Gängen und normalen
+  Räumen: Pfeil-Druckplatte, Stolperdraht (weckt alles in der Nähe),
+  Fallgrube (festgehalten), Giftgasdüse, Bärenfalle (festgehalten).
+- **Entdecken:** in bis zu zwei Feldern Abstand, Chance mit Intelligenz und
+  Fallenkunde. Bekannte Fallen werden gezeichnet, der Klick-Pfad umgeht sie;
+  wer trotzdem drüberläuft, kommt meist mit Geschick heil hinüber.
+- **Entschärfen:** direkt daneben, Chance mit Geschick und Fallenkunde.
+  Erfolg bringt Fallenteile, Misserfolg löst die Falle manchmal aus.
+- **Handwerk** (eigener Tab): Verband, Brandflasche, Nagelbombe, Stachelfalle,
+  Schlingfalle, Sprengfalle, Waffe benageln (+2 Schaden, bis zu dreimal).
+  Aufwendige Rezepte brauchen eine Werkbank (Werkstätten, Schmieden, Safe
+  Rooms oder Klappwerkbank im Rucksack).
+- **Sprengsätze** treffen alles im Umkreis von einem Feld, auch dich.
+  **Eigene Fallen** stellt man auf das eigene Feld; nur Monster lösen sie aus.
+- Neue Skills: **Fallenkunde** und **Handwerk**. Der Beobachter erkennt
+  Fallen- und Bomben-Kills als eigene Muster.
+
+### 3.18 Andere Crawler, Party und Bevölkerung
+- Auf jeder Etage leben andere Crawler (3 + Etage), jeweils mit Namen,
+  früherem Beruf und Charakter: **freundlich**, **vorsichtig**,
+  **eigenbrötlerisch** (nur Tipps), **verzweifelt** (verletzt; nach einer
+  Heilung dankbar und freundlich) oder **feindselig** (will dein Zeug und wird
+  zum Gegner).
+- Ansprechen, **in die Party einladen** (Chance mit Charisma, Level-Abstand,
+  Followern und Vertrauen), **nach Tipps fragen** (Treppe, Safe Room oder
+  Fallen in der Nähe), heilende Gegenstände verschenken, Mitglieder entlassen.
+- **Party bis zu vier Crawler:** Mitglieder folgen, kämpfen, leveln, steigen
+  mit ab – und können sterben.
+- **Bevölkerung:** Die Systemstimme zählt regelmäßig durch, wie viele Crawler
+  noch leben. Die Zahl sinkt im Lauf jeder Etage und beim Einsturz.
+
+### 3.19 Rückblick und Talkshow
+- Beim Abstieg zeigt die Systemstimme einen **Rückblick** auf die Etage:
+  Kämpfe, Fallen, Handwerk, Achievements, erkannte Muster, Party, Gefallene,
+  Follower und verbleibende Crawler.
+- Sobald das Publikum zuschaut, ist man danach Gast in der **Talkshow**
+  „Glanz und Gloria“. Die Fragen richten sich nach dem Run (Haustier, Party,
+  gefallene Mitglieder, Kampfstil, Bomben …). Antworten haben einen Ton
+  (ehrlich, witzig, frech, bescheiden, dramatisch). Riskante Antworten hängen
+  vom Charisma ab und können Follower kosten. Eine gute Sendung bringt eine
+  Fan-Box.
 
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
@@ -206,10 +276,13 @@ tests/      Vitest: Engine-Tests + optionale Balance-Simulation (SIM=1)
 ## 6. Nächste Schritte (Vorschlag)
 
 1. Balance von Etage 2–3 durch Testspielen
-2. Sponsoren, Quests und Fallen
+2. Quests von NPCs
 3. Etage 4+ mit neuen Themen, Klassen-Spezialisierung (Etage 6/9/12)
-4. Party-System, Reittiere
+4. Reittiere
 5. Sound, Grafik-Upgrade der Karte
+
+Bewusst ausgelassen: Inhalte, die in den Büchern erst nach Band 1 vorkommen
+(keine Spoiler).
 
 ## 7. Rechtliches
 *Dungeon Crawler Carl* ist geistiges Eigentum von Matt Dinniman. Das Spiel
