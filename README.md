@@ -25,10 +25,13 @@ SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simula
 
 | Aktion | Maus | Tastatur |
 |---|---|---|
-| Laufen | Klick auf ein bekanntes Feld | Pfeiltasten / Numpad |
+| Laufen | Klick auf ein bekanntes Feld | Pfeiltasten / Numpad (gedrückt halten = weiterlaufen) |
 | Angreifen | Klick auf Gegner | In Gegner hineinlaufen |
 | Körperteil wählen | Aktionsleiste | 1–7 (Faust, Tritt, Knie, Ellbogen, Kopfstoß, Waffe, Wurf) |
 | Ausführung wählen | Aktionsleiste | Q Normal · W Sprung · E Stampfen · R Anlauf |
+| Trefferzone wählen (Kampf) | Kampfpanel | Y Kopf · X Körper · C Arme · V Beine |
+| Ziel wechseln / angreifen (Kampf) | Kampfpanel | Tab / Enter |
+| Tür öffnen | In die Tür hineinlaufen | Pfeiltaste |
 | Warten | Klick auf dich selbst | Leertaste |
 | Aufheben | Klick auf dich selbst / Button | G |
 | Treppe nehmen | Button | Enter |

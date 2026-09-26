@@ -1,4 +1,4 @@
-# Der Große Abstieg – Game Design Dokument (v0.7)
+# Der Große Abstieg – Game Design Dokument (v0.8)
 
 > Inspiriert von der Buchreihe *Dungeon Crawler Carl* von Matt Dinniman.
 > **Spoiler-Regel:** Dieses Dokument enthält nur Buch-Details bis einschließlich
@@ -36,13 +36,22 @@ Eigene Namen: Die Show heißt **„Der Große Abstieg“**, der Erzähler
 ## 3. Systeme im aktuellen Stand
 
 ### 3.1 Spielstart: Das Vorher-Interview
-Ein verzweigtes Interview mit 23 Fragen (je nach Antworten werden 15–20
-gestellt): Berufsbereich und genauer Beruf, Alter, Fitness, Freizeitsport und
-Kampfsport, Sehkraft, Schlaf, Haustier, Ort und Gegenstand in der Hand beim
-Weltuntergang, Kleidung, Konfliktverhalten, Charakter, Sozialverhalten,
-größte Angst, Laster, Glück. Daraus ergeben sich Werte, Start-Skills,
-Ausrüstung, der Gegenstand in der Hand, versteckte Flags für die Klassenwahl
-und **Eigenschaften**:
+Ein verzweigtes Interview (je nach Antworten rund 20–25 Fragen):
+- **Beruf:** 19 Bereiche mit genauen Unterfragen – Handwerk, Büro, Gesundheit,
+  Sicherheit, Gastronomie, Profisport, Bildung, IT und Internet (inkl. Social
+  Media, Webdesign, IT-Sicherheit, Daten und KI), Kunst, Natur, Handel,
+  Medien und Social Media, Transport und Logistik, Recht und Finanzen,
+  Soziales und Erziehung, Technik und Labor, Dienstleistung, Schule und
+  Studium, ohne Arbeit.
+- **Körper und Alltag:** Alter, Fitness, Freizeitsport und Kampfsport,
+  Sehkraft, Schlaf, Haustier, Ort und Gegenstand in der Hand beim Weltuntergang.
+- **Kleidung einzeln:** Oberteil (14 Möglichkeiten), Hose, Unterwäsche,
+  Schuhe (inkl. barfuß) und Accessoire – alles wird angezogen.
+- **Charakter:** Konfliktverhalten, Selbstbild, Sozialverhalten, größte Angst,
+  „Worauf konntest du im Alltag nur schwer verzichten?“, Glück.
+
+Daraus ergeben sich Werte, Start-Skills, Ausrüstung, der Gegenstand in der
+Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
 - Ängste (Krabbeltiere, Ratten, Dunkelheit, Höhe, Enge) wirken als Malus und
   lassen sich im Dungeon überwinden – dann werden sie zu Stärken.
 - Laster, Eigenarten und Berufserfahrung (z. B. Schädlingsbekämpfer: +15 %
@@ -57,6 +66,19 @@ und **Eigenschaften**:
 - **Einsturz-Timer**: 5 Tage (2400 Züge). Warnungen bei 24 h, 6 h, 1 h.
 - Treppenhäuser: eins hinter dem Borough-Boss, zwei in abgelegenen Räumen.
 - Boss-Kammern und Arena sind **Sackgassen mit genau einem Zugang**.
+- **Gilden und Safe Rooms** haben Mauern und **Türen**. Geschlossene Türen
+  versperren Weg und Sicht und müssen erst geöffnet werden (ein Zug, nie
+  schräg); man kann sie wieder schließen. Monster öffnen sie nicht.
+- **Darstellung:** Mauern mit Vorderseite und Schattenwurf, Böden je nach Raum
+  (Dielen, Fliesen, Beton, Ziegel, Teppich im Safe Room, Marmor in der Gilde,
+  Pflaster in Gängen), Einrichtung, Türen, Fallen- und Beutesymbole, weicher
+  flackernder Lichtkegel.
+- **Bewegung:** Figuren gleiten von Feld zu Feld, die Kamera folgt weich.
+  Solange kein Gegner hinter dir her ist, läuft man mit gehaltener
+  Richtungstaste flüssig weiter; Klick-Reisen öffnen Türen unterwegs.
+- **Sichtbare Geschosse:** Würfe (im Bogen), Pfeile, Schleim, Zauber und
+  Haustier-Magie fliegen sichtbar; Schaden, Heilung und Fehlschläge steigen
+  als Zahlen auf.
 
 ### 3.3 Freischaltungen
 | Wann | Was | Status |
@@ -77,6 +99,16 @@ und **Eigenschaften**:
 - Wurfobjekte (Steine, Ziegel, Dosen) landen nach dem Wurf am Boden und
   können wieder aufgehoben werden, Flaschen zerbrechen.
 - Kopfstoß tut auch dir weh – außer du bist geübt.
+- **Trefferzonen:** Kopf (−15 % Treffer, +50 % Schaden, kann benommen machen
+  – leichter bei liegenden Gegnern, schwer bei Riesen), Körper (sicher),
+  Arme (schwächen die Angriffe des Gegners), Beine (Gegner humpelt, fällt
+  leichter um).
+- **Deckung:** bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung.
+- **Kampfsequenz:** Sobald ein Gegner, der dich bemerkt hat, in Sicht ist,
+  wird die Aktionsleiste zum Kampfpanel: 1. womit (Körperteil, Waffe,
+  bestimmtes Wurfobjekt, Zauber, Deckung, Trank, Klassenfähigkeit), 2. wie,
+  3. wohin, 4. wen – jeder sichtbare Gegner mit Entfernung, Zustand und der
+  Trefferchance für genau diese Kombination.
 
 ### 3.5 Passive Skills und der Beobachter
 **Der Beobachter** zeichnet jede Aktion mit vollem Kontext auf: Technik,
@@ -101,6 +133,15 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
   regeneriert, schnell (2 Schritte), fliegend (nicht umwerfbar, kein
   Stampfen), gepanzert (halber Faustschaden).
 - Normale Monster betreten keine Boss-Kammern.
+- **Verhalten:** Wer dich sieht, greift an. Geflohen wird nur, wenn es zur
+  Art passt (feige Gnome und Heinzelmännchen, Diebe mit Beute, kleine
+  verletzte Tiere). Ein Teil schläft und wacht durch Lärm auf; Kampflärm,
+  Explosionen und Stolperdrähte locken andere an die Stelle. Entdeckte
+  Monster warnen Artgenossen, suchen dich an der letzten bekannten Stelle,
+  Fernkämpfer halten Abstand, Elite und Bosse geraten bei wenig Leben in
+  Raserei.
+- Was andere Crawler oder weit entfernte Monster tun, erfährst du nur, wenn
+  du es siehst.
 - **Elite-Mobs** (stärkere Varianten, bessere Beute).
 - **15 Bosse**, jede Etage zieht aus ihrem eigenen Pool (Etage 1: Die Sammlerin,
   Der Hausmeister, König der Kanalratten, Muttis Mega-Mixer, Kammerjäger,
@@ -286,6 +327,11 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
   müssen. Ein Teil der Treffer geht auf das Reittier; Fahrzeuge können
   zerstört werden, Tiere erholen sich beim Schlafen. Im Safe Room steigt man ab.
   Taste M zum Auf- und Absteigen.
+
+### 3.23 Klänge
+Im Browser erzeugt (keine Audiodateien): Lootbox (Knarzen und Glitzern, je
+nach Stufe länger), Level-Aufstieg (Fanfare), Achievement (Glockenschlag),
+neuer Skill. Schalter „Ton an/aus“ in der oberen Leiste.
 
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
