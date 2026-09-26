@@ -15,7 +15,7 @@ import { dynXpNeeded, skillHints } from '../engine/observer';
 import { TRAIT_BY_ID, TRAIT_KIND_NAMES } from '../data/traits';
 import { describeBonuses, PART_NAMES, STAT_NAMES } from '../engine/bonuses';
 import {
-  ATTACK_MOVES, ATTACK_PARTS, MOVE_NAMES, attackCost, hitChance, isInSafeRoom, techniqueBlocker, techniqueName,
+  ATTACK_MOVES, ATTACK_PARTS, HIT_ZONES, MOVE_NAMES, ZONES, attackCost, hitChance, isInSafeRoom, techniqueBlocker, techniqueName,
 } from '../engine/combat';
 import { chebyshev } from '../engine/fov';
 import { disarmableTraps, disarmChance, knownTrapAt, trapName } from '../engine/traps';
@@ -33,7 +33,7 @@ import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   chooseThrowable, craftItem, disarmTrap, placeTrap, closeDoor, adjacentOpenDoors,
-  drainFx, askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff, rideToggle, refuelMount,
+  drainFx, defend, askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff, rideToggle, refuelMount,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable, tileAt } from '../engine/mapgen';
@@ -43,7 +43,7 @@ import {
   ausweichen, currentWeapon, effectiveStats, lichtradius, maxAusdauer, maxHp, throwables, totalBonuses, xpToNext,
 } from '../engine/player';
 import { skillProgress } from '../engine/skills';
-import type { AttackMove, AttackPart, EquipSlot, GameState, Item, MetaState, Pos, StatKey } from '../engine/types';
+import type { AttackMove, AttackPart, EquipSlot, GameState, HitZone, Item, MetaState, Pos, StatKey, Technique } from '../engine/types';
 import { bindActions, esc, formatTime } from './dom';
 import { confirmBox, isModalOpen, showCustom, showDialog, showHtml, showToast } from './modal';
 import { render, tileFromMouse, type View } from './render';
@@ -66,6 +66,7 @@ const EQUIP_NAMES: Record<EquipSlot, string> = {
 
 const PART_KEYS: Record<AttackPart, string> = { faust: '1', tritt: '2', knie: '3', ellbogen: '4', kopf: '5', waffe: '6', wurf: '7' };
 const MOVE_KEYS: Record<AttackMove, string> = { normal: 'Q', sprung: 'W', stampfen: 'E', anlauf: 'R' };
+const ZONE_KEYS: Record<HitZone, string> = { kopf: 'Y', koerper: 'X', arme: 'C', beine: 'V' };
 
 const DIR_KEYS: Record<string, Pos> = {
   ArrowUp: { x: 0, y: -1 }, ArrowDown: { x: 0, y: 1 }, ArrowLeft: { x: -1, y: 0 }, ArrowRight: { x: 1, y: 0 },
@@ -80,6 +81,9 @@ export class GameView {
   private pendingSpell: string | null = null;
   private missileMana = 4;
   private move: AttackMove = 'normal';
+  private zone: HitZone = 'koerper';
+  /** Im Kampf ausgewähltes Ziel (UID). */
+  private targetUid: string | null = null;
   private hover: Pos | null = null;
   private view: View | null = null;
   private visible = new Set<number>();
@@ -337,8 +341,8 @@ export class GameView {
     });
   }
 
-  private technique() {
-    return { part: this.part, move: this.move };
+  private technique(): Technique {
+    return { part: this.part, move: this.move, zone: this.zone };
   }
 
   private attackMonster(uid: string) {
@@ -549,6 +553,25 @@ export class GameView {
       this.move = move;
       if (move === 'stampfen') this.part = 'tritt';
       this.refreshActions();
+      return;
+    }
+    const zone = (Object.entries(ZONE_KEYS) as [HitZone, string][]).find(([, k]) => k.toLowerCase() === e.key.toLowerCase())?.[0];
+    if (zone) {
+      this.zone = zone;
+      this.refreshActions();
+      return;
+    }
+    if (e.key === 'Tab' && this.inCombat()) {
+      e.preventDefault();
+      const list = this.combatTargets();
+      const i = list.findIndex((m) => m.uid === this.targetUid);
+      this.targetUid = list[(i + 1) % Math.max(1, list.length)]?.uid ?? null;
+      this.refreshActions();
+      return;
+    }
+    if (e.key === 'Enter' && this.inCombat() && this.targetUid && !onStairs(s)) {
+      e.preventDefault();
+      this.strike(this.targetUid);
       return;
     }
     if (e.code === 'Space' || e.code === 'Numpad5') {
@@ -1092,9 +1115,170 @@ export class GameView {
     return html;
   }
 
+  /** Gegner, die gerade zu sehen sind – nach Entfernung sortiert. */
+  private combatTargets() {
+    const s = this.s;
+    return s.monsters
+      .filter((m) => this.visible.has(idx(s.map, m.pos.x, m.pos.y)))
+      .sort((a, b) => chebyshev(a.pos, s.player.pos) - chebyshev(b.pos, s.player.pos));
+  }
+
+  /**
+   * Die Kampfsequenz: 1. womit, 2. wie, 3. wohin, 4. wen. Jede Wahl zeigt,
+   * was sie kostet und bewirkt; das Ziel zeigt die Trefferchance für genau
+   * diese Kombination.
+   */
+  private renderCombat(el: HTMLElement) {
+    const s = this.s;
+    const p = s.player;
+    const targets = this.combatTargets();
+    if (!targets.some((m) => m.uid === this.targetUid)) this.targetUid = targets[0]?.uid ?? null;
+    const tech = this.technique();
+    const weapon = currentWeapon(s);
+    const throwList = new Map<string, { name: string; n: number; explosive: boolean }>();
+    for (const it of throwables(s)) {
+      const e = throwList.get(it.baseId) ?? { name: itemName(s, it), n: 0, explosive: !!it.explosion };
+      e.n += it.menge ?? 1;
+      throwList.set(it.baseId, e);
+    }
+    const nextThrow = throwables(s)[0]?.baseId;
+    const partBtn = (part: Exclude<AttackPart, 'wurf'>) => {
+      const disabled = part === 'waffe' && !weapon;
+      const label = part === 'waffe' ? weapon?.name ?? 'Waffe' : PART_NAMES[part];
+      const sel = this.part === part && !this.pendingSpell;
+      return `<button class="${sel ? 'sel' : ''}" data-action="part" data-part="${part}" ${disabled ? 'disabled' : ''}>${esc(label)}<span class="key">${PART_KEYS[part]}</span></button>`;
+    };
+    const throwBtns = [...throwList.entries()]
+      .map(([id, e]) => `<button class="${this.part === 'wurf' && nextThrow === id && !this.pendingSpell ? 'sel' : ''}" data-action="throwsel" data-id="${id}">${esc(e.name)} ×${e.n}${e.explosive ? ' (explodiert)' : ''}</button>`)
+      .join('');
+    const spells = (p.spells ?? []).map((k) => {
+      const def = SPELL_BY_ID[k.id];
+      const cd = p.spellCooldowns?.[k.id] ?? 0;
+      const cost = spellCost(k.id, this.missileMana);
+      const disabled = cd > 0 || (p.mp ?? 0) < cost;
+      return `<button class="spell ${this.pendingSpell === k.id ? 'sel' : ''}" data-action="spell" data-spell="${k.id}" ${disabled ? 'disabled' : ''} title="${esc(def.description)}">${esc(def.name)} (${cost} MP)${cd ? ` – ${cd}` : ''}</button>`;
+    }).join('');
+    const potion = p.inventory.find((i) => i.kind === 'verbrauch' && (i.effekt?.heal || i.effekt?.healPct));
+    const ability = currentAbility(s);
+    const cd = p.abilityCooldown ?? 0;
+
+    const moveBtn = (move: AttackMove) => {
+      const probe = { ...tech, move };
+      const target = targets.find((m) => m.uid === this.targetUid);
+      const blocker = target ? techniqueBlocker(s, target, probe) : null;
+      const disabled = this.part === 'wurf' && move !== 'normal';
+      return `<button class="${this.move === move ? 'sel' : ''}" data-action="move" data-move="${move}" ${disabled ? 'disabled' : ''} title="${esc(blocker ?? '')}">${MOVE_NAMES[move]}<span class="key">${MOVE_KEYS[move]}</span> <span class="muted small">· ${attackCost(probe)} Ausdauer</span></button>`;
+    };
+    const zoneBtn = (zone: HitZone) =>
+      `<button class="zone ${this.zone === zone ? 'sel' : ''}" data-action="zone" data-zone="${zone}" title="${esc(ZONES[zone].effekt)}"><b>${ZONES[zone].name}</b><span class="key">${ZONE_KEYS[zone]}</span><br><span class="muted small">${esc(ZONES[zone].effekt)}</span></button>`;
+
+    const targetRows = targets.map((m) => {
+      const info = describeMonster(s, m);
+      const d = chebyshev(m.pos, p.pos);
+      let chance = '';
+      let blocker: string | null = null;
+      if (this.pendingSpell) {
+        const def = SPELL_BY_ID[this.pendingSpell];
+        blocker = def.target !== 'gegner' ? 'Dieser Zauber braucht kein Ziel.' : d > (def.range ?? 6) ? 'Zu weit weg für den Zauber.' : null;
+        chance = blocker ? '' : 'Zauber trifft sicher';
+      } else {
+        blocker = techniqueBlocker(s, m, tech);
+        chance = blocker ? '' : info.showHitChance ? `${hitChance(s, m, tech)} % Treffer` : 'Trefferchance unklar';
+      }
+      const state = [m.asleep ? 'schläft' : !m.aware ? 'ahnungslos' : '', m.downed > 0 ? 'am Boden' : '', m.stunned ? 'benommen' : '', m.slowed ? 'humpelt' : '', m.weakened ? 'geschwächt' : ''].filter(Boolean).join(', ');
+      const sel = m.uid === this.targetUid;
+      return `<div class="target ${sel ? 'sel' : ''}" data-action="target" data-uid="${m.uid}">
+        <div><b style="color:${info.insight >= 3 ? '#b0a898' : m.color}">${esc(info.name)}</b> <span class="muted small">${esc(info.level)} · ${d} ${d === 1 ? 'Feld' : 'Felder'}</span></div>
+        <div class="small">${esc(info.health)}${state ? ` · <span style="color:#7cc4ff">${esc(state)}</span>` : ''}</div>
+        <div class="row" style="gap:6px;align-items:center"><span class="small" style="flex:1;color:${blocker ? 'var(--muted)' : 'var(--ok)'}">${esc(blocker ?? chance)}</span>
+        <button class="primary" data-action="strike" data-uid="${m.uid}" ${blocker ? 'disabled' : ''}>${this.pendingSpell ? 'Zaubern' : 'Angreifen'}</button></div>
+      </div>`;
+    }).join('');
+
+    el.innerHTML = `<div class="combat">
+      <div class="col"><div class="h">1 · Womit?</div>
+        <div class="btns">${(['faust', 'tritt', 'knie', 'ellbogen', 'kopf', 'waffe'] as const).map(partBtn).join('')}</div>
+        ${throwBtns ? `<div class="sub">Werfen <span class="key">7</span></div><div class="btns">${throwBtns}</div>` : ''}
+        ${spells ? `<div class="sub">Zauber (${p.mp ?? 0} MP)</div><div class="btns spells">${spells}</div>` : ''}
+        <div class="sub">Sonstiges</div><div class="btns">
+          <button data-action="defend" title="Bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung, +2 Ausdauer">Deckung</button>
+          ${potion ? `<button data-action="use" data-uid="${potion.uid}">${esc(itemName(s, potion))} trinken</button>` : ''}
+          ${ability ? `<button class="ability" data-action="ability" ${cd ? 'disabled' : ''} title="${esc(ability.description)}">${esc(ability.name)}${cd ? ` (${cd})` : ''}<span class="key">F</span></button>` : ''}
+          <button data-action="wait">Warten</button>
+        </div>
+      </div>
+      <div class="col"><div class="h">2 · Wie?</div><div class="btns vert">${ATTACK_MOVES.map(moveBtn).join('')}</div>
+        <div class="muted small" style="margin-top:6px">Ausdauer ${p.ausdauer}/${maxAusdauer(s)}</div></div>
+      <div class="col"><div class="h">3 · Wohin?</div><div class="btns vert">${HIT_ZONES.map(zoneBtn).join('')}</div></div>
+      <div class="col targets"><div class="h">4 · Wen? <span class="muted small">(Tab wechselt, Enter greift an)</span></div>${targetRows || '<div class="muted small">Kein Gegner in Sicht.</div>'}</div>
+    </div>
+    <div class="combat-summary small">KAMPF · Gewählt: <b style="color:var(--accent)">${esc(this.pendingSpell ? SPELL_BY_ID[this.pendingSpell].name : techniqueName(tech))}</b>${this.pendingSpell ? '' : ` · ${attackCost(tech)} Ausdauer`} · Bewegen mit Pfeiltasten oder Klick auf die Karte</div>`;
+    bindActions(el, {
+      part: (b) => {
+        this.pendingSpell = null;
+        this.part = b.dataset.part as AttackPart;
+        if (this.part !== 'tritt' && this.move === 'stampfen') this.move = 'normal';
+        this.refreshActions();
+      },
+      throwsel: (b) => {
+        this.pendingSpell = null;
+        chooseThrowable(s, b.dataset.id!);
+        this.part = 'wurf';
+        this.move = 'normal';
+        this.refreshActions();
+      },
+      move: (b) => {
+        this.move = b.dataset.move as AttackMove;
+        if (this.move === 'stampfen') this.part = 'tritt';
+        this.refreshActions();
+      },
+      zone: (b) => {
+        this.zone = b.dataset.zone as HitZone;
+        this.refreshActions();
+      },
+      spell: (b) => {
+        const id = b.dataset.spell!;
+        if (SPELL_BY_ID[id].target === 'selbst') {
+          this.pendingSpell = null;
+          this.act(() => cast(s, id));
+          return;
+        }
+        this.pendingSpell = this.pendingSpell === id ? null : id;
+        this.refreshActions();
+      },
+      target: (b) => {
+        this.targetUid = b.dataset.uid!;
+        this.refreshActions();
+      },
+      strike: (b) => this.strike(b.dataset.uid!),
+      defend: () => this.act(() => defend(s)),
+      use: (b) => this.act(() => useItem(s, b.dataset.uid!)),
+      ability: () => this.act(() => useAbility(s, this.technique())),
+      wait: () => this.act(() => wait(s)),
+    });
+  }
+
+  /** Angriff (oder Zauber) auf ein Ziel aus der Kampfsequenz. */
+  private strike(uid: string) {
+    this.targetUid = uid;
+    if (this.pendingSpell) {
+      const sp = this.pendingSpell;
+      this.pendingSpell = null;
+      const m = this.s.monsters.find((x) => x.uid === uid);
+      this.act(() => cast(this.s, sp, { targetUid: uid, pos: m?.pos, mana: this.missileMana }));
+      return;
+    }
+    this.attackMonster(uid);
+  }
+
   private refreshActions() {
     const s = this.s;
     const el = this.root.querySelector('.actionbar') as HTMLElement;
+    el.classList.toggle('in-combat', this.inCombat());
+    if (this.inCombat()) {
+      this.renderCombat(el);
+      return;
+    }
     const thr = throwables(s).reduce((a, i) => a + (i.menge ?? 1), 0);
     const ability = currentAbility(s);
     const cd = s.player.abilityCooldown ?? 0;

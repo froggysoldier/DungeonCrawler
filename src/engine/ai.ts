@@ -115,6 +115,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     return;
   }
   let raw = R.int(s, m.dmg[0], m.dmg[1]);
+  if (m.weakened && m.weakened > 0) raw = Math.max(1, Math.round(raw * 0.7));
   // Schilde (z. B. Irrlichtrüstung) fangen zuerst ab
   for (const buff of p.buffs) {
     if (!buff.absorb || raw <= 0) continue;
@@ -230,6 +231,13 @@ export function monsterTurn(s: GameState, m: Monster) {
     return;
   }
   if (m.aware) m.asleep = false;
+  // Benommen: Zug aussetzen
+  if (m.stunned && m.stunned > 0) {
+    m.stunned -= 1;
+    if (playerSees(s, m.pos)) log(s, `${NameOf(s, m)} ist noch benommen.`, 'kampf');
+    return;
+  }
+  if (m.weakened) m.weakened -= 1;
   // Schlafende bemerken nur, was direkt neben ihnen passiert
   if (m.asleep) {
     if (chebyshev(m.pos, s.player.pos) <= 1 && R.chance(s, 0.5)) spotPlayer(s, m, `${NameOf(s, m)} wacht auf und sieht dich!`);
@@ -321,6 +329,13 @@ export function monsterTurn(s: GameState, m: Monster) {
     return;
   }
   if (m.behavior === 'stationary') return;
+  // Humpeln: nur jeden zweiten Zug ein Schritt, kein Sprinten
+  if (m.slowed && m.slowed > 0) {
+    m.slowed -= 1;
+    if (m.slowed % 2 === 1) return;
+    stepToward(s, m, p.pos);
+    return;
+  }
   stepToward(s, m, p.pos);
   if (has(m, 'schnell') && chebyshev(m.pos, p.pos) > 1) stepToward(s, m, p.pos);
 }

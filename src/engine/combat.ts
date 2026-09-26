@@ -18,7 +18,7 @@ import { roomOf } from './mapgen';
 import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, totalBonuses } from './player';
 import * as R from './rng';
 import { matchingSkills, techniqueKey, trainAmbush } from './skills';
-import type { AttackMove, AttackPart, GameState, Item, Monster, Pos, Technique } from './types';
+import type { AttackMove, AttackPart, GameState, HitZone, Item, Monster, Pos, Technique } from './types';
 
 export const MOVE_NAMES: Record<AttackMove, string> = {
   normal: 'Normal', sprung: 'Sprung', stampfen: 'Stampfen', anlauf: 'Anlauf',
@@ -37,6 +37,34 @@ const MOVE_COST: Record<AttackMove, number> = { normal: 1, sprung: 4, stampfen: 
 
 export const WURF_RANGE = 6;
 
+/**
+ * Trefferzonen: Kopf ist schwer zu treffen, richtet aber viel an und kann
+ * benommen machen. Arme schwächen die Angriffe des Gegners, Beine lassen ihn
+ * humpeln und leichter umfallen. Der Körper ist das sichere Ziel.
+ */
+export const ZONES: Record<HitZone, { name: string; treffer: number; schaden: number; effekt: string }> = {
+  kopf: { name: 'Kopf', treffer: -15, schaden: 1.5, effekt: 'schwer zu treffen, +50 % Schaden, kann benommen machen (Gegner setzt aus)' },
+  koerper: { name: 'Körper', treffer: 5, schaden: 1, effekt: 'sicherstes Ziel, normaler Schaden' },
+  arme: { name: 'Arme', treffer: -5, schaden: 0.8, effekt: 'weniger Schaden, schwächt oft die Angriffe des Gegners für einige Züge' },
+  beine: { name: 'Beine', treffer: -5, schaden: 0.85, effekt: 'weniger Schaden, Gegner humpelt oft und fällt leichter um' },
+};
+export const HIT_ZONES: HitZone[] = ['kopf', 'koerper', 'arme', 'beine'];
+
+/** Zusätzliche Treffer-Anpassung je Zone und Gegnergröße/-lage. */
+function zoneModifier(target: Monster, t: Technique): number {
+  const zone = t.zone ?? 'koerper';
+  let mod = ZONES[zone].treffer;
+  if (zone === 'kopf') {
+    if (target.downed > 0) mod += 25; // Wer liegt, hält den Kopf hin
+    else if (target.size === 'riesig') mod -= 20;
+    else if (target.size === 'gross' && (t.part === 'faust' || t.part === 'kopf' || t.part === 'ellbogen')) mod -= 10;
+    else if (target.size === 'winzig') mod -= 10;
+    if (t.part === 'tritt' && t.move === 'sprung') mod += 10; // Sprungtritt zum Kopf
+  }
+  if (zone === 'beine' && has(target, 'fliegend')) mod -= 20;
+  return mod;
+}
+
 export function attackCost(t: Technique): number {
   return MOVE_COST[t.move] + (t.part === 'kopf' ? 1 : 0);
 }
@@ -44,7 +72,8 @@ export function attackCost(t: Technique): number {
 /** Beschreibt, wie die Technik angesagt wird, z. B. „Sprung-Tritt“. */
 export function techniqueName(t: Technique): string {
   const part = PART_NAMES[t.part];
-  return t.move === 'normal' ? part : `${MOVE_NAMES[t.move]}-${part}`;
+  const base = t.move === 'normal' ? part : `${MOVE_NAMES[t.move]}-${part}`;
+  return t.zone && t.zone !== 'koerper' ? `${base} (${ZONES[t.zone].name})` : base;
 }
 
 export function isInSafeRoom(s: GameState, p: Pos): boolean {
@@ -93,6 +122,7 @@ export function hitChance(s: GameState, target: Monster, t: Technique): number {
   if (t.part === 'wurf') hit -= 5 + chebyshev(s.player.pos, target.pos) * 2;
   if (!target.aware) hit += 20;
   if (target.downed > 0) hit += 25;
+  hit += zoneModifier(target, t);
   const facets = attackFacets(s, target, t);
   hit += dynAttackBonus(s, facets, t).hit + traitAttackBonus(s, facets).hit;
   return Math.max(5, Math.min(95, Math.round(hit)));
@@ -164,10 +194,11 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     pct += 25 * skillLevel(s, 'hinterhalt');
     trainAmbush(s);
   }
-  let dmg = base * MOVE_MULT[t.move] * (1 + pct / 100) * (0.8 + R.next(s) * 0.4);
+  const zone = t.zone ?? 'koerper';
+  let dmg = base * MOVE_MULT[t.move] * ZONES[zone].schaden * (1 + pct / 100) * (0.8 + R.next(s) * 0.4);
   if (target.downed > 0) dmg *= 1.2;
   if (has(target, 'gepanzert') && t.part === 'faust') dmg *= 0.5;
-  const critChance = 5 + (b.krit ?? 0) + Math.max(0, st.ges - 5);
+  const critChance = 5 + (b.krit ?? 0) + Math.max(0, st.ges - 5) + (zone === 'kopf' ? 5 : 0);
   const crit = R.next(s) * 100 < critChance;
   if (crit) {
     dmg *= 2;
@@ -190,9 +221,14 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     if (p.hp <= 0) handleLethal(s, 'am eigenen Kopfstoß gestorben');
   }
 
+  // Wirkung der Trefferzone
+  if (target.hp > 0) applyZoneEffect(s, target, zone, final);
+
   // Umwerfen
-  if (target.hp > 0 && (t.part === 'tritt' || t.move === 'anlauf' || t.move === 'sprung')) {
+  if (target.hp > 0 && (t.part === 'tritt' || t.move === 'anlauf' || t.move === 'sprung' || zone === 'beine')) {
     let kd = t.part === 'tritt' ? 12 : 6;
+    if (zone === 'beine') kd += 15;
+    if (zone === 'kopf') kd -= 4;
     if (t.move === 'sprung') kd += 13;
     if (t.move === 'anlauf') kd += 12;
     if (ram) kd += 15;
@@ -250,6 +286,20 @@ function detonate(s: GameState, thrown: Item, at: Pos) {
   const dmg = Math.round((thrown.explosion ?? 0) * (1 + 0.1 * skillLevel(s, 'handwerk')) + effectiveStats(s).ges / 3);
   log(s, thrown.baseId === 'brandflasche' ? 'Die Brandflasche zerplatzt in einer Feuerwolke!' : `${thrown.name} detoniert mit ohrenbetäubendem Knall!`, 'kampf');
   blast(s, at, dmg, 'bombe', `vom eigenen Sprengsatz (${thrown.name}) zerlegt`);
+}
+
+function applyZoneEffect(s: GameState, m: Monster, zone: HitZone, dmg: number) {
+  const bigHit = dmg >= m.maxHp * 0.15;
+  if (zone === 'kopf' && m.rank !== 'boroughboss' && R.chance(s, bigHit ? 0.35 : 0.15)) {
+    m.stunned = Math.max(m.stunned ?? 0, 1);
+    log(s, `${NameOf(s, m)} ist benommen und taumelt.`, 'kampf');
+  } else if (zone === 'arme' && R.chance(s, 0.4)) {
+    m.weakened = Math.max(m.weakened ?? 0, 3);
+    log(s, `${NameOf(s, m)} kann den Arm kaum noch heben. Seine Angriffe werden schwächer.`, 'kampf');
+  } else if (zone === 'beine' && R.chance(s, 0.35)) {
+    m.slowed = Math.max(m.slowed ?? 0, 4);
+    log(s, `${NameOf(s, m)} humpelt.`, 'kampf');
+  }
 }
 
 export function dropNear(s: GameState, item: Item, pos: Pos) {

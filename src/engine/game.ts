@@ -341,6 +341,19 @@ export function attack(s: GameState, targetUid: string, t: Technique): ActionRes
   return OK;
 }
 
+/** Deckung: bis zum nächsten Zug schwerer zu treffen, dabei etwas durchatmen. */
+export function defend(s: GameState): ActionResult {
+  if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  if (s.pendingSelection) return fail(SELECT_FIRST);
+  const p = s.player;
+  p.buffs = p.buffs.filter((b) => b.name !== 'Deckung');
+  p.buffs.push({ name: 'Deckung', turns: 1, bonuses: { ausweichen: 20, ruestung: 2 } });
+  p.ausdauer = Math.min(maxAusdauer(s), p.ausdauer + 2);
+  log(s, 'Du gehst in Deckung und hebst die Arme.', 'kampf');
+  endTurn(s);
+  return OK;
+}
+
 export function wait(s: GameState): ActionResult {
   if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
   if (s.pendingSelection) return fail(SELECT_FIRST);
@@ -394,7 +407,7 @@ function tickTime(s: GameState, turns: number, before: number) {
   const expired = p.buffs.filter((b) => b.turns <= 0);
   if (expired.length) {
     p.buffs = p.buffs.filter((b) => b.turns > 0);
-    for (const b of expired) log(s, `Der Effekt „${b.name}“ lässt nach.`, 'info');
+    for (const b of expired) if (b.name !== 'Deckung') log(s, `Der Effekt „${b.name}“ lässt nach.`, 'info');
   }
   const bon = totalBonuses(s);
   const regenTicks = Math.floor(s.turn / 8) - Math.floor((s.turn - turns) / 8);

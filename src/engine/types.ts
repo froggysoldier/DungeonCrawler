@@ -187,9 +187,14 @@ export interface ConsumableEffect {
 export type AttackPart = 'faust' | 'tritt' | 'knie' | 'ellbogen' | 'kopf' | 'waffe' | 'wurf';
 export type AttackMove = 'normal' | 'sprung' | 'stampfen' | 'anlauf';
 
+/** Trefferzone: wohin der Angriff zielt. */
+export type HitZone = 'kopf' | 'koerper' | 'arme' | 'beine';
+
 export interface Technique {
   part: AttackPart;
   move: AttackMove;
+  /** Ziel am Körper des Gegners (Standard: Körper). */
+  zone?: HitZone;
 }
 
 // ---------------------------------------------------------------- Wesen
@@ -253,6 +258,12 @@ export interface Monster {
   searching?: number;
   /** Raserei bei wenig Leben (Elite, Bosse). */
   enraged?: boolean;
+  /** Benommen (Kopftreffer): setzt Züge aus. */
+  stunned?: number;
+  /** Geschwächt (Armtreffer): richtet weniger Schaden an. */
+  weakened?: number;
+  /** Humpelt (Beintreffer): bewegt sich nur jeden zweiten Zug. */
+  slowed?: number;
 }
 
 export interface Pet {
