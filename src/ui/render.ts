@@ -163,6 +163,29 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
     ctx.globalAlpha = 1;
   }
 
+  // --- Andere Crawler (nur sichtbare)
+  for (const c of s.crawlers ?? []) {
+    if (!c.alive || !vis.has(idx(m, c.pos.x, c.pos.y))) continue;
+    const cx = sx(c.pos.x) + TILE / 2;
+    const cy = sy(c.pos.y) + TILE / 2;
+    ctx.fillStyle = c.party ? '#8fe38f' : '#7cc4ff';
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+    ctx.fill();
+    if (c.party) {
+      ctx.strokeStyle = '#2f7a2f';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.lineWidth = 1;
+    }
+    if (c.hp < c.maxHp) {
+      ctx.fillStyle = '#400';
+      ctx.fillRect(sx(c.pos.x) + 3, sy(c.pos.y) + TILE - 4, TILE - 6, 2);
+      ctx.fillStyle = '#e05050';
+      ctx.fillRect(sx(c.pos.x) + 3, sy(c.pos.y) + TILE - 4, ((TILE - 6) * Math.max(0, c.hp)) / c.maxHp, 2);
+    }
+  }
+
   // --- Monster (nur sichtbare)
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';

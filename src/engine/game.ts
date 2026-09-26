@@ -29,6 +29,9 @@ import { eggTick, tryTame, useSpecial } from './extras';
 import { buy, ensureShop, haggle, sell } from './shop';
 import { avoidTile, detectTraps, disarm, onMonsterStep, onPlayerStep, placeOwnTrap, placeTraps, struggle } from './traps';
 import { craft } from './crafting';
+import {
+  announcePopulation, askTip, crawlerAt, crawlersTurn, dismiss, giveHealing, invite, populateCrawlers, populationOnDescend, talkTo,
+} from './crawlers';
 import type {
   ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique,
 } from './types';
@@ -203,6 +206,7 @@ function enterFloor(s: GameState, floor: number, meta: Pick<MetaState, 'ghosts'>
     const spot = neighbors(gen.start).find((q) => isWalkable(s.map, q.x, q.y) && !occupied(s, q));
     pet.pos = spot ?? { ...gen.start };
   }
+  populateCrawlers(s, gen.start);
   afterMove(s);
 }
 
@@ -255,6 +259,8 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
   if (chebyshev(p.pos, to) !== 1) return fail('Nur ein Feld pro Zug.');
   if (!canStep(s.map, p.pos, to)) return fail('Da ist eine Wand.');
   if (monsterAt(s, to)) return fail('Da steht ein Gegner.');
+  const other = crawlerAt(s, to);
+  if (other && !other.party) return fail(`Da steht ${other.name}.`);
   if (p.immobile && !struggle(s)) {
     endTurn(s);
     return OK;
@@ -263,6 +269,7 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
   if (pet?.alive && pet.pos.x === to.x && pet.pos.y === to.y) {
     pet.pos = { ...p.pos }; // Platz tauschen
   }
+  if (other) other.pos = { ...p.pos };
   p.lastMoveDir = { x: to.x - p.pos.x, y: to.y - p.pos.y };
   p.pos = { ...to };
   s.counters.steps += 1;
@@ -311,6 +318,7 @@ export function endTurn(s: GameState, opts: EndTurnOpts = {}) {
     if (m.pos !== from) onMonsterStep(s, m);
   }
   petTurn(s);
+  crawlersTurn(s);
   if (s.status !== 'playing') return;
   tickTime(s, 1, before);
 }
@@ -831,6 +839,33 @@ export function chooseThrowable(s: GameState, baseId: string | null): ActionResu
   return OK;
 }
 
+// ================================================================ Andere Crawler
+
+function crawlerAction(s: GameState, fn: () => { ok: boolean; message?: string }, takesTurn = true): ActionResult {
+  if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  if (s.pendingSelection) return fail(SELECT_FIRST);
+  const res = fn();
+  if (!res.ok) return fail(res.message ?? 'Geht nicht.');
+  if (takesTurn) endTurn(s);
+  return OK;
+}
+
+export const talkCrawler = (s: GameState, uid: string) => crawlerAction(s, () => talkTo(s, uid));
+export const inviteCrawler = (s: GameState, uid: string) => crawlerAction(s, () => invite(s, uid));
+export const askCrawlerTip = (s: GameState, uid: string) => crawlerAction(s, () => askTip(s, uid));
+export const dismissCrawler = (s: GameState, uid: string) => crawlerAction(s, () => dismiss(s, uid), false);
+
+/** Gibt einem Crawler ein heilendes Verbrauchsgut. */
+export function healCrawler(s: GameState, uid: string, itemUid: string): ActionResult {
+  const owned = findOwned(s, itemUid);
+  if (!owned) return fail('Nicht gefunden.');
+  return crawlerAction(s, () => {
+    const res = giveHealing(s, uid, owned.item);
+    if (res.ok) removeOne(s, itemUid);
+    return res;
+  });
+}
+
 // ================================================================ Laden
 
 function safeRoom(s: GameState) {
@@ -883,7 +918,9 @@ export function descend(s: GameState, meta: Pick<MetaState, 'ghosts'>): ActionRe
     return OK;
   }
   const next = s.floor + 1;
+  populationOnDescend(s);
   enterFloor(s, next, meta);
+  announcePopulation(s, true);
   const def = FLOORS.find((f) => f.floor === next)!;
   log(s, `Etage ${next}: ${def.name}.`, 'system');
   const pages = [def.intro];

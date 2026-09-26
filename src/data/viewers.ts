@@ -22,6 +22,10 @@ export const VIEWER_NAMES = [
 export const VIEWER_COMMENTS: Record<string, string[]> = {
   kill: ['LOL', 'weiter so!!', 'noch einer, hahaha', 'ez', 'mehr Blut bitte', 'mein Kind schaut zu, danke dafür'],
   stomp: ['DRAUFGESTAMPFT HAHAHA', 'der Stampfer!!!', 'Clip it!', 'Ich kann nicht mehr vor Lachen', 'SMUSH'],
+  trap: ['HAHAHA reingetreten', 'die Falle!!!', 'KLACK', 'das hat bestimmt wehgetan', 'wer baut sowas lol', 'Fallen-Content, mein Lieblings-Content'],
+  bomb: ['BUMM', 'Feuerwerk!!', 'die Druckwelle', 'mehr Explosionen bitte', 'sprengt alles'],
+  drama: ['nein!!!', 'RIP', 'ich weine', 'die mochte ich', 'das war so traurig', 'F'],
+  party: ['Team!', 'die Gruppe hat Potenzial', 'ship it', 'endlich nicht mehr allein'],
   jump: ['FLIEGENDER TRITT', 'was für ein Sprung', 'Physik: 0, Crawler: 1'],
   crit: ['KRITISCH!!', 'das tat sogar mir weh', 'AUTSCH'],
   boss: ['BOSS DOWN!!!', 'GG', 'Legende.', 'Ich hab 50 Credits auf dich gesetzt und gewonnen!!', 'Abonniert.'],

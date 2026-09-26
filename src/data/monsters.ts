@@ -274,6 +274,13 @@ export const MONSTERS: MonsterDef[] = [
 
   // ------------------------------------------------ Sonderfall: Wer die Toiletten-Regel bricht
   {
+    id: 'abtruenniger_crawler', name: 'Abtrünniger Crawler', glyph: '@', color: '#e0a060',
+    levels: [2, 30], floors: [], hp: 24, hpPerLevel: 6, dmg: [3, 6], dmgPerLevel: 1,
+    treffer: 72, ruestung: 1, ausweichen: 10, size: 'mittel', behavior: 'melee', xp: 40, weight: 0,
+    flavor: 'Ein Mensch wie du. War einer. Jetzt will er nur noch deine Ausrüstung.',
+    tags: ['humanoid', 'crawler'],
+  },
+  {
     id: 'wutelementar', name: 'Wutelementar', glyph: 'W', color: '#ff2020',
     levels: [15, 30], floors: [], hp: 250, hpPerLevel: 20, dmg: [18, 30], dmgPerLevel: 2,
     treffer: 95, ruestung: 6, ausweichen: 10, size: 'gross', behavior: 'melee', xp: 500, weight: 0,

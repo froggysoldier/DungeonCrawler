@@ -20,10 +20,13 @@ import {
 import { chebyshev } from '../engine/fov';
 import { disarmableTraps, disarmChance, knownTrapAt, trapName } from '../engine/traps';
 import { allRecipes, hasWorkbench } from '../engine/crafting';
+import { crawlerAt, describeCrawler, joinChance, party, population, talkableCrawlers } from '../engine/crawlers';
+import { PERSONALITIES } from '../data/crawlers';
 import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
   chooseThrowable, craftItem, disarmTrap, placeTrap,
+  askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable } from '../engine/mapgen';
@@ -280,6 +283,11 @@ export class GameView {
       if (d > 1 && this.part !== 'wurf') return this.stepToward(mon.pos);
       return this.say(blocker);
     }
+    const npc = crawlerAt(s, t);
+    if (npc && this.visible.has(idx(s.map, t.x, t.y)) && !npc.party) {
+      if (chebyshev(npc.pos, s.player.pos) <= 1) return void this.act(() => talkCrawler(s, npc.uid));
+      return this.stepToward(npc.pos);
+    }
     if (t.x === s.player.pos.x && t.y === s.player.pos.y) {
       if (itemsAt(s, t).length) this.act(() => pickup(s));
       else if (onStairs(s)) this.askDescend();
@@ -327,6 +335,8 @@ export class GameView {
       else parts.push(`${esc(techniqueName(tech))}: Trefferchance nicht einschätzbar`);
       if (info.flavor) parts.push(`<span class="muted small">${esc(info.flavor)}</span>`);
     }
+    const npc = visible ? crawlerAt(s, t) : undefined;
+    if (npc) parts.push(`<b style="color:${npc.party ? '#8fe38f' : '#7cc4ff'}">${esc(describeCrawler(npc))}</b><br>${npc.party ? 'In deiner Party' : npc.met ? 'Crawler' : 'Ein anderer Crawler. Stell dich daneben, um zu reden.'} · HP ${npc.hp}/${npc.maxHp}`);
     const trap = knownTrapAt(s, t);
     if (trap) parts.push(`<b style="color:${trap.owner === 'crawler' ? '#6ee07a' : 'var(--danger)'}">${trap.owner === 'crawler' ? 'Deine ' : ''}${esc(trapName(trap.kind))}</b>`);
     const items = itemsAt(s, t);
@@ -474,6 +484,7 @@ export class GameView {
       <span class="spacer"></span>
       <span>${esc(p.name)} · Lv <b>${p.level}</b></span>
       ${hasUnlock(s, 'zuschauer') ? `<span class="viewers">Zuschauer ${liveViewers(s).toLocaleString('de-DE')} · Follower ${s.viewers.follower.toLocaleString('de-DE')} · Hype ${Math.round(s.viewers.hype)}</span>` : ''}
+      ${hasUnlock(s, 'inventar') ? `<span class="muted" title="Lebende Crawler laut letzter Zählung">Crawler übrig ${population(s).alive.toLocaleString('de-DE')}</span>` : ''}
       <span style="color:#ffd700">Gold ${p.gold}</span>
       <span>Lootboxen ${p.boxes.length}</span>
       ${pet ? `<span style="color:#ffb3e6">Haustier ${esc(pet.name)} ${pet.alive ? `${pet.hp}/${pet.maxHp}` : '(bewusstlos)'}</span>` : ''}`;
@@ -491,6 +502,21 @@ export class GameView {
         .join('')}`);
     }
     if (onStairs(s)) blocks.push('<div class="row" style="margin:6px 0"><button class="primary" data-action="descend">Hinabsteigen (Enter)</button></div>');
+    const people = talkableCrawlers(s);
+    if (people.length) {
+      const healer = s.player.inventory.find((i) => i.kind === 'verbrauch' && (i.effekt?.heal || i.effekt?.healPct));
+      blocks.push(`<div class="section">Andere Crawler</div>${people
+        .map((c) => {
+          const btns = [`<button data-action="talk" data-uid="${c.uid}">Ansprechen</button>`];
+          if (c.party) btns.push(`<button data-action="dismiss" data-uid="${c.uid}">Entlassen</button>`);
+          else if (c.met && PERSONALITIES[c.personality].join > 0) btns.push(`<button data-action="invite" data-uid="${c.uid}">In die Party einladen (${Math.round(joinChance(s, c) * 100)} %)</button>`);
+          else if (!c.met) btns.push(`<button data-action="invite" data-uid="${c.uid}">In die Party einladen</button>`);
+          if (!c.tipGiven && !c.party) btns.push(`<button data-action="tip" data-uid="${c.uid}">Nach Tipps fragen</button>`);
+          if (healer && c.hp < c.maxHp) btns.push(`<button data-action="heal" data-uid="${c.uid}" data-item="${healer.uid}">${esc(itemName(s, healer))} geben</button>`);
+          return `<div style="margin-bottom:6px"><div class="small" style="color:${c.party ? '#8fe38f' : '#7cc4ff'}">${esc(describeCrawler(c))} · HP ${c.hp}/${c.maxHp}</div><div class="row" style="flex-wrap:wrap;gap:4px">${btns.join('')}</div></div>`;
+        })
+        .join('')}`);
+    }
     const nearTraps = disarmableTraps(s);
     if (nearTraps.length) {
       blocks.push(`<div class="section">Fallen in der Nähe</div>${nearTraps
@@ -536,6 +562,11 @@ export class GameView {
     bindActions(el, {
       pick: (b) => this.act(() => pickup(s, b.dataset.uid)),
       disarm: (b) => this.act(() => disarmTrap(s, b.dataset.uid!)),
+      talk: (b) => this.act(() => talkCrawler(s, b.dataset.uid!)),
+      invite: (b) => this.act(() => inviteCrawler(s, b.dataset.uid!)),
+      dismiss: (b) => this.act(() => dismissCrawler(s, b.dataset.uid!)),
+      tip: (b) => this.act(() => askCrawlerTip(s, b.dataset.uid!)),
+      heal: (b) => this.act(() => healCrawler(s, b.dataset.uid!, b.dataset.item!)),
       descend: () => this.askDescend(),
       freebie: () => {
         let item: Item | undefined;
@@ -711,6 +742,13 @@ export class GameView {
     }
     if (p.immobile) html += `<div class="small" style="color:var(--danger)">Festgehalten: noch ${p.immobile} Züge (oder losreißen, indem du dich bewegst)</div>`;
     if (p.curses.length) html += `<div class="section">Flüche</div>${p.curses.map((c) => `<div class="small" style="color:var(--danger)">${esc(c)}</div>`).join('')}`;
+    const members = party(s);
+    if (members.length) {
+      html += `<div class="section">Party (${members.length + 1} von 4)</div>${members
+        .map((c) => `<div class="small" style="margin-bottom:3px"><b style="color:#8fe38f">${esc(c.name)}</b> · Level ${c.level} · HP ${c.hp}/${c.maxHp} · ${c.kills} Kills <span class="muted">(früher ${esc(c.background)})</span></div>`)
+        .join('')}`;
+    }
+    if (s.fallen?.length) html += `<div class="muted small">Gefallen: ${esc(s.fallen.join(', '))}</div>`;
     const hoods = s.map.hoods.map((h) => `<div class="small">${esc(h.name)}: ${h.bossAlive ? 'Boss lebt' : 'Boss besiegt'}${h.mapFound ? ', Karte gefunden' : ''}</div>`).join('');
     html += `<div class="section">Viertel</div>${hoods}`;
     return html;

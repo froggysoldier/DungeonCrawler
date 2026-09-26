@@ -9,6 +9,7 @@ import { chebyshev, hasLineOfSight } from './fov';
 import { createAreaMap, createBox, createGold, createItem, rollMobDrop } from './items';
 import { log } from './log';
 import { blast } from './traps';
+import { population } from './crawlers';
 import { roomOf } from './mapgen';
 import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, totalBonuses } from './player';
 import * as R from './rng';
@@ -273,7 +274,8 @@ function explode(s: GameState, m: Monster) {
   }
 }
 
-export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet = false, facets?: string[]) {
+/** `byPet`: true = Haustier, Text = Name eines Party-Mitglieds. */
+export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet: boolean | string = false, facets?: string[]) {
   if (!s.monsters.includes(m)) return;
   s.monsters = s.monsters.filter((x) => x !== m);
   s.counters.kills += 1;
@@ -283,7 +285,7 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
     const key = techniqueKey(t);
     s.player.techniqueKills[key] = (s.player.techniqueKills[key] ?? 0) + 1;
   }
-  const killer = byPet && s.player.pet ? s.player.pet.name : 'Du';
+  const killer = typeof byPet === 'string' ? byPet : byPet && s.player.pet ? s.player.pet.name : 'Du';
   log(s, `${killer === 'Du' ? 'Du tötest' : `${killer} tötet`} ${nameOf(s, m)}!`, 'kampf');
   const xp = gainXp(s, m.xp);
   log(s, `+${xp} XP`, 'info');
@@ -315,6 +317,7 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
     for (const it of m.ghostItems) dropNear(s, { ...it, uid: `${it.uid}g${s.turn}` }, m.pos);
     log(s, `Der Geist zerfällt. Zurück bleibt, was ${m.ghostOf} einst getragen hat.`, 'system');
   }
-  emit(s, { type: 'kill', monster: m, technique: t, byPet, facets });
+  if (m.defId === 'abtruenniger_crawler') population(s).alive -= 1;
+  emit(s, { type: 'kill', monster: m, technique: t, byPet: !!byPet, facets });
   if (has(m, 'explodiert')) explode(s, m);
 }

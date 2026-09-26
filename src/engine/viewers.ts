@@ -83,9 +83,21 @@ export function viewersOnEvent(s: GameState, e: GameEvent) {
       if (m.rank === 'geist') pts += 40;
       if (e.byPet) { pts += 6; kind = 'pet'; }
       if (m.fleeing) pts += 3;
+      if (e.facets?.includes('t:falle')) { pts += 5; kind = 'trap'; }
+      if (e.facets?.includes('t:bombe')) { pts += 4; kind = 'bomb'; }
       addSpectacle(s, pts, kind);
       break;
     }
+    case 'trapTriggered':
+      // Das Publikum liebt es, wenn jemand in eine Falle tritt – egal wer
+      addSpectacle(s, e.onPlayer ? 4 : 3, 'trap');
+      break;
+    case 'crawlerDied':
+      if (e.party) addSpectacle(s, 10, 'drama');
+      break;
+    case 'partyJoined':
+      addSpectacle(s, 3, 'party');
+      break;
     case 'attack':
       if (e.crit) addSpectacle(s, 3, 'crit');
       if (e.damage >= 25) addSpectacle(s, 4, 'crit');

@@ -8,6 +8,7 @@ import { canStep, findPath } from './path';
 import { has, onMonsterHit, startOfTurn } from './abilities';
 import { handleLethal } from './death';
 import { passProtects, petCast } from './extras';
+import { crawlerAt, monsterHitsCrawler } from './crawlers';
 import { dynDefenseBonus, targetFacets, trainDefense } from './observer';
 import { ausweichen, totalBonuses } from './player';
 import * as R from './rng';
@@ -22,6 +23,7 @@ export function occupied(s: GameState, p: Pos, except?: Monster): boolean {
   if (s.player.pos.x === p.x && s.player.pos.y === p.y) return true;
   const pet = s.player.pet;
   if (pet?.alive && pet.pos.x === p.x && pet.pos.y === p.y) return true;
+  if (crawlerAt(s, p)) return true;
   return s.monsters.some((m) => m !== except && m.pos.x === p.x && m.pos.y === p.y);
 }
 
@@ -200,6 +202,7 @@ export function monsterTurn(s: GameState, m: Monster) {
     return;
   }
 
+  if (monsterHitsCrawler(s, m)) return;
   if (d <= 1) {
     if (petAdj && R.chance(s, 0.25)) attackPet(s, m);
     else attackPlayer(s, m, false);

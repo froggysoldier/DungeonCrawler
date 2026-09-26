@@ -1,4 +1,5 @@
 import { MORE_ACHIEVEMENTS } from './achievements_more';
+import { SOCIAL_ACHIEVEMENTS } from './achievements_social';
 import type { BoxTier, BoxType, GameEvent, GameState } from '../engine/types';
 
 export interface AchievementDef {
@@ -378,6 +379,6 @@ const BASE_ACHIEVEMENTS: AchievementDef[] = [
   },
 ];
 
-export const ACHIEVEMENTS: AchievementDef[] = [...BASE_ACHIEVEMENTS, ...MORE_ACHIEVEMENTS];
+export const ACHIEVEMENTS: AchievementDef[] = [...BASE_ACHIEVEMENTS, ...MORE_ACHIEVEMENTS, ...SOCIAL_ACHIEVEMENTS];
 
 export const ACHIEVEMENT_BY_ID: Record<string, AchievementDef> = Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, a]));

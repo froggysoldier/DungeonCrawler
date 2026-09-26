@@ -254,6 +254,39 @@ export interface Pet {
   caster?: boolean;
 }
 
+export type Personality = 'freundlich' | 'vorsichtig' | 'eigenbroetler' | 'feindselig' | 'verzweifelt';
+
+/** Ein anderer Crawler (NPC) auf derselben Etage. */
+export interface NpcCrawler {
+  uid: string;
+  name: string;
+  background: string;
+  personality: Personality;
+  level: number;
+  xp: number;
+  hp: number;
+  maxHp: number;
+  dmg: [number, number];
+  pos: Pos;
+  alive: boolean;
+  /** Schon angesprochen. */
+  met: boolean;
+  party: boolean;
+  /** Vertrauen 0–100: steigt durch Geschenke und gemeinsame Kämpfe. */
+  trust: number;
+  tipGiven?: boolean;
+  /** Zug, bis zu dem eine erneute Einladung abgelehnt wird. */
+  refusedUntil?: number;
+  kills: number;
+}
+
+export interface Population {
+  alive: number;
+  /** Stand zu Beginn der Etage (für den Rückgang). */
+  floorStart: number;
+  lastAnnounce: number;
+}
+
 export interface SkillState {
   id: string;
   level: number;
@@ -442,6 +475,10 @@ export interface GameState {
   logCounter?: number;
   chronicle?: Chronicle;
   traps?: Trap[];
+  crawlers?: NpcCrawler[];
+  population?: Population;
+  /** Namen gefallener Party-Mitglieder (für Rückblicke). */
+  fallen?: string[];
   dynAchievements?: DynAchievement[];
   /** Rassen- und Klassenwahl steht an (Etage 3). */
   pendingSelection: boolean;
@@ -496,6 +533,11 @@ export type GameEvent =
   | { type: 'trapDisarmed'; kind: TrapKind; success: boolean }
   | { type: 'trapPlaced'; kind: TrapKind }
   | { type: 'crafted'; recipe: string }
+  | { type: 'crawlerMet'; name: string; personality: Personality }
+  | { type: 'partyJoined'; name: string; size: number }
+  | { type: 'partyLeft'; name: string }
+  | { type: 'crawlerDied'; name: string; party: boolean }
+  | { type: 'crawlerTurned'; name: string }
   | { type: 'bought'; item: Item; price: number; haggled: boolean }
   | { type: 'sold'; item: Item; price: number }
   | { type: 'haggle'; success: boolean; percent: number }

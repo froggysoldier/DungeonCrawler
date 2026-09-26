@@ -58,6 +58,7 @@ export const TARGET_FACETS: Record<string, FacetDef> = {
   elementar: { label: 'Elementare', weight: 2, skill: true },
   aberration: { label: 'Abscheulichkeiten', weight: 2, skill: true },
   gnom: { label: 'Gnome', weight: 0.5, skill: true },
+  crawler: { label: 'andere Crawler', weight: 3, skill: true },
   // Größe
   winzig: { label: 'Winzlinge', weight: 0 },
   gross: { label: 'große Gegner', weight: 1, skill: true },
