@@ -34,6 +34,19 @@ export interface Room {
   visited?: boolean;
 }
 
+export type TrapKind =
+  | 'pfeilplatte' | 'fallgrube' | 'giftgas' | 'stolperdraht' | 'baerenfalle'
+  | 'stachelfalle' | 'sprengfalle' | 'schlingfalle';
+
+export interface Trap {
+  uid: string;
+  pos: Pos;
+  kind: TrapKind;
+  /** Noch nicht entdeckt (nur Dungeon-Fallen). */
+  hidden: boolean;
+  owner: 'dungeon' | 'crawler';
+}
+
 export interface ShopOffer {
   item: Item;
   price: number;
@@ -132,6 +145,12 @@ export interface Item {
   spell?: string;
   /** Pass/Talisman: Gegner mit dieser Facette greifen nicht an (z. B. „z:kobold“). */
   passFacet?: string;
+  /** Wurfobjekte, die beim Aufprall explodieren: Schaden im Umkreis von 1 Feld. */
+  explosion?: number;
+  /** Eigene Falle zum Aufstellen. */
+  trapKind?: TrapKind;
+  /** Wie oft die Waffe schon verbessert wurde (Handwerk). */
+  upgrades?: number;
   /** Ei: schlüpft in diesem Zug (im Inventar). */
   hatchAt?: number;
   petSpecies?: string;
@@ -299,6 +318,10 @@ export interface Player {
   potionCooldown?: number;
   /** Dauerhafte Pässe (Tätowierungen), Facetten wie „z:kobold“. */
   passes?: string[];
+  /** Festgehalten (z. B. Bärenfalle): so viele Züge keine Bewegung. */
+  immobile?: number;
+  /** Bevorzugtes Wurfobjekt (Basis-ID). */
+  wurfWahl?: string;
 }
 
 export interface SpellState {
@@ -418,6 +441,7 @@ export interface GameState {
   viewers: Viewers;
   logCounter?: number;
   chronicle?: Chronicle;
+  traps?: Trap[];
   dynAchievements?: DynAchievement[];
   /** Rassen- und Klassenwahl steht an (Etage 3). */
   pendingSelection: boolean;
@@ -467,6 +491,11 @@ export type GameEvent =
   | { type: 'followers'; follower: number }
   | { type: 'spellCast'; spell: string; kills: number }
   | { type: 'accident' }
+  | { type: 'trapTriggered'; kind: TrapKind; onPlayer: boolean }
+  | { type: 'trapDetected'; kind: TrapKind }
+  | { type: 'trapDisarmed'; kind: TrapKind; success: boolean }
+  | { type: 'trapPlaced'; kind: TrapKind }
+  | { type: 'crafted'; recipe: string }
   | { type: 'bought'; item: Item; price: number; haggled: boolean }
   | { type: 'sold'; item: Item; price: number }
   | { type: 'haggle'; success: boolean; percent: number }

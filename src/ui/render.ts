@@ -123,6 +123,28 @@ export function render(s: GameState, canvas: HTMLCanvasElement, extras: RenderEx
     }
   }
 
+  // --- Bekannte Fallen
+  for (const tr of s.traps ?? []) {
+    if (tr.hidden) continue;
+    const i = idx(m, tr.pos.x, tr.pos.y);
+    if (!vis.has(i) && !(memory && m.explored[i])) continue;
+    const x0 = sx(tr.pos.x) + 4;
+    const y0 = sy(tr.pos.y) + 4;
+    const w = TILE - 8;
+    ctx.globalAlpha = vis.has(i) ? 1 : 0.4;
+    ctx.strokeStyle = tr.owner === 'crawler' ? '#6ee07a' : '#ff5a4a';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x0, y0, w, w);
+    ctx.beginPath();
+    ctx.moveTo(x0 + 3, y0 + 3);
+    ctx.lineTo(x0 + w - 3, y0 + w - 3);
+    ctx.moveTo(x0 + w - 3, y0 + 3);
+    ctx.lineTo(x0 + 3, y0 + w - 3);
+    ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 1;
+  }
+
   // --- Gegenstände
   for (const e of s.items) {
     const i = idx(m, e.pos.x, e.pos.y);

@@ -1,6 +1,6 @@
 import type { AttackMove, AttackPart, Bonuses } from '../engine/types';
 
-export type SkillTrigger = 'technique' | 'dodge' | 'hurt' | 'ambush' | 'rest' | 'eat' | 'kill';
+export type SkillTrigger = 'technique' | 'dodge' | 'hurt' | 'ambush' | 'rest' | 'eat' | 'kill' | 'trap' | 'craft';
 
 export interface SkillDef {
   id: string;
@@ -101,6 +101,16 @@ export const SKILLS: SkillDef[] = [
     id: 'zaehigkeit', name: 'Zähigkeit', trigger: 'hurt', unlockAt: 25, maxLevel: 15,
     description: '+3 max. HP pro Stufe.', perLevel: { maxHp: 3 },
     unlockText: 'Du wurdest so oft verprügelt, dass dein Körper beschlossen hat, sich daran zu gewöhnen.',
+  },
+  {
+    id: 'fallenkunde', name: 'Fallenkunde', trigger: 'trap', unlockAt: 3, maxLevel: 15,
+    description: 'Fallen leichter entdecken (+6 % pro Stufe), sicherer entschärfen (+8 % pro Stufe), eigene Fallen richten mehr Schaden an.', perLevel: {},
+    unlockText: 'Du schaust jetzt auf jede Bodenplatte, als hätte sie dich persönlich beleidigt.',
+  },
+  {
+    id: 'handwerk', name: 'Handwerk', trigger: 'craft', unlockAt: 3, maxLevel: 15,
+    description: 'Hergestellte Sprengsätze richten +10 % Schaden pro Stufe an; ab Stufe 3 gelingt manchmal ein Stück extra.', perLevel: {},
+    unlockText: 'Klebeband, Nägel, schlechte Ideen. Du hast deine Berufung gefunden.',
   },
   {
     id: 'erste_hilfe', name: 'Erste Hilfe', trigger: 'rest', unlockAt: 9999, maxLevel: 15,

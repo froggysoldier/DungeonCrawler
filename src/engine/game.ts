@@ -27,6 +27,8 @@ import { castSpell, learnSpell, magicTick, maxMp, readTome, type CastOptions } f
 import { addBladder, bladderTick, useToilet } from './bladder';
 import { eggTick, tryTame, useSpecial } from './extras';
 import { buy, ensureShop, haggle, sell } from './shop';
+import { avoidTile, detectTraps, disarm, onMonsterStep, onPlayerStep, placeOwnTrap, placeTraps, struggle } from './traps';
+import { craft } from './crafting';
 import type {
   ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique,
 } from './types';
@@ -189,6 +191,8 @@ function enterFloor(s: GameState, floor: number, meta: Pick<MetaState, 'ghosts'>
   s.monsters = gen.monsters;
   s.items = gen.items;
   s.player.pos = { ...gen.start };
+  s.player.immobile = 0;
+  placeTraps(s, gen.start);
   s.currentRoom = -1;
   const def = FLOORS.find((f) => f.floor === floor) ?? FLOORS[0];
   s.floorStartTurn = s.turn;
@@ -233,7 +237,11 @@ export function planPath(s: GameState, target: Pos): Pos[] | null {
   if (!inBounds(s.map, target.x, target.y)) return null;
   const known = (x: number, y: number) => s.map.explored[idx(s.map, x, y)];
   if (!known(target.x, target.y)) return null;
-  return findPath(s.map, s.player.pos, target, (x, y) => known(x, y) && !monsterAt(s, { x, y }), 6000);
+  const isTarget = (x: number, y: number) => x === target.x && y === target.y;
+  const ok = (x: number, y: number) => known(x, y) && !monsterAt(s, { x, y });
+  // Bekannte Fallen umgehen – wenn es gar nicht anders geht, eben mitten durch
+  return findPath(s.map, s.player.pos, target, (x, y) => ok(x, y) && (isTarget(x, y) || !avoidTile(s, x, y)), 6000)
+    ?? findPath(s.map, s.player.pos, target, ok, 6000);
 }
 
 // ================================================================ Züge
@@ -247,6 +255,10 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
   if (chebyshev(p.pos, to) !== 1) return fail('Nur ein Feld pro Zug.');
   if (!canStep(s.map, p.pos, to)) return fail('Da ist eine Wand.');
   if (monsterAt(s, to)) return fail('Da steht ein Gegner.');
+  if (p.immobile && !struggle(s)) {
+    endTurn(s);
+    return OK;
+  }
   const pet = p.pet;
   if (pet?.alive && pet.pos.x === to.x && pet.pos.y === to.y) {
     pet.pos = { ...p.pos }; // Platz tauschen
@@ -256,6 +268,7 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
   s.counters.steps += 1;
   emit(s, { type: 'moved' });
   afterMove(s);
+  onPlayerStep(s);
   endTurn(s, { keepMoveDir: true });
   return OK;
 }
@@ -293,7 +306,9 @@ export function endTurn(s: GameState, opts: EndTurnOpts = {}) {
   for (const m of [...s.monsters]) {
     if (s.status !== 'playing') break;
     if (chebyshev(m.pos, s.player.pos) > 24 && !m.aware) continue;
+    const from = m.pos;
     monsterTurn(s, m);
+    if (m.pos !== from) onMonsterStep(s, m);
   }
   petTurn(s);
   if (s.status !== 'playing') return;
@@ -335,6 +350,10 @@ function tickTime(s: GameState, turns: number, before: number) {
   magicTick(s, turns);
   eggTick(s);
   if (p.potionCooldown) p.potionCooldown = Math.max(0, p.potionCooldown - turns);
+  if (p.immobile) {
+    p.immobile = Math.max(0, p.immobile - turns);
+    if (!p.immobile) log(s, 'Du bist wieder frei.', 'info');
+  }
   bladderTick(s, turns);
   if (s.status !== 'playing') return;
   if (p.abilityCooldown) p.abilityCooldown = Math.max(0, p.abilityCooldown - turns);
@@ -412,6 +431,8 @@ function afterMove(s: GameState) {
     log(s, 'Du entdeckst ein Treppenhaus nach unten!', 'system');
     emit(s, { type: 'stairsFound' });
   }
+
+  detectTraps(s, vis);
 
   const room = currentRoom(s);
   const roomId = room?.id ?? -1;
@@ -771,6 +792,42 @@ export function toilet(s: GameState): ActionResult {
   const res = useToilet(s);
   if (!res.ok) return fail(res.message ?? 'Geht nicht.');
   endTurn(s);
+  return OK;
+}
+
+// ================================================================ Fallen und Handwerk
+
+export function disarmTrap(s: GameState, trapUid: string): ActionResult {
+  if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  const res = disarm(s, trapUid);
+  if (!res.ok) return fail(res.message ?? 'Geht nicht.');
+  endTurn(s);
+  return OK;
+}
+
+export function placeTrap(s: GameState, uid: string): ActionResult {
+  if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  const owned = findOwned(s, uid);
+  if (!owned) return fail('Nicht gefunden.');
+  const res = placeOwnTrap(s, owned.item);
+  if (!res.ok) return fail(res.message ?? 'Geht nicht.');
+  removeOne(s, uid);
+  endTurn(s);
+  return OK;
+}
+
+export function craftItem(s: GameState, recipeId: string): ActionResult {
+  if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
+  if (!hasUnlock(s, 'inventar')) return fail('Ohne Inventar kannst du nichts basteln. Finde die Gilde.');
+  const res = craft(s, recipeId);
+  if (!res.ok) return fail(res.message ?? 'Geht nicht.');
+  endTurn(s);
+  return OK;
+}
+
+/** Legt fest, welches Wurfobjekt als Nächstes geworfen wird. */
+export function chooseThrowable(s: GameState, baseId: string | null): ActionResult {
+  s.player.wurfWahl = baseId ?? undefined;
   return OK;
 }
 

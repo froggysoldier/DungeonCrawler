@@ -18,9 +18,12 @@ import {
   ATTACK_MOVES, ATTACK_PARTS, MOVE_NAMES, attackCost, hitChance, isInSafeRoom, techniqueBlocker, techniqueName,
 } from '../engine/combat';
 import { chebyshev } from '../engine/fov';
+import { disarmableTraps, disarmChance, knownTrapAt, trapName } from '../engine/traps';
+import { allRecipes, hasWorkbench } from '../engine/crafting';
 import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
+  chooseThrowable, craftItem, disarmTrap, placeTrap,
   type ActionResult,
 } from '../engine/game';
 import { idx, isWalkable } from '../engine/mapgen';
@@ -37,7 +40,7 @@ import { render, tileFromMouse, type View } from './render';
 import { TypeQueue } from './typewriter';
 import { showSelection } from './selection';
 
-type Tab = 'crawler' | 'inventar' | 'skills' | 'erfolge';
+type Tab = 'crawler' | 'inventar' | 'handwerk' | 'skills' | 'erfolge';
 
 const EQUIP_ORDER: EquipSlot[] = [
   'kopf', 'gesicht', 'hals', 'schultern', 'brust', 'ruecken', 'arme', 'haende', 'ring1', 'ring2',
@@ -114,6 +117,7 @@ export class GameView {
           <div class="tabs">
             <button data-tab="crawler">Crawler</button>
             <button data-tab="inventar">Inventar</button>
+            <button data-tab="handwerk">Handwerk</button>
             <button data-tab="skills">Skills</button>
             <button data-tab="erfolge">Erfolge</button>
           </div>
@@ -228,11 +232,14 @@ export class GameView {
       if (!this.traveling || this.s.status !== 'playing' || isModalOpen()) break;
       const hpBefore = this.s.player.hp;
       const roomBefore = this.s.currentRoom;
+      const trapsBefore = (this.s.traps ?? []).filter((x) => !x.hidden).length;
       if (!this.act(() => moveStep(this.s, step))) break;
+      if ((this.s.traps ?? []).filter((x) => !x.hidden).length > trapsBefore) break;
+      if (this.s.player.pos.x !== step.x || this.s.player.pos.y !== step.y) break;
       const newMonster = this.visibleMonsters().some((m) => !seenBefore.has(m.uid) || m.aware);
       if (newMonster) {
         const m = this.visibleMonsters().find((x) => !seenBefore.has(x.uid) || x.aware);
-        if (m) this.say(`Du hältst an: ${m.name} in Sicht.`);
+        if (m) this.say(`Du hältst an: ${describeMonster(this.s, m).name} in Sicht.`);
         break;
       }
       if (this.s.player.hp < hpBefore) break;
@@ -320,6 +327,8 @@ export class GameView {
       else parts.push(`${esc(techniqueName(tech))}: Trefferchance nicht einschätzbar`);
       if (info.flavor) parts.push(`<span class="muted small">${esc(info.flavor)}</span>`);
     }
+    const trap = knownTrapAt(s, t);
+    if (trap) parts.push(`<b style="color:${trap.owner === 'crawler' ? '#6ee07a' : 'var(--danger)'}">${trap.owner === 'crawler' ? 'Deine ' : ''}${esc(trapName(trap.kind))}</b>`);
     const items = itemsAt(s, t);
     if (items.length) parts.push(items.map((e) => `<span style="color:${RARITY_COLORS[e.item.rarity]}">${esc(itemName(s, e.item))}</span>`).join('<br>'));
     const room = s.map.roomAt[i] >= 0 ? s.map.rooms[s.map.roomAt[i]] : null;
@@ -482,6 +491,14 @@ export class GameView {
         .join('')}`);
     }
     if (onStairs(s)) blocks.push('<div class="row" style="margin:6px 0"><button class="primary" data-action="descend">Hinabsteigen (Enter)</button></div>');
+    const nearTraps = disarmableTraps(s);
+    if (nearTraps.length) {
+      blocks.push(`<div class="section">Fallen in der Nähe</div>${nearTraps
+        .map((tr) => tr.owner === 'crawler'
+          ? `<div class="row" style="margin-bottom:4px"><span style="flex:1;color:#6ee07a">Deine ${esc(trapName(tr.kind))}</span><button data-action="disarm" data-uid="${tr.uid}">Abbauen</button></div>`
+          : `<div class="row" style="margin-bottom:4px"><span style="flex:1;color:var(--danger)">${esc(trapName(tr.kind))}</span><button data-action="disarm" data-uid="${tr.uid}">Entschärfen (${Math.round(disarmChance(s, tr) * 100)} %)</button></div>`)
+        .join('')}`);
+    }
     if (room?.kind === 'safe') {
       const inside = isInSafeRoom(s, s.player.pos);
       let html = `<div class="section">Safe Room</div>`;
@@ -518,6 +535,7 @@ export class GameView {
     el.innerHTML = blocks.length ? `<div style="padding:4px 12px 8px;border-bottom:1px solid var(--line)">${blocks.join('')}</div>` : '';
     bindActions(el, {
       pick: (b) => this.act(() => pickup(s, b.dataset.uid)),
+      disarm: (b) => this.act(() => disarmTrap(s, b.dataset.uid!)),
       descend: () => this.askDescend(),
       freebie: () => {
         let item: Item | undefined;
@@ -569,11 +587,21 @@ export class GameView {
     if (it.kind === 'buch' && it.spell) bon.push(`Lehrt den Zauber: ${SPELL_BY_ID[it.spell].name}`);
     if (eff?.ausdauer) bon.push(`+${eff.ausdauer} Ausdauer`);
     if (eff?.buff) bon.push(`${eff.buff.name}: ${describeBonuses(eff.buff.bonuses).join(', ')}`);
+    if (it.explosion) bon.push(`Explodiert: etwa ${it.explosion} Schaden an allem im Umkreis von einem Feld`);
+    if (it.trapKind) bon.push(`Falle zum Aufstellen: ${trapName(it.trapKind)}`);
+    if (it.upgrades) bon.push(`${it.upgrades}x benagelt`);
     const actions: string[] = [];
     if (withActions) {
       if (it.kind === 'ausruestung' && from === 'inv' && hasUnlock(this.s, 'inventar')) actions.push(`<button data-action="equip" data-uid="${it.uid}">Anlegen</button>`);
       if (it.kind === 'verbrauch') actions.push(`<button data-action="use" data-uid="${it.uid}">Benutzen</button>`);
       if (it.kind === 'buch') actions.push(`<button data-action="use" data-uid="${it.uid}">Lesen</button>`);
+      if (it.trapKind && from === 'inv') actions.push(`<button data-action="place" data-uid="${it.uid}">Hier aufstellen</button>`);
+      if (it.kind === 'wurf' && from === 'inv') {
+        const picked = throwables(this.s)[0]?.baseId === it.baseId;
+        actions.push(picked
+          ? `<button data-action="throwpick" data-id="" ${this.s.player.wurfWahl ? '' : 'disabled'}>Wird als Nächstes geworfen</button>`
+          : `<button data-action="throwpick" data-id="${it.baseId}">Als Nächstes werfen</button>`);
+      }
       actions.push(`<button data-action="drop" data-uid="${it.uid}">Ablegen</button>`);
       if (from === 'inv' && currentRoom(this.s)?.kind === 'safe' && it.kind !== 'box') actions.push(`<button data-action="sell" data-uid="${it.uid}">Verkaufen (${sellPrice(it)} G)</button>`);
     }
@@ -595,6 +623,9 @@ export class GameView {
       case 'inventar':
         el.innerHTML = this.inventoryTab();
         break;
+      case 'handwerk':
+        el.innerHTML = this.craftTab();
+        break;
       case 'skills':
         el.innerHTML = this.skillsTab();
         break;
@@ -609,7 +640,28 @@ export class GameView {
       use: (b) => this.act(() => useItem(this.s, b.dataset.uid!)),
       drop: (b) => this.act(() => dropItem(this.s, b.dataset.uid!)),
       sell: (b) => this.act(() => sellItem(this.s, b.dataset.uid!)),
+      place: (b) => this.act(() => placeTrap(this.s, b.dataset.uid!)),
+      craft: (b) => this.act(() => craftItem(this.s, b.dataset.id!)),
+      throwpick: (b) => this.act(() => chooseThrowable(this.s, b.dataset.id || null)),
     });
+  }
+
+  private craftTab(): string {
+    const s = this.s;
+    if (!hasUnlock(s, 'inventar')) {
+      return '<div class="locked">Gesperrt: Ohne Inventar kein Handwerk.<br>Finde die <b>Gilde der Einweisung</b>.</div>';
+    }
+    const bench = hasWorkbench(s);
+    let html = `<div class="muted small">Aus Kram, den du findest, baust du Sprengsätze, Fallen und Verbände. ${bench ? '<b style="color:var(--ok)">Eine Werkbank ist in Reichweite.</b>' : 'Aufwendige Rezepte brauchen eine Werkbank: in Werkstätten, Schmieden und Safe Rooms – oder eine Klappwerkbank im Rucksack.'}</div>`;
+    for (const { recipe: r, missing } of allRecipes(s)) {
+      const ing = r.ingredients.map((x) => `${x.n}x ${x.label}`).join(', ');
+      html += `<div class="item"><div class="name">${esc(r.name)}${r.workbench ? ' <span class="muted small">(Werkbank)</span>' : ''}</div>
+        <div class="meta">${esc(ing)}</div>
+        <div class="bon">${esc(r.description)}</div>
+        ${missing.length ? `<div class="meta" style="color:var(--danger)">Es fehlt: ${esc(missing.join(', '))}</div>` : ''}
+        <div class="actions"><button data-action="craft" data-id="${r.id}" ${missing.length ? 'disabled' : ''}>Herstellen</button></div></div>`;
+    }
+    return html;
   }
 
   private crawlerTab(): string {
@@ -657,6 +709,7 @@ export class GameView {
         .map((t) => `<div class="small" style="margin-bottom:4px"><b>${esc(t.name)}</b> <span class="muted">(${esc(TRAIT_KIND_NAMES[t.kind])})</span><br><span class="muted">${esc(t.description)}</span></div>`)
         .join('')}`;
     }
+    if (p.immobile) html += `<div class="small" style="color:var(--danger)">Festgehalten: noch ${p.immobile} Züge (oder losreißen, indem du dich bewegst)</div>`;
     if (p.curses.length) html += `<div class="section">Flüche</div>${p.curses.map((c) => `<div class="small" style="color:var(--danger)">${esc(c)}</div>`).join('')}`;
     const hoods = s.map.hoods.map((h) => `<div class="small">${esc(h.name)}: ${h.bossAlive ? 'Boss lebt' : 'Boss besiegt'}${h.mapFound ? ', Karte gefunden' : ''}</div>`).join('');
     html += `<div class="section">Viertel</div>${hoods}`;

@@ -8,6 +8,7 @@ import { emit } from './events';
 import { chebyshev, hasLineOfSight } from './fov';
 import { createAreaMap, createBox, createGold, createItem, rollMobDrop } from './items';
 import { log } from './log';
+import { blast } from './traps';
 import { roomOf } from './mapgen';
 import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, totalBonuses } from './player';
 import * as R from './rng';
@@ -131,6 +132,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     log(s, `Dein ${name} verfehlt ${nameOf(s, target)}.`, 'kampf');
     target.aware = true;
     if (thrown?.special === 'bumerang') returnThrown(s, thrown);
+    else if (thrown?.explosion) detonate(s, thrown, target.pos);
     else if (thrown) dropNear(s, thrown, target.pos);
     emit(s, { type: 'attack', technique: t, hit: false, crit: false, damage: 0, target, thrown: thrown ?? undefined, facets });
     return { ok: true };
@@ -204,6 +206,8 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     if (thrown.special === 'bumerang') {
       returnThrown(s, thrown);
       log(s, `${thrown.name} fliegt zu dir zurück.`, 'kampf');
+    } else if (thrown.explosion) {
+      // erst den Treffer auswerten, dann die Explosion
     } else if (thrown.baseId === 'flasche' || thrown.baseId === 'kaffeetasse') log(s, `${thrown.name} zerschellt.`, 'kampf');
     else dropNear(s, thrown, target.pos);
   }
@@ -215,8 +219,17 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   }
 
   emit(s, { type: 'attack', technique: t, hit: true, crit, damage: final, target, thrown: thrown ?? undefined, facets });
+  const at = { ...target.pos };
   if (target.hp <= 0) killMonster(s, target, t, false, facets);
+  if (thrown?.explosion) detonate(s, thrown, at);
   return { ok: true };
+}
+
+/** Sprengsatz geht hoch: Schaden im Umkreis von einem Feld. */
+function detonate(s: GameState, thrown: Item, at: Pos) {
+  const dmg = Math.round((thrown.explosion ?? 0) * (1 + 0.1 * skillLevel(s, 'handwerk')) + effectiveStats(s).ges / 3);
+  log(s, thrown.baseId === 'brandflasche' ? 'Die Brandflasche zerplatzt in einer Feuerwolke!' : `${thrown.name} detoniert mit ohrenbetäubendem Knall!`, 'kampf');
+  blast(s, at, dmg, 'bombe', `vom eigenen Sprengsatz (${thrown.name}) zerlegt`);
 }
 
 export function dropNear(s: GameState, item: Item, pos: Pos) {
@@ -282,6 +295,7 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
     log(s, `Dein gestohlenes Gold (${m.stolenGold}) fällt klimpernd zu Boden.`, 'loot');
   }
   if (m.loot) for (const id of m.loot) dropNear(s, createItem(s, id), m.pos);
+  if (m.defId === 'kobold_bombe' && R.chance(s, 0.6)) dropNear(s, createItem(s, 'schwarzpulver'), m.pos);
 
   if (m.rank === 'nachbarschaftsboss') {
     s.counters.bossKills += 1;

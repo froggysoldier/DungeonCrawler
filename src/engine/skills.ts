@@ -30,6 +30,10 @@ export function skillProgress(s: GameState, def: SkillDef): number {
       return uses['_hurt'] ?? 0;
     case 'ambush':
       return uses['_ambush'] ?? 0;
+    case 'trap':
+      return uses['_trap'] ?? 0;
+    case 'craft':
+      return uses['_craft'] ?? 0;
     default:
       return 0;
   }
@@ -109,6 +113,22 @@ export function skillsOnEvent(s: GameState, e: GameEvent) {
       break;
     case 'eat':
       trainTrigger(s, (d) => d.trigger === 'eat', 3);
+      break;
+    case 'trapDetected':
+    case 'trapDisarmed':
+    case 'trapPlaced':
+      bump(s, '_trap');
+      trainTrigger(s, (d) => d.trigger === 'trap', 3);
+      break;
+    case 'trapTriggered':
+      if (!e.onPlayer) {
+        bump(s, '_trap');
+        trainTrigger(s, (d) => d.trigger === 'trap', 2);
+      }
+      break;
+    case 'crafted':
+      bump(s, '_craft');
+      trainTrigger(s, (d) => d.trigger === 'craft', 3);
       break;
     default:
       break;

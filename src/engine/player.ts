@@ -93,5 +93,8 @@ export function throwables(s: GameState): Item[] {
   const out: Item[] = [];
   if (s.player.hand?.kind === 'wurf') out.push(s.player.hand);
   for (const it of s.player.inventory) if (it.kind === 'wurf') out.push(it);
-  return out;
+  // Gewähltes Wurfobjekt zuerst, Sprengsätze sonst zuletzt (damit sie nicht aus Versehen verbraucht werden)
+  const pick = s.player.wurfWahl;
+  const rank = (i: Item) => (pick && i.baseId === pick ? 0 : i.explosion ? 2 : 1);
+  return out.sort((a, b) => rank(a) - rank(b));
 }

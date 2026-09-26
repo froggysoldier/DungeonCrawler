@@ -44,12 +44,14 @@ export function createItem(s: GameState, baseId: string, menge = 1): Item {
     flavor: base.flavor,
     special: unique?.special,
     passFacet: base.passFacet,
+    explosion: base.explosion,
+    trapKind: base.trapKind,
     wert: base.wert,
   };
 }
 
 export function isStackable(kind: Item['kind']): boolean {
-  return kind === 'wurf' || kind === 'verbrauch';
+  return kind === 'wurf' || kind === 'verbrauch' || kind === 'schrott';
 }
 
 export function createBox(s: GameState, type: BoxType, tier: BoxTier): Item {
@@ -155,6 +157,12 @@ export function rollBoxContents(s: GameState, type: BoxType, tier: BoxTier): Ite
   }
   if (type === 'wurf') out.push(createItem(s, tierIdx >= 2 ? 'ziegel' : 'stein', 5 + tierIdx * 3));
   if (type === 'ueberlebens') out.push(createItem(s, 'gegengift', 1 + Math.floor(tierIdx / 2)));
+  if (type === 'ueberlebens' || type === 'wurf') {
+    if (R.chance(s, 0.5)) out.push(createItem(s, 'fallenteile', 1 + Math.floor(tierIdx / 2)));
+    if (R.chance(s, 0.4)) out.push(createItem(s, 'schwarzpulver', 1 + Math.floor(tierIdx / 2)));
+  }
+  if (type === 'wurf' && tierIdx >= 1) out.push(createItem(s, R.chance(s, 0.5) ? 'brandflasche' : 'nagelbombe', tierIdx));
+  if (tierIdx >= 2 && R.chance(s, 0.1)) out.push(createItem(s, 'klappwerkbank'));
   // Zauberbücher: selten in einfachen Boxen, häufiger in guten
   if ((type === 'abenteurer' || type === 'fan' || type === 'boss') && R.chance(s, 0.12 + tierIdx * 0.1)) {
     out.push(randomTome(s, RARITY_ORDER[Math.min(4, tierIdx + 1)]));
@@ -193,6 +201,8 @@ export function rollMobDrop(s: GameState, level: number, elite: boolean): Item[]
   if (R.chance(s, elite ? 0.6 : 0.12)) out.push(elite ? generateEquipment(s, R.chance(s, 0.3) ? 'selten' : 'ungewoehnlich') : rollGroundItem(s));
   if (R.chance(s, 0.05)) out.push(createItem(s, 'kleiner_heiltrank'));
   if (R.chance(s, 0.03)) out.push(createItem(s, 'gegengift'));
+  // Bastelkram für das Handwerk
+  if (R.chance(s, 0.08)) out.push(createItem(s, R.pick(s, ['lappen', 'naegel', 'klebeband', 'lappen', 'naegel', 'schwarzpulver'])));
   return out;
 }
 

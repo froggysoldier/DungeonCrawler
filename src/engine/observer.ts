@@ -27,7 +27,7 @@ const ABILITY_FACET: Record<MonsterAbility, string> = {
 };
 
 const PART_WEIGHT: Record<string, number> = {
-  zauber: 0.5, faust: 0, tritt: 0, knie: 0.5, ellbogen: 0.5, kopf: 1, waffe: 0, wurf: 0.5 };
+  zauber: 0.5, falle: 1.5, bombe: 1, faust: 0, tritt: 0, knie: 0.5, ellbogen: 0.5, kopf: 1, waffe: 0, wurf: 0.5 };
 const MOVE_WEIGHT: Record<AttackMove, number> = { normal: 0, sprung: 1, stampfen: 1, anlauf: 1 };
 
 function chronicle(s: GameState): Chronicle {

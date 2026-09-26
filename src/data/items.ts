@@ -1,4 +1,4 @@
-import type { Bonuses, ConsumableEffect, ItemKind, Rarity, Slot, SpecialEffect } from '../engine/types';
+import type { Bonuses, ConsumableEffect, ItemKind, Rarity, Slot, SpecialEffect, TrapKind } from '../engine/types';
 
 export interface BaseItem {
   id: string;
@@ -15,6 +15,10 @@ export interface BaseItem {
   passFacet?: string;
   /** Erlaubt das Auftauchen als Bodenfund. */
   ground?: number;
+  /** Wurfobjekt explodiert beim Aufprall (Schaden im Umkreis). */
+  explosion?: number;
+  /** Eigene Falle zum Aufstellen. */
+  trapKind?: TrapKind;
 }
 
 export const RARITY_ORDER: Rarity[] = ['gewoehnlich', 'ungewoehnlich', 'selten', 'episch', 'legendaer', 'himmlisch'];
@@ -224,6 +228,23 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'dosenbier', name: 'Warmes Dosenbier', kind: 'verbrauch', effekt: { heal: 3, blase: 20, buff: { name: 'Mut angetrunken', turns: 40, bonuses: { stats: { str: 1 }, treffer: -3 } } }, flavor: 'Warm. Aber Bier.', wert: 1, ground: 2 },
   { id: 'traubenzucker', name: 'Traubenzucker', kind: 'verbrauch', effekt: { ausdauer: 6 }, flavor: 'Für die schnelle Energie.', wert: 1, ground: 2 },
   { id: 'wutpille', name: 'Rote Wutpille', kind: 'verbrauch', effekt: { buff: { name: 'Rasende Wut', turns: 30, bonuses: { schaden: { alle: 25 }, ausweichen: -5 } } }, flavor: 'Nebenwirkungen: Wut.', wert: 15 },
+
+  // ================= Handwerk: Materialien
+  { id: 'lappen', name: 'Schmutziger Lappen', kind: 'schrott', flavor: 'Riecht nach Frittierfett. Brennt bestimmt gut.', wert: 0, ground: 5 },
+  { id: 'naegel', name: 'Handvoll Nägel', kind: 'schrott', flavor: 'Krumm, rostig, spitz. Genau richtig.', wert: 1, ground: 4 },
+  { id: 'schwarzpulver', name: 'Tütchen Schwarzpulver', kind: 'schrott', flavor: 'Aus aufgeschnittenen Silvesterböllern gekratzt. Nicht rauchen.', wert: 4, ground: 1 },
+  { id: 'fallenteile', name: 'Fallenteile', kind: 'schrott', flavor: 'Federn, Zahnräder, ein Auslöser. Aus einer entschärften Falle geborgen.', wert: 3 },
+  { id: 'klebeband', name: 'Rolle Panzertape', kind: 'schrott', flavor: 'Hält alles zusammen. Auch Waffen, die es nicht sollten.', wert: 2, ground: 2 },
+  { id: 'hochprozentiges', name: 'Flasche Hochprozentiges', kind: 'verbrauch', effekt: { heal: 2, blase: 15, buff: { name: 'Mut angetrunken', turns: 30, bonuses: { stats: { str: 1, cha: 1 }, treffer: -5 } } }, flavor: 'Selbstgebrannt, laut Etikett „nur für Reinigungszwecke“. Man kann es trinken. Oder anzünden.', wert: 3, ground: 2 },
+  { id: 'klappwerkbank', name: 'Klappwerkbank', kind: 'schrott', flavor: 'Zusammengeklappt passt sie in jedes Inventar. Aufgeklappt wird jeder Ort zur Werkstatt.', wert: 20 },
+
+  // ================= Handwerk: Erzeugnisse
+  { id: 'brandflasche', name: 'Brandflasche', kind: 'wurf', wurfSchaden: 3, explosion: 7, flavor: 'Eine Flasche, ein Lappen, viel schlechter Schnaps. Zerplatzt in einer Feuerwolke.', wert: 6 },
+  { id: 'nagelbombe', name: 'Nagelbombe', kind: 'wurf', wurfSchaden: 2, explosion: 11, flavor: 'Eine Ravioli-Dose voller Nägel und Pulver. Die Systemstimme ist entzückt.', wert: 10 },
+  { id: 'verband', name: 'Verband', kind: 'verbrauch', effekt: { heal: 10 }, flavor: 'Aus zwei Lappen gerissen. Nicht steril. Aber besser als nichts.', wert: 2 },
+  { id: 'stachelfalle', name: 'Stachelfalle (zum Aufstellen)', kind: 'schrott', trapKind: 'stachelfalle', flavor: 'Wer drauftritt, bereut es. Du trittst natürlich nicht drauf.', wert: 6 },
+  { id: 'sprengfalle', name: 'Sprengfalle (zum Aufstellen)', kind: 'schrott', trapKind: 'sprengfalle', flavor: 'Ein Stolperdraht an einem Tütchen Pulver. Abstand halten.', wert: 10 },
+  { id: 'schlingfalle', name: 'Schlingfalle (zum Aufstellen)', kind: 'schrott', trapKind: 'schlingfalle', flavor: 'Hält einen Gegner fest, bis du Zeit für ihn hast.', wert: 5 },
 
   // ================= Boss-Beute (Erweiterung)
   { id: 'mottenfluegel_umhang', name: 'Mottenflügel-Umhang', kind: 'ausruestung', slot: 'ruecken', bonuses: { ausweichen: 6, stats: { cha: 1 } }, flavor: 'Staubt bei jeder Bewegung. Flattert beeindruckend.', wert: 30 },

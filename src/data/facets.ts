@@ -20,7 +20,7 @@ export interface FacetDef {
 }
 
 export const PART_PLURAL: Record<string, string> = {
-  zauber: 'Zauber',
+  zauber: 'Zauber', falle: 'Fallen', bombe: 'Sprengsätze',
   faust: 'Faustschläge', tritt: 'Tritte', knie: 'Kniestöße', ellbogen: 'Ellbogenchecks',
   kopf: 'Kopfstöße', waffe: 'Waffenhiebe', wurf: 'Würfe',
 };
@@ -30,7 +30,7 @@ export const MOVE_PLURAL: Record<Exclude<AttackMove, 'normal'>, string> = {
 };
 
 export const PART_BOX: Record<string, BoxType> = {
-  zauber: 'abenteurer',
+  zauber: 'abenteurer', falle: 'ueberlebens', bombe: 'wurf',
   faust: 'brawler', tritt: 'schuh', knie: 'brawler', ellbogen: 'brawler', kopf: 'kleidung', waffe: 'waffen', wurf: 'wurf',
 };
 
