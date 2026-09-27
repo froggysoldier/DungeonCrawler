@@ -7,7 +7,7 @@ import {
   SHOW_NAME, tutorialPages,
 } from '../data/world';
 import { monsterAt, monsterTurn, occupied, petLevelUp, petTurn } from './ai';
-import { cure } from './abilities';
+import { cure, hasSpecial } from './abilities';
 import { isInSafeRoom, playerAttack } from './combat';
 import { handleLethal } from './death';
 import { emit } from './events';
@@ -680,7 +680,9 @@ const FOOD = FOOD_IDS;
 function applyEffect(s: GameState, e: ConsumableEffect, isFood: boolean) {
   const p = s.player;
   if (e.heal || e.healPct) {
-    const boost = isFood ? 1 + 0.15 * skillLevel(s, 'kochen') : 1 + 0.08 * skillLevel(s, 'erste_hilfe');
+    let boost = isFood ? 1 + 0.15 * skillLevel(s, 'kochen') : 1 + 0.08 * skillLevel(s, 'erste_hilfe');
+    if (isFood && hasSpecial(s, 'aasfresser')) boost *= 2;
+    if (!isFood && hasSpecial(s, 'trankkunde')) boost *= 1.5;
     if (!isFood) trainSkill(s, 'heal', 1);
     const amount = Math.round(((e.heal ?? 0) + ((e.healPct ?? 0) / 100) * maxHp(s)) * boost);
     p.hp = Math.min(maxHp(s), p.hp + amount);
@@ -740,7 +742,7 @@ export function useItem(s: GameState, uid: string): ActionResult {
   if (isPotion && (s.player.potionCooldown ?? 0) > 0) {
     return fail(`Dein Körper verträgt gerade keinen weiteren Trank. Noch ${s.player.potionCooldown} Züge.`);
   }
-  if (isPotion) s.player.potionCooldown = 20;
+  if (isPotion) s.player.potionCooldown = hasSpecial(s, 'trankkunde') ? 10 : 20;
   if (it.baseId === 'leckerli') {
     const pet = s.player.pet;
     if (pet) {

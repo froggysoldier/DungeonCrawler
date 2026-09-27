@@ -1,3 +1,4 @@
+import { hasSpecial } from './abilities';
 import { emit } from './events';
 import { itemName } from './identify';
 import { giveItem } from './inventory';
@@ -50,13 +51,19 @@ export function ensureShop(s: GameState, room: Room): Shop {
   return room.shop;
 }
 
+/** Rabatt durch Händlerblut und Systemkenntnis. */
+function buyFactor(s?: GameState): number {
+  if (!s) return 1;
+  return (hasSpecial(s, 'haendler') ? 0.85 : 1) * (hasSpecial(s, 'systemkenntnis') ? 0.9 : 1);
+}
+
 /** Preis für einen Stapel: Stückpreis × Menge. */
-export function offerPrice(price: number, it: Item): number {
-  return price * (isStackable(it.kind) ? (it.menge ?? 1) : 1);
+export function offerPrice(price: number, it: Item, s?: GameState): number {
+  return Math.max(1, Math.round(price * buyFactor(s))) * (isStackable(it.kind) ? (it.menge ?? 1) : 1);
 }
 
 export function sellPrice(it: Item, s?: GameState): number {
-  const bonus = s ? 1 + skillLevel(s, 'feilschen') * 0.02 : 1;
+  const bonus = s ? (1 + skillLevel(s, 'feilschen') * 0.02) * (hasSpecial(s, 'haendler') ? 1.2 : 1) : 1;
   const each = Math.max(1, Math.round((it.wert || 1) * SELL_FACTOR * bonus));
   return each * (isStackable(it.kind) ? (it.menge ?? 1) : 1);
 }
@@ -65,7 +72,7 @@ export function buy(s: GameState, room: Room, index: number): { ok: boolean; mes
   const shop = ensureShop(s, room);
   const offer = shop.offers[index];
   if (!offer) return { ok: false, message: 'Dieses Angebot gibt es nicht mehr.' };
-  const total = offerPrice(offer.price, offer.item);
+  const total = offerPrice(offer.price, offer.item, s);
   if (s.player.gold < total) return { ok: false, message: `Zu teuer. Das kostet ${total} Gold, du hast ${s.player.gold}.` };
   s.player.gold -= total;
   shop.offers.splice(index, 1);

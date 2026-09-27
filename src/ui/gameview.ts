@@ -4,7 +4,8 @@ import { RARITY_COLORS, RARITY_NAMES, SLOT_NAMES } from '../data/items';
 import { SKILLS, SKILL_BY_ID, SKILL_CATEGORY_NAMES, skillXpNeeded, type SkillCategory } from '../data/skills';
 import { BOX_TIER_COLORS, FLOORS, RESTAURANT_HOSTS, RESTAURANT_MENU, SHOW_NAME } from '../data/world';
 import { monsterAt } from '../engine/ai';
-import { CLASS_BY_ID } from '../data/classes';
+import { ABILITIES, ARCHETYPE_NAMES, CLASS_BY_ID } from '../data/classes';
+import { SPECIAL_TEXT } from '../data/specials';
 import { RACE_BY_ID } from '../data/races';
 import { currentAbility, useAbility } from '../engine/classes';
 import { maxMp, spellCost } from '../engine/magic';
@@ -739,7 +740,7 @@ export class GameView {
           html += `<div class="section">Laden</div><div class="muted small">${esc(room.shop.keeper)}${room.shop.mood < 70 ? ' – wirkt verstimmt' : ''}</div>`;
           html += room.shop.offers
             .map((o, i) => {
-              const total = offerPrice(o.price, o.item);
+              const total = offerPrice(o.price, o.item, s);
               return `<div class="row shoprow"><span style="flex:1;color:${RARITY_COLORS[o.item.rarity]}" title="${esc(describeItem(s, o.item).bonuses.join(', '))}">${esc(itemName(s, o.item))}${o.item.menge && o.item.menge > 1 ? ` ×${o.item.menge}` : ''}</span><span class="muted small">${total} G</span><button data-action="buy" data-i="${i}" ${s.player.gold < total ? 'disabled' : ''}>Kaufen</button><button data-action="haggle" data-i="${i}" ${o.haggled ? 'disabled' : ''}>Feilschen</button></div>`;
             })
             .join('');
@@ -1006,6 +1007,15 @@ export class GameView {
       html += `<div class="section">Effekte</div>${p.buffs
         .map((x) => `<div class="small" style="color:${x.debuff ? 'var(--danger)' : 'inherit'}">${x.debuff ? 'Negativ:' : 'Positiv:'} ${esc(x.name)}${x.dot ? ` (−${x.dot} HP/Zug)` : ''} <span class="muted">(${x.turns} Züge)</span></div>`)
         .join('')}`;
+    }
+    if (p.klass) {
+      const k = CLASS_BY_ID[p.klass];
+      const r = p.race ? RACE_BY_ID[p.race] : null;
+      const specials = [...(r?.specials ?? []), ...(k?.specials ?? [])];
+      html += `<div class="section">Klasse und Rasse</div>`;
+      if (k) html += `<div class="small"><b>${esc(k.name)}</b> <span class="muted">(${esc(ARCHETYPE_NAMES[k.archetype])})</span> · Fähigkeit: ${esc(ABILITIES[k.ability].name)}</div>`;
+      if (p.classSkills?.length) html += `<div class="small muted">Klassenskills: ${p.classSkills.map((id) => esc(SKILL_BY_ID[id]?.name ?? id)).join(', ')}</div>`;
+      for (const sp of specials) html += `<div class="small"><b>${esc(SPECIAL_TEXT[sp]?.name ?? sp)}:</b> <span class="muted">${esc(SPECIAL_TEXT[sp]?.text ?? '')}</span></div>`;
     }
     if (p.traits?.length) {
       html += `<div class="section">Eigenschaften</div>${p.traits

@@ -266,6 +266,21 @@ h1, h2, h3 { margin: 0; }
 .rec { font-size: 11px; background: var(--accent); color: #1a1408; border-radius: 4px; padding: 1px 5px; margin-left: 6px; }
 .viewers { color: var(--achv); }
 @media (max-width: 700px) { .select-grid { grid-template-columns: 1fr; } .choices { max-height: 32vh; } }
+.modal.widest { width: min(1280px, 100%); }
+.select3 { display: grid; grid-template-columns: 1fr 1.1fr 1.3fr; gap: 14px; }
+.select3 .detail { max-height: 60vh; overflow: auto; padding-right: 4px; }
+.select3 .choices { max-height: 56vh; }
+.archfilter { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
+.archfilter button { font-size: 12px; padding: 3px 7px; }
+.archfilter button.sel { border-color: var(--accent); color: var(--accent); }
+.detailblock { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; display: grid; gap: 4px; }
+.detailhead { font-weight: 700; color: var(--accent); }
+.bonuslist { color: var(--ok); }
+.kv2 { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; }
+.rec.rare-selten { background: #7cc4ff; }
+.rec.rare-legendaer { background: #d070ff; color: #fff; }
+@media (max-width: 1000px) { .select3 { grid-template-columns: 1fr 1fr; } .select3 .detail { grid-column: 1 / -1; max-height: none; } }
+@media (max-width: 700px) { .select3 { grid-template-columns: 1fr; } }
 .actionbar button.ability { border-color: var(--accent-2); color: var(--accent-2); }
 
 .caret { display: inline-block; width: 0.55em; height: 1em; margin-left: 1px; vertical-align: -0.12em; background: currentColor; animation: blink 0.8s steps(1) infinite; }

@@ -1,3 +1,4 @@
+import { hasSpecial } from './abilities';
 import { EGG_SPECIES, HATCH_TURNS, PET_SPECIES, TAMEABLE } from '../data/pets';
 import { emit } from './events';
 import { chebyshev, hasLineOfSight } from './fov';
@@ -27,6 +28,7 @@ export function activePasses(s: GameState): string[] {
 export function passProtects(s: GameState, m: Monster): boolean {
   if (m.provoked || m.rank === 'nachbarschaftsboss' || m.rank === 'boroughboss') return false;
   const passes = activePasses(s);
+  if (hasSpecial(s, 'rattenfreund')) passes.push('z:ratte');
   if (!passes.length) return false;
   const facets = targetFacets(s, m);
   return passes.some((p) => facets.includes(p));

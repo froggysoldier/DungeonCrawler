@@ -101,7 +101,7 @@ export function placeTraps(s: GameState, start: Pos) {
 
 export function detectChance(s: GameState, t: Trap, dist: number): number {
   const int = effectiveStats(s).int;
-  const base = 12 + (int - 5) * 4 + skillLevel(s, 'fallenkunde') * 6 + skillLevel(s, 'wahrnehmung') * 3 - TRAP_DEFS[t.kind].hide - (dist - 1) * 6;
+  const base = 12 + (int - 5) * 4 + skillLevel(s, 'fallenkunde') * 6 + skillLevel(s, 'wahrnehmung') * 3 - TRAP_DEFS[t.kind].hide - (dist - 1) * 6 + (hasSpecial(s, 'fallenmeister') ? 20 : 0);
   return Math.max(3, Math.min(90, base)) / 100;
 }
 
@@ -273,6 +273,9 @@ function trapFacets(s: GameState, m: Monster, part: 'falle' | 'bombe'): string[]
 }
 
 /** Ein Monster betritt ein Feld: eigene Fallen des Crawlers lösen aus. */
+/** Fallenmeister bauen gemeinere Fallen. */
+const masterTrap = (s: GameState) => (hasSpecial(s, 'fallenmeister') ? 1.5 : 1);
+
 export function onMonsterStep(s: GameState, m: Monster) {
   const t = trapAt(s, m.pos);
   if (!t || t.owner !== 'crawler' || !s.monsters.includes(m)) return;
@@ -284,7 +287,7 @@ export function onMonsterStep(s: GameState, m: Monster) {
   emit(s, { type: 'trapTriggered', kind: t.kind, onPlayer: false });
   switch (t.kind) {
     case 'stachelfalle': {
-      const dmg = Math.max(1, R.int(s, 6, 10) + s.floor * 2 + skill * 2 - Math.floor(m.ruestung / 2));
+      const dmg = Math.max(1, Math.round((R.int(s, 6, 10) + s.floor * 2 + skill * 2) * masterTrap(s)) - Math.floor(m.ruestung / 2));
       m.hp -= dmg;
       log(s, seen ? `${who} tritt in deine Stachelfalle. ${dmg} Schaden.` : 'Irgendwo schnappt deine Stachelfalle zu. Ein Schrei hallt durch die Gänge.', 'kampf');
       if (m.hp <= 0) killMonster(s, m, null, false, facets);
@@ -299,7 +302,7 @@ export function onMonsterStep(s: GameState, m: Monster) {
     }
     case 'sprengfalle':
       log(s, seen ? `${who} löst deine Sprengfalle aus. BUMM!` : 'Irgendwo geht deine Sprengfalle hoch. BUMM!', 'kampf');
-      blast(s, m.pos, R.int(s, 10, 15) + s.floor * 2 + skill * 2, 'falle', 'von der eigenen Sprengfalle zerlegt');
+      blast(s, m.pos, Math.round((R.int(s, 10, 15) + s.floor * 2 + skill * 2) * masterTrap(s)), 'falle', 'von der eigenen Sprengfalle zerlegt');
       break;
     default:
       break;

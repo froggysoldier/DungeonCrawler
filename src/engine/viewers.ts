@@ -10,6 +10,7 @@ import { log, toast } from './log';
 import { effectiveStats, maxHp } from './player';
 import * as R from './rng';
 import { track } from './stats';
+import { hasSpecial } from './abilities';
 import type { GameEvent, GameState } from './types';
 
 /**
@@ -30,7 +31,7 @@ export function addSpectacle(s: GameState, points: number, kind: string) {
   const v = s.viewers;
   const cha = effectiveStats(s).cha;
   const stage = 1 + (s.player.skills.find((k) => k.id === 'rampenlicht')?.level ?? 0) * 0.05;
-  const mult = Math.max(0.3, 1 + (cha - 5) * 0.08) * (0.5 + v.hype / 50) * (s.player.klass === 'showstar' ? 2 : 1) * traitFollowerMult(s) * stage;
+  const mult = Math.max(0.3, 1 + (cha - 5) * 0.08) * (0.5 + v.hype / 50) * (hasSpecial(s, 'reichweite') ? 2 : 1) * traitFollowerMult(s) * stage;
   if (points >= 4) trainSkill(s, 'show', 1);
   v.hype = Math.min(100, v.hype + points * 1.5);
   v.lastSpectacle = s.turn;

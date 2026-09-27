@@ -7,6 +7,7 @@ import { roomOf } from './mapgen';
 import * as R from './rng';
 import { skillLevel } from './player';
 import { trainSkill } from './skills';
+import { hasSpecial } from './abilities';
 import type { GameState, Item } from './types';
 
 /**
@@ -85,7 +86,8 @@ export function mountStep(s: GameState): boolean {
   trainSkill(s, 'ride', 0.3);
   if (m.fuel !== undefined) {
     // Wer gut reitet, fährt sparsamer
-    if (!R.chance(s, Math.min(0.75, skillLevel(s, 'reiten') * 0.05))) m.fuel -= 1;
+    const saving = Math.min(0.75, skillLevel(s, 'reiten') * 0.05) + (hasSpecial(s, 'schrauber') ? 0.5 : 0);
+    if (!R.chance(s, Math.min(0.9, saving))) m.fuel -= 1;
     if (m.fuel <= 0) {
       m.fuel = 0;
       p.riding = false;
@@ -111,7 +113,8 @@ export function mountAbsorbs(s: GameState, dmg: number, source: string): boolean
   const p = s.player;
   const m = p.mount!;
   const def = mountDef(s)!;
-  dmg = Math.max(1, Math.round(dmg * (1 - Math.min(0.6, skillLevel(s, 'reiten') * 0.04))));
+  const armor = (hasSpecial(s, 'schrauber') ? 0.3 : 0) + (hasSpecial(s, 'sattelfest') ? 0.25 : 0);
+  dmg = Math.max(1, Math.round(dmg * (1 - Math.min(0.6, skillLevel(s, 'reiten') * 0.04)) * (1 - armor)));
   m.hp -= dmg;
   log(s, `${source} trifft ${m.name} für ${dmg} Schaden.`, 'kampf');
   if (m.hp > 0) return true;
@@ -135,6 +138,11 @@ export function restMount(s: GameState) {
   if (!m) return;
   m.down = false;
   m.hp = m.maxHp;
+}
+
+/** Tankgröße des aktuellen Fahrzeugs. */
+export function mountFuelMax(s: GameState): number {
+  return mountDef(s)?.fuel ?? 0;
 }
 
 export function ramBonus(s: GameState): number {

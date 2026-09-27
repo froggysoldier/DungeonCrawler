@@ -91,7 +91,8 @@ function trainSpell(s: GameState, id: string, amount: number) {
 
 /** Zauberschaden an einem Monster; Kills gehen durch den normalen Kampfweg. */
 /** Arkane Kunde verstärkt alle Zauberwirkungen. */
-const arcane = (s: GameState) => 1 + 0.04 * (s.player.skills.find((k) => k.id === 'arkane_kunde')?.level ?? 0);
+const arcane = (s: GameState) =>
+  1 + 0.04 * (s.player.skills.find((k) => k.id === 'arkane_kunde')?.level ?? 0) + (s.player.buffs.some((b) => b.name === 'Manaflut') ? 0.3 : 0);
 
 function spellHurt(s: GameState, m: Monster, dmg: number, label: string): boolean {
   const facets = ['t:zauber', ...targetFacets(s, m), ...selfFacets(s)];

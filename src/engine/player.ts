@@ -4,6 +4,7 @@ import { SKILL_BY_ID } from '../data/skills';
 import { MOUNTS } from '../data/mounts';
 import { LEVEL_UP_QUIPS } from '../data/world';
 import { addBonuses } from './bonuses';
+import { hasSpecial } from './abilities';
 import { traitBonuses } from './traits';
 import { xpToNext } from './progression';
 import { emit } from './events';
@@ -31,6 +32,10 @@ export function totalBonuses(s: GameState): Bonuses {
   if (pet?.alive && pet.abilities?.includes('spaeher')) addBonuses(b, { lichtradius: 1 });
   const mount = s.player.mount;
   if (s.player.riding && mount && !mount.down) addBonuses(b, { ruestung: MOUNTS[mount.id]?.ruestung ?? 0 });
+  // Sondereigenschaften von Rasse und Klasse, die vom Zustand abhängen
+  const eq = s.player.equipment;
+  if (hasSpecial(s, 'nudist') && !eq.kopf && !eq.brust && !eq.beine) addBonuses(b, { ruestung: 4, ausweichen: 10 });
+  if (hasSpecial(s, 'zaeh') && s.player.hp < maxHp(s, b) * 0.25) addBonuses(b, { schaden: { alle: 30 }, ausweichen: 10 });
   return b;
 }
 

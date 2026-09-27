@@ -96,6 +96,11 @@ export function inflict(s: GameState, m: Monster, id: ConditionId, turns: number
   }
   m.conditions ??= {};
   const cur = m.conditions[id];
+  // Brandstifter: eigene Brände brennen heißer und länger
+  if (id === 'brennen' && source === 'du' && hasSpecial(s, 'brandstifter')) {
+    power *= 1.5;
+    turns += 1;
+  }
   const strength = Math.max(1, Math.round(power * (sus > 1 ? 1.5 : 1)));
   if (cur && cur.turns > 0) {
     cur.turns = Math.max(cur.turns, turns);

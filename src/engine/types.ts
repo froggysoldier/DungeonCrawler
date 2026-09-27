@@ -179,7 +179,10 @@ export type SpecialEffect =
   | 'zweite_chance' | 'stampf_beben' | 'katzenfreund' | 'glueckspilz' | 'giftimmun' | 'goldmagnet'
   | 'explosionsschutz' | 'bumerang' | 'vampir'
   // Schutz vor Zuständen
-  | 'blutlos' | 'feuerfest' | 'furchtlos' | 'scharfsichtig';
+  | 'blutlos' | 'feuerfest' | 'furchtlos' | 'scharfsichtig'
+  // Klassen und Rassen
+  | 'klingenmeister' | 'krallen' | 'giftklinge' | 'brandstifter' | 'trankkunde' | 'aasfresser' | 'schrauber' | 'sattelfest'
+  | 'systemkenntnis' | 'haendler' | 'rattenfreund' | 'konterprofi' | 'zaeh' | 'nudist' | 'jaeger' | 'fallenmeister' | 'reichweite';
 
 export interface ConsumableEffect {
   heal?: number;
@@ -280,6 +283,8 @@ export interface Monster {
   zonesHit?: HitZone[];
   /** Hat seinen Schreckensschrei schon ausgestoßen. */
   roared?: boolean;
+  /** Wurde schon bestohlen (Klassenfähigkeit Langfinger). */
+  pickpocketed?: boolean;
   /** Aktive Zustände: Blutung, Brennen, Gift, Furcht, Blindheit. */
   conditions?: Partial<Record<ConditionId, ActiveCondition>>;
   /** Schläft (wacht bei Lärm oder direkt daneben auf). */

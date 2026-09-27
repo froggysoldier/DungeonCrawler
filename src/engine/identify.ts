@@ -1,5 +1,5 @@
 import { RARITY_NAMES, SLOT_NAMES } from '../data/items';
-import { ABILITY_NAMES } from './abilities';
+import { ABILITY_NAMES, hasSpecial } from './abilities';
 import { describeBonuses } from './bonuses';
 import { effectiveStats, maxHp } from './player';
 import { CHALLENGES, challengeOf } from './progression';
@@ -26,7 +26,8 @@ export const INSIGHT_NAMES: Record<Insight, string> = {
 export function intelligenceBonus(s: GameState): number {
   // Wahrnehmung ab Stufe 8 hilft zusätzlich beim Einschätzen
   const perception = (s.player.skills.find((k) => k.id === 'wahrnehmung')?.level ?? 0) >= 8 ? 1 : 0;
-  return Math.max(0, Math.floor((effectiveStats(s).int - 5) / 3)) + perception;
+  const system = hasSpecial(s, 'systemkenntnis') ? 2 : 0;
+  return Math.max(0, Math.floor((effectiveStats(s).int - 5) / 3)) + perception + system;
 }
 
 /** Bonus durch Erfahrung: je 3 besiegte Exemplare dieses Typs eine Stufe (max. 2). */

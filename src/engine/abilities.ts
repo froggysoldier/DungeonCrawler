@@ -8,7 +8,7 @@ import { log } from './log';
 import { isWalkable } from './mapgen';
 import { monsterDefById, spawnForFloor, spawnMonster } from './monsters';
 import * as R from './rng';
-import type { GameState, Monster, MonsterAbility, Pos } from './types';
+import type { GameState, Monster, MonsterAbility, Pos, SpecialEffect } from './types';
 
 export const ABILITY_NAMES: Record<MonsterAbility, string> = {
   gift: 'giftig',
@@ -29,8 +29,8 @@ export const has = (m: Monster, a: MonsterAbility) => !!m.abilities?.includes(a)
 
 export function hasSpecial(s: GameState, special: string): boolean {
   const p = s.player;
-  if (p.race && RACE_BY_ID[p.race]?.special === special) return true;
-  if (p.klass && CLASS_BY_ID[p.klass]?.special === special) return true;
+  if (p.race && RACE_BY_ID[p.race]?.specials?.includes(special as SpecialEffect)) return true;
+  if (p.klass && CLASS_BY_ID[p.klass]?.specials?.includes(special as SpecialEffect)) return true;
   if (traitSpecial(s, special)) return true;
   return Object.values(p.equipment).some((i) => i?.special === special);
 }

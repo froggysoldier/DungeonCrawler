@@ -1,3 +1,4 @@
+import { classSkillsOf } from './classes';
 import type { GameState, Item, MetaState } from './types';
 
 const META_KEY = 'grosser-abstieg.meta.v1';
@@ -62,6 +63,9 @@ export function migrate(s: GameState): GameState {
   }
   // Wer mit altem Spielstand schon auf Etage 2 ist, bekommt das Publikum nachträglich
   if (s.floor >= 2 && !s.unlocks.includes('zuschauer')) s.unlocks.push('zuschauer');
+  // Klassenskills und Begabung für Spielstände von vor dem Klassen-Umbau
+  if (s.player.klass && !s.player.classSkills) s.player.classSkills = classSkillsOf(s.player.race, s.player.klass);
+  s.stats ??= {};
   return s;
 }
 

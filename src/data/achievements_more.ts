@@ -1,5 +1,6 @@
 import type { GameEvent, GameState, Item, Monster } from '../engine/types';
 import type { AchievementDef } from './achievements';
+import { RACE_BY_ID } from './races';
 
 // Zweite Welle an Achievements: Monster, Bosse, Kampfstile, Mode, Wirtschaft.
 
@@ -485,7 +486,7 @@ MORE_ACHIEVEMENTS.push(
     id: 'exot', name: 'Evolution per Mausklick', tier: 'gold', box: 'abenteurer',
     description: 'Wähle eine Rasse, die du dir erst freischalten musstest.',
     comment: 'Du hast dir dein neues Ich verdient. Mit Blut, Schweiß und sehr seltsamen Entscheidungen.',
-    check: (e) => e.type === 'classChosen' && ['katzenmensch', 'troll', 'minotaurus', 'golem', 'pilzling', 'vampir', 'kobold'].includes(e.race),
+    check: (e) => e.type === 'classChosen' && !!RACE_BY_ID[e.race]?.requirement,
   },
   {
     id: 'faehigkeit', name: 'Spezialmove!', tier: 'bronze', box: 'brawler',

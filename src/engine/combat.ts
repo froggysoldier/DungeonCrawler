@@ -147,7 +147,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   const st = effectiveStats(s, b);
   const skills = matchingSkills(s, t);
   const ambush = !target.aware;
-  const ram = t.move === 'anlauf' ? Math.round(ramBonus(s) * (1 + 0.08 * skillLevel(s, 'reiten'))) : 0;
+  const ram = t.move === 'anlauf' ? Math.round(ramBonus(s) * (1 + 0.08 * skillLevel(s, 'reiten')) * (hasSpecial(s, 'sattelfest') ? 1.5 : 1)) : 0;
   p.ausdauer -= ram ? 1 : attackCost(t);
   if (!ram && attackCost(t) >= 3) trainSkill(s, 'stamina', learnFactor(s, target.level));
 
@@ -203,8 +203,12 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     trainAmbush(s);
     if (target.asleep) trainSkill(s, 'sneak', 2 * learnFactor(s, target.level));
   }
+  // Jäger: Arten, die man gut kennt, trifft man dort, wo es wehtut
+  if (hasSpecial(s, 'jaeger') && (s.counters.killsByDef[target.defId] ?? 0) >= 10) pct += 15;
   const zone = t.zone ?? 'koerper';
   let dmg = base * MOVE_MULT[t.move] * ZONES[zone].schaden * (1 + pct / 100) * (0.8 + R.next(s) * 0.4);
+  // Gnadenstoß: angeschlagene Gegner bekommen den Rest
+  if (target.hp < target.maxHp * 0.35 && p.buffs.some((x) => x.name === 'Gnadenstoß')) dmg *= 3;
   if (target.downed > 0) dmg *= 1.2;
   if (has(target, 'gepanzert') && t.part === 'faust') dmg *= 0.5;
   const critChance = 5 + (b.krit ?? 0) + Math.max(0, st.ges - 5) + (zone === 'kopf' ? 5 : 0);
@@ -302,9 +306,17 @@ export function bleedChance(w: Item | null): number {
 
 /** Zustände, die ein Treffer auslösen kann. */
 function applyHitConditions(s: GameState, m: Monster, t: Technique, dmg: number, crit: boolean) {
+  const bleedPower = 1 + Math.floor(dmg / 6);
+  const rage = s.player.buffs.some((b) => b.name === 'Blutrausch');
   if (t.part === 'waffe') {
-    const chance = bleedChance(currentWeapon(s)) + (crit ? 15 : 0);
-    if (chance > 0 && R.chance(s, chance / 100)) inflict(s, m, 'blutung', 4, 1 + Math.floor(dmg / 6));
+    const chance = bleedChance(currentWeapon(s)) + (crit ? 15 : 0) + (hasSpecial(s, 'klingenmeister') ? 20 : 0);
+    if (rage || (chance > 0 && R.chance(s, chance / 100))) inflict(s, m, 'blutung', 4, bleedPower);
+  } else if (t.part !== 'wurf') {
+    // Krallen reißen Wunden, im Blutrausch blutet jeder Treffer
+    if (rage || (t.part === 'faust' && hasSpecial(s, 'krallen') && R.chance(s, 0.2))) inflict(s, m, 'blutung', 4, bleedPower);
+  }
+  if (t.part !== 'wurf' && hasSpecial(s, 'giftklinge') && m.hp > 0 && R.chance(s, 0.25)) {
+    inflict(s, m, 'gift', 5, 1 + Math.floor(s.player.level / 4));
   }
 }
 

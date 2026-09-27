@@ -5,7 +5,7 @@ import { chebyshev, hasLineOfSight } from './fov';
 import { log } from './log';
 import { idx, randomOpenTile, roomOf } from './mapgen';
 import { canStep, findPath } from './path';
-import { has, onMonsterHit, startOfTurn } from './abilities';
+import { has, hasSpecial, onMonsterHit, startOfTurn } from './abilities';
 import { handleLethal } from './death';
 import { passProtects, petCast } from './extras';
 import { crawlerAt, monsterHitsCrawler } from './crawlers';
@@ -121,7 +121,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     emit(s, { type: 'dodged', source: m.name, facets: source });
     if (!ranged) {
       trainSkill(s, 'counter', learnFactor(s, m.level));
-      if (R.chance(s, skillLevel(s, 'konter') * 0.03)) counterStrike(s, m);
+      if (R.chance(s, skillLevel(s, 'konter') * 0.03 + (hasSpecial(s, 'konterprofi') ? 0.15 : 0))) counterStrike(s, m);
     }
     return;
   }
@@ -436,6 +436,7 @@ export function petTurn(s: GameState) {
       }
       let dmg = Math.round((R.int(s, pet.dmg[0], pet.dmg[1]) + petBiteBonus(s)) * (1 + skillLevel(s, 'tierkunde') * 0.06));
       if (Object.values(p.equipment).some((i) => i?.special === 'katzenfreund')) dmg = Math.round(dmg * 1.5);
+      if (p.buffs.some((b) => b.name === 'Rudelruf')) dmg *= 2;
       const dealt = Math.max(1, dmg - t.ruestung);
       t.hp -= dealt;
       t.aware = true;
