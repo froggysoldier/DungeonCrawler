@@ -3,41 +3,47 @@ extends RefCounted
 ## Sichtfeld und Sichtlinie (Port von src/engine/fov.ts).
 
 
-## Sichtfeld per Strahlenwurf. Gibt die sichtbaren Kachel-Indizes zurück.
-static func compute(m: FloorMap, origin: Vector2i, radius: int) -> Dictionary:
+## Sichtfeld per Strahlenwurf. Gibt die sichtbaren Kachel-Indizes als Menge zurück.
+static func compute(m: Dictionary, origin: Dictionary, radius: int) -> Dictionary:
 	var visible := {}
-	visible[m.idx(origin.x, origin.y)] = true
+	var width: int = m.width
+	var height: int = m.height
+	visible[int(origin.y) * width + int(origin.x)] = true
 	var steps := ceili(2.0 * PI * radius * 1.5)
 	for i in steps:
 		var a := (float(i) / steps) * PI * 2.0
 		var dx := cos(a)
 		var dy := sin(a)
-		var x := origin.x + 0.5
-		var y := origin.y + 0.5
+		var x: float = origin.x + 0.5
+		var y: float = origin.y + 0.5
 		for d in radius:
 			x += dx
 			y += dy
 			var tx := floori(x)
 			var ty := floori(y)
-			if not m.in_bounds(tx, ty):
+			if tx < 0 or ty < 0 or tx >= width or ty >= height:
 				break
-			visible[m.idx(tx, ty)] = true
-			if m.blocks_sight(tx, ty):
+			var i2 := ty * width + tx
+			visible[i2] = true
+			var t: String = m.tiles[i2]
+			if t == "wall" or t == "door":
 				break
 	return visible
 
 
 ## Sichtlinie zwischen zwei Punkten (Bresenham).
-static func has_line_of_sight(m: FloorMap, a: Vector2i, b: Vector2i) -> bool:
-	var x0 := a.x
-	var y0 := a.y
-	var dx := absi(b.x - x0)
-	var dy := -absi(b.y - y0)
-	var sx := 1 if x0 < b.x else -1
-	var sy := 1 if y0 < b.y else -1
+static func has_line_of_sight(m: Dictionary, a: Dictionary, b: Dictionary) -> bool:
+	var x0: int = a.x
+	var y0: int = a.y
+	var bx: int = b.x
+	var by: int = b.y
+	var dx := absi(bx - x0)
+	var dy := -absi(by - y0)
+	var sx := 1 if x0 < bx else -1
+	var sy := 1 if y0 < by else -1
 	var err := dx + dy
-	while not (x0 == b.x and y0 == b.y):
-		if not (x0 == a.x and y0 == a.y) and m.blocks_sight(x0, y0):
+	while not (x0 == bx and y0 == by):
+		if not (x0 == a.x and y0 == a.y) and MapGen.blocks_sight(m, x0, y0):
 			return false
 		var e2 := 2 * err
 		if e2 >= dy:
@@ -49,5 +55,5 @@ static func has_line_of_sight(m: FloorMap, a: Vector2i, b: Vector2i) -> bool:
 	return true
 
 
-static func chebyshev(a: Vector2i, b: Vector2i) -> int:
-	return maxi(absi(a.x - b.x), absi(a.y - b.y))
+static func chebyshev(a: Dictionary, b: Dictionary) -> int:
+	return maxi(absi(int(a.x) - int(b.x)), absi(int(a.y) - int(b.y)))

@@ -30,6 +30,10 @@ func _initialize() -> void:
 	var dir := DirAccess.open("res://tests")
 	var files := Array(dir.get_files()).filter(func(f): return f.begins_with("test_") and f.ends_with(".gd"))
 	files.sort()
+	# Filter: godot ... -s res://tests/run_tests.gd -- replay
+	var filter := OS.get_cmdline_user_args()
+	if not filter.is_empty():
+		files = files.filter(func(f): return f.contains(filter[0]))
 	for file in files:
 		var inst = load("res://tests/%s" % file).new()
 		if inst.has_method("setup"):

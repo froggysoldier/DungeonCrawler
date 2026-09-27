@@ -2685,7 +2685,13 @@
    "wert": 60
   }
  ],
- "FOOD_IDS": {},
+ "FOOD_IDS": [
+  "schokoriegel",
+  "dosenbrot",
+  "mettbroetchen",
+  "apfel",
+  "dosenbier"
+ ],
  "UNIQUE_ITEMS": [
   {
    "id": "zweite_chance",

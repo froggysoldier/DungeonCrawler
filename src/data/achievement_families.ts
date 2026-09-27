@@ -27,7 +27,8 @@ interface Family {
   stages: Stage[];
 }
 
-const st = (key: string) => (s: GameState) => s.stats?.[key] ?? 0;
+/** Wert aus der Statistik; der Schlüssel hängt an der Funktion (für den Godot-Export). */
+const st = (key: string) => Object.assign((s: GameState) => s.stats?.[key] ?? 0, { statKey: key });
 
 const COMMENTS: Record<AchievementCategory, string[]> = {
   kampf: [
@@ -727,6 +728,13 @@ function hashIndex(id: string, n: number): number {
   let h = 0;
   for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   return h % n;
+}
+
+/** Familien ohne Funktionen: Statistik-Schlüssel oder Familien-ID (für den Godot-Export). */
+export function familyTable() {
+  return FAMILIES.map((f) => ({
+    id: f.id, stat: (f.value as { statKey?: string }).statKey ?? null, stages: f.stages.map((x) => x.n),
+  }));
 }
 
 /** Alle gestuften Achievements als normale Achievement-Definitionen. */

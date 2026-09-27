@@ -3,7 +3,7 @@
 Erzeugt von `npm run export:godot`. Nicht von Hand bearbeiten.
 
 ## achievement_families
-Exporte: –
+Exporte: familyTable
 Nicht exportierbar (Funktionen, in GDScript nachbauen):
 - familyAchievements
 - nextGoals
@@ -15,7 +15,7 @@ Nicht exportierbar (Funktionen, in GDScript nachbauen):
 - categoryOf
 
 ## achievements_moments
-Exporte: MOMENT_ACHIEVEMENTS
+Exporte: MOMENT_ACHIEVEMENTS, momentTable
 Nicht exportierbar (Funktionen, in GDScript nachbauen):
 - MOMENT_ACHIEVEMENTS[].check
 

@@ -567,5 +567,322 @@
    "box": "waffen",
    "category": "technik"
   }
+ ],
+ "momentTable": [
+  {
+   "id": "mo_einschlag",
+   "stat": "kills.einschlag",
+   "n": 1
+  },
+  {
+   "id": "mo_einschlag10",
+   "stat": "kills.einschlag",
+   "n": 10
+  },
+  {
+   "id": "mo_anatomie",
+   "stat": "kills.anatomie",
+   "n": 1
+  },
+  {
+   "id": "mo_erschoepft",
+   "stat": "kills.erschoepft",
+   "n": 1
+  },
+  {
+   "id": "mo_toedlich",
+   "stat": "kills.toedlich",
+   "n": 1
+  },
+  {
+   "id": "mo_elite_staerker",
+   "stat": "kills.elite.staerker",
+   "n": 1
+  },
+  {
+   "id": "mo_riese",
+   "stat": "kills.riesig",
+   "n": 1
+  },
+  {
+   "id": "mo_unbekannt",
+   "stat": "kills.unbekannt",
+   "n": 1
+  },
+  {
+   "id": "mo_tuer",
+   "stat": "kills.tuer",
+   "n": 1
+  },
+  {
+   "id": "mo_umzingelt",
+   "stat": "kills.umzingelt",
+   "n": 10
+  },
+  {
+   "id": "mo_nackt",
+   "stat": "kills.nackt",
+   "n": 10
+  },
+  {
+   "id": "mo_barfuss",
+   "stat": "kills.barfuss",
+   "n": 25
+  },
+  {
+   "id": "mo_bademantel",
+   "stat": "kills.bademantel",
+   "n": 25
+  },
+  {
+   "id": "mo_angetrunken",
+   "stat": "kills.angetrunken",
+   "n": 5
+  },
+  {
+   "id": "mo_feuertaufe",
+   "stat": "kills.selbstbrennend",
+   "n": 1
+  },
+  {
+   "id": "mo_blindflug",
+   "stat": "kills.geblendet",
+   "n": 1
+  },
+  {
+   "id": "mo_mut",
+   "stat": "kills.veraengstigt",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_makellos",
+   "stat": "boss.makellos",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_zauber",
+   "stat": "boss.zauber",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_falle",
+   "stat": "boss.falle",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_haustier",
+   "stat": "boss.haustier",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_party",
+   "stat": "boss.party",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_sprung",
+   "stat": "boss.sprung",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_kopf",
+   "stat": "boss.kopf",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_gerammt",
+   "stat": "boss.gerammt",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_konter",
+   "stat": "boss.konter",
+   "n": 1
+  },
+  {
+   "id": "mo_boss_schlafend",
+   "stat": "boss.schlafend",
+   "n": 1
+  },
+  {
+   "id": "mo_explosion3",
+   "stat": "max.explosionkills",
+   "n": 3
+  },
+  {
+   "id": "mo_eigentor",
+   "stat": "explosion.selbst",
+   "n": 1
+  },
+  {
+   "id": "mo_befreit_kampf",
+   "stat": "befreit.kampf",
+   "n": 1
+  },
+  {
+   "id": "mo_weitwurf",
+   "stat": "kills.weitwurf",
+   "n": 1
+  },
+  {
+   "id": "mo_ein_lp",
+   "stat": "ueberlebt.einlp",
+   "n": 1
+  },
+  {
+   "id": "mo_trank_knapp",
+   "stat": "traenke.knapp",
+   "n": 1
+  },
+  {
+   "id": "mo_rettung_haustier",
+   "stat": "rettung.haustier",
+   "n": 1
+  },
+  {
+   "id": "mo_rettung_party",
+   "stat": "rettung.party",
+   "n": 1
+  },
+  {
+   "id": "mo_saferoom_knapp",
+   "stat": "saferoom.knapp",
+   "n": 1
+  },
+  {
+   "id": "mo_tuer_zu",
+   "stat": "tueren.zugeschlagen",
+   "n": 1
+  },
+  {
+   "id": "mo_schlaflos",
+   "stat": "max.wach",
+   "n": 480
+  },
+  {
+   "id": "mo_umzingelt_aufstieg",
+   "stat": "aufstieg.umzingelt",
+   "n": 1
+  },
+  {
+   "id": "mo_doppelaufstieg",
+   "stat": "max.aufstiege.zug",
+   "n": 2
+  },
+  {
+   "id": "mo_snack",
+   "stat": "essen.imkampf",
+   "n": 1
+  },
+  {
+   "id": "mo_toilette_kampf",
+   "stat": "toilette.imkampf",
+   "n": 1
+  },
+  {
+   "id": "mo_unfall",
+   "stat": "unfall",
+   "n": 1
+  },
+  {
+   "id": "mo_boxen_horten",
+   "stat": null,
+   "n": null
+  },
+  {
+   "id": "mo_goldbad",
+   "stat": "max.gold",
+   "n": 2000
+  },
+  {
+   "id": "mo_feilschen_max",
+   "stat": "feilschen.maximal",
+   "n": 1
+  },
+  {
+   "id": "mo_feilschen_pleiten",
+   "stat": "max.feilschpleiten",
+   "n": 3
+  },
+  {
+   "id": "mo_ausverkauf",
+   "stat": "laden.leergekauft",
+   "n": 1
+  },
+  {
+   "id": "mo_jackpot",
+   "stat": "lose.jackpot",
+   "n": 1
+  },
+  {
+   "id": "mo_nieten",
+   "stat": "lose.nieten",
+   "n": 10
+  },
+  {
+   "id": "mo_kettenzauber",
+   "stat": null,
+   "n": null
+  },
+  {
+   "id": "mo_gerettet_party",
+   "stat": "party.gerettet",
+   "n": 1
+  },
+  {
+   "id": "mo_auftrag_verpatzt",
+   "stat": "auftraege.verpatzt",
+   "n": 1
+  },
+  {
+   "id": "mo_etage2_frueh",
+   "stat": null,
+   "n": null
+  },
+  {
+   "id": "mo_etage3_frueh",
+   "stat": null,
+   "n": null
+  },
+  {
+   "id": "mo_waffe_bratpfanne",
+   "stat": "kills.waffe.bratpfanne",
+   "n": 5
+  },
+  {
+   "id": "mo_waffe_handtasche",
+   "stat": "kills.waffe.handtasche",
+   "n": 5
+  },
+  {
+   "id": "mo_waffe_regenschirm",
+   "stat": "kills.waffe.regenschirm",
+   "n": 5
+  },
+  {
+   "id": "mo_waffe_nudelholz",
+   "stat": "kills.waffe.nudelholz",
+   "n": 5
+  },
+  {
+   "id": "mo_waffe_golfschlaeger",
+   "stat": "kills.waffe.golfschlaeger",
+   "n": 5
+  },
+  {
+   "id": "mo_waffe_tischtennis",
+   "stat": "kills.waffe.tischtennis",
+   "n": 5
+  },
+  {
+   "id": "mo_waffe_kettensaege",
+   "stat": "kills.waffe.kettensaege",
+   "n": 5
+  },
+  {
+   "id": "mo_waffe_schoepfkelle",
+   "stat": "kills.waffe.schoepfkelle",
+   "n": 5
+  }
  ]
 }

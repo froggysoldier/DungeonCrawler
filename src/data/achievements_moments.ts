@@ -8,7 +8,8 @@ import type { AchievementCategory, AchievementDef } from './achievements';
  */
 
 const st = (s: GameState, key: string) => s.stats?.[key] ?? 0;
-const once = (key: string, n = 1) => (_e: unknown, s: GameState) => st(s, key) >= n;
+/** Schwelle auf einem Statistik-Wert; Schlüssel und Schwelle hängen an der Funktion (für den Godot-Export). */
+const once = (key: string, n = 1) => Object.assign((_e: unknown, s: GameState) => st(s, key) >= n, { statKey: key, n });
 
 type Moment = Omit<AchievementDef, 'check' | 'category'> & { check: AchievementDef['check'] };
 
@@ -389,3 +390,8 @@ export const MOMENT_ACHIEVEMENTS: AchievementDef[] = MOMENTS.map((m) => ({
   ...m,
   category: CATEGORY[m.id] ?? (m.id.startsWith('mo_waffe_') ? 'technik' : 'momente'),
 }));
+
+/** Moment-Achievements mit Statistik-Schwelle (für den Godot-Export). */
+export function momentTable() {
+  return MOMENTS.map((m) => ({ id: m.id, stat: (m.check as { statKey?: string }).statKey ?? null, n: (m.check as { n?: number }).n ?? null }));
+}

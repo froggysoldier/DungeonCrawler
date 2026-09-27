@@ -21,6 +21,8 @@ function clean(value, path, dropped, seen = new WeakSet()) {
     return undefined;
   }
   if (value === null || typeof value !== 'object') return value;
+  if (value instanceof Set) return clean([...value], path, dropped, seen);
+  if (value instanceof Map) return clean(Object.fromEntries(value), path, dropped, seen);
   if (seen.has(value)) return value;
   seen.add(value);
   if (Array.isArray(value)) return value.map((v, i) => clean(v, `${path}[${i}]`, dropped, seen)).filter((v) => v !== undefined);
@@ -65,6 +67,10 @@ async function writeFixtures() {
     return { seed, width: m.width, height: m.height, tiles: m.tiles, from, fov, to, path };
   });
   writeFileSync(join(FIX, 'maps.json'), JSON.stringify(maps) + '\n');
+  const RP = await server.ssrLoadModule('/scripts/godot-replay.ts');
+  const reps = RP.replays();
+  writeFileSync(join(FIX, 'replays.json'), JSON.stringify(reps) + '\n');
+  console.log(`Replays: ${reps.map((r) => `Seed ${r.seed}: ${r.actions.length} Aktionen`).join(', ')}`);
 }
 
 try {
@@ -76,6 +82,11 @@ try {
     for (const [k, v] of Object.entries(mod)) {
       // Nachschlage-Tabellen (…_BY_ID) baut Godot beim Laden selbst auf
       if (/_BY_ID$/.test(k)) continue;
+      // Funktionen, die eine Tabelle für den Export liefern (z. B. familyTable)
+      if (typeof v === 'function' && /Table$/.test(k) && v.length === 0) {
+        data[k] = clean(v(), k, dropped);
+        continue;
+      }
       const c = clean(v, k, dropped);
       if (c !== undefined) data[k] = c;
       else dropped.add(k);

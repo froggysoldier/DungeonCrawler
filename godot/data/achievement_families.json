@@ -1,1 +1,850 @@
-{}
+{
+ "familyTable": [
+  {
+   "id": "kills",
+   "stat": "kills",
+   "stages": [
+    250,
+    500,
+    1000
+   ]
+  },
+  {
+   "id": "krits",
+   "stat": "krits",
+   "stages": [
+    100,
+    300
+   ]
+  },
+  {
+   "id": "schaden",
+   "stat": "schaden.ausgeteilt",
+   "stages": [
+    500,
+    2500,
+    10000
+   ]
+  },
+  {
+   "id": "maxtreffer",
+   "stat": "max.treffer",
+   "stages": [
+    50,
+    100,
+    200
+   ]
+  },
+  {
+   "id": "killserie",
+   "stat": "max.killserie",
+   "stages": [
+    2,
+    3,
+    5
+   ]
+  },
+  {
+   "id": "sauber",
+   "stat": "max.sauber",
+   "stages": [
+    5,
+    15,
+    30
+   ]
+  },
+  {
+   "id": "staerker",
+   "stat": "kills.staerker",
+   "stages": [
+    10,
+    50
+   ]
+  },
+  {
+   "id": "harmlos",
+   "stat": "kills.harmlos",
+   "stages": [
+    25,
+    100
+   ]
+  },
+  {
+   "id": "schlafend",
+   "stat": "kills.schlafend",
+   "stages": [
+    1,
+    10,
+    40
+   ]
+  },
+  {
+   "id": "fliehend",
+   "stat": "kills.fliehend",
+   "stages": [
+    1,
+    10
+   ]
+  },
+  {
+   "id": "liegend",
+   "stat": "kills.liegend",
+   "stages": [
+    10,
+    50,
+    150
+   ]
+  },
+  {
+   "id": "fasttot",
+   "stat": "kills.fasttot",
+   "stages": [
+    5,
+    25
+   ]
+  },
+  {
+   "id": "umwerfen",
+   "stat": null,
+   "stages": [
+    50,
+    150
+   ]
+  },
+  {
+   "id": "teil_faust",
+   "stat": "kills.teil.faust",
+   "stages": [
+    25,
+    100,
+    300
+   ]
+  },
+  {
+   "id": "teil_tritt",
+   "stat": "kills.teil.tritt",
+   "stages": [
+    25,
+    100,
+    300
+   ]
+  },
+  {
+   "id": "teil_knie",
+   "stat": "kills.teil.knie",
+   "stages": [
+    25,
+    100,
+    250
+   ]
+  },
+  {
+   "id": "teil_ellbogen",
+   "stat": "kills.teil.ellbogen",
+   "stages": [
+    25,
+    100,
+    250
+   ]
+  },
+  {
+   "id": "teil_kopf",
+   "stat": "kills.teil.kopf",
+   "stages": [
+    25,
+    100,
+    250
+   ]
+  },
+  {
+   "id": "teil_waffe",
+   "stat": "kills.teil.waffe",
+   "stages": [
+    25,
+    100,
+    300
+   ]
+  },
+  {
+   "id": "teil_wurf",
+   "stat": "kills.teil.wurf",
+   "stages": [
+    25,
+    100,
+    250
+   ]
+  },
+  {
+   "id": "teil_zauber",
+   "stat": "kills.teil.zauber",
+   "stages": [
+    5,
+    25,
+    100
+   ]
+  },
+  {
+   "id": "teil_falle",
+   "stat": "kills.teil.falle",
+   "stages": [
+    3,
+    15,
+    50
+   ]
+  },
+  {
+   "id": "teil_bombe",
+   "stat": "kills.teil.bombe",
+   "stages": [
+    3,
+    15,
+    50
+   ]
+  },
+  {
+   "id": "teil_haustier",
+   "stat": "kills.teil.haustier",
+   "stages": [
+    5,
+    25,
+    100
+   ]
+  },
+  {
+   "id": "teil_blutung",
+   "stat": "kills.teil.blutung",
+   "stages": [
+    5,
+    25,
+    75
+   ]
+  },
+  {
+   "id": "teil_feuer",
+   "stat": "kills.teil.feuer",
+   "stages": [
+    5,
+    25,
+    75
+   ]
+  },
+  {
+   "id": "teil_gift",
+   "stat": "kills.teil.gift",
+   "stages": [
+    5,
+    25,
+    75
+   ]
+  },
+  {
+   "id": "furcht",
+   "stat": "zustand.furcht",
+   "stages": [
+    10,
+    50
+   ]
+  },
+  {
+   "id": "blenden",
+   "stat": "zustand.blind",
+   "stages": [
+    10,
+    50
+   ]
+  },
+  {
+   "id": "aufschlitzen",
+   "stat": "zustand.blutung",
+   "stages": [
+    25,
+    100
+   ]
+  },
+  {
+   "id": "anzuenden",
+   "stat": "zustand.brennen",
+   "stages": [
+    10,
+    50
+   ]
+  },
+  {
+   "id": "teil_party",
+   "stat": "kills.teil.party",
+   "stages": [
+    5,
+    25,
+    100
+   ]
+  },
+  {
+   "id": "konter",
+   "stat": "kills.konter",
+   "stages": [
+    3,
+    15
+   ]
+  },
+  {
+   "id": "bewegung_sprung",
+   "stat": "kills.bewegung.sprung",
+   "stages": [
+    10,
+    50,
+    150
+   ]
+  },
+  {
+   "id": "bewegung_stampfen",
+   "stat": "kills.bewegung.stampfen",
+   "stages": [
+    50,
+    150
+   ]
+  },
+  {
+   "id": "bewegung_anlauf",
+   "stat": "kills.bewegung.anlauf",
+   "stages": [
+    25,
+    100
+   ]
+  },
+  {
+   "id": "zone_kopf",
+   "stat": "kills.zone.kopf",
+   "stages": [
+    5,
+    25,
+    100
+   ]
+  },
+  {
+   "id": "zone_beine",
+   "stat": "kills.zone.beine",
+   "stages": [
+    5,
+    25
+   ]
+  },
+  {
+   "id": "zone_arme",
+   "stat": "kills.zone.arme",
+   "stages": [
+    5,
+    25
+   ]
+  },
+  {
+   "id": "benommen",
+   "stat": "zonen.benommen",
+   "stages": [
+    5,
+    25,
+    100
+   ]
+  },
+  {
+   "id": "humpeln",
+   "stat": "zonen.humpelt",
+   "stages": [
+    10,
+    50
+   ]
+  },
+  {
+   "id": "schwaechen",
+   "stat": "zonen.geschwaecht",
+   "stages": [
+    10,
+    50
+   ]
+  },
+  {
+   "id": "bestiarium",
+   "stat": "bestiarium.arten",
+   "stages": [
+    10,
+    20,
+    30,
+    45
+   ]
+  },
+  {
+   "id": "elite_viel",
+   "stat": "kills.elite",
+   "stages": [
+    10,
+    25
+   ]
+  },
+  {
+   "id": "raeume",
+   "stat": "raeume.entdeckt",
+   "stages": [
+    10,
+    25,
+    60,
+    120
+   ]
+  },
+  {
+   "id": "erkundet",
+   "stat": "max.erkundet",
+   "stages": [
+    50,
+    75,
+    95
+   ]
+  },
+  {
+   "id": "tueren",
+   "stat": "tueren.geoeffnet",
+   "stages": [
+    1,
+    10,
+    30
+   ]
+  },
+  {
+   "id": "schritte",
+   "stat": null,
+   "stages": [
+    1000,
+    5000,
+    20000
+   ]
+  },
+  {
+   "id": "saferooms",
+   "stat": "saferooms.entdeckt",
+   "stages": [
+    3,
+    10
+   ]
+  },
+  {
+   "id": "aufheben",
+   "stat": "gegenstaende.aufgehoben",
+   "stages": [
+    60,
+    200,
+    500
+   ]
+  },
+  {
+   "id": "boxen",
+   "stat": "boxen.geoeffnet",
+   "stages": [
+    50,
+    100
+   ]
+  },
+  {
+   "id": "boxstufe_gold",
+   "stat": "boxen.stufe.gold",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "boxstufe_platin",
+   "stat": "boxen.stufe.platin",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "boxstufe_legendaer",
+   "stat": "boxen.stufe.legendaer",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "boxstufe_himmlisch",
+   "stat": "boxen.stufe.himmlisch",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "episch",
+   "stat": "fund.episch",
+   "stages": [
+    1,
+    5
+   ]
+  },
+  {
+   "id": "ausgegeben",
+   "stat": "gold.ausgegeben",
+   "stages": [
+    100,
+    500,
+    2000
+   ]
+  },
+  {
+   "id": "verkauft",
+   "stat": "verkauft",
+   "stages": [
+    10,
+    50,
+    150
+   ]
+  },
+  {
+   "id": "gekauft",
+   "stat": "gekauft",
+   "stages": [
+    5,
+    25
+   ]
+  },
+  {
+   "id": "feilschen",
+   "stat": "feilschen.gewonnen",
+   "stages": [
+    3,
+    15,
+    40
+   ]
+  },
+  {
+   "id": "lose",
+   "stat": "lose",
+   "stages": [
+    5,
+    25
+   ]
+  },
+  {
+   "id": "gold_verdient",
+   "stat": null,
+   "stages": [
+    1500,
+    5000
+   ]
+  },
+  {
+   "id": "erlitten",
+   "stat": "schaden.erlitten",
+   "stages": [
+    500,
+    2000,
+    5000
+   ]
+  },
+  {
+   "id": "ausweichen",
+   "stat": "ausgewichen",
+   "stages": [
+    25,
+    100,
+    300
+   ]
+  },
+  {
+   "id": "knapp",
+   "stat": "knapp.ueberlebt",
+   "stages": [
+    3,
+    15
+   ]
+  },
+  {
+   "id": "traenke",
+   "stat": null,
+   "stages": [
+    30,
+    100
+   ]
+  },
+  {
+   "id": "mahlzeiten",
+   "stat": null,
+   "stages": [
+    20,
+    50
+   ]
+  },
+  {
+   "id": "toilette",
+   "stat": "toilette",
+   "stages": [
+    1,
+    10,
+    25
+   ]
+  },
+  {
+   "id": "fallen_gefunden",
+   "stat": null,
+   "stages": [
+    5,
+    20,
+    50
+   ]
+  },
+  {
+   "id": "fallen_entschaerft",
+   "stat": null,
+   "stages": [
+    5,
+    20
+   ]
+  },
+  {
+   "id": "fallen_ausgeloest",
+   "stat": null,
+   "stages": [
+    3,
+    10
+   ]
+  },
+  {
+   "id": "verbandszeug",
+   "stat": "zustand.erlitten",
+   "stages": [
+    10,
+    50
+   ]
+  },
+  {
+   "id": "befreit",
+   "stat": "befreit",
+   "stages": [
+    5
+   ]
+  },
+  {
+   "id": "gezaubert",
+   "stat": "zauber.gewirkt",
+   "stages": [
+    10,
+    50,
+    200
+   ]
+  },
+  {
+   "id": "zauber_gelernt",
+   "stat": null,
+   "stages": [
+    2,
+    5,
+    9
+   ]
+  },
+  {
+   "id": "gebaut",
+   "stat": null,
+   "stages": [
+    5,
+    25,
+    75
+   ]
+  },
+  {
+   "id": "rezept_verband",
+   "stat": "hergestellt.verband",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "rezept_brandflasche",
+   "stat": "hergestellt.brandflasche",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "rezept_nagelbombe",
+   "stat": "hergestellt.nagelbombe",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "rezept_stachelfalle",
+   "stat": "hergestellt.stachelfalle",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "rezept_schlingfalle",
+   "stat": "hergestellt.schlingfalle",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "rezept_sprengfalle",
+   "stat": "hergestellt.sprengfalle",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "rezept_waffe_naegel",
+   "stat": "hergestellt.waffe_naegel",
+   "stages": [
+    1
+   ]
+  },
+  {
+   "id": "aufgestellt",
+   "stat": "fallen.aufgestellt",
+   "stages": [
+    5,
+    20
+   ]
+  },
+  {
+   "id": "crawler",
+   "stat": "crawler.getroffen",
+   "stages": [
+    5,
+    15,
+    40
+   ]
+  },
+  {
+   "id": "party",
+   "stat": "party.beigetreten",
+   "stages": [
+    3,
+    8
+   ]
+  },
+  {
+   "id": "auftraege",
+   "stat": "auftraege.erledigt",
+   "stages": [
+    10,
+    25
+   ]
+  },
+  {
+   "id": "tipps",
+   "stat": "tipps",
+   "stages": [
+    5
+   ]
+  },
+  {
+   "id": "samariter",
+   "stat": "crawler.geheilt",
+   "stages": [
+    1,
+    5
+   ]
+  },
+  {
+   "id": "crawlerjagd",
+   "stat": "kills.crawler",
+   "stages": [
+    3,
+    10
+   ]
+  },
+  {
+   "id": "haustier_stufe",
+   "stat": null,
+   "stages": [
+    10,
+    15
+   ]
+  },
+  {
+   "id": "follower",
+   "stat": null,
+   "stages": [
+    2500,
+    25000,
+    100000
+   ]
+  },
+  {
+   "id": "sponsorwuensche",
+   "stat": "sponsor.wuensche",
+   "stages": [
+    3,
+    10
+   ]
+  },
+  {
+   "id": "fangeschenke",
+   "stat": "fangeschenke",
+   "stages": [
+    1,
+    5
+   ]
+  },
+  {
+   "id": "reiten",
+   "stat": "reittier.schritte",
+   "stages": [
+    100,
+    1000
+   ]
+  },
+  {
+   "id": "rammkills",
+   "stat": "reittier.kills",
+   "stages": [
+    10,
+    30
+   ]
+  },
+  {
+   "id": "stufe",
+   "stat": null,
+   "stages": [
+    3,
+    7,
+    12,
+    20
+   ]
+  },
+  {
+   "id": "skills_gelernt",
+   "stat": null,
+   "stages": [
+    3,
+    8,
+    15,
+    25
+   ]
+  },
+  {
+   "id": "skill_stufe",
+   "stat": null,
+   "stages": [
+    5,
+    15
+   ]
+  },
+  {
+   "id": "entdeckte_skills",
+   "stat": null,
+   "stages": [
+    1,
+    5,
+    10
+   ]
+  },
+  {
+   "id": "wert",
+   "stat": null,
+   "stages": [
+    12,
+    16,
+    20
+   ]
+  }
+ ]
+}
