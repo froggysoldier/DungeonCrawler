@@ -250,6 +250,8 @@ export interface Monster {
   provoked?: boolean;
   /** Techniken, mit denen dieser Mob in diesem Kampf getroffen wurde. */
   hitBy?: string[];
+  /** Trefferzonen, die der Crawler an diesem Mob schon getroffen hat. */
+  zonesHit?: HitZone[];
   /** Schläft (wacht bei Lärm oder direkt daneben auf). */
   asleep?: boolean;
   /** Wo es den Crawler zuletzt gesehen oder gehört hat. */
@@ -311,6 +313,8 @@ export interface NpcCrawler {
   /** Vertrauen 0–100: steigt durch Geschenke und gemeinsame Kämpfe. */
   trust: number;
   tipGiven?: boolean;
+  /** Vom Crawler versorgt (Heilung geschenkt). */
+  healed?: boolean;
   /** Zug, bis zu dem eine erneute Einladung abgelehnt wird. */
   refusedUntil?: number;
   kills: number;
@@ -602,6 +606,8 @@ export interface GameState {
   fallen?: string[];
   floorSnapshot?: FloorSnapshot;
   fx?: Fx[];
+  /** Statistik: zählt alles mit (Grundlage für gestufte Achievements). */
+  stats?: Record<string, number>;
   sfx?: Sfx[];
   sponsors?: SponsorState[];
   quests?: Quest[];
@@ -682,6 +688,8 @@ export type GameEvent =
   | { type: 'petLevel'; level: number }
   | { type: 'petEvolved'; form: string; stage: number }
   | { type: 'doorOpened'; pos: Pos }
+  | { type: 'doorClosed'; pos: Pos }
+  | { type: 'potion'; item: Item; hpBefore: number }
   | { type: 'mountGained'; id: string }
   | { type: 'rammed'; kill: boolean }
   | { type: 'mountLost'; id: string }

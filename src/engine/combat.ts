@@ -19,6 +19,7 @@ import { roomOf } from './mapgen';
 import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, totalBonuses } from './player';
 import * as R from './rng';
 import { learnFactor, matchingSkills, techniqueKey, trainAmbush, trainSkill } from './skills';
+import { track } from './stats';
 import type { AttackMove, AttackPart, GameState, HitZone, Item, Monster, Pos, Technique } from './types';
 
 export const MOVE_NAMES: Record<AttackMove, string> = {
@@ -216,6 +217,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   target.aware = true;
   floatText(s, target.pos, crit ? `${final}!` : String(final), crit ? FX_COLORS.krit : FX_COLORS.schaden);
   target.hitBy = [...new Set([...(target.hitBy ?? []), t.part])];
+  target.zonesHit = [...new Set([...(target.zonesHit ?? []), zone])];
   s.counters.damageDealt += final;
   const critTxt = crit ? ' KRITISCH!' : '';
   log(s, `${ambush ? 'Überraschungsangriff! ' : ''}Dein ${name} trifft ${nameOf(s, target)} für ${final} Schaden.${critTxt}`, 'kampf');
@@ -301,12 +303,15 @@ function applyZoneEffect(s: GameState, m: Monster, zone: HitZone, dmg: number) {
   if (zone !== 'koerper') trainSkill(s, 'zone', learnFactor(s, m.level));
   if (zone === 'kopf' && m.rank !== 'boroughboss' && R.chance(s, (bigHit ? 0.35 : 0.15) + skill)) {
     m.stunned = Math.max(m.stunned ?? 0, 1);
+    track(s, 'zonen.benommen');
     log(s, `${NameOf(s, m)} ist benommen und taumelt.`, 'kampf');
   } else if (zone === 'arme' && R.chance(s, 0.4 + skill)) {
     m.weakened = Math.max(m.weakened ?? 0, 3);
+    track(s, 'zonen.geschwaecht');
     log(s, `${NameOf(s, m)} kann den Arm kaum noch heben. Seine Angriffe werden schwächer.`, 'kampf');
   } else if (zone === 'beine' && R.chance(s, 0.35 + skill)) {
     m.slowed = Math.max(m.slowed ?? 0, 4);
+    track(s, 'zonen.humpelt');
     log(s, `${NameOf(s, m)} humpelt.`, 'kampf');
   }
 }
@@ -322,7 +327,11 @@ export function counterStrike(s: GameState, m: Monster) {
   floatText(s, m.pos, String(dmg), FX_COLORS.schaden);
   log(s, `Du weichst aus und konterst sofort: ${dmg} Schaden an ${nameOf(s, m)}.`, 'kampf');
   const t: Technique = { part: 'faust', move: 'normal' };
-  if (m.hp <= 0) killMonster(s, m, t, false, attackFacets(s, m, t));
+  if (m.hp > 0) return;
+  // Merker für die Statistik: dieser Kill war ein Konter
+  s.stats = { ...s.stats, _konter: 1 };
+  killMonster(s, m, t, false, attackFacets(s, m, t));
+  s.stats._konter = 0;
 }
 
 export function dropNear(s: GameState, item: Item, pos: Pos) {

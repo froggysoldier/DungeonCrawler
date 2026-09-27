@@ -317,6 +317,7 @@ export function closeDoor(s: GameState, at: Pos): ActionResult {
   if (occupied(s, at) || itemsAt(s, at).length) return fail('Etwas steht in der Tür.');
   s.map.tiles[idx(s.map, at.x, at.y)] = 'door';
   log(s, 'Du ziehst die Tür hinter dir zu. Klick.', 'info');
+  emit(s, { type: 'doorClosed', pos: { ...at } });
   afterMove(s);
   endTurn(s);
   return OK;
@@ -737,9 +738,12 @@ export function useItem(s: GameState, uid: string): ActionResult {
     }
   } else {
     log(s, `Du benutzt: ${itemName(s, it)}.`, 'info');
-    if (it.baseId.includes('trank') || it.baseId === 'gegengift') s.counters.potionsDrunk += 1;
+    const potion = it.baseId.includes('trank') || it.baseId === 'gegengift';
+    const hpBefore = s.player.hp;
+    if (potion) s.counters.potionsDrunk += 1;
     applyEffect(s, it.effekt ?? {}, FOOD.has(it.baseId));
     if (FOOD.has(it.baseId)) emit(s, { type: 'eat', item: it });
+    if (potion) emit(s, { type: 'potion', item: it, hpBefore });
   }
   removeOne(s, uid);
   endTurn(s);

@@ -22,14 +22,21 @@ export function checkAchievements(s: GameState, e: GameEvent) {
     }
     if (!ok) continue;
     s.achievements.push(a.id);
+    log(s, `NEUES ACHIEVEMENT: ${a.name} – ${a.description}`, 'achievement');
+    log(s, `${a.comment}`, 'achievement');
+    if (!a.box) {
+      // Kleine Erfolge: keine Box, nur etwas Aufmerksamkeit beim Publikum
+      sound(s, { kind: 'achievement', tier: 'bronze' });
+      log(s, 'Belohnung: Das Publikum nimmt Notiz von dir.', 'loot');
+      addSpectacle(s, 2, 'achievement');
+      toast(s, `Achievement: ${a.name}`, a.description, 'achievement');
+      continue;
+    }
     const first = !s.firstEver.includes(a.id);
     const tier: BoxTier = first ? upgrade(a.tier) : a.tier;
     sound(s, { kind: 'achievement', tier });
-    const box = createBox(s, a.box, tier);
-    s.player.boxes.push(box);
+    s.player.boxes.push(createBox(s, a.box, tier));
     const firstNote = first ? ' ERSTMALIG IN DEINER KARRIERE – Box-Stufe erhöht!' : '';
-    log(s, `NEUES ACHIEVEMENT: ${a.name} – ${a.description}`, 'achievement');
-    log(s, `${a.comment}`, 'achievement');
     log(s, `Belohnung: ${BOX_TIER_NAMES[tier]} ${BOX_TYPE_NAMES[a.box]}.${firstNote}`, 'loot');
     addSpectacle(s, 4 + BOX_TIERS.indexOf(tier) * 4, 'achievement');
     toast(s, `Achievement: ${a.name}`, `${a.description} Belohnung: ${BOX_TIER_NAMES[tier]} ${BOX_TYPE_NAMES[a.box]}`, 'achievement');

@@ -1,4 +1,5 @@
-import { ACHIEVEMENTS } from '../data/achievements';
+import { ACHIEVEMENTS, ACHIEVEMENT_CATEGORIES } from '../data/achievements';
+import { nextGoals } from '../data/achievement_families';
 import { RARITY_COLORS, RARITY_NAMES, SLOT_NAMES } from '../data/items';
 import { SKILLS, SKILL_BY_ID, SKILL_CATEGORY_NAMES, skillXpNeeded, type SkillCategory } from '../data/skills';
 import { BOX_TIER_COLORS, FLOORS, RESTAURANT_HOSTS, RESTAURANT_MENU, SHOW_NAME } from '../data/world';
@@ -43,6 +44,8 @@ import {
   ausweichen, currentWeapon, effectiveStats, lichtradius, maxAusdauer, maxHp, throwables, totalBonuses, xpToNext,
 } from '../engine/player';
 import { skillEffectText, skillProgress } from '../engine/skills';
+import { stat } from '../engine/stats';
+import { monsterDefById } from '../engine/monsters';
 import type { AttackMove, AttackPart, EquipSlot, GameState, HitZone, Item, MetaState, Pos, StatKey, Technique } from '../engine/types';
 import { bindActions, esc, formatTime } from './dom';
 import { confirmBox, isModalOpen, showCustom, showDialog, showHtml, showToast } from './modal';
@@ -77,6 +80,9 @@ const DIR_KEYS: Record<string, Pos> = {
 
 export class GameView {
   private tab: Tab = 'crawler';
+  /** Erfolge-Tab: Übersicht oder Statistik, aufgeklappte Kategorien. */
+  private achvView: 'erfolge' | 'statistik' = 'erfolge';
+  private achvOpen = new Set<string>();
   private part: AttackPart = 'faust';
   /** Zauber, der auf ein Ziel wartet (nächster Klick auf die Karte). */
   private pendingSpell: string | null = null;
@@ -874,6 +880,16 @@ export class GameView {
       'sponsor-no': (b) => this.act(() => declineSponsorOffer(this.s, b.dataset.id!)),
       craft: (b) => this.act(() => craftItem(this.s, b.dataset.id!)),
       throwpick: (b) => this.act(() => chooseThrowable(this.s, b.dataset.id || null)),
+      'achv-view': (b) => {
+        this.achvView = b.dataset.id === 'statistik' ? 'statistik' : 'erfolge';
+        this.refreshSide();
+      },
+      'achv-cat': (b) => {
+        const id = b.dataset.id!;
+        if (this.achvOpen.has(id)) this.achvOpen.delete(id);
+        else this.achvOpen.add(id);
+        this.refreshSide();
+      },
     });
   }
 
@@ -1115,29 +1131,154 @@ export class GameView {
   private achievementsTab(): string {
     const s = this.s;
     const done = ACHIEVEMENTS.filter((a) => s.achievements.includes(a.id));
-    const everOnly = ACHIEVEMENTS.filter((a) => !s.achievements.includes(a.id) && this.meta.achievementsEver.includes(a.id));
     const patterns = s.dynAchievements ?? [];
-    let html = `<div class="muted small">Diese Staffel: ${done.length + patterns.length} · Karriere insgesamt: ${this.meta.achievementsEver.length}</div>`;
+    const view = this.achvView;
+    let html = `<div class="muted small">Diese Staffel: ${done.length + patterns.length} Achievements · Karriere insgesamt: ${this.meta.achievementsEver.length}</div>`;
+    html += `<div class="row achvnav"><button data-action="achv-view" data-id="erfolge" class="${view === 'erfolge' ? 'primary' : ''}">Erfolge</button><button data-action="achv-view" data-id="statistik" class="${view === 'statistik' ? 'primary' : ''}">Statistik</button></div>`;
+    if (view === 'statistik') return html + this.statsView();
+
+    const card = (a: { name: string; description: string; comment: string; tier?: string }, locked = false) =>
+      `<div class="achv${locked ? ' locked-a' : ''}"><div class="n"${a.tier && !locked ? ` style="color:${BOX_TIER_COLORS[a.tier as keyof typeof BOX_TIER_COLORS]}"` : ''}>${esc(a.name)}</div><div class="small">${esc(a.description)}</div>${locked ? '' : `<div class="muted small"><i>${esc(a.comment)}</i></div>`}</div>`;
+
+    // Zuletzt erreicht
+    const recent = s.achievements.slice(-4).reverse().map((id) => ACHIEVEMENTS.find((a) => a.id === id)).filter((a): a is (typeof ACHIEVEMENTS)[number] => !!a);
+    if (recent.length) html += `<div class="section">Zuletzt erreicht</div>${recent.map((a) => card(a)).join('')}`;
+
     if (patterns.length) {
-      html += `<div class="section">Entdeckte Muster</div>`;
-      html += patterns
-        .slice()
-        .reverse()
-        .map((a) => `<div class="achv"><div class="n">${esc(a.name)}</div><div class="small">${esc(a.description)}</div><div class="muted small"><i>${esc(a.comment)}</i></div></div>`)
-        .join('');
-      html += `<div class="section">Feste Achievements</div>`;
+      const open = this.achvOpen.has('muster');
+      html += `<button class="achvcat" data-action="achv-cat" data-id="muster"><span>${open ? '−' : '+'} Entdeckte Muster</span><span class="muted">${patterns.length}</span></button>`;
+      if (open) html += patterns.slice().reverse().map((a) => card(a)).join('');
     }
-    html += done
-      .slice()
-      .reverse()
-      .map((a) => `<div class="achv"><div class="n">${esc(a.name)}</div><div class="small">${esc(a.description)}</div><div class="muted small"><i>${esc(a.comment)}</i></div></div>`)
-      .join('');
-    if (everOnly.length) {
-      html += `<div class="section">Aus früheren Staffeln</div>`;
-      html += everOnly.map((a) => `<div class="achv locked-a"><div class="n">${esc(a.name)}</div><div class="small">${esc(a.description)}</div></div>`).join('');
+
+    const goals = nextGoals(s);
+    for (const c of ACHIEVEMENT_CATEGORIES) {
+      const all = ACHIEVEMENTS.filter((a) => a.category === c.id);
+      const got = all.filter((a) => s.achievements.includes(a.id));
+      const open = this.achvOpen.has(c.id);
+      html += `<button class="achvcat" data-action="achv-cat" data-id="${c.id}"><span>${open ? '−' : '+'} ${esc(c.name)}</span><span class="muted">${got.length} / ${all.length}</span></button>`;
+      html += `<div class="progress" style="margin:-2px 0 6px"><div style="width:${all.length ? (100 * got.length) / all.length : 0}%"></div></div>`;
+      if (!open) continue;
+      const next = goals
+        .filter((g) => g.category === c.id && g.value < g.target)
+        .sort((a, b) => b.value / b.target - a.value / a.target)
+        .slice(0, 6);
+      if (next.length) {
+        html += `<div class="muted small" style="margin:4px 0">Nächste Ziele</div>`;
+        html += next
+          .map((g) => `<div class="skill small"><div class="top"><span>${esc(g.description)}</span><span class="muted goalcount">${g.value.toLocaleString('de-DE')} / ${g.target.toLocaleString('de-DE')}</span></div><div class="progress"><div style="width:${Math.min(100, (100 * g.value) / g.target)}%"></div></div></div>`)
+          .join('');
+      }
+      html += got.slice().reverse().map((a) => card(a)).join('');
+      const ever = all.filter((a) => !s.achievements.includes(a.id) && this.meta.achievementsEver.includes(a.id));
+      if (ever.length) html += `<div class="muted small" style="margin:4px 0">Aus früheren Staffeln</div>${ever.map((a) => card(a, true)).join('')}`;
+      const hidden = all.length - got.length - ever.length;
+      if (hidden > 0) html += `<div class="muted small" style="margin:2px 0 8px">Noch ${hidden} geheime Achievements in dieser Kategorie.</div>`;
     }
-    const hidden = ACHIEVEMENTS.length - done.length - everOnly.length;
-    if (hidden > 0) html += `<div class="muted small" style="margin-top:8px">…und ${hidden} geheime Achievements, die noch niemand von dir gesehen hat.</div>`;
+    return html;
+  }
+
+  /** Alles, was der Dungeon über dich mitzählt. */
+  private statsView(): string {
+    const s = this.s;
+    const v = (k: string) => stat(s, k);
+    const n = (x: number) => Math.round(x).toLocaleString('de-DE');
+    const rows = (title: string, list: [string, string | number][]) => {
+      const shown = list.filter(([, x]) => x !== 0 && x !== '0');
+      if (!shown.length) return '';
+      return `<div class="section">${title}</div>${shown.map(([k, x]) => `<div class="small row statrow"><span style="flex:1">${esc(k)}</span><span class="muted">${typeof x === 'number' ? n(x) : esc(x)}</span></div>`).join('')}`;
+    };
+    const hits = v('treffer');
+    const tries = hits + v('fehlschlaege');
+    let html = rows('Kampf', [
+      ['Besiegte Gegner', v('kills')],
+      ['Treffer', hits],
+      ['Trefferquote', tries ? `${Math.round((100 * hits) / tries)} %` : 0],
+      ['Kritische Treffer', v('krits')],
+      ['Schaden ausgeteilt', v('schaden.ausgeteilt')],
+      ['Höchster Einzeltreffer', v('max.treffer')],
+      ['Längste Killserie', v('max.killserie')],
+      ['Kills ohne erlittenen Treffer (Rekord)', v('max.sauber')],
+      ['Gegner zu Boden geworfen', s.counters.knockdowns],
+      ['Benommen gemacht', v('zonen.benommen')],
+      ['Humpeln lassen', v('zonen.humpelt')],
+      ['Geschwächt', v('zonen.geschwaecht')],
+      ['Kills durch Konter', v('kills.konter')],
+      ['Kills an stärkeren Gegnern (3+ Stufen)', v('kills.staerker')],
+      ['Kills an schlafenden Gegnern', v('kills.schlafend')],
+      ['Kills an fliehenden Gegnern', v('kills.fliehend')],
+    ]);
+    const PART_LABELS: Record<string, string> = {
+      ...PART_NAMES, zauber: 'Zauber', falle: 'Fallen', bombe: 'Sprengsätze', haustier: 'Haustier', party: 'Party', sonstiges: 'Sonstiges',
+    };
+    const byKey = (prefix: string, label: (id: string) => string) =>
+      Object.entries(s.stats ?? {})
+        .filter(([k]) => k.startsWith(prefix))
+        .sort((a, b) => b[1] - a[1])
+        .map(([k, x]) => [label(k.slice(prefix.length)), x] as [string, number]);
+    html += rows('Kills nach Angriffsart', byKey('kills.teil.', (id) => PART_LABELS[id] ?? id));
+    html += rows('Kills nach Ausführung', byKey('kills.bewegung.', (id) => MOVE_NAMES[id as AttackMove] ?? id));
+    html += rows('Kills nach Trefferzone', byKey('kills.zone.', (id) => ZONES[id as HitZone]?.name ?? id));
+    // Bestiarium: Namen nur für Arten, die man erkannt hat
+    const beasts = byKey('kills.art.', (id) => (v(`bekannt.${id}`) ? monsterDefById(id)?.name ?? id : 'Unbekannte Art')).slice(0, 12);
+    html += rows('Bestiarium', [
+      ['Verschiedene Arten besiegt', v('bestiarium.arten')],
+      ['Elite-Gegner', v('kills.elite')],
+      ['Bosse', v('kills.boss')],
+      ['Nicht einschätzbare Gegner besiegt', v('kills.unbekannt')],
+      ...beasts,
+    ]);
+    html += rows('Überleben', [
+      ['Schaden eingesteckt', v('schaden.erlitten')],
+      ['Ausgewichen', v('ausgewichen')],
+      ['Knapp überlebt (unter 10 %)', v('knapp.ueberlebt')],
+      ['Tränke getrunken', s.counters.potionsDrunk],
+      ['Mahlzeiten', s.counters.mealsEaten],
+      ['Geschlafen', v('geschlafen')],
+      ['Längste Zeit ohne Schlaf', v('max.wach') ? `${Math.floor((v('max.wach') * 3) / 60)} Std.` : 0],
+      ['Toilettenbesuche', v('toilette')],
+    ]);
+    html += rows('Erkundung', [
+      ['Schritte', s.counters.steps],
+      ['Räume entdeckt', v('raeume.entdeckt')],
+      ['Safe Rooms entdeckt', v('saferooms.entdeckt')],
+      ['Türen geöffnet', v('tueren.geoeffnet')],
+      ['Türen geschlossen', v('tueren.geschlossen')],
+      ['Beste Erkundung einer Etage', v('max.erkundet') ? `${v('max.erkundet')} %` : 0],
+      ['Schritte auf dem Reittier', v('reittier.schritte')],
+    ]);
+    html += rows('Beute und Handel', [
+      ['Gegenstände aufgehoben', v('gegenstaende.aufgehoben')],
+      ['Boxen geöffnet', v('boxen.geoeffnet')],
+      ['Gold verdient', s.counters.goldEarned],
+      ['Höchster Goldstand', v('max.gold')],
+      ['Gekauft', v('gekauft')],
+      ['Gold ausgegeben', v('gold.ausgegeben')],
+      ['Verkauft', v('verkauft')],
+      ['Preisverhandlungen gewonnen', v('feilschen.gewonnen')],
+      ['Rubbellose', v('lose')],
+      ['Davon Nieten', v('lose.nieten')],
+    ]);
+    html += rows('Handwerk und Fallen', [
+      ['Hergestellt', s.counters.crafted],
+      ['Eigene Fallen aufgestellt', v('fallen.aufgestellt')],
+      ['Fallen entdeckt', s.counters.trapsFound],
+      ['Fallen entschärft', s.counters.trapsDisarmed],
+      ['Selbst in Fallen getreten', s.counters.trapsTriggered],
+      ['Aus Fallen befreit', v('befreit')],
+      ['Zauber gewirkt', v('zauber.gewirkt')],
+    ]);
+    html += rows('Andere Crawler und Show', [
+      ['Crawler angesprochen', v('crawler.getroffen')],
+      ['Party-Beitritte', v('party.beigetreten')],
+      ['Party-Mitglieder verloren', v('party.verloren')],
+      ['Verletzte Crawler versorgt', v('crawler.geheilt')],
+      ['Aufträge erledigt', v('auftraege.erledigt')],
+      ['Aufträge verpatzt', v('auftraege.verpatzt')],
+      ['Sponsorenwünsche erfüllt', v('sponsor.wuensche')],
+      ['Geschenke aus dem Publikum', v('fangeschenke')],
+      ['Talkshow-Auftritte', v('talkshows')],
+      ['Follower', s.viewers.follower],
+    ]);
     return html;
   }
 

@@ -180,6 +180,11 @@ h1, h2, h3 { margin: 0; }
 .achv { padding: 6px 8px; border-radius: 6px; background: var(--panel-2); margin-bottom: 6px; border: 1px solid var(--line); }
 .achv.locked-a { opacity: 0.45; }
 .achv .n { color: var(--achv); font-weight: 700; }
+.achvnav { gap: 6px; margin: 8px 0 4px; }
+.achvnav button { flex: 1; }
+.achvcat { display: flex; justify-content: space-between; width: 100%; margin-top: 6px; padding: 6px 8px; text-align: left; font-weight: 700; background: var(--panel-2); border: 1px solid var(--line); }
+.statrow { border-bottom: 1px solid var(--line); padding: 2px 0; }
+.goalcount { white-space: nowrap; margin-left: 8px; }
 
 .bottom {
   grid-column: 1;

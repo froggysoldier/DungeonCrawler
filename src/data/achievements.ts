@@ -1,6 +1,28 @@
+import { familyAchievements } from './achievement_families';
+import { MOMENT_ACHIEVEMENTS } from './achievements_moments';
 import { MORE_ACHIEVEMENTS } from './achievements_more';
 import { SOCIAL_ACHIEVEMENTS } from './achievements_social';
 import type { BoxTier, BoxType, GameEvent, GameState } from '../engine/types';
+
+export type AchievementCategory =
+  | 'kampf' | 'technik' | 'bestiarium' | 'erkundung' | 'beute' | 'wirtschaft' | 'ueberleben'
+  | 'magie' | 'handwerk' | 'sozial' | 'show' | 'fortschritt' | 'momente';
+
+export const ACHIEVEMENT_CATEGORIES: { id: AchievementCategory; name: string }[] = [
+  { id: 'kampf', name: 'Kampf' },
+  { id: 'technik', name: 'Kampftechnik' },
+  { id: 'bestiarium', name: 'Bestiarium und Bosse' },
+  { id: 'erkundung', name: 'Erkundung und Reisen' },
+  { id: 'beute', name: 'Beute und Ausrüstung' },
+  { id: 'wirtschaft', name: 'Handel und Gold' },
+  { id: 'ueberleben', name: 'Überleben' },
+  { id: 'magie', name: 'Magie' },
+  { id: 'handwerk', name: 'Handwerk und Fallen' },
+  { id: 'sozial', name: 'Crawler, Party und Haustiere' },
+  { id: 'show', name: 'Show und Sponsoren' },
+  { id: 'fortschritt', name: 'Fortschritt' },
+  { id: 'momente', name: 'Besondere Momente' },
+];
 
 export interface AchievementDef {
   id: string;
@@ -9,7 +31,9 @@ export interface AchievementDef {
   /** Sarkastischer Kommentar der Systemstimme. */
   comment: string;
   tier: BoxTier;
-  box: BoxType;
+  /** Welche Box es gibt. null = keine Box, nur Ruhm beim Publikum. */
+  box: BoxType | null;
+  category?: AchievementCategory;
   check: (e: GameEvent, s: GameState) => boolean;
 }
 
@@ -379,6 +403,61 @@ const BASE_ACHIEVEMENTS: AchievementDef[] = [
   },
 ];
 
-export const ACHIEVEMENTS: AchievementDef[] = [...BASE_ACHIEVEMENTS, ...MORE_ACHIEVEMENTS, ...SOCIAL_ACHIEVEMENTS];
+/** Kategorien der festen Achievements (die Familien bringen ihre eigene mit). */
+const CATEGORY_IDS: Record<AchievementCategory, string[]> = {
+  kampf: [
+    'erstes_blut', 'zehn_kills', 'fuenfzig_kills', 'hundert', 'david', 'multitasker', 'ruepel', 'hinterhalt', 'knapp_daneben',
+    'crit', 'overkill', 'letzte_kraft', 'faehigkeit', 'boss_haende', 'boss_stein', 'boss_stampf', 'ueberrollt',
+  ],
+  technik: [
+    'faust10', 'tritt10', 'stampf1', 'stampf15', 'kopf1', 'stein1', 'wurf25', 'sprung5', 'meteor', 'ellbogen10', 'knie10',
+    'waffe1', 'anlauf1', 'kopf10', 'waffe10', 'wurf10', 'anlauf10', 'tritt50', 'faust50', 'allrounder', 'krit25', 'umgehauen',
+    'pulverisiert', 'klobuerste', 'selfie', 'baguette', 'bowling',
+  ],
+  bestiarium: [
+    'rattenfaenger', 'elite1', 'elite5', 'hoodboss1', 'hoodboss4', 'boroughboss', 'lebensmuede', 'spinnen', 'fledermaus',
+    'kroete_fern', 'knall', 'zwerge', 'heinzel', 'kryptozoologe', 'erstkontakt', 'mimic', 'toaster', 'friedhof', 'verstaerkung',
+    'dosenoeffner',
+  ],
+  erkundung: ['kartograph', 'treppe', 'safe1', 'gilde', 'wanderer', 'weltkarte', 'etage3', 'absteiger', 'fruehaufsteher', 'last_minute', 'fahrzeughalter'],
+  beute: [
+    'klepto', 'unboxing', 'unboxing10', 'boxen25', 'modeopfer', 'fussringe', 'vierfach', 'komplett', 'crocs', 'aluhut', 'zirkus',
+    'stoeckel', 'legendaer', 'himmlisch',
+  ],
+  wirtschaft: ['gold100', 'gold500', 'bestohlen', 'rache', 'pleite'],
+  ueberleben: [
+    'sandsack', 'haaresbreite', 'feinschmecker', 'schlafmuetze', 'vergiftet', 'geheilt', 'giftschlucker', 'drei_gaenge',
+    'winterschlaf', 'trankjunkie', 'adlerauge', 'reingetreten', 'entschaerfer',
+  ],
+  magie: [],
+  handwerk: ['fallensteller', 'bastler', 'brandstifter', 'bombig'],
+  sozial: [
+    'haustier_kill', 'haustier5', 'hallo_nachbar', 'gemeinsam', 'volles_haus', 'trauer', 'crawler_gegen_crawler', 'auftrag_erster',
+    'auftrag_fuenf', 'retter', 'evolution', 'endform', 'katzenlady', 'hundemensch',
+  ],
+  show: [
+    'follower100', 'follower1000', 'follower10000', 'hype100', 'showtime', 'primetime', 'publikumsliebling', 'shitstorm',
+    'sponsor_erster', 'sponsor_drei', 'sponsor_wunsch', 'sponsor_weg', 'bademantel',
+  ],
+  fortschritt: ['willkommen', 'level5', 'level10', 'level15', 'skill1', 'skill5', 'skill10', 'vielseitig', 'streber', 'klasse', 'mensch', 'exot'],
+  momente: ['nackter_boss', 'pazifist', 'zweite_chance', 'geist', 'anleitung', 'totalschaden'],
+};
+
+const CATEGORY_OF: Record<string, AchievementCategory> = Object.fromEntries(
+  Object.entries(CATEGORY_IDS).flatMap(([cat, ids]) => ids.map((id) => [id, cat as AchievementCategory])),
+);
+
+export const ACHIEVEMENTS: AchievementDef[] = [
+  ...BASE_ACHIEVEMENTS,
+  ...MORE_ACHIEVEMENTS,
+  ...SOCIAL_ACHIEVEMENTS,
+  ...MOMENT_ACHIEVEMENTS,
+  ...familyAchievements(),
+].map((a) => ({ ...a, category: a.category ?? CATEGORY_OF[a.id] ?? (a.id.startsWith('b_') ? 'bestiarium' : 'momente') }));
+
+/** Kategorie eines Achievements (für die Anzeige). */
+export function categoryOf(a: AchievementDef): AchievementCategory {
+  return a.category ?? 'momente';
+}
 
 export const ACHIEVEMENT_BY_ID: Record<string, AchievementDef> = Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, a]));

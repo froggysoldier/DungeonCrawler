@@ -9,6 +9,7 @@ import { createBox, createItem } from './items';
 import { log, toast } from './log';
 import { effectiveStats, maxHp } from './player';
 import * as R from './rng';
+import { track } from './stats';
 import type { GameEvent, GameState } from './types';
 
 /**
@@ -56,6 +57,7 @@ export function addSpectacle(s: GameState, points: number, kind: string) {
 export function fanGift(s: GameState) {
   const item = createItem(s, R.pick(s, FAN_GIFTS));
   giveItem(s, item);
+  track(s, 'fangeschenke');
   log(s, `Zuschauer ${R.pick(s, VIEWER_NAMES)} schickt dir ein Geschenk: ${itemName(s, item)}!`, 'loot');
 }
 

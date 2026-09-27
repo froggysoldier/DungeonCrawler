@@ -14,6 +14,7 @@ import { selfFacets, targetFacets } from './observer';
 import { effectiveStats, skillLevel } from './player';
 import { trainSkill } from './skills';
 import * as R from './rng';
+import { track } from './stats';
 import type { GameState, Item, Monster, Pos, Trap, TrapKind } from './types';
 
 /**
@@ -200,6 +201,8 @@ export function struggle(s: GameState): boolean {
   trainSkill(s, 'struggle', 1);
   if (R.chance(s, Math.min(0.9, 0.1 + (str - 5) * 0.05 + skillLevel(s, 'entfesseln') * 0.08))) {
     p.immobile = 0;
+    track(s, 'befreit');
+    if (s.monsters.some((m) => m.aware && chebyshev(m.pos, p.pos) <= 2)) track(s, 'befreit.kampf');
     log(s, 'Mit aller Kraft reißt du dich los.', 'info');
     return true;
   }

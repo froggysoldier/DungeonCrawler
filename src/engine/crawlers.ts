@@ -15,6 +15,7 @@ import { canStep, findPath } from './path';
 import { effectiveStats } from './player';
 import { playerSees } from './sight';
 import * as R from './rng';
+import { track } from './stats';
 import type { GameState, Item, Monster, NpcCrawler, Personality, Pos } from './types';
 
 /**
@@ -206,6 +207,7 @@ export function invite(s: GameState, uid: string): Res {
     c.trust = Math.max(c.trust, 50);
     log(s, `${c.name}: „${R.pick(s, pd.joinYes)}“`, 'dialog');
     log(s, `${c.name} ist jetzt in deiner Party.`, 'system');
+    if (c.healed) track(s, 'party.gerettet');
     emit(s, { type: 'partyJoined', name: c.name, size: party(s).length + 1 });
   } else {
     c.refusedUntil = s.turn + 40;
@@ -252,6 +254,7 @@ export function askTip(s: GameState, uid: string): Res {
   }
   log(s, `${c.name}: „${TIP_LINES[kind]}“`, 'dialog');
   c.trust = Math.min(100, c.trust + 5);
+  track(s, 'tipps');
   return { ok: true };
 }
 
@@ -267,6 +270,8 @@ export function giveHealing(s: GameState, uid: string, item: Item): Res {
   c.refusedUntil = undefined;
   c.met = true;
   if (c.personality === 'verzweifelt') c.personality = 'freundlich';
+  c.healed = true;
+  track(s, 'crawler.geheilt');
   log(s, `Du gibst ${c.name} ${itemName(s, item)}. „Danke. Wirklich. Das vergesse ich dir nicht.“`, 'dialog');
   return { ok: true };
 }
