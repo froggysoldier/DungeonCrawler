@@ -101,6 +101,13 @@ export type BoxType =
   | 'abenteurer' | 'waffen' | 'schuh' | 'kleidung' | 'schmuck' | 'haustier'
   | 'boss' | 'brawler' | 'wurf' | 'ueberlebens' | 'fan';
 
+export interface ThrowCondition {
+  id: ConditionId;
+  turns: number;
+  power: number;
+  radius?: number;
+}
+
 /** Bonuswerte, die Items (und Buffs) gewähren können. */
 export interface Bonuses {
   stats?: Partial<Stats>;
@@ -150,6 +157,10 @@ export interface Item {
   passFacet?: string;
   /** Wurfobjekte, die beim Aufprall explodieren: Schaden im Umkreis von 1 Feld. */
   explosion?: number;
+  /** Waffen: Chance in Prozent, eine Blutung zu verursachen. */
+  blutung?: number;
+  /** Wurfobjekte: Zustand beim Aufprall (mit Radius: alle im Umkreis). */
+  wurfZustand?: ThrowCondition;
   /** Eigene Falle zum Aufstellen. */
   trapKind?: TrapKind;
   /** Halsband für das Haustier. */
@@ -166,7 +177,9 @@ export interface Item {
 
 export type SpecialEffect =
   | 'zweite_chance' | 'stampf_beben' | 'katzenfreund' | 'glueckspilz' | 'giftimmun' | 'goldmagnet'
-  | 'explosionsschutz' | 'bumerang' | 'vampir';
+  | 'explosionsschutz' | 'bumerang' | 'vampir'
+  // Schutz vor Zuständen
+  | 'blutlos' | 'feuerfest' | 'furchtlos' | 'scharfsichtig';
 
 export interface ConsumableEffect {
   heal?: number;
@@ -178,6 +191,8 @@ export interface ConsumableEffect {
   blase?: number;
   /** Heilt Vergiftung. */
   cure?: boolean;
+  /** Verband: stoppt Blutungen. */
+  bandage?: boolean;
   ausdauer?: number;
   buff?: { name: string; turns: number; bonuses: Bonuses };
 }
@@ -208,7 +223,18 @@ export type Behavior = 'melee' | 'ranged' | 'coward' | 'boss' | 'stationary';
  * rufer – ruft Verstärkung · regeneriert – heilt sich · schnell – zwei Schritte pro Zug ·
  * fliegend – kann nicht umgeworfen oder gestampft werden · gepanzert – halber Schaden von Fäusten.
  */
-export type MonsterAbility = 'gift' | 'explodiert' | 'diebisch' | 'rufer' | 'regeneriert' | 'schnell' | 'fliegend' | 'gepanzert';
+export type MonsterAbility =
+  | 'gift' | 'explodiert' | 'diebisch' | 'rufer' | 'regeneriert' | 'schnell' | 'fliegend' | 'gepanzert'
+  | 'blutig' | 'brennend' | 'blendend' | 'furchterregend';
+
+/** Zustände im Kampf (siehe engine/conditions.ts). */
+export type ConditionId = 'blutung' | 'brennen' | 'gift' | 'furcht' | 'blind';
+
+export interface ActiveCondition {
+  turns: number;
+  /** Schaden pro Zug (Blutung, Brennen, Gift) bzw. Stärke. */
+  power: number;
+}
 
 export interface Monster {
   uid: string;
@@ -252,6 +278,10 @@ export interface Monster {
   hitBy?: string[];
   /** Trefferzonen, die der Crawler an diesem Mob schon getroffen hat. */
   zonesHit?: HitZone[];
+  /** Hat seinen Schreckensschrei schon ausgestoßen. */
+  roared?: boolean;
+  /** Aktive Zustände: Blutung, Brennen, Gift, Furcht, Blindheit. */
+  conditions?: Partial<Record<ConditionId, ActiveCondition>>;
   /** Schläft (wacht bei Lärm oder direkt daneben auf). */
   asleep?: boolean;
   /** Wo es den Crawler zuletzt gesehen oder gehört hat. */
@@ -665,6 +695,7 @@ export type GameEvent =
   | { type: 'mapPicked'; hood: number }
   | { type: 'revived' }
   | { type: 'poisoned'; source: string }
+  | { type: 'conditioned'; condition: ConditionId; source: string }
   | { type: 'cured' }
   | { type: 'robbed'; amount: number; source: string }
   | { type: 'explosion'; damage: number; source: string }

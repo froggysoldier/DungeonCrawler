@@ -77,7 +77,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [3, 5], floors: [1, 2], hp: 9, hpPerLevel: 3, dmg: [2, 4], dmgPerLevel: 1,
     treffer: 70, ruestung: 0, ausweichen: 20, size: 'mittel', behavior: 'ranged', range: 4, xp: 18, weight: 3,
     flavor: 'Wirft Geschirr. Wo kommt das ganze Geschirr her? Niemand weiß es.',
-    tags: ['geist'], abilities: ['fliegend'],
+    tags: ['geist'], abilities: ['fliegend', 'furchterregend'],
   },
   {
     id: 'grauer_spaeher', name: 'Grauer Späher', glyph: 'a', color: '#9aa8b8',
@@ -99,6 +99,7 @@ export const MONSTERS: MonsterDef[] = [
     treffer: 70, ruestung: 2, ausweichen: 5, size: 'mittel', behavior: 'melee', xp: 26, weight: 2,
     flavor: 'Alpenländischer Katzenkopf-Lindwurm. Faucht, beißt und ist beleidigt, wenn man ihn für eine Eidechse hält.',
     tags: ['folklore'],
+    abilities: ['blutig'],
   },
   {
     id: 'ghul', name: 'Kellerghul', glyph: 'G', color: '#8ab870',
@@ -127,6 +128,7 @@ export const MONSTERS: MonsterDef[] = [
     treffer: 60, ruestung: 3, ausweichen: 0, size: 'winzig', behavior: 'ranged', range: 3, xp: 16, weight: 2,
     flavor: 'Schießt glühende Toastscheiben. Das ist die Zukunft, vor der dich deine Mutter gewarnt hat.',
     tags: ['mimic'],
+    abilities: ['brennend'],
   },
   // ------------------------------------------------ weitere Etage-1/2-Mobs
   {
@@ -190,7 +192,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [2, 5], floors: [1, 2], hp: 6, hpPerLevel: 2, dmg: [2, 4], dmgPerLevel: 1,
     treffer: 70, ruestung: 0, ausweichen: 35, size: 'winzig', behavior: 'ranged', range: 4, xp: 16, weight: 3,
     flavor: 'Ein schwebendes Licht, das Wanderer in Sümpfe lockt. In Ermangelung von Sümpfen: in Heizungskeller.',
-    tags: ['geist'], abilities: ['fliegend'],
+    tags: ['geist'], abilities: ['fliegend', 'blendend'],
   },
   {
     id: 'abflusstentakel', name: 'Tentakel aus dem Abfluss', glyph: 'S', color: '#c060a0',
@@ -211,14 +213,14 @@ export const MONSTERS: MonsterDef[] = [
     levels: [3, 5], floors: [1, 2], hp: 10, hpPerLevel: 3, dmg: [2, 4], dmgPerLevel: 1,
     treffer: 75, ruestung: 2, ausweichen: 20, size: 'winzig', behavior: 'ranged', range: 5, xp: 20, weight: 2,
     flavor: 'Eine surrende Metallkugel mit rotem Auge. Sendet vermutlich alles live an irgendwen.',
-    tags: ['alien'], abilities: ['fliegend'],
+    tags: ['alien'], abilities: ['fliegend', 'blendend'],
   },
   {
     id: 'chupacabra', name: 'Chupacabra', glyph: 'c', color: '#80a080',
     levels: [3, 5], floors: [1, 2], hp: 16, hpPerLevel: 4, dmg: [2, 5], dmgPerLevel: 1,
     treffer: 75, ruestung: 0, ausweichen: 20, size: 'klein', behavior: 'melee', xp: 24, weight: 2,
     flavor: 'Saugt Ziegen aus. Ziegen sind aus. Du bist keine Ziege, aber nah genug dran.',
-    tags: ['kryptid'], abilities: ['gift', 'schnell'],
+    tags: ['kryptid'], abilities: ['gift', 'schnell', 'blutig'],
   },
 
   // ------------------------------------------------ Etage 2 (tiefere Keller)
@@ -227,7 +229,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [5, 8], floors: [2], hp: 34, hpPerLevel: 7, dmg: [4, 7], dmgPerLevel: 1,
     treffer: 70, ruestung: 2, ausweichen: 0, size: 'gross', behavior: 'melee', xp: 45, weight: 3,
     flavor: 'Noch in der Ausbildung. Die Prüfung heißt: dich zerquetschen.',
-    tags: ['troll'], abilities: ['regeneriert'],
+    tags: ['troll'], abilities: ['regeneriert', 'blutig'],
   },
   {
     id: 'knochenratte', name: 'Knochenratte', glyph: 'r', color: '#e8e8d0',
@@ -262,14 +264,14 @@ export const MONSTERS: MonsterDef[] = [
     levels: [5, 8], floors: [2], hp: 22, hpPerLevel: 5, dmg: [3, 6], dmgPerLevel: 1,
     treffer: 75, ruestung: 0, ausweichen: 25, size: 'mittel', behavior: 'melee', xp: 38, weight: 2,
     flavor: 'Setzt sich Schlafenden auf die Brust. Du schläfst nicht? Dann eben so.',
-    tags: ['geist'], abilities: ['fliegend', 'gift'],
+    tags: ['geist'], abilities: ['fliegend', 'gift', 'furchterregend'],
   },
   {
     id: 'ghulhund', name: 'Ghulhund', glyph: 'D', color: '#9ab870',
     levels: [4, 7], floors: [2], hp: 18, hpPerLevel: 4, dmg: [3, 5], dmgPerLevel: 1,
     treffer: 75, ruestung: 0, ausweichen: 15, size: 'mittel', behavior: 'melee', xp: 28, weight: 4, pack: [1, 3],
     flavor: 'Der Hund eines Ghuls. Treuer als der Ghul. Hungriger auch.',
-    tags: ['untot'], abilities: ['schnell'],
+    tags: ['untot'], abilities: ['schnell', 'blutig'],
   },
 
   // ------------------------------------------------ Sonderfall: Wer die Toiletten-Regel bricht
@@ -285,7 +287,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [15, 30], floors: [], hp: 250, hpPerLevel: 20, dmg: [18, 30], dmgPerLevel: 2,
     treffer: 95, ruestung: 6, ausweichen: 10, size: 'gross', behavior: 'melee', xp: 500, weight: 0,
     flavor: 'Ein Wirbel aus purem Zorn, herbeigerufen von deinem Fehltritt. Die Regel war eindeutig. Nur in Toiletten.',
-    tags: ['elementar'], abilities: ['schnell', 'regeneriert'],
+    tags: ['elementar'], abilities: ['schnell', 'regeneriert', 'brennend'],
   },
 
   // ------------------------------------------------ Etage 3 (Kanalstadt)
@@ -294,7 +296,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [7, 11], floors: [3], hp: 45, hpPerLevel: 7, dmg: [5, 9], dmgPerLevel: 1,
     treffer: 70, ruestung: 3, ausweichen: 0, size: 'gross', behavior: 'melee', xp: 70, weight: 3,
     flavor: 'Jemand hat es als Baby das Klo hinuntergespült. Es hat nicht vergeben.',
-    tags: ['reptil'], abilities: ['gepanzert'],
+    tags: ['reptil'], abilities: ['gepanzert', 'blutig'],
   },
   {
     id: 'fischmensch', name: 'Fischmensch', glyph: 'f', color: '#60a0c0',
@@ -322,7 +324,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [7, 10], floors: [3], hp: 22, hpPerLevel: 5, dmg: [4, 7], dmgPerLevel: 1,
     treffer: 75, ruestung: 0, ausweichen: 20, size: 'mittel', behavior: 'ranged', range: 5, xp: 55, weight: 3,
     flavor: 'Braut Tränke aus Abwasser. Wirft sie dir ins Gesicht. Die Tränke sind giftig, die Hexe auch.',
-    tags: ['hexe'], abilities: ['gift'],
+    tags: ['hexe'], abilities: ['gift', 'blendend'],
   },
   {
     id: 'pilzmensch', name: 'Sporenmensch', glyph: 'p', color: '#d0a0a0',
@@ -336,7 +338,7 @@ export const MONSTERS: MonsterDef[] = [
     levels: [8, 11], floors: [3], hp: 30, hpPerLevel: 5, dmg: [5, 8], dmgPerLevel: 1,
     treffer: 80, ruestung: 0, ausweichen: 30, size: 'gross', behavior: 'melee', xp: 70, weight: 2,
     flavor: 'Rote Augen, riesige Flügel, eine unerklärliche Vorliebe für deine Taschenlampe.',
-    tags: ['kryptid'], abilities: ['fliegend', 'schnell'],
+    tags: ['kryptid'], abilities: ['fliegend', 'schnell', 'blutig'],
   },
   {
     id: 'schmuggler', name: 'Schmuggler-Kobold', glyph: 'g', color: '#ffd060',
@@ -350,14 +352,14 @@ export const MONSTERS: MonsterDef[] = [
     levels: [7, 10], floors: [3], hp: 26, hpPerLevel: 5, dmg: [4, 7], dmgPerLevel: 1,
     treffer: 75, ruestung: 0, ausweichen: 10, size: 'mittel', behavior: 'melee', xp: 50, weight: 3,
     flavor: 'Ein Maul voller Zahnringe an einem Aal. Saugt sich fest. Saugt dich aus.',
-    tags: ['aquatisch'], abilities: ['regeneriert'],
+    tags: ['aquatisch'], abilities: ['regeneriert', 'blutig'],
   },
   {
     id: 'taubenschwarm', name: 'Mutierte Stadttaube', glyph: 't', color: '#a0a0b0',
     levels: [6, 9], floors: [3], hp: 12, hpPerLevel: 3, dmg: [3, 5], dmgPerLevel: 1,
     treffer: 75, ruestung: 0, ausweichen: 30, size: 'klein', behavior: 'melee', xp: 30, weight: 5, pack: [2, 4],
     flavor: 'Tauben waren schon vorher Ratten mit Flügeln. Jetzt haben sie auch Zähne.',
-    tags: ['tier'], abilities: ['fliegend'],
+    tags: ['tier'], abilities: ['fliegend', 'blendend'],
   },
 ];
 
@@ -401,6 +403,7 @@ export const HOOD_BOSSES: BossDef[] = [
     intro: 'Ein drei Meter großer Mann im grauen Kittel dreht sich um. Sein Wischmopp tropft. „Hier wird nicht gelaufen!“',
     flavor: 'Seit 40 Jahren im Dienst. Hat jeden einzelnen Tag gehasst.',
     loot: ['wischmopp'],
+    abilities: ['furchterregend'],
   },
   {
     id: 'koenig_kanalratte', name: 'König der Kanalratten', glyph: 'K', color: '#c0a060', level: 8,
@@ -425,6 +428,7 @@ export const HOOD_BOSSES: BossDef[] = [
     intro: 'In der Mitte des Gewölbes steht ein Kessel, groß wie ein Pool. Eine riesige alte Frau rührt darin und dreht sich langsam um. „Du bist aber dünn geworden. Komm, iss was.“',
     flavor: 'Wirft kochendes Gulasch. Die Treppe nach unten ist direkt hinter ihr.',
     loot: ['schoepfkelle', 'omas_schuerze'],
+    abilities: ['brennend'],
   },
   // ---------------------------------------- weitere Nachbarschafts-Bosse
   {
@@ -454,7 +458,7 @@ export const HOOD_BOSSES: BossDef[] = [
   {
     id: 'heizungsbestie', name: 'Die Heizungsbestie', glyph: 'F', color: '#ff6030', level: 8,
     hp: 85, dmg: [5, 8], treffer: 70, ruestung: 4, ausweichen: 0, size: 'riesig', xp: 150,
-    rank: 'nachbarschaftsboss', floors: [1, 2], abilities: ['gepanzert', 'regeneriert'],
+    rank: 'nachbarschaftsboss', floors: [1, 2], abilities: ['gepanzert', 'regeneriert', 'brennend'],
     intro: 'Ein Heizkessel aus den 60ern hat Beine bekommen. Und Zähne. Und schlechte Laune. Es wird sehr warm.',
     flavor: 'Wurde nie gewartet. Hat es sich gemerkt.',
     loot: ['thermostat_amulett'],
@@ -472,7 +476,7 @@ export const HOOD_BOSSES: BossDef[] = [
   {
     id: 'kanalkoenigin', name: 'Die Kanalkönigin', glyph: 'Q', color: '#40c0a0', level: 12,
     hp: 150, dmg: [6, 10], treffer: 75, ruestung: 3, ausweichen: 15, size: 'riesig', xp: 350,
-    rank: 'nachbarschaftsboss', floors: [3], abilities: ['gift', 'regeneriert'],
+    rank: 'nachbarschaftsboss', floors: [3], abilities: ['gift', 'regeneriert', 'furchterregend'],
     intro: 'Aus dem Wasser erhebt sich eine gewaltige Schlangenfrau mit einer Krone aus verrosteten Gullydeckeln. „Wer hat hier ohne zu fragen gespült?“',
     flavor: 'Herrscherin über alles, was durch die Rohre kommt. Also über sehr viel Ekliges.',
     loot: ['gullydeckel_schild'],
@@ -488,7 +492,7 @@ export const HOOD_BOSSES: BossDef[] = [
   {
     id: 'schwarzmarkt_oger', name: 'Der Schwarzmarkt-Oger', glyph: 'O', color: '#c09060', level: 13,
     hp: 180, dmg: [7, 12], treffer: 70, ruestung: 3, ausweichen: 0, size: 'riesig', xp: 380,
-    rank: 'nachbarschaftsboss', floors: [3], abilities: ['diebisch'],
+    rank: 'nachbarschaftsboss', floors: [3], abilities: ['diebisch', 'furchterregend'],
     intro: 'Zwischen Kisten mit geklauten Waren sitzt ein Oger mit Goldzähnen und Bauchtasche. „Du kaufst nix? Dann bist DU die Ware.“',
     flavor: 'Hat alles. Verkauft alles. Klaut den Rest.',
     loot: ['bauchtasche'],
@@ -504,7 +508,7 @@ export const HOOD_BOSSES: BossDef[] = [
   {
     id: 'rattenkaiser', name: 'Der Rattenkaiser', glyph: 'R', color: '#ffd700', level: 15,
     hp: 320, dmg: [8, 14], treffer: 75, ruestung: 4, ausweichen: 10, size: 'riesig', range: 4, xp: 1000,
-    rank: 'boroughboss', floors: [3], abilities: ['rufer', 'regeneriert'],
+    rank: 'boroughboss', floors: [3], abilities: ['rufer', 'regeneriert', 'blutig', 'furchterregend'],
     intro: 'Auf einem Thron aus Fahrradreifen und Knochen sitzt eine Ratte so groß wie ein Bus, in einen Königsmantel aus Duschvorhängen gehüllt. Tausende kleine Augen leuchten im Dunkeln.',
     flavor: 'Der Herrscher der Kanalstadt. Hinter ihm: die Treppe nach unten.',
     loot: ['kaiserzepter', 'duschvorhang_mantel'],

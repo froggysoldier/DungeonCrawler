@@ -391,6 +391,8 @@ export function crawlersTurn(s: GameState) {
       crawlerDies(s, c);
       continue;
     }
+    // Wer verzweifelt auf Rettung wartet oder gerade mit dir spricht, bleibt stehen
+    if (c.personality === 'verzweifelt' || d <= 1) continue;
     if (R.chance(s, 0.25)) {
       const q = R.pick(s, DIRS);
       const p = { x: c.pos.x + q.x, y: c.pos.y + q.y };

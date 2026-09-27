@@ -45,6 +45,8 @@ export function createItem(s: GameState, baseId: string, menge = 1): Item {
     special: unique?.special,
     passFacet: base.passFacet,
     explosion: base.explosion,
+    blutung: base.blutung,
+    wurfZustand: base.wurfZustand ? { ...base.wurfZustand } : undefined,
     trapKind: base.trapKind,
     petBonus: base.petBonus,
     wert: base.wert,

@@ -30,6 +30,8 @@ import { buy, ensureShop, haggle, sell } from './shop';
 import { avoidTile, detectTraps, disarm, onMonsterStep, onPlayerStep, placeOwnTrap, placeTraps, struggle } from './traps';
 import { craft } from './crafting';
 import { FX_COLORS, floatText } from './fx';
+import { clearPlayer, deathByBuff } from './conditions';
+import { track } from './stats';
 export { drainFx, drainSfx } from './fx';
 import {
   announcePopulation, askTip, crawlerAt, crawlersTurn, dismiss, giveHealing, invite, populateCrawlers, populationOnDescend, talkTo,
@@ -359,6 +361,11 @@ export function defend(s: GameState): ActionResult {
 export function wait(s: GameState): ActionResult {
   if (s.status !== 'playing') return fail('Das Spiel ist vorbei.');
   if (s.pendingSelection) return fail(SELECT_FIRST);
+  if (clearPlayer(s, 'brennen')) {
+    log(s, 'Du wirfst dich zu Boden und wälzt dich, bis die Flammen erstickt sind.', 'info');
+    endTurn(s);
+    return OK;
+  }
   s.player.ausdauer = Math.min(maxAusdauer(s), s.player.ausdauer + 1);
   endTurn(s);
   return OK;
@@ -396,15 +403,20 @@ function tickTime(s: GameState, turns: number, before: number) {
   for (const b of p.buffs) {
     if (!b.dot) continue;
     const ticks = Math.min(turns, b.turns);
+    const poisoned = b.name === 'Vergiftet';
     // Giftfestigkeit dämpft Gift
-    const resist = b.name === 'Vergiftet' ? Math.min(0.9, skillLevel(s, 'giftfestigkeit') * 0.06) : 0;
-    const dmg = Math.max(b.name === 'Vergiftet' && resist >= 0.9 ? 0 : 1, Math.round(b.dot * ticks * (1 - resist)));
-    if (b.name === 'Vergiftet' && turns === 1) trainSkill(s, 'poison', 0.5);
+    const resist = poisoned ? Math.min(0.9, skillLevel(s, 'giftfestigkeit') * 0.06) : 0;
+    const dmg = Math.max(poisoned && resist >= 0.9 ? 0 : 1, Math.round(b.dot * ticks * (1 - resist)));
+    if (poisoned && turns === 1) trainSkill(s, 'poison', 0.5);
     p.hp -= dmg;
-    s.counters.poisonDamage += dmg;
-    if (turns === 1) log(s, `${b.name}: −${dmg} HP.`, 'gefahr');
+    if (poisoned) s.counters.poisonDamage += dmg;
+    else track(s, `schaden.${b.name.toLowerCase()}`, dmg);
+    if (turns === 1) {
+      log(s, `${b.name}: −${dmg} HP.`, 'gefahr');
+      floatText(s, p.pos, `-${dmg}`, FX_COLORS.gegenSpieler);
+    }
     if (p.hp <= 0) {
-      handleLethal(s, 'an einer Vergiftung gestorben');
+      handleLethal(s, deathByBuff(b.name));
       if (s.status !== 'playing') return;
     }
   }
@@ -683,6 +695,8 @@ function applyEffect(s: GameState, e: ConsumableEffect, isFood: boolean) {
   if (e.blase) addBladder(s, e.blase);
   if (e.ausdauer) p.ausdauer = Math.min(maxAusdauer(s), p.ausdauer + e.ausdauer);
   if (e.cure) cure(s);
+  // Verbände und starke Heiltränke schließen Wunden
+  if ((e.bandage || (e.healPct ?? 0) >= 50) && clearPlayer(s, 'blutung')) log(s, 'Die Blutung hört auf.', 'info');
   if (e.buff) {
     p.buffs = p.buffs.filter((b) => b.name !== e.buff!.name);
     p.buffs.push(structuredClone(e.buff));

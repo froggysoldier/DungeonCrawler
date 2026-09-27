@@ -1,3 +1,4 @@
+import { conditionList } from '../engine/conditions';
 import { RARITY_COLORS } from '../data/items';
 import { hasUnlock, visibleTiles } from '../engine/game';
 import { lichtradius } from '../engine/player';
@@ -549,6 +550,15 @@ export function render(
       ctx.stroke();
     }
     drawToken(ctx, cx, cy, r, color, mo.rank === 'elite' ? '#2a0808' : '#140d0a', boss ? 3 : 2);
+    // Brennende Gegner flackern
+    if ((mo.conditions?.brennen?.turns ?? 0) > 0) {
+      const flicker = 0.45 + 0.35 * Math.sin(time / 70 + mo.pos.x);
+      ctx.strokeStyle = `rgba(255,140,40,${flicker})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r + 1.5, 0, Math.PI * 2);
+      ctx.stroke();
+    }
     ctx.fillStyle = color;
     ctx.font = `bold ${boss ? 14 : r < 8 ? 10 : 12}px Montserrat, sans-serif`;
     ctx.fillText(unknown ? '?' : mo.glyph, cx, cy + 1);
@@ -561,6 +571,18 @@ export function render(
     ctx.fillStyle = info.challenge.color;
     ctx.font = 'bold 8px Montserrat, sans-serif';
     ctx.fillText(info.insight <= 1 ? String(mo.level) : '?', cx - r + 1, cy + r - 0.5);
+    // Zustände als kleine farbige Punkte oben rechts
+    const conds = conditionList(mo);
+    conds.forEach((c, k) => {
+      ctx.fillStyle = 'rgba(0,0,0,0.75)';
+      ctx.beginPath();
+      ctx.arc(cx + r - 1 - k * 6, cy - r + 1, 3.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = c.color;
+      ctx.beginPath();
+      ctx.arc(cx + r - 1 - k * 6, cy - r + 1, 2.4, 0, Math.PI * 2);
+      ctx.fill();
+    });
     ctx.font = 'bold 10px Montserrat, sans-serif';
     if (mo.asleep) {
       ctx.fillStyle = '#9fc4ff';
@@ -570,6 +592,12 @@ export function render(
     } else if (mo.downed > 0) {
       ctx.fillStyle = '#7cc4ff';
       ctx.fillText('am Boden', cx, sy(p.y) + TILE + 4);
+    } else if ((mo.conditions?.furcht?.turns ?? 0) > 0) {
+      ctx.fillStyle = '#b38cff';
+      ctx.fillText('verängstigt', cx, sy(p.y) + TILE + 4);
+    } else if ((mo.conditions?.blind?.turns ?? 0) > 0) {
+      ctx.fillStyle = '#d9d9d9';
+      ctx.fillText('geblendet', cx, sy(p.y) + TILE + 4);
     } else if (mo.fleeing) {
       ctx.fillStyle = '#ffd24a';
       ctx.fillText('flieht', cx, sy(p.y) + TILE + 4);

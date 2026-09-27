@@ -20,6 +20,7 @@ import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, t
 import * as R from './rng';
 import { learnFactor, matchingSkills, techniqueKey, trainAmbush, trainSkill } from './skills';
 import { track } from './stats';
+import { inflict, inflictPlayer } from './conditions';
 import type { AttackMove, AttackPart, GameState, HitZone, Item, Monster, Pos, Technique } from './types';
 
 export const MOVE_NAMES: Record<AttackMove, string> = {
@@ -182,6 +183,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     target.aware = true;
     if (thrown?.special === 'bumerang') returnThrown(s, thrown);
     else if (thrown?.explosion) detonate(s, thrown, target.pos);
+    else if (thrown?.wurfZustand) burst(s, thrown, target.pos);
     else if (thrown) dropNear(s, thrown, target.pos);
     emit(s, { type: 'attack', technique: t, hit: false, crit: false, damage: 0, target, thrown: thrown ?? undefined, facets });
     return { ok: true };
@@ -266,8 +268,8 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     if (thrown.special === 'bumerang') {
       returnThrown(s, thrown);
       log(s, `${thrown.name} fliegt zu dir zurück.`, 'kampf');
-    } else if (thrown.explosion) {
-      // erst den Treffer auswerten, dann die Explosion
+    } else if (thrown.explosion || thrown.wurfZustand) {
+      // erst den Treffer auswerten, dann Explosion oder Wolke
     } else if (thrown.baseId === 'flasche' || thrown.baseId === 'kaffeetasse') log(s, `${thrown.name} zerschellt.`, 'kampf');
     else dropNear(s, thrown, target.pos);
   }
@@ -283,10 +285,37 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
     log(s, `${p.mount!.name} rammt mit voller Wucht!`, 'kampf');
     emit(s, { type: 'rammed', kill: target.hp <= 0 });
   }
+  // Zustände durch den Treffer: Klingen lassen bluten, Klassen und Rassen bringen eigene mit
+  if (target.hp > 0) applyHitConditions(s, target, t, final, crit);
   const at = { ...target.pos };
   if (target.hp <= 0) killMonster(s, target, t, false, facets);
   if (thrown?.explosion) detonate(s, thrown, at);
+  else if (thrown?.wurfZustand) burst(s, thrown, at);
   return { ok: true };
+}
+
+/** Blutungschance einer Waffe in Prozent (Nägel machen jede Waffe gemeiner). */
+export function bleedChance(w: Item | null): number {
+  if (!w) return 0;
+  return (w.blutung ?? 0) + (w.upgrades ?? 0) * 20;
+}
+
+/** Zustände, die ein Treffer auslösen kann. */
+function applyHitConditions(s: GameState, m: Monster, t: Technique, dmg: number, crit: boolean) {
+  if (t.part === 'waffe') {
+    const chance = bleedChance(currentWeapon(s)) + (crit ? 15 : 0);
+    if (chance > 0 && R.chance(s, chance / 100)) inflict(s, m, 'blutung', 4, 1 + Math.floor(dmg / 6));
+  }
+}
+
+/** Wurfobjekte mit Zustand (Rattengift, Staubsaugerbeutel): platzen und treffen alles im Umkreis. */
+function burst(s: GameState, thrown: Item, at: Pos) {
+  const c = thrown.wurfZustand!;
+  const r = c.radius ?? 0;
+  log(s, thrown.baseId === 'staubbeutel' ? 'Der Beutel platzt in einer dichten grauen Wolke.' : `${thrown.name} platzt auf.`, 'kampf');
+  const power = c.power + Math.floor(s.player.level / 4);
+  for (const m of [...s.monsters]) if (chebyshev(m.pos, at) <= r) inflict(s, m, c.id, c.turns, power);
+  if (chebyshev(s.player.pos, at) <= r) inflictPlayer(s, c.id, Math.max(1, c.turns - 1), c.power, 'Deine eigene Wolke');
 }
 
 /** Sprengsatz geht hoch: Schaden im Umkreis von einem Feld. */
@@ -294,7 +323,7 @@ function detonate(s: GameState, thrown: Item, at: Pos) {
   const dmg = Math.round((thrown.explosion ?? 0) * (1 + 0.1 * skillLevel(s, 'handwerk') + 0.08 * skillLevel(s, 'sprengmeister')) + effectiveStats(s).ges / 3);
   trainSkill(s, 'explode', 1);
   log(s, thrown.baseId === 'brandflasche' ? 'Die Brandflasche zerplatzt in einer Feuerwolke!' : `${thrown.name} detoniert mit ohrenbetäubendem Knall!`, 'kampf');
-  blast(s, at, dmg, 'bombe', `vom eigenen Sprengsatz (${thrown.name}) zerlegt`);
+  blast(s, at, dmg, 'bombe', `vom eigenen Sprengsatz (${thrown.name}) zerlegt`, thrown.wurfZustand);
 }
 
 function applyZoneEffect(s: GameState, m: Monster, zone: HitZone, dmg: number) {

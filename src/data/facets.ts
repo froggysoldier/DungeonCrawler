@@ -20,7 +20,7 @@ export interface FacetDef {
 }
 
 export const PART_PLURAL: Record<string, string> = {
-  zauber: 'Zauber', falle: 'Fallen', bombe: 'Sprengsätze',
+  zauber: 'Zauber', falle: 'Fallen', bombe: 'Sprengsätze', blutung: 'Blutungen', feuer: 'Flammen', gift: 'Gifte',
   faust: 'Faustschläge', tritt: 'Tritte', knie: 'Kniestöße', ellbogen: 'Ellbogenchecks',
   kopf: 'Kopfstöße', waffe: 'Waffenhiebe', wurf: 'Würfe',
 };
@@ -30,7 +30,7 @@ export const MOVE_PLURAL: Record<Exclude<AttackMove, 'normal'>, string> = {
 };
 
 export const PART_BOX: Record<string, BoxType> = {
-  zauber: 'abenteurer', falle: 'ueberlebens', bombe: 'wurf',
+  zauber: 'abenteurer', falle: 'ueberlebens', bombe: 'wurf', blutung: 'waffen', feuer: 'wurf', gift: 'ueberlebens',
   faust: 'brawler', tritt: 'schuh', knie: 'brawler', ellbogen: 'brawler', kopf: 'kleidung', waffe: 'waffen', wurf: 'wurf',
 };
 
@@ -72,6 +72,10 @@ export const TARGET_FACETS: Record<string, FacetDef> = {
   rufer: { label: 'Rudelführer', weight: 1, skill: true },
   regeneriert: { label: 'Regenerierende', weight: 1, skill: true },
   schnell: { label: 'Flinke', weight: 1, skill: true },
+  blutig: { label: 'Reißer', weight: 1, skill: true },
+  brennend: { label: 'Feuerwesen', weight: 1.5, skill: true },
+  blendend: { label: 'Blender', weight: 1, skill: true },
+  furchterregend: { label: 'Schreckgestalten', weight: 1.5, skill: true },
   // Verhalten
   fernkampf: { label: 'Fernkämpfer', weight: 0.5, skill: true },
   feigling: { label: 'Feiglinge', weight: 0.5 },
@@ -85,6 +89,11 @@ export const TARGET_FACETS: Record<string, FacetDef> = {
   ahnungslos: { label: 'ahnungslose Gegner', weight: 1, skill: true },
   schlafend: { label: 'schlafende Gegner', short: 'Schlafende', weight: 1.5, skill: true },
   fliehend: { label: 'fliehende Gegner', weight: 1 },
+  blutend: { label: 'blutende Gegner', weight: 0.5, skill: true },
+  brennend_ziel: { label: 'brennende Gegner', weight: 1, skill: true },
+  vergiftet_ziel: { label: 'vergiftete Gegner', weight: 0.5, skill: true },
+  veraengstigt: { label: 'verängstigte Gegner', weight: 1 },
+  geblendet: { label: 'geblendete Gegner', weight: 1, skill: true },
   staerker: { label: 'stärkere Gegner (3+ Level über dir)', short: 'Stärkere', weight: 3, skill: true },
   schwaecher: { label: 'schwächere Gegner (3+ Level unter dir)', short: 'Schwächere', weight: -1 },
 };
@@ -92,6 +101,10 @@ export const TARGET_FACETS: Record<string, FacetDef> = {
 /** Eigene Zustände (i:…). */
 export const SELF_FACETS: Record<string, FacetDef> = {
   vergiftet: { label: 'vergiftet', weight: 2, skill: true, box: 'ueberlebens' },
+  blutend: { label: 'blutend', weight: 2, skill: true, box: 'ueberlebens' },
+  brennend: { label: 'in Flammen', short: 'Brennend', weight: 3, skill: true, box: 'ueberlebens' },
+  veraengstigt: { label: 'verängstigt', weight: 2, skill: true, box: 'fan' },
+  geblendet: { label: 'geblendet', weight: 2.5, skill: true, box: 'ueberlebens' },
   fasttot: { label: 'mit weniger als 20 % HP', short: 'Am Abgrund', weight: 3, skill: true, box: 'ueberlebens' },
   verletzt: { label: 'verletzt (unter 50 % HP)', short: 'Angeschlagen', weight: 0.5, skill: true },
   barfuss: { label: 'barfuß', weight: 1, skill: true, box: 'schuh' },

@@ -98,6 +98,24 @@ const MOMENTS: Moment[] = [
     comment: 'Dein Kampfstil ist unvorhersehbar. Für alle Beteiligten, dich eingeschlossen.',
     check: once('kills.angetrunken', 5),
   },
+  {
+    id: 'mo_feuertaufe', name: 'Feuertaufe', tier: 'silber', box: 'ueberlebens',
+    description: 'Besiege einen Gegner, während du selbst in Flammen stehst.',
+    comment: 'Du brennst, und trotzdem hast du zuerst an ihn gedacht. Das nennt man Prioritäten.',
+    check: once('kills.selbstbrennend'),
+  },
+  {
+    id: 'mo_blindflug', name: 'Blindflug', tier: 'silber', box: 'brawler',
+    description: 'Besiege einen Gegner, während du geblendet bist.',
+    comment: 'Du hast nichts gesehen. Der Gegner leider schon.',
+    check: once('kills.geblendet'),
+  },
+  {
+    id: 'mo_mut', name: 'Mut ist, wenn man trotzdem zuschlägt', tier: 'silber', box: 'fan',
+    description: 'Besiege einen Gegner, während du verängstigt bist.',
+    comment: 'Die Knie haben gezittert. Die Faust nicht.',
+    check: once('kills.veraengstigt'),
+  },
   // ------------------------------------------------------------ Bosse
   {
     id: 'mo_boss_makellos', name: 'Makellos', tier: 'gold', box: 'boss',
@@ -364,7 +382,7 @@ const CATEGORY: Record<string, AchievementCategory> = {
   mo_rettung_haustier: 'sozial', mo_rettung_party: 'sozial', mo_saferoom_knapp: 'ueberleben', mo_tuer_zu: 'erkundung', mo_schlaflos: 'ueberleben',
   mo_doppelaufstieg: 'fortschritt', mo_boxen_horten: 'beute', mo_goldbad: 'wirtschaft', mo_feilschen_max: 'wirtschaft',
   mo_feilschen_pleiten: 'wirtschaft', mo_ausverkauf: 'wirtschaft', mo_jackpot: 'wirtschaft', mo_nieten: 'wirtschaft', mo_kettenzauber: 'magie',
-  mo_gerettet_party: 'sozial', mo_auftrag_verpatzt: 'sozial', mo_etage2_frueh: 'erkundung', mo_etage3_frueh: 'erkundung',
+  mo_feuertaufe: 'ueberleben', mo_blindflug: 'kampf', mo_mut: 'kampf', mo_gerettet_party: 'sozial', mo_auftrag_verpatzt: 'sozial', mo_etage2_frueh: 'erkundung', mo_etage3_frueh: 'erkundung',
 };
 
 export const MOMENT_ACHIEVEMENTS: AchievementDef[] = MOMENTS.map((m) => ({

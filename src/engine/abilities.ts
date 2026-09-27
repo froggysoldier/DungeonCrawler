@@ -19,6 +19,10 @@ export const ABILITY_NAMES: Record<MonsterAbility, string> = {
   schnell: 'schnell',
   fliegend: 'fliegt',
   gepanzert: 'gepanzert (halber Faustschaden)',
+  blutig: 'reißt blutende Wunden',
+  brennend: 'setzt in Brand',
+  blendend: 'blendet',
+  furchterregend: 'jagt Angst ein',
 };
 
 export const has = (m: Monster, a: MonsterAbility) => !!m.abilities?.includes(a);

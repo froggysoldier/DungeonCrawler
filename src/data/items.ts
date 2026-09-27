@@ -1,4 +1,4 @@
-import type { Bonuses, ConsumableEffect, ItemKind, Rarity, Slot, SpecialEffect, TrapKind } from '../engine/types';
+import type { Bonuses, ConsumableEffect, ItemKind, Rarity, Slot, SpecialEffect, ThrowCondition, TrapKind } from '../engine/types';
 
 export interface BaseItem {
   id: string;
@@ -17,6 +17,10 @@ export interface BaseItem {
   ground?: number;
   /** Wurfobjekt explodiert beim Aufprall (Schaden im Umkreis). */
   explosion?: number;
+  /** Waffen: Chance in Prozent, eine Blutung zu verursachen. */
+  blutung?: number;
+  /** Wurfobjekte: Zustand beim Aufprall. */
+  wurfZustand?: ThrowCondition;
   /** Eigene Falle zum Aufstellen. */
   trapKind?: TrapKind;
   /** Halsband: Bonus für das Haustier. */
@@ -62,7 +66,7 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'bratpfanne', name: 'Bratpfanne', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 4, bonuses: { ruestung: 1 }, flavor: 'Klassiker. *Bonk.*', wert: 4, ground: 2 },
   { id: 'nudelholz', name: 'Nudelholz', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 3, bonuses: { krit: 5 }, flavor: 'Omas Lieblingswaffe.', wert: 3, ground: 2 },
   { id: 'hockeyschlaeger', name: 'Hockeyschläger', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 5, flavor: 'Kanadische Diplomatie.', wert: 6 },
-  { id: 'brecheisen', name: 'Brecheisen', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 6, flavor: 'Öffnet Türen und Schädel.', wert: 8 },
+  { id: 'brecheisen', name: 'Brecheisen', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 6, flavor: 'Öffnet Türen und Schädel.', wert: 8, blutung: 10 },
   { id: 'schlagring', name: 'Schlagring', kind: 'ausruestung', slot: 'haende', bonuses: { schaden: { faust: 20 } }, flavor: 'Erhöht Faustschaden, ohne als Waffe zu zählen.', wert: 8 },
 
   // ---- Kleidung
@@ -99,7 +103,7 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'handy', name: 'Handy ohne Netz', kind: 'wurf', wurfSchaden: 2, flavor: 'Kein Netz. Kein Akku bald. Aber es fliegt ganz gut.', wert: 0 },
   { id: 'fernbedienung', name: 'Fernbedienung', kind: 'wurf', wurfSchaden: 2, flavor: 'Hat noch nie funktioniert, wenn man sie brauchte. Jetzt auch nicht.', wert: 0 },
   { id: 'schluesselbund', name: 'Schlüsselbund', kind: 'wurf', wurfSchaden: 3, flavor: 'Schlüssel für ein Haus, das es nicht mehr gibt.', wert: 0 },
-  { id: 'kochmesser', name: 'Kochmesser', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 5, bonuses: { krit: 5 }, flavor: 'Scharf. Sehr scharf. Du hast damit Zwiebeln geschnitten. Früher.', wert: 6 },
+  { id: 'kochmesser', name: 'Kochmesser', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 5, bonuses: { krit: 5 }, flavor: 'Scharf. Sehr scharf. Du hast damit Zwiebeln geschnitten. Früher.', wert: 6, blutung: 35 },
   { id: 'trillerpfeife', name: 'Trillerpfeife', kind: 'ausruestung', slot: 'hals', bonuses: { stats: { cha: 1 } }, flavor: 'Vom Sportunterricht. Pfeifen hilft nicht gegen Monster. Aber es fühlt sich gut an.', wert: 1 },
   { id: 'bademantel', name: 'Bademantel', kind: 'ausruestung', slot: 'brust', bonuses: { ruestung: 0, stats: { cha: 1 } }, flavor: 'Flauschig. Offen. Leider.', wert: 1 },
   { id: 'schlafanzug', name: 'Dino-Schlafanzug', kind: 'ausruestung', slot: 'brust', bonuses: { maxHp: 1 }, flavor: 'Mit Kapuze. Die Kapuze hat Zähne.', wert: 1 },
@@ -180,13 +184,13 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'klobuerste', name: 'Klobürste', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 3, bonuses: { krit: 8, stats: { cha: -1 } }, flavor: 'Benutzt. Die Gegner wissen das.', wert: 1, ground: 2 },
   { id: 'regenschirm', name: 'Regenschirm', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 3, bonuses: { ausweichen: 3 }, flavor: 'Spannt sich im falschen Moment auf.', wert: 2, ground: 2 },
   { id: 'hammer', name: 'Zimmermannshammer', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 5, flavor: 'Für Nägel. Und Köpfe wie Nägel.', wert: 5, ground: 2 },
-  { id: 'spaten', name: 'Spaten', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 6, bonuses: { ruestung: 1 }, flavor: 'Gräbt auch Gräber. Praktisch.', wert: 6, ground: 1 },
-  { id: 'kettensaege', name: 'Kettensäge (ohne Benzin)', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 4, bonuses: { stats: { cha: 2 } }, flavor: 'Macht nur Brumm-Geräusche, wenn du sie selbst machst.', wert: 5 },
+  { id: 'spaten', name: 'Spaten', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 6, bonuses: { ruestung: 1 }, flavor: 'Gräbt auch Gräber. Praktisch.', wert: 6, ground: 1, blutung: 15 },
+  { id: 'kettensaege', name: 'Kettensäge (ohne Benzin)', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 4, bonuses: { stats: { cha: 2 } }, flavor: 'Macht nur Brumm-Geräusche, wenn du sie selbst machst.', wert: 5, blutung: 25 },
   { id: 'tischtennis', name: 'Tischtennisschläger', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 2, bonuses: { treffer: 8 }, flavor: 'Schnell, präzise, lächerlich.', wert: 2, ground: 1 },
   { id: 'selfiestick', name: 'Selfie-Stick', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 2, bonuses: { stats: { cha: 3 } }, flavor: 'Die Zuschauer lieben den Winkel.', wert: 3, ground: 1 },
   { id: 'fleischklopfer', name: 'Fleischklopfer', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 5, bonuses: { krit: 4 }, flavor: 'Für Schnitzel. Du bist jetzt das Schnitzel-Problem.', wert: 4, ground: 1 },
   { id: 'baguette', name: 'Versteinertes Baguette', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 4, flavor: 'Drei Wochen alt. Härter als Stahl.', wert: 2, ground: 2 },
-  { id: 'dachlatte', name: 'Dachlatte', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 5, flavor: 'Mit rostigem Nagel. Natürlich mit rostigem Nagel.', wert: 3, ground: 2 },
+  { id: 'dachlatte', name: 'Dachlatte', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 5, flavor: 'Mit rostigem Nagel. Natürlich mit rostigem Nagel.', wert: 3, ground: 2, blutung: 10 },
   { id: 'eishockeyschlaeger', name: 'Eishockeyschläger', kind: 'ausruestung', slot: 'waffe', waffenSchaden: 6, bonuses: { schaden: { waffe: 5 } }, flavor: 'Kanada hat angerufen. Es will ihn nicht zurück.', wert: 8 },
 
   // ================= Erweiterung: Kleidung
@@ -248,7 +252,7 @@ export const BASE_ITEMS: BaseItem[] = [
 
   // ================= Erweiterung: Verbrauchsgüter
   { id: 'gegengift', name: 'Gegengift', kind: 'verbrauch', effekt: { cure: true, heal: 3 }, flavor: 'Schmeckt nach Kreide. Rettet Leben.', wert: 8, ground: 2 },
-  { id: 'pflaster', name: 'Pflaster', kind: 'verbrauch', effekt: { heal: 5 }, flavor: 'Mit Dinos drauf.', wert: 1, ground: 3 },
+  { id: 'pflaster', name: 'Pflaster', kind: 'verbrauch', effekt: { heal: 5, bandage: true }, flavor: 'Mit Dinos drauf.', wert: 1, ground: 3 },
   { id: 'ausdauertrank', name: 'Ausdauertrank', kind: 'verbrauch', effekt: { ausdauer: 20, blase: 10 }, flavor: 'Grün und sprudelnd. Wie ein Energydrink, nur legal.', wert: 6 },
   { id: 'grosser_heiltrank', name: 'Großer Heiltrank', kind: 'verbrauch', effekt: { healPct: 100, blase: 5 }, flavor: 'Eine ganze Flasche Hoffnung.', wert: 25 },
   { id: 'mettbroetchen', name: 'Mettbrötchen', kind: 'verbrauch', effekt: { heal: 8 }, flavor: 'Mit Zwiebeln. Wie lange lag das hier? Egal.', wert: 2, ground: 1 },
@@ -285,9 +289,11 @@ export const BASE_ITEMS: BaseItem[] = [
   { id: 'klappwerkbank', name: 'Klappwerkbank', kind: 'schrott', flavor: 'Zusammengeklappt passt sie in jedes Inventar. Aufgeklappt wird jeder Ort zur Werkstatt.', wert: 20 },
 
   // ================= Handwerk: Erzeugnisse
-  { id: 'brandflasche', name: 'Brandflasche', kind: 'wurf', wurfSchaden: 3, explosion: 7, flavor: 'Eine Flasche, ein Lappen, viel schlechter Schnaps. Zerplatzt in einer Feuerwolke.', wert: 6 },
-  { id: 'nagelbombe', name: 'Nagelbombe', kind: 'wurf', wurfSchaden: 2, explosion: 11, flavor: 'Eine Ravioli-Dose voller Nägel und Pulver. Die Systemstimme ist entzückt.', wert: 10 },
-  { id: 'verband', name: 'Verband', kind: 'verbrauch', effekt: { heal: 10 }, flavor: 'Aus zwei Lappen gerissen. Nicht steril. Aber besser als nichts.', wert: 2 },
+  { id: 'brandflasche', name: 'Brandflasche', kind: 'wurf', wurfSchaden: 3, explosion: 7, flavor: 'Eine Flasche, ein Lappen, viel schlechter Schnaps. Zerplatzt in einer Feuerwolke.', wert: 6, wurfZustand: { id: 'brennen', turns: 3, power: 3, radius: 1 } },
+  { id: 'nagelbombe', name: 'Nagelbombe', kind: 'wurf', wurfSchaden: 2, explosion: 11, flavor: 'Eine Ravioli-Dose voller Nägel und Pulver. Die Systemstimme ist entzückt.', wert: 10, wurfZustand: { id: 'blutung', turns: 4, power: 2, radius: 1 } },
+  { id: 'rattengift', name: 'Dose Rattengift', kind: 'wurf', wurfSchaden: 1, wurfZustand: { id: 'gift', turns: 6, power: 2, radius: 1 }, flavor: 'Laut Etikett „für Nagetiere aller Größen“. Hier unten sind die Größen etwas anders.', wert: 4, ground: 3 },
+  { id: 'staubbeutel', name: 'Staubsaugerbeutel', kind: 'wurf', wurfSchaden: 1, wurfZustand: { id: 'blind', turns: 3, power: 1, radius: 1 }, flavor: 'Randvoll. Zerplatzt in einer grauen Wolke aus Staub, Haaren und Dingen, über die man nicht nachdenken will.', wert: 3, ground: 3 },
+  { id: 'verband', name: 'Verband', kind: 'verbrauch', effekt: { heal: 10, bandage: true }, flavor: 'Aus zwei Lappen gerissen. Nicht steril. Aber besser als nichts.', wert: 2 },
   { id: 'stachelfalle', name: 'Stachelfalle (zum Aufstellen)', kind: 'schrott', trapKind: 'stachelfalle', flavor: 'Wer drauftritt, bereut es. Du trittst natürlich nicht drauf.', wert: 6 },
   { id: 'sprengfalle', name: 'Sprengfalle (zum Aufstellen)', kind: 'schrott', trapKind: 'sprengfalle', flavor: 'Ein Stolperdraht an einem Tütchen Pulver. Abstand halten.', wert: 10 },
   { id: 'schlingfalle', name: 'Schlingfalle (zum Aufstellen)', kind: 'schrott', trapKind: 'schlingfalle', flavor: 'Hält einen Gegner fest, bis du Zeit für ihn hast.', wert: 5 },

@@ -104,6 +104,9 @@ function onKillMoments(s: GameState, e: Extract<GameEvent, { type: 'kill' }>, di
   if (own && f.includes('i:bademantel')) track(s, 'kills.bademantel');
   if (own && f.includes('i:umzingelt')) track(s, 'kills.umzingelt');
   if (own && f.includes('i:angetrunken')) track(s, 'kills.angetrunken');
+  if (own && f.includes('i:brennend')) track(s, 'kills.selbstbrennend');
+  if (own && f.includes('i:geblendet')) track(s, 'kills.geblendet');
+  if (own && f.includes('i:veraengstigt')) track(s, 'kills.veraengstigt');
   if (own && e.technique?.part === 'waffe') {
     const w = currentWeapon(s);
     if (w) track(s, `kills.waffe.${w.baseId}`);
@@ -229,6 +232,10 @@ export function statsOnEvent(s: GameState, e: GameEvent) {
       break;
     case 'accident':
       track(s, 'unfall');
+      break;
+    case 'conditioned':
+      track(s, 'zustand.erlitten');
+      track(s, `zustand.erlitten.${e.condition}`);
       break;
     case 'eat':
       track(s, 'gegessen');

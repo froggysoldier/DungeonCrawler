@@ -19,6 +19,8 @@ import { learnFactor, trainSkill } from './skills';
 import * as R from './rng';
 import type { Fx, GameState, Monster, Pos } from './types';
 import { FX_COLORS, floatText, shot } from './fx';
+import { conditionsTurn, hasCondition, inflictPlayer } from './conditions';
+import { selfFacets } from './observer';
 
 const DIRS: Pos[] = [
   { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 },
@@ -105,7 +107,8 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
   const source = targetFacets(s, m).filter((f) => f !== 'z:ahnungslos');
   if (ranged && !source.includes('z:fernkampf')) source.push('z:fernkampf');
   const defense = dynDefenseBonus(s, source);
-  const hit = Math.max(5, Math.min(95, m.treffer - ausweichen(s, b) - defense.ausweichen - (ranged ? 5 : 0) + levelGapHit(m.level, p.level)));
+  const blind = hasCondition(m, 'blind') ? 30 : 0;
+  const hit = Math.max(5, Math.min(95, m.treffer - ausweichen(s, b) - defense.ausweichen - (ranged ? 5 : 0) + levelGapHit(m.level, p.level) - blind));
   const verb = ranged ? 'schießt auf dich' : 'greift an';
   if (ranged) shot(s, m.pos, p.pos, shotStyle(s, m));
   const covered = p.buffs.some((x) => x.name === 'Deckung');
@@ -158,6 +161,16 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
   }
   emit(s, { type: 'damageTaken', amount: dmg, source: m.name, facets: source });
   onMonsterHit(s, m);
+  monsterConditionHit(s, m, dmg);
+}
+
+/** Fähigkeiten, die beim Treffer einen Zustand auslösen. */
+function monsterConditionHit(s: GameState, m: Monster, dmg: number) {
+  if (s.status !== 'playing') return;
+  const who = NameOf(s, m);
+  if (has(m, 'blutig') && R.chance(s, 0.3)) inflictPlayer(s, 'blutung', 4, 1 + Math.floor(m.level / 4) + (dmg >= 8 ? 1 : 0), who);
+  if (has(m, 'brennend') && R.chance(s, 0.35)) inflictPlayer(s, 'brennen', 3, 2 + Math.floor(m.level / 4), who);
+  if (has(m, 'blendend') && R.chance(s, 0.25)) inflictPlayer(s, 'blind', 3, 1, who);
 }
 
 function attackPet(s: GameState, m: Monster) {
@@ -178,6 +191,7 @@ function attackPet(s: GameState, m: Monster) {
 
 /** Sichtweite eines Monsters: Fernkämpfer sehen weiter, Schattenmantel halbiert sie. */
 function perceptionRange(s: GameState, m: Monster): number {
+  if (hasCondition(m, 'blind')) return 1;
   let r = m.behavior === 'ranged' || m.range ? 9 : 8;
   if (m.size === 'winzig') r -= 1;
   if (s.player.buffs.some((b) => b.name === 'Schattenmantel')) r = Math.floor(r / 2);
@@ -196,6 +210,7 @@ function spotChance(s: GameState, d: number): number {
 
 /** Wann ein Monster flieht – nur wenn es zu seiner Art passt. */
 function wantsToFlee(s: GameState, m: Monster, d: number): boolean {
+  if (hasCondition(m, 'furcht')) return true;
   if (m.rank !== 'normal') return false;
   // Feiglinge laut Beschreibung (Bürokraten, Heinzelmännchen …) halten Abstand
   if (m.behavior === 'coward') return d <= 4;
@@ -213,6 +228,11 @@ function spotPlayer(s: GameState, m: Monster, text: string) {
   m.lastSeen = { ...s.player.pos };
   m.searching = 0;
   if (playerSees(s, m.pos)) log(s, text, 'gefahr');
+  if (has(m, 'furchterregend') && !m.roared && chebyshev(m.pos, s.player.pos) <= 6) {
+    m.roared = true;
+    if (playerSees(s, m.pos)) log(s, `${NameOf(s, m)} stößt einen markerschütternden Schrei aus.`, 'gefahr');
+    inflictPlayer(s, 'furcht', 4, 1, NameOf(s, m));
+  }
   let warned = 0;
   for (const o of s.monsters) {
     if (o === m || o.aware || o.asleep || o.homeRoom !== undefined || chebyshev(o.pos, m.pos) > 6) continue;
@@ -245,6 +265,9 @@ export function makeNoise(s: GameState, at: Pos, radius: number) {
 
 export function monsterTurn(s: GameState, m: Monster) {
   if (s.status !== 'playing' || !s.monsters.includes(m)) return;
+  // Blutung, Brennen, Gift: Schaden zu Beginn des Zugs
+  const died = conditionsTurn(s, m, (x, part) => killMonster(s, x, null, false, [`t:${part}`, ...targetFacets(s, x), ...selfFacets(s)]));
+  if (died || !s.monsters.includes(m) || s.status !== 'playing') return;
   if (m.downed > 0) {
     m.downed -= 1;
     if (m.downed === 0 && playerSees(s, m.pos)) log(s, `${NameOf(s, m)} rappelt sich wieder auf.`, 'kampf');
@@ -267,6 +290,18 @@ export function monsterTurn(s: GameState, m: Monster) {
   }
   startOfTurn(s, m);
   const p = s.player;
+  // Brennende Tiere geraten in Panik und rennen ziellos herum
+  if (hasCondition(m, 'brennen') && m.rank === 'normal' && targetFacets(s, m).some((f) => f === 'z:tier' || f === 'z:ratte' || f === 'z:insekt') && R.chance(s, 0.5)) {
+    const before = m.pos;
+    wander(s, m);
+    if (m.pos === before) stepAway(s, m, p.pos);
+    return;
+  }
+  // Geblendete tappen oft ins Leere
+  if (hasCondition(m, 'blind') && chebyshev(m.pos, p.pos) > 1 && R.chance(s, 0.5)) {
+    wander(s, m);
+    return;
+  }
   const d = chebyshev(m.pos, p.pos);
   const sees = canSeePlayer(s, m, perceptionRange(s, m));
 

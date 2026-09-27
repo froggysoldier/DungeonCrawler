@@ -45,6 +45,7 @@ import {
 } from '../engine/player';
 import { skillEffectText, skillProgress } from '../engine/skills';
 import { stat } from '../engine/stats';
+import { CONDITIONS, CONDITION_IDS, conditionList, playerHas } from '../engine/conditions';
 import { monsterDefById } from '../engine/monsters';
 import type { AttackMove, AttackPart, EquipSlot, GameState, HitZone, Item, MetaState, Pos, StatKey, Technique } from '../engine/types';
 import { bindActions, esc, formatTime } from './dom';
@@ -483,6 +484,8 @@ export class GameView {
       parts.push(`<span class="muted">${esc(info.level)} · ${esc(INSIGHT_NAMES[info.insight])}</span>`);
       parts.push(`Herausforderung: <b style="color:${info.challenge.color}">${esc(info.challenge.name)}</b> <span class="muted small">(${esc(info.challenge.hint)})</span>`);
       parts.push(`${esc(info.health)}${mon.downed > 0 ? ' · <span style="color:#7cc4ff">am Boden</span>' : ''}${mon.asleep ? ' · <span style="color:#6ee07a">schläft</span>' : !mon.aware ? ' · <span style="color:#6ee07a">ahnungslos</span>' : ''}`);
+      const conds = conditionList(mon);
+      if (conds.length) parts.push(conds.map((c) => `<span style="color:${c.color}">${esc(c.state)} (${c.turns})</span>`).join(' · '));
       if (info.combat) parts.push(esc(info.combat));
       if (info.abilities) parts.push(`<span style="color:#ff9dff">${esc(info.abilities)}</span>`);
       if (blocker) parts.push(`<span class="muted">${esc(techniqueName(tech))}: ${esc(blocker)}</span>`);
@@ -526,7 +529,8 @@ export class GameView {
     const mon = this.visible.has(idx(this.s.map, t.x, t.y)) ? monsterAt(this.s, t) : undefined;
     if (mon) {
       const info = describeMonster(this.s, mon);
-      return this.say([`${info.name} (${info.level}, ${INSIGHT_NAMES[info.insight]})`, info.health, info.combat, info.abilities, info.flavor].filter(Boolean).join('. '));
+      const conds = conditionList(mon).map((c) => c.state).join(', ');
+      return this.say([`${info.name} (${info.level}, ${INSIGHT_NAMES[info.insight]})`, info.health, conds, info.combat, info.abilities, info.flavor].filter(Boolean).join('. '));
     }
     const items = itemsAt(this.s, t);
     if (items.length) {
@@ -972,8 +976,9 @@ export class GameView {
     const ma = maxAusdauer(s, b);
     const need = xpToNext(p.level);
     const poisoned = p.buffs.some((x) => x.name === 'Vergiftet');
+    const ailments = CONDITION_IDS.filter((id) => playerHas(s, id)).map((id) => CONDITIONS[id].state);
     let html = `<div class="bars">
-      <div class="bar hp ${poisoned ? 'poison' : ''}"><div style="width:${(100 * Math.max(0, p.hp)) / mh}%"></div><span>HP ${Math.max(0, p.hp)} / ${mh}${poisoned ? ' · vergiftet' : ''}</span></div>
+      <div class="bar hp ${poisoned ? 'poison' : ''}"><div style="width:${(100 * Math.max(0, p.hp)) / mh}%"></div><span>HP ${Math.max(0, p.hp)} / ${mh}${ailments.length ? ` · ${ailments.join(', ')}` : ''}</span></div>
       <div class="bar st"><div style="width:${(100 * p.ausdauer) / ma}%"></div><span>Ausdauer ${p.ausdauer} / ${ma}</span></div>
       ${p.spells?.length ? `<div class="bar mp"><div style="width:${(100 * (p.mp ?? 0)) / maxMp(s, b)}%"></div><span>Mana ${p.mp ?? 0} / ${maxMp(s, b)}</span></div>` : ''}
       ${hasUnlock(s, 'inventar') ? `<div class="bar bl ${(p.blase ?? 0) >= 80 ? 'urgent' : ''}"><div style="width:${p.blase ?? 0}%"></div><span>Blase ${Math.round(p.blase ?? 0)} %${(p.blase ?? 0) >= 80 ? ' – such eine Toilette!' : ''}</span></div>` : ''}
@@ -1203,12 +1208,18 @@ export class GameView {
       ['Humpeln lassen', v('zonen.humpelt')],
       ['Geschwächt', v('zonen.geschwaecht')],
       ['Kills durch Konter', v('kills.konter')],
+      ['Blutungen zugefügt', v('zustand.blutung')],
+      ['Gegner in Brand gesetzt', v('zustand.brennen')],
+      ['Gegner vergiftet', v('zustand.gift')],
+      ['Gegnern Angst eingejagt', v('zustand.furcht')],
+      ['Gegner geblendet', v('zustand.blind')],
       ['Kills an stärkeren Gegnern (3+ Stufen)', v('kills.staerker')],
       ['Kills an schlafenden Gegnern', v('kills.schlafend')],
       ['Kills an fliehenden Gegnern', v('kills.fliehend')],
     ]);
     const PART_LABELS: Record<string, string> = {
       ...PART_NAMES, zauber: 'Zauber', falle: 'Fallen', bombe: 'Sprengsätze', haustier: 'Haustier', party: 'Party', sonstiges: 'Sonstiges',
+      blutung: 'Blutung', feuer: 'Feuer', gift: 'Gift',
     };
     const byKey = (prefix: string, label: (id: string) => string) =>
       Object.entries(s.stats ?? {})
@@ -1231,6 +1242,7 @@ export class GameView {
       ['Schaden eingesteckt', v('schaden.erlitten')],
       ['Ausgewichen', v('ausgewichen')],
       ['Knapp überlebt (unter 10 %)', v('knapp.ueberlebt')],
+      ['Zustände überstanden', v('zustand.erlitten')],
       ['Tränke getrunken', s.counters.potionsDrunk],
       ['Mahlzeiten', s.counters.mealsEaten],
       ['Geschlafen', v('geschlafen')],
@@ -1353,10 +1365,11 @@ export class GameView {
         chance = blocker ? '' : info.showHitChance ? `${hitChance(s, m, tech)} % Treffer` : 'Trefferchance unklar';
       }
       const state = [m.asleep ? 'schläft' : !m.aware ? 'ahnungslos' : '', m.downed > 0 ? 'am Boden' : '', m.stunned ? 'benommen' : '', m.slowed ? 'humpelt' : '', m.weakened ? 'geschwächt' : ''].filter(Boolean).join(', ');
+      const conds = conditionList(m).map((c) => `<span style="color:${c.color}">${esc(c.state)}</span>`).join(', ');
       const sel = m.uid === this.targetUid;
       return `<div class="target ${sel ? 'sel' : ''}" data-action="target" data-uid="${m.uid}">
         <div><b style="color:${info.insight >= 3 ? '#b0a898' : m.color}">${esc(info.name)}</b> <span class="muted small">${esc(info.level)} · ${d} ${d === 1 ? 'Feld' : 'Felder'}</span> <span class="small" style="color:${info.challenge.color}">${esc(info.challenge.name)}</span></div>
-        <div class="small">${esc(info.health)}${state ? ` · <span style="color:#7cc4ff">${esc(state)}</span>` : ''}</div>
+        <div class="small">${esc(info.health)}${state ? ` · <span style="color:#7cc4ff">${esc(state)}</span>` : ''}${conds ? ` · ${conds}` : ''}</div>
         <div class="row" style="gap:6px;align-items:center"><span class="small" style="flex:1;color:${blocker ? 'var(--muted)' : 'var(--ok)'}">${esc(blocker ?? chance)}</span>
         <button class="primary" data-action="strike" data-uid="${m.uid}" ${blocker ? 'disabled' : ''}>${this.pendingSpell ? 'Zaubern' : 'Angreifen'}</button></div>
       </div>`;

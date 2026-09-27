@@ -1,3 +1,4 @@
+import { inflict, inflictPlayer } from './conditions';
 import { SPELLS, SPELL_BY_ID, SPELL_MAX_LEVEL, spellXpNeeded } from '../data/spells';
 import { cure, has } from './abilities';
 import { isInSafeRoom, killMonster } from './combat';
@@ -171,12 +172,16 @@ export function castSpell(s: GameState, id: string, opts: CastOptions = {}): { o
       const dmg = 10 + st.int + level * 2;
       shot(s, p.pos, center, 'feuer');
       log(s, 'Ein Feuerball rast los und explodiert!', 'kampf');
-      for (const m of s.monsters.filter((x) => chebyshev(x.pos, center) <= 1)) if (spellHurt(s, m, dmg, 'Der Feuerball')) kills++;
+      for (const m of s.monsters.filter((x) => chebyshev(x.pos, center) <= 1)) {
+        if (spellHurt(s, m, dmg, 'Der Feuerball')) kills++;
+        else inflict(s, m, 'brennen', 3, 2 + Math.floor(level / 2));
+      }
       if (chebyshev(p.pos, center) <= 1) {
         const self = Math.round(dmg / 2);
         p.hp -= self;
         log(s, `Du stehst zu nah dran. Der Feuerball erwischt auch dich: −${self} HP.`, 'gefahr');
         if (p.hp <= 0) handleLethal(s, 'vom eigenen Feuerball verbrannt');
+        else inflictPlayer(s, 'brennen', 2, 2, 'Dein Feuerball');
       }
       break;
     }

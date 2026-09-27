@@ -26,10 +26,11 @@ import type {
 const ABILITY_FACET: Record<MonsterAbility, string> = {
   gift: 'giftig', explodiert: 'explosiv', diebisch: 'diebisch', rufer: 'rufer',
   regeneriert: 'regeneriert', schnell: 'schnell', fliegend: 'fliegend', gepanzert: 'gepanzert',
+  blutig: 'blutig', brennend: 'brennend', blendend: 'blendend', furchterregend: 'furchterregend',
 };
 
 const PART_WEIGHT: Record<string, number> = {
-  zauber: 0.5, falle: 1.5, bombe: 1, faust: 0, tritt: 0, knie: 0.5, ellbogen: 0.5, kopf: 1, waffe: 0, wurf: 0.5 };
+  zauber: 0.5, falle: 1.5, bombe: 1, blutung: 1, feuer: 1.5, gift: 1, faust: 0, tritt: 0, knie: 0.5, ellbogen: 0.5, kopf: 1, waffe: 0, wurf: 0.5 };
 const MOVE_WEIGHT: Record<AttackMove, number> = { normal: 0, sprung: 1, stampfen: 1, anlauf: 1 };
 
 function chronicle(s: GameState): Chronicle {
@@ -55,6 +56,12 @@ export function targetFacets(s: GameState, m: Monster): string[] {
   if (!m.aware) out.add('z:ahnungslos');
   if (m.asleep) out.add('z:schlafend');
   if (m.fleeing) out.add('z:fliehend');
+  const c = m.conditions ?? {};
+  if ((c.blutung?.turns ?? 0) > 0) out.add('z:blutend');
+  if ((c.brennen?.turns ?? 0) > 0) out.add('z:brennend_ziel');
+  if ((c.gift?.turns ?? 0) > 0) out.add('z:vergiftet_ziel');
+  if ((c.furcht?.turns ?? 0) > 0) out.add('z:veraengstigt');
+  if ((c.blind?.turns ?? 0) > 0) out.add('z:geblendet');
   const diff = m.level - s.player.level;
   if (diff >= 3) out.add('z:staerker');
   if (diff <= -3) out.add('z:schwaecher');
@@ -72,6 +79,10 @@ export function selfFacets(s: GameState): string[] {
   if (p.hp < mh * 0.2) out.push('i:fasttot');
   else if (p.hp < mh * 0.5) out.push('i:verletzt');
   if (p.buffs.some((b) => b.name === 'Vergiftet')) out.push('i:vergiftet');
+  if (p.buffs.some((b) => b.name === 'Blutung')) out.push('i:blutend');
+  if (p.buffs.some((b) => b.name === 'Brennen')) out.push('i:brennend');
+  if (p.buffs.some((b) => b.name === 'Furcht')) out.push('i:veraengstigt');
+  if (p.buffs.some((b) => b.name === 'Geblendet')) out.push('i:geblendet');
   if (p.buffs.some((b) => b.name === 'Mut angetrunken')) out.push('i:angetrunken');
   if (p.buffs.some((b) => b.name === 'Wutanfall' || b.name === 'Rasende Wut')) out.push('i:wuetend');
   if (p.ausdauer <= 2) out.push('i:erschoepft');

@@ -12,6 +12,7 @@ import { idx } from './mapgen';
 import { effectiveStats, maxHp } from './player';
 import { petLevelUp } from './ai';
 import { learnSkill } from './skills';
+import { inflict } from './conditions';
 import { addSpectacle, fanGift } from './viewers';
 import type { GameState, Monster, Technique } from './types';
 
@@ -137,7 +138,7 @@ export function useAbility(s: GameState, technique: Technique): ActionResult {
       break;
     }
     case 'kampfschrei': {
-      for (const m of visibleMonsters(s, 7)) if (m.rank === 'normal' || m.rank === 'elite') m.fleeing = true;
+      for (const m of visibleMonsters(s, 7)) inflict(s, m, 'furcht', 6, 1);
       p.buffs.push({ name: 'Kampfschrei', turns: 10, bonuses: { schaden: { alle: 20 } } });
       log(s, 'Dein Kampfschrei hallt durch die Gänge. Deine Gegner nehmen Reißaus!', 'system');
       break;

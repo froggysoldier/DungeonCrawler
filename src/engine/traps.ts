@@ -15,7 +15,8 @@ import { effectiveStats, skillLevel } from './player';
 import { trainSkill } from './skills';
 import * as R from './rng';
 import { track } from './stats';
-import type { GameState, Item, Monster, Pos, Trap, TrapKind } from './types';
+import { inflict, inflictPlayer } from './conditions';
+import type { GameState, Item, Monster, Pos, ThrowCondition, Trap, TrapKind } from './types';
 
 /**
  * Fallen. Der Dungeon ist voll davon: Druckplatten, Gruben, Gasdüsen,
@@ -309,7 +310,7 @@ export function onMonsterStep(s: GameState, m: Monster) {
  * Explosion im Umkreis von einem Feld (Sprengsätze, Sprengfallen).
  * Trifft Monster, das Haustier und den Crawler.
  */
-export function blast(s: GameState, at: Pos, dmg: number, part: 'falle' | 'bombe', selfCause: string) {
+export function blast(s: GameState, at: Pos, dmg: number, part: 'falle' | 'bombe', selfCause: string, cond?: ThrowCondition) {
   makeNoise(s, at, 10);
   for (const o of [...s.monsters]) {
     if (chebyshev(o.pos, at) > 1) continue;
@@ -320,6 +321,8 @@ export function blast(s: GameState, at: Pos, dmg: number, part: 'falle' | 'bombe
     o.provoked = true;
     if (playerSees(s, o.pos)) log(s, `Die Explosion trifft ${nameOf(s, o)} für ${hit} Schaden.`, 'kampf');
     if (o.hp <= 0) killMonster(s, o, null, false, facets);
+    // Feuer und Splitter wirken nach
+    else if (cond) inflict(s, o, cond.id, cond.turns, cond.power + Math.floor(s.player.level / 4));
   }
   const pet = s.player.pet;
   if (pet?.alive && chebyshev(pet.pos, at) <= 1) {
@@ -334,7 +337,10 @@ export function blast(s: GameState, at: Pos, dmg: number, part: 'falle' | 'bombe
     const raw = Math.max(1, Math.round(dmg * 0.6 * (1 - Math.min(0.75, skillLevel(s, 'sprengmeister') * 0.05))));
     const taken = hasSpecial(s, 'explosionsschutz') ? Math.ceil(raw / 2) : raw;
     log(s, `Du stehst zu nah dran. Die Druckwelle erwischt dich für ${taken} Schaden.`, 'gefahr');
-    if (!hurtPlayer(s, taken, selfCause)) emit(s, { type: 'explosion', damage: taken, source: 'eigener Sprengsatz' });
+    if (!hurtPlayer(s, taken, selfCause)) {
+      emit(s, { type: 'explosion', damage: taken, source: 'eigener Sprengsatz' });
+      if (cond && s.status === 'playing') inflictPlayer(s, cond.id, Math.max(1, cond.turns - 1), cond.power, 'Die Druckwelle');
+    }
   }
 }
 

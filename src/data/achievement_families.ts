@@ -204,6 +204,37 @@ const FAMILIES: Family[] = [
   ...partFamily('falle', 'eigenen Fallen', 'ueberlebens', ['Stolperfalle', 'Fallenstellerei', 'Hohe Schule der Hinterlist'], [3, 15, 50]),
   ...partFamily('bombe', 'Sprengsätzen', 'wurf', ['Feuerwerk', 'Sprengkommando', 'Zündfreudig'], [3, 15, 50]),
   ...partFamily('haustier', 'deinem Haustier', 'haustier', ['Kleine Hilfe', 'Rudeltier', 'Bestie an der Leine'], [5, 25, 100]),
+  ...partFamily('blutung', 'Blutungen', 'waffen', ['Aderlass', 'Blutspur', 'Rote Flut'], [5, 25, 75]),
+  ...partFamily('feuer', 'Flammen', 'wurf', ['Lagerfeuer', 'Flächenbrand', 'Inferno'], [5, 25, 75]),
+  ...partFamily('gift', 'Gift', 'ueberlebens', ['Giftschrank', 'Schleichendes Ende', 'Giftküche'], [5, 25, 75]),
+  {
+    id: 'furcht', category: 'technik', box: 'fan', text: 'Jage Gegnern {n}-mal Angst ein.', value: st('zustand.furcht'),
+    stages: [
+      { n: 10, name: 'Gruselfaktor', tier: 'bronze' },
+      { n: 50, name: 'Schreckgespenst', tier: 'silber' },
+    ],
+  },
+  {
+    id: 'blenden', category: 'technik', box: 'wurf', text: 'Blende Gegner {n}-mal.', value: st('zustand.blind'),
+    stages: [
+      { n: 10, name: 'Sand in die Augen', tier: 'bronze' },
+      { n: 50, name: 'Blendwerk', tier: 'silber' },
+    ],
+  },
+  {
+    id: 'aufschlitzen', category: 'technik', box: 'waffen', text: 'Füge Gegnern {n}-mal eine Blutung zu.', value: st('zustand.blutung'),
+    stages: [
+      { n: 25, name: 'Schnittmuster', tier: 'bronze' },
+      { n: 100, name: 'Metzgerei', tier: 'silber' },
+    ],
+  },
+  {
+    id: 'anzuenden', category: 'technik', box: 'wurf', text: 'Setze Gegner {n}-mal in Brand.', value: st('zustand.brennen'),
+    stages: [
+      { n: 10, name: 'Zündler', tier: 'bronze' },
+      { n: 50, name: 'Feuerteufel', tier: 'silber' },
+    ],
+  },
   ...partFamily('party', 'deiner Party', 'abenteurer', ['Teamwork', 'Truppführung', 'Kommandostab'], [5, 25, 100]),
   {
     id: 'konter', category: 'technik', box: 'brawler', text: 'Besiege {n} Gegner mit einem Konter.', value: st('kills.konter'),
@@ -453,6 +484,13 @@ const FAMILIES: Family[] = [
     stages: [
       { n: 3, name: 'Pechsträhne', tier: null },
       { n: 10, name: 'Fallenmagnet', tier: 'bronze', comment: 'Zehn Fallen. Mit dem eigenen Körper. Die Systemstimme hat dir eine Taschenlampe geschickt. Aus Mitleid.' },
+    ],
+  },
+  {
+    id: 'verbandszeug', category: 'ueberleben', box: 'ueberlebens', text: 'Überstehe {n} Zustände wie Blutung, Brennen, Furcht oder Blindheit.', value: st('zustand.erlitten'),
+    stages: [
+      { n: 10, name: 'Hart im Nehmen', tier: 'bronze' },
+      { n: 50, name: 'Wandelndes Lazarett', tier: 'silber' },
     ],
   },
   {
