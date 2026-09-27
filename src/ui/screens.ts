@@ -212,7 +212,7 @@ export function endScreen(root: HTMLElement, s: GameState, meta: MetaState, onNe
       <div class="title-logo" style="font-size:36px">${esc(headline)}</div>
       <div class="systemquote">${esc(text)}</div>
       <div class="section">Bilanz von ${esc(s.player.name)} (${esc(s.player.background)})</div>
-      <div class="muted">Level ${s.player.level} · Etage ${s.floor} · ${b.kills} Kills (${b.bossKills} Bosse) · ${b.damageDealt} Schaden ausgeteilt · ${b.damageTaken} eingesteckt · ${b.steps} Schritte · ${s.achievements.length} Achievements · ${b.boxesOpened} Boxen geöffnet</div>
+      <div class="muted">Level ${s.player.level} · Etage ${s.floor} · ${b.kills} Kills (${b.bossKills} Bosse) · ${b.damageDealt} Schaden ausgeteilt · ${b.damageTaken} eingesteckt · ${b.steps} ${b.steps === 1 ? 'Schritt' : 'Schritte'} · ${s.achievements.length} Achievements · ${b.boxesOpened} Boxen geöffnet</div>
       <div class="section">Hall of Fame</div>
       ${hallOfFame(meta)}
       <div class="row" style="margin-top:12px"><button class="primary" data-action="new">Neue Staffel</button><button data-action="title">Zum Titel</button></div>

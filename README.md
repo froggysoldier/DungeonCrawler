@@ -41,6 +41,9 @@ SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simula
 | Handwerk | Tab „Handwerk“ | – |
 | Reittier auf- / absteigen | Button im Crawler-Tab | M |
 | Untersuchen | Rechtsklick | – |
+| Zoom | Mausrad / Knöpfe unten rechts | + / - |
+| Übersichtskarte vergrößern | Klick auf die kleine Karte | K |
+| Hilfe (alle Tasten) | Knopf „Hilfe“ | H |
 
 ## Umfang (Etage 1–3)
 

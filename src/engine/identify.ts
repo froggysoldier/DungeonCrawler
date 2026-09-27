@@ -61,6 +61,19 @@ export function nameOf(s: GameState, m: Monster): string {
   return boss ? `ein unbekannter Boss` : `ein unbekanntes ${SIZE_WORDS[m.size]} Wesen`;
 }
 
+const SIZE_DAT: Record<MonsterSize, string> = {
+  winzig: 'winzigen', klein: 'kleinen', mittel: 'mittelgroßen', gross: 'großen', riesig: 'riesigen',
+};
+
+/** Name im Dativ, z. B. nach „von“: „einem unbekannten großen Wesen“. */
+export function nameOfDat(s: GameState, m: Monster): string {
+  const insight = monsterInsight(s, m);
+  if (insight <= 2) return m.name;
+  if (insight === 4) return 'etwas sehr Gefährlichem';
+  const boss = m.rank === 'nachbarschaftsboss' || m.rank === 'boroughboss';
+  return boss ? 'einem unbekannten Boss' : `einem unbekannten ${SIZE_DAT[m.size]} Wesen`;
+}
+
 /** Name am Satzanfang (großgeschrieben). */
 export function NameOf(s: GameState, m: Monster): string {
   const n = nameOf(s, m);

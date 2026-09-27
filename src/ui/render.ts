@@ -1587,3 +1587,89 @@ function drawProjectile(ctx: Ctx, pr: DrawProjectile, sx: (x: number) => number,
   }
   ctx.restore();
 }
+
+// ================================================================ Übersichtskarte
+
+/**
+ * Kleine Übersichtskarte aller bekannten Felder: Räume nach Art eingefärbt,
+ * Treppe und Crawler hervorgehoben. Wird nur neu gezeichnet, wenn sich etwas ändert.
+ */
+export function renderMinimap(s: GameState, canvas: HTMLCanvasElement) {
+  const m = s.map;
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  if (!w || !h) return;
+  if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+  }
+  const ctx = canvas.getContext('2d')!;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  // Nur den bekannten Bereich zeigen (mit etwas Rand), damit er groß genug ist
+  let bx0 = m.width, by0 = m.height, bx1 = 0, by1 = 0;
+  for (let y = 0; y < m.height; y++) for (let x = 0; x < m.width; x++) {
+    if (!m.explored[idx(m, x, y)]) continue;
+    if (x < bx0) bx0 = x;
+    if (y < by0) by0 = y;
+    if (x > bx1) bx1 = x;
+    if (y > by1) by1 = y;
+  }
+  if (bx1 < bx0) return;
+  const pad = 3;
+  bx0 = Math.max(0, bx0 - pad);
+  by0 = Math.max(0, by0 - pad);
+  bx1 = Math.min(m.width - 1, bx1 + pad);
+  by1 = Math.min(m.height - 1, by1 + pad);
+  const bw = bx1 - bx0 + 1;
+  const bh = by1 - by0 + 1;
+  const cell = Math.min(w / bw, h / bh, 8);
+  const ox = (w - cell * bw) / 2 - bx0 * cell;
+  const oy = (h - cell * bh) / 2 - by0 * cell;
+  const roomColor: Record<string, string> = {
+    safe: '#c9973a', guild: '#4f7fc9', boss: '#b0413a', arena: '#9a6a3a', start: '#6b6f7a',
+  };
+  for (let y = by0; y <= by1; y++) {
+    for (let x = bx0; x <= bx1; x++) {
+      const i = idx(m, x, y);
+      if (!m.explored[i]) continue;
+      const tile = m.tiles[i];
+      if (tile === 'wall') {
+        // Nur Wände an bekanntem Boden zeigen
+        let edge = false;
+        for (let dy = -1; dy <= 1 && !edge; dy++) for (let dx = -1; dx <= 1 && !edge; dx++) {
+          if (inBounds(m, x + dx, y + dy) && m.tiles[idx(m, x + dx, y + dy)] !== 'wall' && m.explored[idx(m, x + dx, y + dy)]) edge = true;
+        }
+        if (!edge) continue;
+        ctx.fillStyle = '#3a3e4a';
+      } else if (tile === 'stairs') ctx.fillStyle = '#ffcc33';
+      else if (tile === 'door' || tile === 'dooropen') ctx.fillStyle = '#a0703a';
+      else {
+        const r = m.roomAt[i] >= 0 ? m.rooms[m.roomAt[i]] : null;
+        ctx.fillStyle = r ? roomColor[r.kind] ?? '#8a8f9b' : '#6a6f7a';
+      }
+      ctx.fillRect(ox + x * cell, oy + y * cell, Math.ceil(cell), Math.ceil(cell));
+    }
+  }
+  const i = m.tiles.indexOf('stairs');
+  if (i >= 0 && m.explored[i]) {
+    const sx = ox + (i % m.width) * cell + cell / 2;
+    const sy = oy + Math.floor(i / m.width) * cell + cell / 2;
+    ctx.strokeStyle = '#ffcc33';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(sx, sy, Math.max(3, cell * 1.6), 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  const px = ox + s.player.pos.x * cell + cell / 2;
+  const py = oy + s.player.pos.y * cell + cell / 2;
+  ctx.fillStyle = 'rgba(255,214,90,0.3)';
+  ctx.beginPath();
+  ctx.arc(px, py, Math.max(4, cell * 2.4), 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#fff4cc';
+  ctx.beginPath();
+  ctx.arc(px, py, Math.max(2, cell * 1.1), 0, Math.PI * 2);
+  ctx.fill();
+}

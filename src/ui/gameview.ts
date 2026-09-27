@@ -51,7 +51,7 @@ import { monsterDefById } from '../engine/monsters';
 import type { AttackMove, AttackPart, EquipSlot, GameState, HitZone, Item, MetaState, Pos, StatKey, Technique } from '../engine/types';
 import { bindActions, esc, formatTime } from './dom';
 import { confirmBox, isModalOpen, showCustom, showDialog, showHtml, showToast } from './modal';
-import { render, tileFromMouse, zoom, zoomBounds, type View } from './render';
+import { render, renderMinimap, tileFromMouse, zoom, zoomBounds, type View } from './render';
 import { TypeQueue, typeText, type Typing } from './typewriter';
 import { Animator, STEP_MS } from './animator';
 import { playSfx, setSoundEnabled, setTypingSoundEnabled, soundEnabled, typeClick, typingSoundEnabled } from './sound';
@@ -82,6 +82,10 @@ const DIR_KEYS: Record<string, Pos> = {
 
 export class GameView {
   private tab: Tab = 'crawler';
+  private showAllBoxes = false;
+  private minimap!: HTMLCanvasElement;
+  private minimapKey = '';
+  private minimapBig = false;
   /** Erfolge-Tab: Übersicht oder Statistik, aufgeklappte Kategorien. */
   private achvView: 'erfolge' | 'statistik' = 'erfolge';
   private achvOpen = new Set<string>();
@@ -185,6 +189,7 @@ export class GameView {
         <div class="mapwrap">
           <canvas></canvas>
           <div class="roomlabel"></div>
+          <div class="minimapwrap" hidden><canvas class="minimap"></canvas><span class="minihint">Karte · K</span></div>
           <div class="zoomctl"><button data-zoom="-1" title="Herauszoomen (Taste -)">−</button><button data-zoom="1" title="Hineinzoomen (Taste +)">+</button></div>
           <div class="tooltip" hidden></div>
         </div>
@@ -205,6 +210,8 @@ export class GameView {
         </div>
       </div>`;
     this.canvas = this.root.querySelector('canvas')!;
+    this.minimap = this.root.querySelector('.minimap') as HTMLCanvasElement;
+    this.root.querySelector('.minimapwrap')!.addEventListener('click', () => this.toggleMinimap());
     this.root.querySelector('.log')!.addEventListener('click', () => this.typer.finishAll());
     this.root.querySelectorAll<HTMLButtonElement>('.tabs button').forEach((b) =>
       b.addEventListener('click', () => {
@@ -620,6 +627,10 @@ export class GameView {
       this.act(() => pickup(s));
     } else if (e.key === 'Enter' && onStairs(s)) {
       this.askDescend();
+    } else if (e.key === 'k' || e.key === 'K') {
+      this.toggleMinimap();
+    } else if (e.key === 'h' || e.key === 'H' || e.key === '?') {
+      this.showHelp();
     } else if (e.key === '+' || e.key === '=' || e.code === 'NumpadAdd') {
       this.zoomMap(1);
     } else if (e.key === '-' || e.code === 'NumpadSubtract') {
@@ -675,6 +686,49 @@ export class GameView {
     this.visible = res.visible;
     const room = currentRoom(this.s);
     (this.root.querySelector('.roomlabel') as HTMLElement).textContent = room ? room.name : 'Gang';
+    this.drawMinimap();
+  }
+
+  /** Übersichtskarte (ab dem Tutorial): nur neu zeichnen, wenn sich Zug oder Größe ändern. */
+  private drawMinimap() {
+    const wrap = this.root.querySelector('.minimapwrap') as HTMLElement;
+    const on = hasUnlock(this.s, 'minimap');
+    wrap.hidden = !on;
+    if (!on) return;
+    wrap.classList.toggle('big', this.minimapBig);
+    const key = `${this.s.floor}|${this.s.turn}|${this.s.player.pos.x},${this.s.player.pos.y}|${this.minimapBig}`;
+    if (key === this.minimapKey) return;
+    this.minimapKey = key;
+    renderMinimap(this.s, this.minimap);
+  }
+
+  private toggleMinimap() {
+    this.minimapBig = !this.minimapBig;
+    this.minimapKey = '';
+    this.drawMinimap();
+  }
+
+  /** Alle Tasten und Bedienhinweise auf einen Blick. */
+  private showHelp() {
+    const rows: [string, string][] = [
+      ['Laufen', 'Klick auf ein bekanntes Feld · Pfeiltasten oder Ziffernblock (gedrückt halten = weiterlaufen)'],
+      ['Angreifen', 'Klick auf einen Gegner oder in ihn hineinlaufen · im Kampf Enter'],
+      ['Körperteil', '1 Faust · 2 Tritt · 3 Knie · 4 Ellbogen · 5 Kopfstoß · 6 Waffe · 7 Wurf'],
+      ['Ausführung', 'Q Normal · W Sprung · E Stampfen · R Anlauf'],
+      ['Trefferzone', 'Y Kopf · X Körper · C Arme · V Beine'],
+      ['Ziel wechseln', 'Tab'],
+      ['Warten', 'Leertaste (wer brennt, wälzt sich am Boden)'],
+      ['Aufheben', 'G'],
+      ['Treppe nehmen', 'Enter auf der Treppe'],
+      ['Klassenfähigkeit', 'F (ab Etage 3)'],
+      ['Reittier', 'M'],
+      ['Zoom', 'Mausrad · Plus und Minus'],
+      ['Übersichtskarte', 'K oder Klick auf die kleine Karte'],
+      ['Untersuchen', 'Rechtsklick auf Feld, Gegner oder Gegenstand'],
+      ['Text sofort zeigen', 'Klick auf den Text oder das Log'],
+      ['Hilfe', 'H'],
+    ];
+    showHtml('Steuerung', `<div class="helpgrid">${rows.map(([a, b]) => `<b>${esc(a)}</b><span>${esc(b)}</span>`).join('')}</div>`);
   }
 
   private refreshTop() {
@@ -685,14 +739,15 @@ export class GameView {
     const pet = p.pet;
     (this.root.querySelector('.topbar') as HTMLElement).innerHTML = `
       <span class="show">${esc(SHOW_NAME)}</span>
-      <span class="muted">Staffel ${s.season}</span>
+      <span class="muted opt">Staffel ${s.season}</span>
       <span>Etage <b>${s.floor}</b>: ${esc(def?.name ?? '')}</span>
       <span class="timer ${left <= 120 ? 'warn' : ''}" title="Zeit bis zum Einsturz">Einsturz in ${formatTime(left)}</span>
       <span class="spacer"></span>
       <span>${esc(p.name)} · Lv <b>${p.level}</b></span>
       ${hasUnlock(s, 'zuschauer') ? `<span class="viewers">Zuschauer ${liveViewers(s).toLocaleString('de-DE')} · Follower ${s.viewers.follower.toLocaleString('de-DE')} · Hype ${Math.round(s.viewers.hype)}</span>` : ''}
-      ${hasUnlock(s, 'inventar') ? `<span class="muted" title="Lebende Crawler laut letzter Zählung">Crawler übrig ${population(s).alive.toLocaleString('de-DE')}</span>` : ''}
+      ${hasUnlock(s, 'inventar') ? `<span class="muted opt" title="Lebende Crawler laut letzter Zählung">Crawler übrig ${population(s).alive.toLocaleString('de-DE')}</span>` : ''}
       <span style="color:#ffd700">Gold ${p.gold}</span>
+      <button class="soundtoggle" data-action="help" title="Alle Tasten (H)">Hilfe</button>
       <button class="soundtoggle" data-action="sound" title="Klänge für Lootboxen, Level-Aufstieg und Achievements">Ton: ${soundEnabled() ? 'an' : 'aus'}</button>
       <button class="soundtoggle" data-action="typing" title="Weiches Tastenklicken, wenn Texte getippt werden" ${soundEnabled() ? '' : 'disabled'}>Tippen: ${typingSoundEnabled() ? 'an' : 'aus'}</button>
       <span>Lootboxen ${p.boxes.length}</span>
@@ -703,6 +758,7 @@ export class GameView {
         if (soundEnabled()) playSfx([{ kind: 'skill' }]);
         this.refreshTop();
       },
+      help: () => this.showHelp(),
       typing: () => {
         setTypingSoundEnabled(!typingSoundEnabled());
         if (typingSoundEnabled()) typeClick('taste');
@@ -776,10 +832,13 @@ export class GameView {
           html += this.questHtml(questOf(s, String(room.id)));
         }
         if (s.player.boxes.length) {
-          html += `<div class="muted small" style="margin-top:6px">Lootboxen öffnen:</div>`;
-          html += s.player.boxes
-            .map((b) => `<div class="row" style="margin:3px 0"><span style="flex:1;color:${BOX_TIER_COLORS[b.box!.tier]}">${esc(b.name)}</span><button data-action="box" data-uid="${b.uid}">Öffnen</button></div>`)
+          const boxes = s.player.boxes;
+          const shown = this.showAllBoxes ? boxes : boxes.slice(0, 3);
+          html += `<div class="boxhead"><span>Lootboxen <b>${boxes.length}</b></span>${boxes.length > 1 ? `<button class="primary" data-action="boxall">Alle öffnen</button>` : ''}</div>`;
+          html += shown
+            .map((b) => `<div class="row boxrow"><span style="flex:1;color:${BOX_TIER_COLORS[b.box!.tier]}">${esc(b.name)}</span><button data-action="box" data-uid="${b.uid}">Öffnen</button></div>`)
             .join('');
+          if (boxes.length > 3) html += `<button class="linkbtn" data-action="boxmore">${this.showAllBoxes ? 'Weniger anzeigen' : `${boxes.length - 3} weitere anzeigen`}</button>`;
         }
       }
       blocks.push(html);
@@ -822,7 +881,33 @@ export class GameView {
         });
         if (contents && box) this.revealItems(box.name, contents);
       },
+      boxmore: () => {
+        this.showAllBoxes = !this.showAllBoxes;
+        this.refreshHere();
+      },
+      boxall: () => {
+        const opened: { name: string; items: Item[] }[] = [];
+        for (const box of [...s.player.boxes]) {
+          let contents: Item[] | undefined;
+          const ok = this.act(() => {
+            const res = openBox(s, box.uid);
+            contents = res.contents;
+            return res;
+          });
+          if (!ok || !contents) break;
+          opened.push({ name: box.name, items: contents });
+        }
+        if (opened.length) this.revealBoxes(opened);
+      },
     });
+  }
+
+  /** Mehrere Boxen auf einmal: Inhalt nach Box gruppiert. */
+  private revealBoxes(list: { name: string; items: Item[] }[]) {
+    const html = list
+      .map((b, bi) => `<div class="section">${esc(b.name)}</div><div class="reveal">${b.items.map((it, i) => `<div style="animation-delay:${Math.min(2, bi * 0.15 + i * 0.08)}s" class="item">${this.itemHtml(it, false)}</div>`).join('')}</div>`)
+      .join('');
+    showHtml(`${list.length} Lootboxen geöffnet`, html, 'Super!');
   }
 
   private revealItems(title: string, items: Item[]) {
@@ -1512,7 +1597,7 @@ export class GameView {
     el.innerHTML = `
       <div class="grp">${ATTACK_PARTS.map(partBtn).join('')}</div>
       <div class="grp">${ATTACK_MOVES.map(moveBtn).join('')}</div>
-      ${ability ? `<div class="grp"><button class="ability" data-action="ability" ${cd ? 'disabled' : ''} title="Taste F · ${esc(ability.description)}"Fähigkeit: ${esc(ability.name)}${cd ? ` (${cd})` : ''}<span class="key">F</span></button></div>` : ''}
+      ${ability ? `<div class="grp"><button class="ability" data-action="ability" ${cd ? 'disabled' : ''} title="Taste F · ${esc(ability.description)}">Fähigkeit: ${esc(ability.name)}${cd ? ` (${cd})` : ''}<span class="key">F</span></button></div>` : ''}
       <div class="grp"><button data-action="wait" title="Leertaste">Warten</button><button data-action="pickup" title="G">Aufheben</button></div>
       ${this.spellBar()}
       <span class="muted small">Gewählt: <b style="color:var(--accent)">${esc(techniqueName(this.technique()))}</b> · ${attackCost(this.technique())} Ausdauer</span>`;
@@ -1586,7 +1671,10 @@ export class GameView {
       p.append(time, text);
       el.append(p);
       if (firstRender) text.textContent = l.text;
-      else this.typer.push(text, esc(l.text));
+      else {
+        p.classList.add('pending');
+        this.typer.push(text, esc(l.text));
+      }
     }
     this.lastLogId = entries[entries.length - 1]?.id ?? this.lastLogId;
     while (el.childElementCount > 150) el.firstElementChild?.remove();

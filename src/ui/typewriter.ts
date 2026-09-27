@@ -81,6 +81,7 @@ export class TypeQueue {
     // Bei vielen wartenden Zeilen die älteren sofort zeigen, damit das Spiel nicht hinterherhinkt
     while (this.queue.length > 6) {
       const old = this.queue.shift()!;
+      old.el.parentElement?.classList.remove('pending');
       old.el.innerHTML = old.html;
     }
     if (!this.current) this.next();
@@ -88,7 +89,10 @@ export class TypeQueue {
 
   finishAll() {
     this.current?.finish();
-    for (const q of this.queue) q.el.innerHTML = q.html;
+    for (const q of this.queue) {
+      q.el.parentElement?.classList.remove('pending');
+      q.el.innerHTML = q.html;
+    }
     this.queue = [];
   }
 
@@ -98,6 +102,7 @@ export class TypeQueue {
       this.current = null;
       return;
     }
+    item.el.parentElement?.classList.remove('pending');
     this.current = typeText(item.el, item.html, this.msPerChar, this.sound);
     const step = setInterval(() => this.onStep?.(), 60);
     this.current.done.then(() => {

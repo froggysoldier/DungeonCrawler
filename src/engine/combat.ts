@@ -1,4 +1,4 @@
-import { NameOf, nameOf } from './identify';
+import { NameOf, nameOf, nameOfDat } from './identify';
 import { has, hasSpecial } from './abilities';
 import { PART_NAMES } from './bonuses';
 import { handleLethal } from './death';
@@ -411,7 +411,7 @@ function explode(s: GameState, m: Monster) {
     s.player.hp -= taken;
     s.counters.damageTaken += taken;
     log(s, `Die Explosion erwischt dich für ${taken} Schaden.`, 'gefahr');
-    if (s.player.hp <= 0) handleLethal(s, `durch die Explosion von ${nameOf(s, m)} zerfetzt`);
+    if (s.player.hp <= 0) handleLethal(s, `durch die Explosion von ${nameOfDat(s, m)} zerfetzt`);
     else emit(s, { type: 'explosion', damage: taken, source: m.name });
   }
 }

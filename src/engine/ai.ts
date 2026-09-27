@@ -1,4 +1,4 @@
-import { NameOf, nameOf } from './identify';
+import { NameOf, nameOf, nameOfDat } from './identify';
 import { counterStrike, isInSafeRoom, killMonster } from './combat';
 import { emit } from './events';
 import { chebyshev, hasLineOfSight } from './fov';
@@ -156,7 +156,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     if (m.hp <= 0) killMonster(s, m, null);
   }
   if (p.hp <= 0) {
-    handleLethal(s, `getötet von ${nameOf(s, m)}`);
+    handleLethal(s, `getötet von ${nameOfDat(s, m)}`);
     return;
   }
   emit(s, { type: 'damageTaken', amount: dmg, source: m.name, facets: source });
