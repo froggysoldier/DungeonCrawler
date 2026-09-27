@@ -66,6 +66,8 @@ export class Animator {
     }
     if (Math.max(Math.abs((before.get('p')?.x ?? 0) - s.player.pos.x), Math.abs((before.get('p')?.y ?? 0) - s.player.pos.y)) > 3) this.cam = null;
     let delay = 0;
+    // Mehrere Texte auf demselben Feld nacheinander aufsteigen lassen
+    const perTile = new Map<string, number>();
     for (const f of fx) {
       if (f.kind === 'shot') {
         const dist = Math.hypot(f.to.x - f.from.x, f.to.y - f.from.y);
@@ -73,7 +75,10 @@ export class Animator {
         this.shots.push({ from: f.from, to: f.to, start: now + delay, dur, style: f.style as ProjectileStyle });
         delay += 60;
       } else {
-        this.floaters.push({ at: { ...f.at }, text: f.text, color: f.color, start: now + delay, dur: 900 });
+        const key = `${f.at.x},${f.at.y}`;
+        const n = perTile.get(key) ?? 0;
+        perTile.set(key, n + 1);
+        this.floaters.push({ at: { ...f.at }, text: f.text, color: f.color, start: now + delay + n * 260, dur: 900 });
       }
     }
   }

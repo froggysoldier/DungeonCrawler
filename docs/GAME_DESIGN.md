@@ -1,8 +1,10 @@
-# Der Große Abstieg – Game Design Dokument (v0.8)
+# Der Große Abstieg – Game Design Dokument (v0.9)
 
 > Inspiriert von der Buchreihe *Dungeon Crawler Carl* von Matt Dinniman.
-> **Spoiler-Regel:** Dieses Dokument enthält nur Buch-Details bis einschließlich
-> Buch 1 (Etagen 1–2). Alles ab Etage 3 ist unser eigenes Design.
+> **Spoiler-Regel:** Aus den Büchern werden nur Spielmechaniken und die
+> Komplexität der Systeme übernommen (Achievements, Skills, Stufen, Klassen,
+> Rassen, Boxen, Sponsoren, Aufträge, Haustiere, Reittiere) – keine Handlung,
+> Figuren, Orte oder Wendungen. Alle Namen und Texte sind eigene. Fokus: Etage 1–3.
 
 ---
 
@@ -104,11 +106,26 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   Arme (schwächen die Angriffe des Gegners), Beine (Gegner humpelt, fällt
   leichter um).
 - **Deckung:** bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung.
+- **Zustände:** Blutung, Brennen, Gift, Furcht und Blindheit (siehe 3.24).
+- **Stufen-Abstand:** Gegner weit über dir sind schwerer zu treffen und treffen
+  dich leichter (bis zu 20 Prozentpunkte), bei viel schwächeren ist es umgekehrt.
 - **Kampfsequenz:** Sobald ein Gegner, der dich bemerkt hat, in Sicht ist,
   wird die Aktionsleiste zum Kampfpanel: 1. womit (Körperteil, Waffe,
   bestimmtes Wurfobjekt, Zauber, Deckung, Trank, Klassenfähigkeit), 2. wie,
   3. wohin, 4. wen – jeder sichtbare Gegner mit Entfernung, Zustand und der
   Trefferchance für genau diese Kombination.
+
+### 3.4a Erfahrung und Stufen
+- Erfahrung hängt vom **Stufen-Abstand** ab: Ein gleich starker Gegner gibt
+  volle Erfahrung, einer fünf Stufen darunter nur noch 10 %, einer fünf Stufen
+  darüber fast das Doppelte.
+- Jeder Gegner trägt eine farbige **Herausforderung**: harmlos, leicht,
+  ebenbürtig, fordernd, gefährlich, tödlich (Markierung auf der Karte, im
+  Tooltip und in der Zielliste).
+- Die Stufenkurve ist steil (60 × Stufe^1,75). Auf den ersten Etagen steigt man
+  deshalb langsam; wer später stärkere Gegner besiegt, steigt schneller.
+  Simulation: gründliche Spieler erreichen etwa Stufe 5 / 8 / 10 am Ende der
+  Etagen 1 / 2 / 3, vorsichtige etwa 3 / 5 / 7.
 
 ### 3.5 Passive Skills und der Beobachter
 **Der Beobachter** zeichnet jede Aktion mit vollem Kontext auf: Technik,
@@ -121,8 +138,16 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
   z. B. „Tritte gegen Flieger“ (+Schaden und +Treffer nur in genau dieser
   Situation), „Barfuß: Tritte“, „Ausweichen gegen Fernkämpfer“,
   „Abgehärtet gegen Giftige“. Sie leveln mit Nutzung (max. Stufe 10).
-- **Grundskills** entstehen weiterhin aus der Technik allein (Faustkampf,
-  Treten, Stampfer, Wuchtschlag …).
+- **Grundskills:** 30 Skills in sieben Gruppen (Kampf, Verteidigung,
+  Bewegung, Überleben, Handwerk, Sozial, Magie). Sie entstehen aus dem, was
+  man tut: Faustkampf aus Faustschlägen, Schleichen aus unentdecktem
+  Anschleichen, Abwehr aus Angriffen in Deckung, Konter aus Ausweichen,
+  Schmerzresistenz aus schweren Treffern, Feilschen aus Preisverhandlungen,
+  Reiten aus Ritten, Arkane Kunde aus Zaubern und so weiter.
+- Jede Stufe kostet mehr (25 + 20 × Stufe Skill-Erfahrung). An viel
+  schwächeren Gegnern lernt man kaum etwas (Lernfaktor nach Stufen-Abstand).
+- Jeder Skill beschreibt seine Wirkung pro Stufe („Jetzt“ und „Nächste Stufe“).
+- **Klassenskills** und die Begabung der Rasse wachsen 50 % schneller.
 
 ### 3.6 Gegner
 - 49 Mob-Typen auf Etage 1–3 (Kellerratte, Kobolde, Wolpertinger,
@@ -175,13 +200,28 @@ Spezialeffekten (Zweite-Chance-Klausel, Stiefel des ungebremsten Stampfens,
 Der Ziegel …), Verbrauchsgüter, Haustier-Leckerli.
 
 ### 3.9 Achievements & Lootboxen
+Für gefühlt alles, was ein Achievement wert ist, gibt es eines – insgesamt
+über 600 feste Achievements plus die dynamischen Muster.
+- **Statistik:** Der Dungeon zählt alles mit (Kills nach Art, Angriffsart,
+  Ausführung, Trefferzone und Umständen, Schaden, Serien, Räume, Türen,
+  Handel, Fallen, Handwerk, Zauber, Crawler, Show). Sichtbar im Erfolge-Tab
+  unter „Statistik“.
+- **Achievement-Familien:** Aus der Statistik entstehen gestufte Ziele mit
+  eigenen Namen (zum Beispiel Killserien, Kills ohne erlittenen Treffer,
+  schlafende, fliehende oder liegende Gegner, jede Angriffsart, Blutungen,
+  Brände, erkundete Fläche, geöffnete Türen, Feilschen, Tränke, Fallen).
+- **Bestiarium je Monsterart:** Neu im Bestiarium, Routine (10), Plage
+  beseitigt (30) – aber erst, wenn man die Art auch erkennen konnte.
+- **Besondere Momente:** über 60 einmalige Situationen, zum Beispiel ein Boss
+  bei vollen Lebenspunkten, drei Gegner mit einer Explosion, ein Treffer, der
+  mehr Schaden macht als der Gegner Leben hat, Rettung durch Haustier oder
+  Party, ein Safe Room direkt vor dem Verfolger, Kills während man brennt oder
+  geblendet ist, Doppelaufstieg, Jackpot, einen Laden leer kaufen.
 - **Entdeckte Muster (dynamisch):** Der Beobachter vergibt Achievements für
   Kombinationen, die tatsächlich passieren, in Stufen I–V (1, 5, 15, 40, 100).
-  Ungewöhnliches (Kopfstoß gegen einen Ghul, barfuß, vergiftet, gegen stärkere
-  Gegner, gegen Bosse) wird sofort erkannt, Gewöhnliches erst bei vielen
-  Wiederholungen. Die Box-Stufe richtet sich danach, wie ungewöhnlich es war.
-  Beispiele: „Vergiftet: Tritte gegen Giftige I“, „Revier: Waschküche II“.
-- 170 feste Achievements mit sarkastischem Kommentar kommen hinzu.
+- Kleine Erfolge bringen keine Box, nur Aufmerksamkeit beim Publikum.
+- Der Erfolge-Tab ist nach 13 Kategorien geordnet, zeigt den Fortschritt je
+  Kategorie und die nächsten erreichbaren Ziele.
 - Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen.
 - **Wer ein Achievement zum ersten Mal in seiner Karriere schafft, bekommt eine Box-Stufe mehr.**
 
@@ -194,17 +234,34 @@ Der Ziegel …), Verbrauchsgüter, Haustier-Leckerli.
 - Zuschauer-Kommentare im Log (Zuschauer xX_Glorbnak_Xx: „DRAUFGESTAMPFT HAHAHA“).
 
 ### 3.11 Rassen & Klassen (ab Etage 3)
-- Man wird in die Gilde geholt und wählt **Rasse** und **Klasse**.
-- 14 Rassen: 7 frei wählbar (Mensch mit +4 Stat-Punkten, Halbork, Kellerelf,
-  Zwerg, Gnom, Halbling, Echsenmensch), 7 **durch Verhalten freigeschaltet**
-  (Katzenmensch: mit Katze gestartet · Troll: 15 Gegner umgeworfen ·
-  Minotaurus: 25 Kopfstöße/Sturmangriffe · Golem: 150 Schaden eingesteckt ·
-  Pilzling: 20 Giftschaden · Vampir: 10 Krits · Kobold: 20 Würfe).
-- 18 Klassen, jede wird **nach deinem bisherigen Kampfstil bewertet**; 8
-  stehen zur Wahl, die 3 passendsten werden empfohlen.
-- Jede Klasse hat eine **aktive Fähigkeit** mit Abklingzeit (Taste F):
-  Wutanfall, Wirbelwind, Erdbeben, Kampfschrei, Bollwerk, Schattenschritt,
-  Steinhagel, Bombe, Zweite Luft, Showtime.
+- Man wird in die Gilde geholt und wählt **Rasse** und **Klasse**. Der
+  Auswahlbildschirm zeigt alle Boni, Fähigkeit, Klassenskills, Startzauber,
+  Startausrüstung, Sondereigenschaften und eine Vorschau der Grundwerte.
+- **24 Rassen:** 8 frei wählbar (Mensch mit 4 freien Stat-Punkten und mehr
+  Erfahrung, Halbork, Kellerelf, Zwerg, Gnom, Halbling, Echsenmensch,
+  Hobgoblin), 16 **durch Verhalten freigeschaltet** (zum Beispiel
+  Katzenmensch mit Krallen, Höhlentroll, Minotaurus, Lehmgolem, Pilzling,
+  Kellervampir, Kobold, Salamanderblut, Rattling, Kelleroger, Schattenwesen,
+  Wasserspeier, Kellerfee, Ghulblut, Blechmensch, Drachenblut).
+  Jede Rasse hat eine **Begabung** (ein Skill, der schneller wächst) und oft
+  Sondereigenschaften (feuerfest, blutlos, furchtlos, giftimmun …).
+- **49 Klassen in 10 Gruppen:** Nahkampf, Fernkampf, Magie, Heimlichkeit,
+  Verteidigung, Heilung und Versorgung, Show und Handel, Handwerk und
+  Technik, Tiere und Reittiere, Sonderklassen.
+- Die **persönliche Klassenliste** bewertet jede Klasse nach Kampfstil,
+  Statistik und Interview: die 10 passendsten gewöhnlichen Klassen, dazu alle
+  **seltenen und legendären Klassen**, deren Bedingung erfüllt ist (zum
+  Beispiel Todesverächter nach zehn knappen Überlebenden, Bestiarius nach 20
+  Monsterarten, Apokalypsen-Nudist nach zehn Kills ohne Ausrüstung). Die drei
+  passendsten werden empfohlen.
+- Jede Klasse hat **Klassenskills** (wachsen 50 % schneller, der erste startet
+  zwei Stufen höher), eine **aktive Fähigkeit** mit Abklingzeit (Taste F) und
+  oft Startzauber, Startausrüstung und Sondereigenschaften.
+- 25 Fähigkeiten: Wutanfall, Wirbelwind, Erdbeben, Kampfschrei, Bollwerk,
+  Schattenschritt, Steinhagel, Bombe, Zweite Luft, Showtime, Blutrausch,
+  Gnadenstoß, Giftwolke, Brandsatz, Blitzlicht, Meditation, Rudelruf,
+  Zeitlupe, Rauchbombe, Langfinger, Notreparatur, Motivationsrede, Arkaner
+  Schild, Manaflut, Totstellen.
 
 ### 3.12 Identifikation
 Was man über Monster und Gegenstände erfährt, hängt vom Level-Abstand ab.
@@ -333,6 +390,24 @@ Im Browser erzeugt (keine Audiodateien): Lootbox (Knarzen und Glitzern, je
 nach Stufe länger), Level-Aufstieg (Fanfare), Achievement (Glockenschlag),
 neuer Skill. Schalter „Ton an/aus“ in der oberen Leiste.
 
+### 3.24 Zustände im Kampf
+| Zustand | Wirkung | Quellen |
+|---|---|---|
+| Blutung | Schaden pro Zug, stapelt sich | Klingen, benagelte Waffen, Nagelbomben, Krallen, reißende Monster |
+| Brennen | Schaden pro Zug, Tiere geraten in Panik | Brandflaschen, Feuerball, Brandsatz, Feuerwesen |
+| Gift | Schaden pro Zug | Rattengift, Giftwolke, Giftklinge, giftige Monster |
+| Furcht | flieht und greift nicht an | Kampfschrei, Schreckgestalten |
+| Blindheit | trifft kaum, sieht fast nichts | Staubsaugerbeutel, Blitzlicht, Rauchbombe, blendende Monster |
+
+- Anfälligkeit nach Art: Konstrukte, Geister, Elementare und Schleime bluten
+  nicht; Untote kennen kein Gift; Insekten, Pflanzen und Untote brennen gut;
+  Bosse lassen sich nicht einschüchtern; Elite-Gegner widerstehen oft.
+- Beim Crawler: Verbände und starke Heiltränke stoppen Blutungen, Warten heißt
+  am Boden wälzen und löscht Flammen, Charisma hilft gegen Furcht, Geschick
+  gegen Blendung. Rassen und Klassen können immun sein.
+- Zustände stehen auf der Karte (farbige Punkte, flackernder Rand bei Brand),
+  im Tooltip, in der Zielliste und an der eigenen Lebensleiste.
+
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
 1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben
@@ -356,13 +431,9 @@ tests/      Vitest: Engine-Tests + optionale Balance-Simulation (SIM=1)
 
 ## 6. Nächste Schritte (Vorschlag)
 
-1. Balance von Etage 2–3 durch Testspielen
+1. Balance von Etage 2–3 durch Testspielen (Klassen, Zustände, Achievements)
 2. Etage 4+ mit neuen Themen, Klassen-Spezialisierung (Etage 6/9/12)
-3. Sound, Grafik-Upgrade der Karte
-
-Spoiler-Grenze: Band 1 vollständig; aus Band 2 nur allgemeine Mechaniken
-(Sponsoren, Aufträge, Haustier-Entwicklung, Reittiere), keine Handlung,
-Figuren oder Orte. Ab Band 3 nichts.
+3. Grafik-Upgrade der Karte
 
 ## 7. Rechtliches
 *Dungeon Crawler Carl* ist geistiges Eigentum von Matt Dinniman. Das Spiel

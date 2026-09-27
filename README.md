@@ -42,6 +42,14 @@ SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simula
 | Reittier auf- / absteigen | Button im Crawler-Tab | M |
 | Untersuchen | Rechtsklick | – |
 
+## Umfang (Etage 1–3)
+
+- über 600 Achievements (Familien, Bestiarium, besondere Momente) plus dynamische Muster
+- 30 Skills in sieben Gruppen, dazu selbst entdeckte Skills
+- 49 Klassen und 24 Rassen mit Begabungen, Sondereigenschaften und 25 Fähigkeiten
+- Zustände im Kampf: Blutung, Brennen, Gift, Furcht, Blindheit
+- Statistik über alles, was du im Dungeon tust
+
 ## Dokumentation
 
 Das Spielkonzept steht in [`docs/GAME_DESIGN.md`](docs/GAME_DESIGN.md).
