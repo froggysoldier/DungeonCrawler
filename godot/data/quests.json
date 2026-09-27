@@ -1,0 +1,98 @@
+{
+ "HUNT_TEXTS": [
+  "„{was} haben meinen Freund erwischt. Ich schaffe das nicht allein. Erledige {n} von ihnen – für ihn.“",
+  "„Die {was} hier lassen mich nicht schlafen. Wenn du {n} erledigst, gebe ich dir, was ich habe.“",
+  "„Ich wette mit jemandem, dass du {n} {was} schaffst. Hilf mir, die Wette zu gewinnen.“"
+ ],
+ "FETCH_ITEMS": [
+  {
+   "name": "Omas Fotoalbum",
+   "text": "„Ich habe Omas Fotoalbum verloren, als ich weggerannt bin. Irgendwo im {viertel}. Bitte bring es mir zurück.“"
+  },
+  {
+   "name": "Ehering mit Gravur",
+   "text": "„Mein Ehering. Er ist mir im {viertel} vom Finger gerutscht. Er ist alles, was mir geblieben ist.“"
+  },
+  {
+   "name": "Kuscheltier „Herr Bommel“",
+   "text": "„Meine Tochter hatte ein Kuscheltier. Herrn Bommel. Er liegt irgendwo im {viertel}. Sie ist … nicht mehr da. Ich will ihn trotzdem wiederhaben.“"
+  },
+  {
+   "name": "Tagebuch mit Schloss",
+   "text": "„Mein Tagebuch liegt im {viertel}. Bitte nicht reinschauen. Bitte einfach bringen.“"
+  },
+  {
+   "name": "Blutdrucktabletten",
+   "text": "„Meine Tabletten! Sie sind im {viertel} aus meiner Tasche gefallen. Ohne die kippe ich um.“"
+  },
+  {
+   "name": "Autoschlüssel mit Glücksbringer",
+   "text": "„Es gibt kein Auto mehr. Ich weiß. Aber der Glücksbringer daran … bitte. Er liegt im {viertel}.“"
+  }
+ ],
+ "DELIVER_WANTS": [
+  {
+   "ids": [
+    "kleiner_heiltrank",
+    "heiltrank",
+    "grosser_heiltrank"
+   ],
+   "label": "Heiltränke",
+   "n": 2,
+   "text": "„Ich brauche Heiltränke. Zwei. Ich zahle gut, versprochen.“"
+  },
+  {
+   "ids": [
+    "gegengift"
+   ],
+   "label": "Gegengift",
+   "n": 1,
+   "text": "„Mich hat etwas gebissen. Es brennt. Hast du ein Gegengift?“"
+  },
+  {
+   "ids": [
+    "lappen"
+   ],
+   "label": "Lappen",
+   "n": 3,
+   "text": "„Ich will Verbände machen, aber ich habe nichts. Bring mir drei Lappen?“"
+  },
+  {
+   "ids": [
+    "schokoriegel",
+    "apfel",
+    "dosenbrot",
+    "mettbroetchen"
+   ],
+   "label": "etwas zu essen",
+   "n": 2,
+   "text": "„Ich habe seit zwei Tagen nichts gegessen. Zwei Portionen, irgendwas. Bitte.“"
+  },
+  {
+   "ids": [
+    "stein",
+    "ziegel",
+    "dartpfeil",
+    "schraubenmutter"
+   ],
+   "label": "Wurfgeschosse",
+   "n": 6,
+   "text": "„Ich kann nicht nah ran. Bring mir sechs Dinge zum Werfen, dann komme ich klar.“"
+  }
+ ],
+ "RESCUE_TEXTS": [
+  "„Mein Bruder {person} ist im {viertel} eingeschlossen. Monster überall. Bitte hol ihn da raus.“",
+  "„{person} aus meinem Haus ist allein im {viertel} zurückgeblieben. Sie ist verletzt. Ich traue mich nicht zurück.“",
+  "„Wir haben {person} im {viertel} verloren. Vielleicht lebt er noch. Vielleicht.“"
+ ],
+ "BOSS_TEXTS": [
+  "„Solange der Boss im {viertel} lebt, hören die Monster nicht auf zu kommen. Mach ihn fertig, und ich mache dir einen Freundschaftspreis.“",
+  "„Der Boss im {viertel} hat meinen Lieferanten gefressen. Rache ist ein Geschäft. Ich zahle.“"
+ ],
+ "QUEST_THANKS": [
+  "„Danke. Wirklich. Du bist ein guter Mensch. Oder was auch immer du inzwischen bist.“",
+  "„Ich wusste, dass auf dich Verlass ist. Hier, nimm das.“",
+  "„Das vergesse ich dir nie. Und ich vergesse selten etwas.“"
+ ],
+ "MAX_ACTIVE_QUESTS": 5
+}

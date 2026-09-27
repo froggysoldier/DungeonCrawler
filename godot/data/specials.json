@@ -1,0 +1,124 @@
+{
+ "SPECIAL_TEXT": {
+  "zweite_chance": {
+   "name": "Zweite Chance",
+   "text": "Rettet dich einmal vor dem Tod."
+  },
+  "stampf_beben": {
+   "name": "Stampfbeben",
+   "text": "Stampfer treffen auch Gegner direkt daneben."
+  },
+  "katzenfreund": {
+   "name": "Katzenfreund",
+   "text": "Dein Haustier beißt 50 % stärker zu."
+  },
+  "glueckspilz": {
+   "name": "Glückspilz",
+   "text": "Das Glück ist auf deiner Seite."
+  },
+  "giftimmun": {
+   "name": "Giftimmun",
+   "text": "Gift wirkt nicht bei dir."
+  },
+  "goldmagnet": {
+   "name": "Goldmagnet",
+   "text": "50 % mehr Gold aus jeder Quelle."
+  },
+  "explosionsschutz": {
+   "name": "Explosionsschutz",
+   "text": "Explosionen treffen dich nur halb so stark."
+  },
+  "bumerang": {
+   "name": "Bumerang",
+   "text": "Geworfenes kommt zurück."
+  },
+  "vampir": {
+   "name": "Lebensraub",
+   "text": "15 % des Nahkampfschadens heilen dich."
+  },
+  "blutlos": {
+   "name": "Blutlos",
+   "text": "Du kannst nicht bluten."
+  },
+  "feuerfest": {
+   "name": "Feuerfest",
+   "text": "Du fängst kein Feuer."
+  },
+  "furchtlos": {
+   "name": "Furchtlos",
+   "text": "Niemand kann dir Angst einjagen."
+  },
+  "scharfsichtig": {
+   "name": "Scharfsichtig",
+   "text": "Du lässt dich nicht blenden."
+  },
+  "klingenmeister": {
+   "name": "Klingenmeister",
+   "text": "Jeder Waffentreffer hat 20 % mehr Chance, eine Blutung zu verursachen."
+  },
+  "krallen": {
+   "name": "Krallen",
+   "text": "Faustschläge können blutende Wunden reißen (20 %)."
+  },
+  "giftklinge": {
+   "name": "Giftklinge",
+   "text": "Nahkampftreffer vergiften mit 25 % Chance."
+  },
+  "brandstifter": {
+   "name": "Brandstifter",
+   "text": "Deine Brände brennen heißer (+50 %) und länger."
+  },
+  "trankkunde": {
+   "name": "Trankkunde",
+   "text": "Tränke heilen 50 % mehr, die Pause zwischen zwei Tränken ist halb so lang."
+  },
+  "aasfresser": {
+   "name": "Aasfresser",
+   "text": "Essen heilt dich doppelt."
+  },
+  "schrauber": {
+   "name": "Schrauber",
+   "text": "Dein Reittier nimmt 30 % weniger Schaden und verbraucht halb so viel Benzin."
+  },
+  "sattelfest": {
+   "name": "Sattelfest",
+   "text": "Rammen richtet 50 % mehr Schaden an, dein Reittier nimmt 25 % weniger Schaden."
+  },
+  "systemkenntnis": {
+   "name": "Systemkenntnis",
+   "text": "Du schätzt Gegner und Gegenstände zwei Stufen besser ein, Läden geben 10 % Rabatt."
+  },
+  "haendler": {
+   "name": "Händlerblut",
+   "text": "Kaufen kostet 15 % weniger, Verkaufen bringt 20 % mehr."
+  },
+  "rattenfreund": {
+   "name": "Rattenfreund",
+   "text": "Ratten greifen dich nicht an, solange du sie in Ruhe lässt."
+  },
+  "konterprofi": {
+   "name": "Konterprofi",
+   "text": "+15 % Chance, nach einem Ausweichen sofort zu kontern."
+  },
+  "zaeh": {
+   "name": "Zäh",
+   "text": "Unter 25 % Lebenspunkten: +30 % Schaden und +10 % Ausweichen."
+  },
+  "nudist": {
+   "name": "Naturbursche",
+   "text": "Ohne etwas an Kopf, Brust und Beinen: +4 Rüstung und +10 % Ausweichen."
+  },
+  "jaeger": {
+   "name": "Jäger",
+   "text": "+15 % Schaden gegen Arten, von denen du schon 10 besiegt hast."
+  },
+  "fallenmeister": {
+   "name": "Fallenmeister",
+   "text": "Eigene Fallen richten 50 % mehr Schaden an, fremde Fallen entdeckst du leichter."
+  },
+  "reichweite": {
+   "name": "Reichweite",
+   "text": "Doppelt so viele neue Follower."
+  }
+ }
+}

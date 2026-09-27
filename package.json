@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "build:artifact": "vite build && node scripts/build-artifact.mjs"
+    "build:artifact": "vite build && node scripts/build-artifact.mjs",
+    "export:godot": "node scripts/export-godot-data.mjs",
+    "test:godot": "${GODOT:-godot} --headless --path godot -s res://tests/run_tests.gd"
   },
   "devDependencies": {
     "typescript": "^7.0.2",

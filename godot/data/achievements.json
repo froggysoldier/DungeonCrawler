@@ -1,0 +1,5503 @@
+{
+ "ACHIEVEMENT_CATEGORIES": [
+  {
+   "id": "kampf",
+   "name": "Kampf"
+  },
+  {
+   "id": "technik",
+   "name": "Kampftechnik"
+  },
+  {
+   "id": "bestiarium",
+   "name": "Bestiarium und Bosse"
+  },
+  {
+   "id": "erkundung",
+   "name": "Erkundung und Reisen"
+  },
+  {
+   "id": "beute",
+   "name": "Beute und Ausrüstung"
+  },
+  {
+   "id": "wirtschaft",
+   "name": "Handel und Gold"
+  },
+  {
+   "id": "ueberleben",
+   "name": "Überleben"
+  },
+  {
+   "id": "magie",
+   "name": "Magie"
+  },
+  {
+   "id": "handwerk",
+   "name": "Handwerk und Fallen"
+  },
+  {
+   "id": "sozial",
+   "name": "Crawler, Party und Haustiere"
+  },
+  {
+   "id": "show",
+   "name": "Show und Sponsoren"
+  },
+  {
+   "id": "fortschritt",
+   "name": "Fortschritt"
+  },
+  {
+   "id": "momente",
+   "name": "Besondere Momente"
+  }
+ ],
+ "ACHIEVEMENTS": [
+  {
+   "id": "willkommen",
+   "name": "Willkommen im Abstieg!",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Betritt den Dungeon.",
+   "comment": "Herzlichen Glückwunsch! Du hast überlebt, dass deine Welt zerstört wurde. Das ist mehr, als 99 % deiner Spezies geschafft haben. Genieß es. Es wird nicht besser.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "katzenlady",
+   "name": "Komische Katzenlady",
+   "tier": "silber",
+   "box": "haustier",
+   "description": "Betritt den Dungeon zusammen mit einer Katze.",
+   "comment": "Die Welt geht unter, und das Erste, woran du denkst, ist die Katze. Die Zuschauer lieben dich bereits. Die Katze eher nicht.",
+   "category": "sozial"
+  },
+  {
+   "id": "hundemensch",
+   "name": "Bester Freund des Menschen",
+   "tier": "silber",
+   "box": "haustier",
+   "description": "Betritt den Dungeon zusammen mit einem Hund.",
+   "comment": "Ein treuer Begleiter. Er wird dich bis in den Tod begleiten. Bei eurem Tempo: bald.",
+   "category": "sozial"
+  },
+  {
+   "id": "bademantel",
+   "name": "Mode-Ikone der Apokalypse",
+   "tier": "bronze",
+   "box": "kleidung",
+   "description": "Betritt den Dungeon im Bademantel.",
+   "comment": "Die Galaxis sieht zu. Die GANZE Galaxis. Und du trägst einen Bademantel.",
+   "category": "show"
+  },
+  {
+   "id": "erstes_blut",
+   "name": "Erstes Blut",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Töte deinen ersten Mob.",
+   "comment": "Ein Leben weniger im Dungeon. Nur noch etwa 40 Millionen.",
+   "category": "kampf"
+  },
+  {
+   "id": "zehn_kills",
+   "name": "Schädlingsbekämpfung",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Töte 10 Mobs.",
+   "comment": "Du bist jetzt offiziell gefährlicher als ein Kammerjäger. Knapp.",
+   "category": "kampf"
+  },
+  {
+   "id": "fuenfzig_kills",
+   "name": "Serienkiller (im Rahmen der Spielregeln)",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Töte 50 Mobs.",
+   "comment": "Auf der Erde hätte man dich dafür eingesperrt. Hier gibt es eine Box.",
+   "category": "kampf"
+  },
+  {
+   "id": "rattenfaenger",
+   "name": "Rattenfänger von Hameln (ohne Flöte)",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Töte 20 Ratten jeglicher Art.",
+   "comment": "Die Ratten haben einen Namen für dich. Er ist nicht nett.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "david",
+   "name": "David gegen Goliath",
+   "tier": "silber",
+   "box": "wurf",
+   "description": "Töte einen Mob, der mindestens 3 Level über dir ist.",
+   "comment": "Statistisch hättest du sterben müssen. Die Statistikabteilung ist verärgert.",
+   "category": "kampf"
+  },
+  {
+   "id": "multitasker",
+   "name": "Kampf-Multitasking",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Töte einen Gegner, nachdem du ihn mit 4 verschiedenen Techniken getroffen hast.",
+   "comment": "Faust, Fuß, Knie, Kopf. Du hast einfach alles an ihm ausprobiert. Wie ein Kleinkind mit einem Gummihammer.",
+   "category": "kampf"
+  },
+  {
+   "id": "ruepel",
+   "name": "Rüpel",
+   "tier": "bronze",
+   "box": "brawler",
+   "description": "Töte einen fliehenden Gegner.",
+   "comment": "Er wollte doch nur weg. Du Monster. Die Zuschauer sind begeistert.",
+   "category": "kampf"
+  },
+  {
+   "id": "hinterhalt",
+   "name": "Buh!",
+   "tier": "bronze",
+   "box": "brawler",
+   "description": "Töte einen Gegner mit einem einzigen Schlag, bevor er dich bemerkt.",
+   "comment": "Er hat dich nicht kommen sehen. Er wird auch sonst nichts mehr sehen.",
+   "category": "kampf"
+  },
+  {
+   "id": "knapp_daneben",
+   "name": "Knapp daneben ist auch vorbei",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Verfehle 5-mal hintereinander.",
+   "comment": "Die Zuschauer haben ein Trinkspiel erfunden. Es heißt „Wann trifft er endlich?“.",
+   "category": "kampf"
+  },
+  {
+   "id": "sandsack",
+   "name": "Menschlicher Sandsack",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Werde 8-mal hintereinander getroffen.",
+   "comment": "Du hast eine beeindruckende Fähigkeit, im Weg zu stehen.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "haaresbreite",
+   "name": "Um Haaresbreite",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Überlebe einen Treffer mit 1–2 HP übrig.",
+   "comment": "Die Wettquoten auf deinen Tod sind gerade eingebrochen. Viele sind sehr enttäuscht.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "crit",
+   "name": "Volltreffer!",
+   "tier": "bronze",
+   "box": "waffen",
+   "description": "Lande einen kritischen Treffer.",
+   "comment": "Genau da, wo es wehtut. Die Systemstimme hat es in Zeitlupe gesehen. Mehrmals.",
+   "category": "kampf"
+  },
+  {
+   "id": "overkill",
+   "name": "Overkill",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Füge mit einem einzigen Angriff 25 Schaden zu.",
+   "comment": "Man hätte ihn auch einfach… nein, schon gut. Genau so.",
+   "category": "kampf"
+  },
+  {
+   "id": "faust10",
+   "name": "Hände wie Schaufeln",
+   "tier": "bronze",
+   "box": "brawler",
+   "description": "Töte 10 Gegner mit Faustschlägen.",
+   "comment": "Deine Knöchel sehen aus wie Hackfleisch. Stolz darf man trotzdem sein.",
+   "category": "technik"
+  },
+  {
+   "id": "tritt10",
+   "name": "Barfuß-Rambo",
+   "tier": "bronze",
+   "box": "schuh",
+   "description": "Töte 10 Gegner mit Tritten.",
+   "comment": "Dein Fuß hat jetzt mehr Kills als die meisten Crawler. Das ist traurig. Für die anderen.",
+   "category": "technik"
+  },
+  {
+   "id": "stampf1",
+   "name": "Plattgemacht!",
+   "tier": "bronze",
+   "box": "schuh",
+   "description": "Töte einen Gegner durch Stampfen.",
+   "comment": "Er lag schon am Boden. Du hast trotzdem draufgetreten. Die Zuschauer: Standing Ovations.",
+   "category": "technik"
+  },
+  {
+   "id": "stampf15",
+   "name": "Podophilie",
+   "tier": "gold",
+   "box": "schuh",
+   "description": "Töte 15 Gegner durch Stampfen.",
+   "comment": "Du hast ein Problem. Ein Fußproblem. Die Systemstimme urteilt nicht. Die Systemstimme urteilt ein bisschen.",
+   "category": "technik"
+  },
+  {
+   "id": "kopf1",
+   "name": "Kopf durch die Wand",
+   "tier": "bronze",
+   "box": "kleidung",
+   "description": "Töte einen Gegner mit einem Kopfstoß.",
+   "comment": "Beide Köpfe haben gelitten. Nur einer lebt noch.",
+   "category": "technik"
+  },
+  {
+   "id": "stein1",
+   "name": "Steinzeit",
+   "tier": "bronze",
+   "box": "wurf",
+   "description": "Töte einen Gegner mit einem geworfenen Stein.",
+   "comment": "Hunderttausende Jahre Evolution, und am Ende ist es doch wieder ein Stein.",
+   "category": "technik"
+  },
+  {
+   "id": "wurf25",
+   "name": "Wurfmaschine",
+   "tier": "silber",
+   "box": "wurf",
+   "description": "Wirf 25 Gegenstände auf Gegner.",
+   "comment": "Du wirfst mit allem, was nicht festgeschraubt ist. Und manchmal mit Schrauben.",
+   "category": "technik"
+  },
+  {
+   "id": "sprung5",
+   "name": "Sprungbrett",
+   "tier": "bronze",
+   "box": "schuh",
+   "description": "Töte 5 Gegner mit Sprungangriffen.",
+   "comment": "Hoch, runter, tot. Einfache Choreografie.",
+   "category": "technik"
+  },
+  {
+   "id": "meteor",
+   "name": "Meteoriteneinschlag",
+   "tier": "silber",
+   "box": "schuh",
+   "description": "Töte einen Gegner mit einem Sprungtritt.",
+   "comment": "Du bist durch die Luft geflogen und mit dem Fuß voran gelandet. Auf einem Gesicht. Kunst.",
+   "category": "technik"
+  },
+  {
+   "id": "ellbogen10",
+   "name": "Ellbogengesellschaft",
+   "tier": "bronze",
+   "box": "brawler",
+   "description": "Töte 10 Gegner mit dem Ellbogen.",
+   "comment": "So hast du dich früher auch im Supermarkt an der Kasse vorgedrängelt, oder?",
+   "category": "technik"
+  },
+  {
+   "id": "knie10",
+   "name": "Kniefall",
+   "tier": "bronze",
+   "box": "brawler",
+   "description": "Töte 10 Gegner mit dem Knie.",
+   "comment": "Vor dir gehen die Gegner in die Knie. Also eigentlich eher: in dein Knie.",
+   "category": "technik"
+  },
+  {
+   "id": "waffe1",
+   "name": "Heimwerkerkönig",
+   "tier": "bronze",
+   "box": "waffen",
+   "description": "Töte einen Gegner mit einer improvisierten Waffe.",
+   "comment": "Das war mal ein Möbelstück. Jetzt ist es ein Mordwerkzeug. Nachhaltig!",
+   "category": "technik"
+  },
+  {
+   "id": "anlauf1",
+   "name": "Mit Anlauf!",
+   "tier": "bronze",
+   "box": "brawler",
+   "description": "Töte einen Gegner mit einem Sturmangriff.",
+   "comment": "Zehn Meter Anlauf für einen Schlag. Effizienz sieht anders aus. Unterhaltung nicht.",
+   "category": "technik"
+  },
+  {
+   "id": "nackter_boss",
+   "name": "Die nackte Wahrheit",
+   "tier": "gold",
+   "box": "kleidung",
+   "description": "Besiege einen Boss ohne angelegte Ausrüstung.",
+   "comment": "Keine Rüstung. Keine Waffe. Kaum Kleidung. Nur Wut. Die Einschaltquoten explodieren.",
+   "category": "momente"
+  },
+  {
+   "id": "elite1",
+   "name": "Nicht mehr ganz so normal",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Besiege einen Elite-Mob.",
+   "comment": "Er war etwas größer, etwas stärker und etwas hässlicher. Jetzt ist er vor allem: tot.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "hoodboss1",
+   "name": "Nachbarschaftshilfe",
+   "tier": "silber",
+   "box": "boss",
+   "description": "Besiege einen Nachbarschafts-Boss.",
+   "comment": "Das Viertel ist jetzt sicherer. Es ist auch leerer. Beides deine Schuld.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "hoodboss4",
+   "name": "Bürgermeister der Ruinen",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege alle vier Nachbarschafts-Bosse einer Etage.",
+   "comment": "Vier Viertel, vier Bosse, vier Beerdigungen. Du solltest ein Bestattungsunternehmen gründen.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "boroughboss",
+   "name": "Oma ist satt",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege den Borough-Boss.",
+   "comment": "Du hast eine riesige Oma verprügelt. Deine eigene Oma wäre… eigentlich stolz. Sie war ja auch so.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "lebensmuede",
+   "name": "Lebensmüde",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "description": "Besiege einen Boss, der mindestens 5 Level über dir ist.",
+   "comment": "Die Systemstimme hat bereits deinen Nachruf geschrieben. Jetzt muss sie ihn löschen. Danke für nichts.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "kartograph",
+   "name": "Kartograph",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Hebe eine Gebietskarte auf.",
+   "comment": "Ein Stück Papier, das dir sagt, wo du bist. Luxus.",
+   "category": "erkundung"
+  },
+  {
+   "id": "treppe",
+   "name": "Treppenwitz",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Finde ein Treppenhaus.",
+   "comment": "Der Weg nach unten. Hier bedeutet „nach unten“ übrigens „schlimmer“.",
+   "category": "erkundung"
+  },
+  {
+   "id": "safe1",
+   "name": "Zuhause ist, wo einen keiner haut",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Betritt einen Safe Room.",
+   "comment": "Keine Gewalt erlaubt. Ungewohnt, oder?",
+   "category": "erkundung"
+  },
+  {
+   "id": "gilde",
+   "name": "Hausaufgaben gemacht",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Schließe das Tutorial in der Gilde ab.",
+   "comment": "Du hast dir die Anleitung durchgelesen. Die Systemstimme ist schockiert. Das macht sonst niemand.",
+   "category": "erkundung"
+  },
+  {
+   "id": "pazifist",
+   "name": "Pazifist (vorläufig)",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Schließe das Tutorial ab, ohne etwas getötet zu haben.",
+   "comment": "Du hast noch niemanden umgebracht. Die Systemstimme gibt dir etwa zehn Minuten.",
+   "category": "momente"
+  },
+  {
+   "id": "wanderer",
+   "name": "Ich bin dann mal weg",
+   "tier": "bronze",
+   "box": "schuh",
+   "description": "Laufe 1000 Schritte.",
+   "comment": "Tausend Schritte durch einen Keller voller Monster. Deine Fitness-App wäre stolz. Wenn es sie noch gäbe.",
+   "category": "erkundung"
+  },
+  {
+   "id": "klepto",
+   "name": "Kleptomane",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Hebe 20 Gegenstände auf.",
+   "comment": "Du nimmst einfach alles mit. Die Systemstimme fühlt sich an ihre Ex erinnert.",
+   "category": "beute"
+  },
+  {
+   "id": "unboxing",
+   "name": "Unboxing-Influencer",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Öffne deine erste Lootbox.",
+   "comment": "Die Zuschauer lieben Unboxing. Mach beim nächsten Mal ein überraschtes Gesicht.",
+   "category": "beute"
+  },
+  {
+   "id": "unboxing10",
+   "name": "Glücksspielsucht",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Öffne 10 Lootboxen.",
+   "comment": "Das ist keine Sucht. Das ist ein Hobby. Mit Entzugserscheinungen.",
+   "category": "beute"
+  },
+  {
+   "id": "modeopfer",
+   "name": "Modeopfer",
+   "tier": "silber",
+   "box": "kleidung",
+   "description": "Trage gleichzeitig 8 Ausrüstungsteile.",
+   "comment": "Nichts davon passt zusammen. Aber du siehst aus wie jemand, der überleben will.",
+   "category": "beute"
+  },
+  {
+   "id": "feinschmecker",
+   "name": "Feinschmecker",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Iss in einem Safe-Room-Restaurant.",
+   "comment": "Die Welt ist untergegangen, aber das Schnitzel ist gut. Prioritäten.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "schlafmuetze",
+   "name": "Schlafmütze",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Schlafe in einem Safe Room.",
+   "comment": "Acht Stunden Schlaf während einer Apokalypse. Gesund. Und völlig irre.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "level5",
+   "name": "Aufsteiger",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Erreiche Level 5.",
+   "comment": "Level 5! Auf der Erde wärst du damit… nichts. Hier bist du damit etwas weniger nichts.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "skill1",
+   "name": "Autodidakt",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Lerne deinen ersten Skill durch Übung.",
+   "comment": "Du hast etwas durch Wiederholung gelernt. Deine Eltern hatten doch recht.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "skill5",
+   "name": "Spezialist",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Bringe einen Skill auf Stufe 5.",
+   "comment": "Du bist jetzt richtig gut in genau einer Sache. Das ist mehr, als die meisten Menschen je waren.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "haustier_kill",
+   "name": "Wer ist ein guter Killer?",
+   "tier": "silber",
+   "box": "haustier",
+   "description": "Dein Haustier tötet einen Gegner.",
+   "comment": "Dein Haustier hat getötet. Es hat keine Reue gezeigt. Du auch nicht. Ihr passt zusammen.",
+   "category": "sozial"
+  },
+  {
+   "id": "zweite_chance",
+   "name": "Kleingedrucktes gelesen",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "description": "Entkomme dem Tod durch die Zweite-Chance-Klausel.",
+   "comment": "Du warst tot. Jetzt bist du es nicht mehr. Die Buchhaltung ist verwirrt.",
+   "category": "momente"
+  },
+  {
+   "id": "geist",
+   "name": "Vergangenheitsbewältigung",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Besiege den Geist eines deiner früheren Crawler.",
+   "comment": "Du hast dich selbst verprügelt. Also, eine frühere Version. Therapeuten würden das begrüßen. Glaube ich.",
+   "category": "momente"
+  },
+  {
+   "id": "fruehaufsteher",
+   "name": "Frühaufsteher",
+   "tier": "gold",
+   "box": "schuh",
+   "description": "Steige in den ersten 24 Stunden einer Etage hinab.",
+   "comment": "So schnell? Die Zuschauer haben nicht mal ihr Popcorn fertig.",
+   "category": "erkundung"
+  },
+  {
+   "id": "last_minute",
+   "name": "Auf den letzten Drücker",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Erreiche die Treppe in der letzten Stunde vor dem Einsturz.",
+   "comment": "Das war knapp. Die Systemstimme hatte schon die Einsturz-Animation geladen.",
+   "category": "erkundung"
+  },
+  {
+   "id": "absteiger",
+   "name": "Absteiger des Jahres",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Steige auf die nächste Etage hinab.",
+   "comment": "Tiefer, dunkler, tödlicher. Willkommen in deiner Zukunft.",
+   "category": "erkundung"
+  },
+  {
+   "id": "spinnen",
+   "name": "Arachnophobie überwunden",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Töte 5 Kellerspinnen.",
+   "comment": "Acht Beine weniger. Mal fünf. Die Systemstimme hat mitgezählt: 40 Beine.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "fledermaus",
+   "name": "Flugabwehr",
+   "tier": "silber",
+   "box": "wurf",
+   "description": "Töte 10 fliegende Gegner.",
+   "comment": "Was fliegt, kann fallen. Du hast nachgeholfen.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "kroete_fern",
+   "name": "Sicherheitsabstand",
+   "tier": "silber",
+   "box": "wurf",
+   "description": "Töte eine Blähkröte mit einem Wurf.",
+   "comment": "Aus sicherer Entfernung. Klug. Langweilig, aber klug.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "knall",
+   "name": "Knallfrosch",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Werde von einer Explosion erwischt und überlebe.",
+   "comment": "Du riechst jetzt nach Kröte. Innen und außen.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "bestohlen",
+   "name": "Opfer eines Taschendiebs",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Lass dir Gold stehlen.",
+   "comment": "Selbst in der Apokalypse: Achte auf deine Wertsachen. Die Systemstimme hat es gesehen und nichts gesagt.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "rache",
+   "name": "Wer zuletzt lacht",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Töte einen Dieb, der dich bestohlen hat.",
+   "comment": "Rache ist süß. Und klimpert.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "pleite",
+   "name": "Pleite",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Lass dir dein letztes Gold klauen.",
+   "comment": "Null Gold. Die Zuschauer haben Mitleid. Ein bisschen.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "vergiftet",
+   "name": "Das war wohl nicht vegan",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Werde vergiftet.",
+   "comment": "Grün im Gesicht steht dir. Nein, eigentlich nicht.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "geheilt",
+   "name": "Chemie-Leistungskurs",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Neutralisiere eine Vergiftung.",
+   "comment": "Gift raus, Leben bleibt. Deine Lehrer wären stolz.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "giftschlucker",
+   "name": "Giftschlucker",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Erleide insgesamt 30 Giftschaden.",
+   "comment": "Deine Leber schreibt gerade eine Kündigung.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "zwerge",
+   "name": "Rasenpflege",
+   "tier": "bronze",
+   "box": "waffen",
+   "description": "Zerschlage 5 belebte Gartenzwerge.",
+   "comment": "Der Vorgarten deiner Nachbarn ist gerächt.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "heinzel",
+   "name": "Nachtschicht beendet",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Erwische ein Heinzelmännchen.",
+   "comment": "Die sind echt schnell. Du warst schneller. Oder es war müde.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "kryptozoologe",
+   "name": "Kryptozoologe",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Töte einen Wolpertinger, einen Tatzelwurm und einen Chupacabra.",
+   "comment": "Die Wissenschaft hätte sie gern lebend gehabt. Die Wissenschaft ist aber tot.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "erstkontakt",
+   "name": "Erstkontakt",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Töte einen außerirdischen Späher.",
+   "comment": "Die Menschheit hat endlich Aliens getroffen. Und sofort verprügelt. Typisch.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mimic",
+   "name": "Nicht alles ist, wie es scheint",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Besiege einen Mimic.",
+   "comment": "Ab jetzt wirst du jeden Müllsack misstrauisch ansehen. Zu Recht.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "toaster",
+   "name": "Frühstück ist fertig",
+   "tier": "bronze",
+   "box": "kleidung",
+   "description": "Besiege einen Rauchenden Toaster.",
+   "comment": "Leicht angebrannt. Wie immer.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "friedhof",
+   "name": "Friedhofsruhe",
+   "tier": "silber",
+   "box": "waffen",
+   "description": "Töte 10 Untote.",
+   "comment": "Tot, untot, wieder tot. Der Kreislauf des Lebens, Kellerversion.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "verstaerkung",
+   "name": "Verstärkung abgelehnt",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Töte einen Gegner, der bereits Verstärkung gerufen hat.",
+   "comment": "Er hat seine Freunde angerufen. Jetzt können sie gemeinsam auf der Beerdigung sein.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "dosenoeffner",
+   "name": "Dosenöffner",
+   "tier": "silber",
+   "box": "schuh",
+   "description": "Töte einen gepanzerten Gegner mit einem Tritt.",
+   "comment": "Fäuste prallen ab. Füße nicht. Lektion gelernt.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "elite5",
+   "name": "Elitejäger",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Besiege 5 Elite-Mobs.",
+   "comment": "Die Elite hat Angst vor dir. Die Elite hat recht.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "hundert",
+   "name": "Hundert!",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Töte 100 Mobs.",
+   "comment": "Dreistellig. Die Galaxis applaudiert. Die Mobs weniger.",
+   "category": "kampf"
+  },
+  {
+   "id": "b_sammlerin",
+   "name": "Entrümpelung",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege Die Sammlerin.",
+   "comment": "Das Viertel ist aufgeräumt. Die Handtaschen gehören jetzt dir.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_hausmeister",
+   "name": "Fristlose Kündigung",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege den Hausmeister.",
+   "comment": "Er wollte nur, dass niemand läuft. Jetzt läuft er nicht mehr.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_rattenkoenig",
+   "name": "Königsmord",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege den König der Kanalratten.",
+   "comment": "Sieben Köpfe, sieben Beerdigungen, eine Krone.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_mixer",
+   "name": "Stecker gezogen",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege Muttis Mega-Mixer.",
+   "comment": "Mutti wird enttäuscht sein. Mutti ist aber nicht hier.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_kammerjaeger",
+   "name": "Der Jäger wird zum Gejagten",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege den Kammerjäger.",
+   "comment": "Ungeziefer 1, Kammerjäger 0.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_motten",
+   "name": "Mottenkugel",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege die Mutter aller Motten.",
+   "comment": "Deine Wollpullover sind sicher. Du hast keine, aber trotzdem.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_pfand",
+   "name": "Pfand zurück",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege den Pfandflaschen-Baron.",
+   "comment": "Er war 25 Cent wert. Mehr nicht.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_heizung",
+   "name": "Wartung überfällig",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege die Heizungsbestie.",
+   "comment": "Endlich hat sich jemand um die Heizung gekümmert. Mit Gewalt.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_verwalter",
+   "name": "Mietminderung",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege den Hausverwalter.",
+   "comment": "Die Nebenkostenabrechnung ist hiermit hinfällig.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_kanalkoenigin",
+   "name": "Machtwechsel im Abfluss",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege die Kanalkönigin.",
+   "comment": "Die Rohre haben eine neue Herrschaft. Dich. Glückwunsch?",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_schlamm",
+   "name": "Unehrenhaft entlassen",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege Kommandant Klärschlamm.",
+   "comment": "Seine Armee hat sich aufgelöst. Buchstäblich.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_oger",
+   "name": "Geschäftsaufgabe",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege den Schwarzmarkt-Oger.",
+   "comment": "Alles muss raus! Vor allem seine Zähne.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_nixe",
+   "name": "Falscher Ton",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege die Nixe vom Überlauf.",
+   "comment": "Ihr letztes Lied war das schönste. Und das kürzeste.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "b_rattenkaiser",
+   "name": "Revolution!",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege den Rattenkaiser.",
+   "comment": "Das Imperium ist gefallen. Die Ratten suchen einen neuen Kaiser. Sie schauen dich an.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "boss_haende",
+   "name": "Mit bloßen Händen",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Besiege einen Boss mit einem unbewaffneten Angriff.",
+   "comment": "Keine Waffe. Nur du und deine Körperteile. Die Galaxis ist beeindruckt und leicht verstört.",
+   "category": "kampf"
+  },
+  {
+   "id": "boss_stein",
+   "name": "Goliath, Teil zwei",
+   "tier": "gold",
+   "box": "wurf",
+   "description": "Besiege einen Boss mit einem Wurf.",
+   "comment": "Ein Stein. Ein Riese. Eine sehr alte Geschichte, neu erzählt.",
+   "category": "kampf"
+  },
+  {
+   "id": "boss_stampf",
+   "name": "Bodenständig",
+   "tier": "platin",
+   "box": "schuh",
+   "description": "Besiege einen Boss durch Stampfen.",
+   "comment": "Du hast einen Boss plattgetreten. Die Regie hat die Szene dreimal wiederholt.",
+   "category": "kampf"
+  },
+  {
+   "id": "weltkarte",
+   "name": "Weltkarte",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Sammle alle vier Gebietskarten einer Etage.",
+   "comment": "Du kennst jetzt jeden Winkel. Jeden feuchten, stinkenden Winkel.",
+   "category": "erkundung"
+  },
+  {
+   "id": "kopf10",
+   "name": "Dickschädel",
+   "tier": "silber",
+   "box": "kleidung",
+   "description": "Töte 10 Gegner mit Kopfstößen.",
+   "comment": "Dein Kopf ist jetzt offiziell eine Waffe. Dein Gehirn hat Einwände eingereicht.",
+   "category": "technik"
+  },
+  {
+   "id": "waffe10",
+   "name": "Handwerker des Todes",
+   "tier": "silber",
+   "box": "waffen",
+   "description": "Töte 10 Gegner mit Waffen.",
+   "comment": "Werkzeug ist, was man daraus macht.",
+   "category": "technik"
+  },
+  {
+   "id": "wurf10",
+   "name": "Steinewerfer",
+   "tier": "silber",
+   "box": "wurf",
+   "description": "Töte 10 Gegner mit Würfen.",
+   "comment": "Wer im Glashaus sitzt… ach, hier gibt es keine Glashäuser mehr.",
+   "category": "technik"
+  },
+  {
+   "id": "anlauf10",
+   "name": "Stier",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Töte 10 Gegner mit Sturmangriffen.",
+   "comment": "Kopf runter, losrennen, nicht nachdenken. Eine Lebensphilosophie.",
+   "category": "technik"
+  },
+  {
+   "id": "tritt50",
+   "name": "Das Bein der Apokalypse",
+   "tier": "gold",
+   "box": "schuh",
+   "description": "Töte 50 Gegner mit Tritten.",
+   "comment": "Fünfzig. Mit dem Fuß. Deine Schuhe haben mehr erlebt als die meisten Menschen.",
+   "category": "technik"
+  },
+  {
+   "id": "faust50",
+   "name": "Die Faust der Apokalypse",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Töte 50 Gegner mit Faustschlägen.",
+   "comment": "Deine Knöchel sind jetzt härter als die Wände. Die Wände haben Angst.",
+   "category": "technik"
+  },
+  {
+   "id": "allrounder",
+   "name": "Schweizer Taschenmesser",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Töte Gegner mit allen sieben Angriffsarten.",
+   "comment": "Faust, Fuß, Knie, Ellbogen, Kopf, Waffe, Wurf. Du bist ein wandelndes Kampfsport-Lehrbuch.",
+   "category": "technik"
+  },
+  {
+   "id": "krit25",
+   "name": "Präzisionsarbeit",
+   "tier": "silber",
+   "box": "waffen",
+   "description": "Lande 25 kritische Treffer.",
+   "comment": "Immer genau da, wo es wehtut. Du hast ein Talent. Ein verstörendes.",
+   "category": "technik"
+  },
+  {
+   "id": "umgehauen",
+   "name": "Umgehauen",
+   "tier": "silber",
+   "box": "schuh",
+   "description": "Wirf 15 Gegner zu Boden.",
+   "comment": "Die Schwerkraft ist dein bester Freund. Du bist ihr bester Kunde.",
+   "category": "technik"
+  },
+  {
+   "id": "pulverisiert",
+   "name": "Pulverisiert",
+   "tier": "gold",
+   "box": "waffen",
+   "description": "Füge mit einem einzigen Angriff 50 Schaden zu.",
+   "comment": "Da ist nichts mehr übrig. Die Reinigungskräfte sind verzweifelt.",
+   "category": "technik"
+  },
+  {
+   "id": "letzte_kraft",
+   "name": "Mit letzter Kraft",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "description": "Töte einen Gegner, während du vergiftet bist und höchstens 5 HP hast.",
+   "comment": "Grün, blutend, siegreich. Das ist Fernsehen.",
+   "category": "kampf"
+  },
+  {
+   "id": "klobuerste",
+   "name": "Hygienefachkraft",
+   "tier": "silber",
+   "box": "waffen",
+   "description": "Töte einen Gegner mit einer Klobürste.",
+   "comment": "Die unwürdigste Art zu sterben. Für ihn. Für dich ein Achievement.",
+   "category": "technik"
+  },
+  {
+   "id": "selfie",
+   "name": "Content Creator",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Töte einen Gegner mit einem Selfie-Stick.",
+   "comment": "Das Foto ist fantastisch geworden. Der Gegner eher nicht.",
+   "category": "technik"
+  },
+  {
+   "id": "baguette",
+   "name": "Französische Revolution",
+   "tier": "silber",
+   "box": "waffen",
+   "description": "Töte einen Gegner mit einem versteinerten Baguette.",
+   "comment": "Liberté, Égalité, Kopfnuss mit Brot.",
+   "category": "technik"
+  },
+  {
+   "id": "bowling",
+   "name": "Strike!",
+   "tier": "silber",
+   "box": "wurf",
+   "description": "Wirf eine Bowlingkugel auf einen Gegner und triff.",
+   "comment": "Alle Neune. Oder zumindest einer.",
+   "category": "technik"
+  },
+  {
+   "id": "fussringe",
+   "name": "Doppelt beringte Füße",
+   "tier": "gold",
+   "box": "schmuck",
+   "description": "Trage zwei Fußringe gleichzeitig.",
+   "comment": "Klimper, klimper. Jeder Tritt ein Konzert.",
+   "category": "beute"
+  },
+  {
+   "id": "vierfach",
+   "name": "Vierfach beringt",
+   "tier": "platin",
+   "box": "schmuck",
+   "description": "Trage zwei Ringe und zwei Fußringe gleichzeitig.",
+   "comment": "Du glitzerst. Die Monster sehen dich schon von Weitem. Die Zuschauer auch.",
+   "category": "beute"
+  },
+  {
+   "id": "komplett",
+   "name": "Komplettpaket",
+   "tier": "platin",
+   "box": "kleidung",
+   "description": "Belege alle 17 Ausrüstungsplätze.",
+   "comment": "Kopf bis Fuß, Ring bis Unterhose. Du bist jetzt ein wandelnder Kleiderschrank.",
+   "category": "beute"
+  },
+  {
+   "id": "crocs",
+   "name": "Modeverbrechen",
+   "tier": "bronze",
+   "box": "kleidung",
+   "description": "Trage Crocs.",
+   "comment": "Die Galaxis hat kurz weggesehen. Aus Respekt vor den Toten.",
+   "category": "beute"
+  },
+  {
+   "id": "aluhut",
+   "name": "Die Wahrheit ist irgendwo da unten",
+   "tier": "bronze",
+   "box": "kleidung",
+   "description": "Trage einen Aluhut.",
+   "comment": "Du hattest recht. Aliens haben die Erde übernommen. Hilft dir jetzt aber auch nicht.",
+   "category": "beute"
+  },
+  {
+   "id": "zirkus",
+   "name": "Zirkusreif",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Trage Clownsnase und Partyhut gleichzeitig.",
+   "comment": "Wenn schon untergehen, dann mit Stil. Mit sehr fragwürdigem Stil.",
+   "category": "beute"
+  },
+  {
+   "id": "stoeckel",
+   "name": "Hohe Absätze, tiefe Wunden",
+   "tier": "silber",
+   "box": "schuh",
+   "description": "Töte einen Gegner per Tritt, während du Stöckelschuhe trägst.",
+   "comment": "Zwölf Zentimeter Absatz, null Gnade.",
+   "category": "beute"
+  },
+  {
+   "id": "legendaer",
+   "name": "Legendär!",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Finde einen legendären Gegenstand.",
+   "comment": "Orange! Es ist orange! Alle Gamer der Galaxis kreischen gerade.",
+   "category": "beute"
+  },
+  {
+   "id": "himmlisch",
+   "name": "Himmlische Fügung",
+   "tier": "legendaer",
+   "box": "abenteurer",
+   "description": "Finde einen himmlischen Gegenstand.",
+   "comment": "Es gibt davon nur eine Handvoll in der Geschichte der Show. Und du hast eins. Die Systemstimme ist neidisch.",
+   "category": "beute"
+  },
+  {
+   "id": "gold100",
+   "name": "Dagobert-Syndrom",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Besitze 100 Gold auf einmal.",
+   "comment": "Hundert Goldstücke. Du könntest darin baden. Bitte nicht.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "gold500",
+   "name": "Kapitalist",
+   "tier": "gold",
+   "box": "fan",
+   "description": "Verdiene insgesamt 500 Gold.",
+   "comment": "Die Wirtschaft ist zusammengebrochen. Deine nicht.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "drei_gaenge",
+   "name": "Drei-Gänge-Menü",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Iss dreimal in einem Restaurant.",
+   "comment": "Vorspeise, Hauptgang, Monster. Guten Appetit.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "winterschlaf",
+   "name": "Winterschlaf",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Schlafe fünfmal in Safe Rooms.",
+   "comment": "Du verschläfst die Apokalypse. Respekt.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "trankjunkie",
+   "name": "Trank-Junkie",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Trinke 10 Tränke.",
+   "comment": "Kirsche, Kreide, Verzweiflung. Du kennst alle Geschmacksrichtungen.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "boxen25",
+   "name": "Schatzsucher",
+   "tier": "gold",
+   "box": "fan",
+   "description": "Öffne 25 Lootboxen.",
+   "comment": "Du hast ein Problem. Ein glänzendes, belohnendes Problem.",
+   "category": "beute"
+  },
+  {
+   "id": "haustier5",
+   "name": "Tierischer Aufstieg",
+   "tier": "gold",
+   "box": "haustier",
+   "description": "Bringe dein Haustier auf Stufe 5.",
+   "comment": "Dein Haustier ist jetzt gefährlicher als du. Merk dir das.",
+   "category": "sozial"
+  },
+  {
+   "id": "level10",
+   "name": "Zweistellig",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Erreiche Level 10.",
+   "comment": "Level 10. Jetzt bist du offiziell kein Futter mehr. Nur noch Vorspeise.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "level15",
+   "name": "Veteran",
+   "tier": "platin",
+   "box": "abenteurer",
+   "description": "Erreiche Level 15.",
+   "comment": "Die meisten Crawler sterben lange vorher. Du bist nicht wie die meisten. Leider für die Monster.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "skill10",
+   "name": "Meisterklasse",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Bringe einen Skill auf Stufe 10.",
+   "comment": "Zehntausend Stunden Übung? Hier reichen ein paar hundert Kämpfe.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "vielseitig",
+   "name": "Vielseitig",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Lerne 5 Skills durch Übung.",
+   "comment": "Du kannst ein bisschen von allem. Die Systemstimme nennt das „unentschlossen“.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "streber",
+   "name": "Streber",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Schließe das Tutorial in der ersten Stunde ab.",
+   "comment": "Direkt zur Gilde. Keine Umwege. Deine Lehrer hätten dich geliebt.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "anleitung",
+   "name": "Wer braucht schon Anleitungen?",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Schließe das Tutorial erst mit Level 4 oder höher ab.",
+   "comment": "Erst prügeln, dann lesen. Eine Strategie, die in keinem Handbuch steht. Weil du keins gelesen hast.",
+   "category": "momente"
+  },
+  {
+   "id": "etage3",
+   "name": "Ab in die Kanalisation",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Erreiche Etage 3.",
+   "comment": "Es riecht. Es riecht wirklich sehr. Willkommen auf Etage 3.",
+   "category": "erkundung"
+  },
+  {
+   "id": "follower100",
+   "name": "Hallo, Galaxis!",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Erreiche 100 Follower.",
+   "comment": "Hundert Wesen aus dem ganzen Universum finden dich interessant. Die Systemstimme kann es auch nicht erklären.",
+   "category": "show"
+  },
+  {
+   "id": "follower1000",
+   "name": "Influencer der Apokalypse",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Erreiche 1.000 Follower.",
+   "comment": "Tausend Follower. Du könntest jetzt Energydrinks bewerben. Wenn es noch Werbung gäbe.",
+   "category": "show"
+  },
+  {
+   "id": "follower10000",
+   "name": "Galaktischer Superstar",
+   "tier": "platin",
+   "box": "fan",
+   "description": "Erreiche 10.000 Follower.",
+   "comment": "Auf drei Planeten gibt es jetzt T-Shirts mit deinem Gesicht. Keines davon ist lizenziert.",
+   "category": "show"
+  },
+  {
+   "id": "hype100",
+   "name": "Die Halle tobt",
+   "tier": "gold",
+   "box": "fan",
+   "description": "Bringe den Hype auf 100.",
+   "comment": "Maximaler Hype. Irgendwo in der Galaxis ist gerade ein Sofa zusammengebrochen.",
+   "category": "show"
+  },
+  {
+   "id": "klasse",
+   "name": "Berufswahl",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Wähle Rasse und Klasse.",
+   "comment": "Du bist jetzt offiziell jemand. Jemand, der in einer Kanalisation kämpft, aber immerhin jemand.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "mensch",
+   "name": "Traditionalist",
+   "tier": "silber",
+   "box": "kleidung",
+   "description": "Bleib ein Mensch.",
+   "comment": "Hunderte Rassen, und du bleibst, was du bist. Konsequent. Und ein bisschen langweilig.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "exot",
+   "name": "Evolution per Mausklick",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Wähle eine Rasse, die du dir erst freischalten musstest.",
+   "comment": "Du hast dir dein neues Ich verdient. Mit Blut, Schweiß und sehr seltsamen Entscheidungen.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "faehigkeit",
+   "name": "Spezialmove!",
+   "tier": "bronze",
+   "box": "brawler",
+   "description": "Setze deine Klassenfähigkeit ein.",
+   "comment": "Die Zuschauer haben auf diesen Moment gewartet. Du auch, gib es zu.",
+   "category": "kampf"
+  },
+  {
+   "id": "showtime",
+   "name": "Rampensau",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Nutze „Showtime!“.",
+   "comment": "Eine Pose mitten im Kampf. Mutig. Die Monster waren zu verwirrt, um anzugreifen.",
+   "category": "show"
+  },
+  {
+   "id": "adlerauge",
+   "name": "Adlerauge",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Entdecke eine versteckte Falle.",
+   "comment": "Der Boden hat dich angelogen. Du hast es gemerkt. Die Systemstimme ist ein bisschen enttäuscht.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "reingetreten",
+   "name": "Voll reingetreten",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Löse eine Falle aus. Mit dem eigenen Körper.",
+   "comment": "Die Falle hat jahrelang auf diesen Moment gewartet. Danke, dass du ihr den Tag gerettet hast.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "entschaerfer",
+   "name": "Roter oder blauer Draht?",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Entschärfe eine Falle.",
+   "comment": "Ruhige Hände. Die Zuschauer hätten lieber eine Explosion gesehen.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fallensteller",
+   "name": "Wer anderen eine Grube gräbt",
+   "tier": "silber",
+   "box": "wurf",
+   "description": "Ein Monster tappt in deine eigene Falle.",
+   "comment": "… fällt normalerweise selbst hinein. Diesmal nicht. Sprichwörter sind hier unten außer Kraft.",
+   "category": "handwerk"
+  },
+  {
+   "id": "bastler",
+   "name": "Bastelstunde",
+   "tier": "bronze",
+   "box": "wurf",
+   "description": "Stelle etwas her.",
+   "comment": "Aus Müll wird Ausrüstung. Die Galaxis nennt das Recycling. Du nennst es Überleben.",
+   "category": "handwerk"
+  },
+  {
+   "id": "brandstifter",
+   "name": "Brandbeschleuniger",
+   "tier": "silber",
+   "box": "wurf",
+   "description": "Stelle eine Brandflasche oder Nagelbombe her.",
+   "comment": "Die Systemstimme hat das Rezept nicht verraten. Du hast es trotzdem herausgefunden. Beunruhigend.",
+   "category": "handwerk"
+  },
+  {
+   "id": "bombig",
+   "name": "Bombenstimmung",
+   "tier": "gold",
+   "box": "wurf",
+   "description": "Töte einen Gegner mit einem selbstgebauten Sprengsatz.",
+   "comment": "Handwerk hat goldenen Boden. Und jetzt auch Einzelteile eines Gegners darauf.",
+   "category": "handwerk"
+  },
+  {
+   "id": "hallo_nachbar",
+   "name": "Hallo, Nachbar",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Sprich mit einem anderen Crawler.",
+   "comment": "Ein Mensch! Wie aufregend. Genieß es. Die Zahl sinkt schnell.",
+   "category": "sozial"
+  },
+  {
+   "id": "gemeinsam",
+   "name": "Gemeinsam statt einsam",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Nimm jemanden in deine Party auf.",
+   "comment": "Jetzt seid ihr zu zweit. Doppelt so viele Ziele für die Monster.",
+   "category": "sozial"
+  },
+  {
+   "id": "volles_haus",
+   "name": "Volles Haus",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Führe eine Party mit vier Crawlern an.",
+   "comment": "Vier Leute, ein Ziel, null Plan. Klassische Abenteurergruppe.",
+   "category": "sozial"
+  },
+  {
+   "id": "trauer",
+   "name": "Es gibt kein Wiedersehen",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Verliere ein Party-Mitglied.",
+   "comment": "Die Systemstimme spricht ihr Beileid aus. Sie hat eine Vorlage dafür. Sie benutzt sie oft.",
+   "category": "sozial"
+  },
+  {
+   "id": "crawler_gegen_crawler",
+   "name": "Homo homini lupus",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Besiege einen Crawler, der dich ausrauben wollte.",
+   "comment": "Der Mensch ist des Menschen Wolf. Heute warst du der größere Wolf.",
+   "category": "sozial"
+  },
+  {
+   "id": "primetime",
+   "name": "Primetime",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Sei zu Gast in der Talkshow zwischen den Etagen.",
+   "comment": "Das Sofa ist bequemer als alles, worauf du in letzter Zeit gesessen hast. Genieß es. Es ist gemietet.",
+   "category": "show"
+  },
+  {
+   "id": "publikumsliebling",
+   "name": "Liebling der Galaxis",
+   "tier": "gold",
+   "box": "fan",
+   "description": "Gewinne in einer einzigen Talkshow mindestens 500 Follower.",
+   "comment": "Die Einschaltquote hat einen neuen Rekord. Die Sponsoren wollen deine Telefonnummer. Du hast kein Telefon mehr.",
+   "category": "show"
+  },
+  {
+   "id": "shitstorm",
+   "name": "Shitstorm",
+   "tier": "bronze",
+   "box": "kleidung",
+   "description": "Verliere in einer Talkshow Follower.",
+   "comment": "Das Internet vergisst nicht. Das galaktische Internet noch weniger.",
+   "category": "show"
+  },
+  {
+   "id": "sponsor_erster",
+   "name": "Gekauft!",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Nimm dein erstes Sponsorenangebot an.",
+   "comment": "Du bist jetzt offiziell eine Werbefläche. Lächeln, das Logo ist im Bild.",
+   "category": "show"
+  },
+  {
+   "id": "sponsor_drei",
+   "name": "Litfaßsäule",
+   "tier": "gold",
+   "box": "fan",
+   "description": "Habe drei Sponsoren gleichzeitig.",
+   "comment": "Man sieht dich kaum noch hinter all den Logos. Die Monster auch nicht. Vorteil!",
+   "category": "show"
+  },
+  {
+   "id": "sponsor_wunsch",
+   "name": "Kundenzufriedenheit",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Erfülle einen Sponsorenwunsch.",
+   "comment": "Der Kunde ist König. Du bist der Hofnarr. Aber ein gut bezahlter.",
+   "category": "show"
+  },
+  {
+   "id": "sponsor_weg",
+   "name": "Vertragsbruch",
+   "tier": "bronze",
+   "box": "kleidung",
+   "description": "Verliere einen Sponsor.",
+   "comment": "Die Anwälte der Galaxis haben schon angerufen. Die Systemstimme hat aufgelegt.",
+   "category": "show"
+  },
+  {
+   "id": "auftrag_erster",
+   "name": "Dienstleister",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Erledige einen Auftrag.",
+   "comment": "Die Apokalypse hat eine Gig-Economy. Wer hätte das gedacht.",
+   "category": "sozial"
+  },
+  {
+   "id": "auftrag_fuenf",
+   "name": "Mädchen für alles",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Erledige fünf Aufträge.",
+   "comment": "Alle wollen etwas von dir. Das nennt man Beliebtheit. Oder Ausbeutung.",
+   "category": "sozial"
+  },
+  {
+   "id": "retter",
+   "name": "Held des Tages",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "description": "Rette einen eingeschlossenen Crawler.",
+   "comment": "Ein Leben gerettet. Die Systemstimme zählt das nicht mit. Du schon.",
+   "category": "sozial"
+  },
+  {
+   "id": "evolution",
+   "name": "Es entwickelt sich!",
+   "tier": "silber",
+   "box": "haustier",
+   "description": "Lass dein Haustier sich entwickeln.",
+   "comment": "Es ist gewachsen. Es hat eine neue Fähigkeit. Es hält dich immer noch für sein Personal.",
+   "category": "sozial"
+  },
+  {
+   "id": "endform",
+   "name": "Endgegner auf vier Pfoten",
+   "tier": "gold",
+   "box": "haustier",
+   "description": "Bring dein Haustier in seine Endform.",
+   "comment": "Die Monster haben jetzt mehr Angst vor deinem Haustier als vor dir. Zu Recht.",
+   "category": "sozial"
+  },
+  {
+   "id": "fahrzeughalter",
+   "name": "Führerschein? Nie gehabt.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Besorge dir ein Reittier oder Fahrzeug.",
+   "comment": "Endlich musst du nicht mehr laufen. Die Monster übrigens auch nicht – sie fliegen jetzt.",
+   "category": "erkundung"
+  },
+  {
+   "id": "ueberrollt",
+   "name": "Verkehrsunfall",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Erledige einen Gegner, indem du ihn mit deinem Reittier rammst.",
+   "comment": "Die Versicherung zahlt nicht. Es gibt keine Versicherung mehr.",
+   "category": "kampf"
+  },
+  {
+   "id": "totalschaden",
+   "name": "Totalschaden",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Verliere dein Reittier im Kampf.",
+   "comment": "Es war schön, solange es fuhr. Oder lief. Oder kroch.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_einschlag",
+   "name": "Ein Schlag, ein Grab",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Besiege einen Gegner mit einem Treffer, der mindestens so viel Schaden macht, wie er Lebenspunkte hat.",
+   "comment": "Kein Vorgeplänkel, kein zweiter Versuch. Die Regie hat die Zeitlupe gleich dreimal abgespielt.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_einschlag10",
+   "name": "Kurzer Prozess",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Besiege 10 Gegner mit jeweils einem einzigen Treffer.",
+   "comment": "Zehnmal ein Schlag. Die Monster haben angefangen, dir aus dem Weg zu gehen. Klug von ihnen.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_anatomie",
+   "name": "Anatomiestunde",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Triff denselben Gegner an Kopf, Armen und Beinen, bevor er fällt.",
+   "comment": "Gründlich. Sehr gründlich. Die Systemstimme schickt dir ein Diplom in Humanmedizin. Monstermedizin. Egal.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_erschoepft",
+   "name": "Auf dem Zahnfleisch",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Besiege einen Gegner mit deinem allerletzten Ausdauerpunkt.",
+   "comment": "Keine Luft mehr, aber noch ein Schlag. Die Zuschauer haben mitgekeucht.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_toedlich",
+   "name": "Unmöglich ist nur ein Wort",
+   "tier": "platin",
+   "box": "brawler",
+   "description": "Besiege einen Gegner, der als tödlich eingestuft ist (mindestens sechs Stufen über dir).",
+   "comment": "Die Wettbüros der Galaxis haben heute sehr viel Geld verloren. Sie sind nicht erfreut.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_elite_staerker",
+   "name": "Elite? Pah!",
+   "tier": "gold",
+   "box": "waffen",
+   "description": "Besiege einen Elite-Gegner, der mindestens drei Stufen über dir steht.",
+   "comment": "Elite heißt übersetzt: nicht gut genug für dich.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_riese",
+   "name": "Je größer sie sind",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Besiege einen riesigen Gegner.",
+   "comment": "... desto lauter fallen sie. Der Boden hat noch eine Weile nachgezittert.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_unbekannt",
+   "name": "Was war das eigentlich?",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Besiege einen Gegner, den du nicht einschätzen konntest.",
+   "comment": "Du weißt nicht, was es war. Du weißt nur, dass es jetzt tot ist. Reicht auch.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_tuer",
+   "name": "Türsteher",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Besiege einen Gegner, der gerade in einer Tür steht.",
+   "comment": "Hier kommt keiner rein. Und der da kommt auch nicht mehr raus.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_umzingelt",
+   "name": "Rücken frei? Fehlanzeige.",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Besiege 10 Gegner, während du von mindestens drei Gegnern umringt bist.",
+   "comment": "Umzingelt ist nur ein anderes Wort für: viele Ziele in Reichweite.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_nackt",
+   "name": "Nacktkampf",
+   "tier": "silber",
+   "box": "kleidung",
+   "description": "Besiege 10 Gegner, ohne irgendetwas angelegt zu haben.",
+   "comment": "Keine Rüstung, keine Hose, keine Scham. Die Zensurabteilung hat Überstunden gemacht.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_barfuss",
+   "name": "Barfußpfad",
+   "tier": "bronze",
+   "box": "schuh",
+   "description": "Besiege 25 Gegner barfuß.",
+   "comment": "Deine Fußsohlen sind inzwischen härter als die meisten Rüstungen hier unten.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_bademantel",
+   "name": "Frottee-Terror",
+   "tier": "silber",
+   "box": "kleidung",
+   "description": "Besiege 25 Gegner im Bademantel.",
+   "comment": "Der gefürchtetste Bademantel der Galaxis. Es gibt schon Fanartikel.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_angetrunken",
+   "name": "Kneipenschlägerei",
+   "tier": "bronze",
+   "box": "brawler",
+   "description": "Besiege 5 Gegner, während du angetrunken bist.",
+   "comment": "Dein Kampfstil ist unvorhersehbar. Für alle Beteiligten, dich eingeschlossen.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_feuertaufe",
+   "name": "Feuertaufe",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Besiege einen Gegner, während du selbst in Flammen stehst.",
+   "comment": "Du brennst, und trotzdem hast du zuerst an ihn gedacht. Das nennt man Prioritäten.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_blindflug",
+   "name": "Blindflug",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Besiege einen Gegner, während du geblendet bist.",
+   "comment": "Du hast nichts gesehen. Der Gegner leider schon.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_mut",
+   "name": "Mut ist, wenn man trotzdem zuschlägt",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Besiege einen Gegner, während du verängstigt bist.",
+   "comment": "Die Knie haben gezittert. Die Faust nicht.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_boss_makellos",
+   "name": "Makellos",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss, während du volle Lebenspunkte hast.",
+   "comment": "Nicht ein Kratzer. Der Boss hat sich beim Management beschwert. Abgelehnt.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_boss_zauber",
+   "name": "Abrakadabra",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss mit einem Zauber.",
+   "comment": "Ein Fingerschnippen, ein Boss weniger. Die Magieabteilung ist stolz auf dich.",
+   "category": "magie"
+  },
+  {
+   "id": "mo_boss_falle",
+   "name": "In die Falle gelockt",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss mit einer Falle oder einem Sprengsatz.",
+   "comment": "Planung schlägt Muskeln. Und Sprengstoff schlägt beides.",
+   "category": "handwerk"
+  },
+  {
+   "id": "mo_boss_haustier",
+   "name": "Braves Tier!",
+   "tier": "gold",
+   "box": "haustier",
+   "description": "Lass dein Haustier den letzten Treffer gegen einen Boss landen.",
+   "comment": "Du hast die Vorarbeit gemacht. Die Zuschauer jubeln trotzdem nur dem Tier zu.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_boss_party",
+   "name": "Gemeinsam stark",
+   "tier": "silber",
+   "box": "boss",
+   "description": "Lass ein Party-Mitglied den letzten Treffer gegen einen Boss landen.",
+   "comment": "Teamarbeit. Der Ruhm wird geteilt. Die Beute nicht.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_boss_sprung",
+   "name": "Todessprung",
+   "tier": "gold",
+   "box": "schuh",
+   "description": "Besiege einen Boss mit einem Sprungangriff.",
+   "comment": "Aus der Luft, mit vollem Gewicht. Die Kamera hat es aus sieben Winkeln.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_boss_kopf",
+   "name": "Kopf ab, Krone weg",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss mit einem gezielten Kopftreffer.",
+   "comment": "Genau zwischen die Augen. Oder wo auch immer dieses Ding seine Augen hatte.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_boss_gerammt",
+   "name": "Vorfahrt missachtet",
+   "tier": "platin",
+   "box": "boss",
+   "description": "Besiege einen Boss, indem du ihn mit deinem Reittier rammst.",
+   "comment": "Der Unfallbericht ist eindeutig. Der Boss hätte nicht auf der Fahrbahn stehen sollen.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_boss_konter",
+   "name": "Der Spieß umgedreht",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Besiege einen Boss mit einem Konter.",
+   "comment": "Er hat angegriffen. Du hast geantwortet. Das Gespräch ist beendet.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_boss_schlafend",
+   "name": "Gute-Nacht-Geschichte",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss, der noch schläft.",
+   "comment": "Er ist nie aufgewacht. Die Zuschauer finden das unfair. Die Wettquoten fanden es großartig.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_explosion3",
+   "name": "Drei auf einen Streich",
+   "tier": "gold",
+   "box": "wurf",
+   "description": "Besiege drei Gegner mit einer einzigen Explosion.",
+   "comment": "Effizienz ist das neue Schwarz. Oder das neue Verkohlt.",
+   "category": "handwerk"
+  },
+  {
+   "id": "mo_eigentor",
+   "name": "Eigentor",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Werde von deinem eigenen Sprengsatz getroffen.",
+   "comment": "Die Druckwelle kennt keine Freunde. Das steht auch klein gedruckt auf der Packung.",
+   "category": "handwerk"
+  },
+  {
+   "id": "mo_befreit_kampf",
+   "name": "Entfesselungskunst",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Befreie dich aus einer Falle, während ein Gegner direkt auf dich zukommt.",
+   "comment": "Genau im richtigen Moment. Die Musik der Regie hat perfekt gepasst.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_weitwurf",
+   "name": "Weitwurf",
+   "tier": "bronze",
+   "box": "wurf",
+   "description": "Besiege einen Gegner mit einem Wurf aus mindestens fünf Feldern Entfernung.",
+   "comment": "Die Flugbahn war perfekt. Das Ziel war es danach nicht mehr.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_ein_lp",
+   "name": "Ein einziger Lebenspunkt",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "description": "Überlebe einen Treffer mit genau einem Lebenspunkt.",
+   "comment": "Eins. Ein Punkt. Die Systemstimme hatte den Nachruf schon angefangen.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_trank_knapp",
+   "name": "Rettung aus der Flasche",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Trinke einen Trank mit weniger als 10 % deiner Lebenspunkte.",
+   "comment": "Ein Schluck zwischen dir und dem Jenseits. Er hat geschmeckt wie Hustensaft.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_rettung_haustier",
+   "name": "Gerettet von der Fellnase",
+   "tier": "silber",
+   "box": "haustier",
+   "description": "Dein Haustier besiegt einen Gegner, während du fast tot bist.",
+   "comment": "Das Tier hat dir das Leben gerettet. Es wird dich nie wieder vergessen lassen.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_rettung_party",
+   "name": "Rückendeckung",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Ein Party-Mitglied besiegt einen Gegner, während du fast tot bist.",
+   "comment": "Freunde sind Leute, die im richtigen Moment zuschlagen. Diesmal wörtlich.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_saferoom_knapp",
+   "name": "Rettendes Ufer",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Betritt einen Safe Room, während ein Gegner direkt hinter dir ist.",
+   "comment": "Der Türsteher hat nur kurz genickt. Dein Verfolger durfte draußen bleiben.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_tuer_zu",
+   "name": "Tür zu, es zieht!",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Schließe eine Tür, während ein wacher Gegner ganz in der Nähe ist.",
+   "comment": "Monster können Türen öffnen. Aber es ist die Geste, die zählt.",
+   "category": "erkundung"
+  },
+  {
+   "id": "mo_schlaflos",
+   "name": "Schlaflos im Keller",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Halte 24 Stunden durch, ohne zu schlafen.",
+   "comment": "Deine Augenringe haben eigene Augenringe. Die Zuschauer sind trotzdem begeistert.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_umzingelt_aufstieg",
+   "name": "Aufstieg unter Druck",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Steige eine Stufe auf, während dich mindestens zwei Gegner bedrängen.",
+   "comment": "Du hast gelevelt. Die Monster nicht. Das wird ihnen gleich leidtun.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_doppelaufstieg",
+   "name": "Doppelter Aufstieg",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Steige mit einem einzigen Kill zwei Stufen auf einmal auf.",
+   "comment": "So viel Erfahrung auf einmal. Dein Kopf brummt, aber auf die gute Art.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "mo_snack",
+   "name": "Snack zwischendurch",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Iss etwas, während ein Gegner direkt neben dir steht.",
+   "comment": "Hunger kennt keinen Waffenstillstand. Der Gegner war ehrlich gesagt beeindruckt.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_toilette_kampf",
+   "name": "Es war dringend",
+   "tier": "silber",
+   "box": "kleidung",
+   "description": "Benutze eine Toilette, während ein wacher Gegner in der Nähe ist.",
+   "comment": "Manche Dinge können nicht warten. Die Regie hat diskret weggeblendet. Fast.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_unfall",
+   "name": "Malheur",
+   "tier": "bronze",
+   "box": "kleidung",
+   "description": "Schaffe es nicht mehr rechtzeitig zur Toilette.",
+   "comment": "Das haben ungefähr vier Milliarden Zuschauer gesehen. Die Wiederholung läuft in Endlosschleife.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_boxen_horten",
+   "name": "Lieber später auspacken",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Horte 10 ungeöffnete Boxen gleichzeitig.",
+   "comment": "Vorfreude ist die schönste Freude. Oder du hast einfach vergessen, sie zu öffnen.",
+   "category": "beute"
+  },
+  {
+   "id": "mo_goldbad",
+   "name": "Goldbad",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Besitze 2.000 Gold auf einmal.",
+   "comment": "Du könntest darin baden. Bitte tu es nicht. Die Zuschauer haben schon genug gesehen.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_feilschen_max",
+   "name": "Halsabschneider",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Handle mindestens 25 % Rabatt heraus.",
+   "comment": "Hinter der Theke wird leise geweint. Du hast kein Mitleid.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_feilschen_pleiten",
+   "name": "Beratungsresistent",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Scheitere dreimal hintereinander beim Feilschen.",
+   "comment": "Die Preise sind jetzt höher als vorher. Das nennt man wohl Verhandlungsgeschick.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_ausverkauf",
+   "name": "Alles muss raus",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Kaufe einen Laden komplett leer.",
+   "comment": "Das Regal ist leer, die Kasse ist voll. Der Laden macht heute früher zu.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_jackpot",
+   "name": "Drei goldene Kronen",
+   "tier": "gold",
+   "box": "fan",
+   "description": "Knacke den Jackpot eines Rubbelloses.",
+   "comment": "Die Chancen standen schlecht. Die Systemstimme prüft gerade, ob du geschummelt hast.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_nieten",
+   "name": "Dauerpech",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Ziehe 10 Nieten beim Rubbellos.",
+   "comment": "Zehn Nieten. Das Glücksspiel ist nicht dein Freund. Die Losbude sieht das anders.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_kettenzauber",
+   "name": "Kettenreaktion",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Besiege drei Gegner mit einem einzigen Zauber.",
+   "comment": "Ein Zauber, drei Beerdigungen. Die Magieabteilung verlangt eine Gebühr für die Nutzung.",
+   "category": "magie"
+  },
+  {
+   "id": "mo_gerettet_party",
+   "name": "Vom Retter zum Freund",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Nimm einen Crawler in die Party auf, den du vorher versorgt hast.",
+   "comment": "Freundschaft beginnt mit einem Heiltrank. So steht es in keinem Buch, aber es stimmt.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_auftrag_verpatzt",
+   "name": "Versprochen ist versprochen",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Lass einen Auftrag scheitern.",
+   "comment": "Die Enttäuschung im Gesicht deines Auftraggebers war sehenswert. Die Zuschauer haben es genossen.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_etage2_frueh",
+   "name": "Mut zur Lücke",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Erreiche Etage 2 mit Stufe 3 oder weniger.",
+   "comment": "Unterlevelt, aber optimistisch. Die Systemstimme hat die Sterbeversicherung schon mal angefragt.",
+   "category": "erkundung"
+  },
+  {
+   "id": "mo_etage3_frueh",
+   "name": "Ins kalte Wasser",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "description": "Erreiche Etage 3 mit Stufe 6 oder weniger.",
+   "comment": "Die Kanalisation erwartet dich. Sie hat Hunger, und du bist sehr klein.",
+   "category": "erkundung"
+  },
+  {
+   "id": "mo_waffe_bratpfanne",
+   "name": "Gut durch",
+   "description": "Besiege 5 Gegner mit einer Bratpfanne.",
+   "comment": "Das Geräusch einer Bratpfanne auf einem Schädel ist Musik. Sagt die Tonabteilung.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_handtasche",
+   "name": "Handtaschen-Hieb",
+   "description": "Besiege 5 Gegner mit einer schweren Handtasche.",
+   "comment": "Was da wohl drin ist? Niemand wagt es zu fragen.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_regenschirm",
+   "name": "Bei jedem Wetter",
+   "description": "Besiege 5 Gegner mit einem Regenschirm.",
+   "comment": "Hier unten regnet es nie. Der Schirm hat trotzdem seinen Zweck gefunden.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_nudelholz",
+   "name": "Ausgerollt",
+   "description": "Besiege 5 Gegner mit einem Nudelholz.",
+   "comment": "Flach wie ein Pizzateig. Die Kochshow des Senders hat angefragt.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_golfschlaeger",
+   "name": "Einlochen",
+   "description": "Besiege 5 Gegner mit einem Golfschläger.",
+   "comment": "Ein sauberer Abschlag. Das Loch war allerdings ein Monster.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_tischtennis",
+   "name": "Rückhand",
+   "description": "Besiege 5 Gegner mit einem Tischtennisschläger.",
+   "comment": "Niemand hat das kommen sehen. Wirklich niemand.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_kettensaege",
+   "name": "Auch ohne Benzin",
+   "description": "Besiege 5 Gegner mit der Kettensäge ohne Benzin.",
+   "comment": "Sie läuft nicht. Sie ist trotzdem schwer. Das reicht.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_schoepfkelle",
+   "name": "Nachschlag",
+   "description": "Besiege 5 Gegner mit Omas Schöpfkelle.",
+   "comment": "Es gibt noch Nachschlag. Für jeden. Ob er will oder nicht.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "fam_kills_250",
+   "name": "Vierteltausend",
+   "description": "Besiege insgesamt 250 Gegner.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_kills_500",
+   "name": "Kellerplage",
+   "description": "Besiege insgesamt 500 Gegner.",
+   "comment": "Fünfhundert. Die Monsterversicherung hat dich als Naturkatastrophe eingestuft.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_kills_1000",
+   "name": "Tausend und kein Ende",
+   "description": "Besiege insgesamt 1.000 Gegner.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "platin",
+   "box": "abenteurer",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_krits_100",
+   "name": "Präzisionsuhrwerk",
+   "description": "Lande 100 kritische Treffer.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_krits_300",
+   "name": "Chirurgie des Chaos",
+   "description": "Lande 300 kritische Treffer.",
+   "comment": "Blut, Schweiß und Statistik. Vor allem Statistik.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_schaden_500",
+   "name": "Schadensbilanz",
+   "description": "Teile insgesamt 500 Schaden aus.",
+   "comment": "Die Monster haben eine Gewerkschaft gegründet. Du bist Thema der nächsten Sitzung.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_schaden_2500",
+   "name": "Abrissunternehmen",
+   "description": "Teile insgesamt 2.500 Schaden aus.",
+   "comment": "Irgendwo in der Galaxis wettet jemand auf dich. Er gewinnt gerade.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_schaden_10000",
+   "name": "Naturgewalt",
+   "description": "Teile insgesamt 10.000 Schaden aus.",
+   "comment": "Die Monster haben eine Gewerkschaft gegründet. Du bist Thema der nächsten Sitzung.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_maxtreffer_50",
+   "name": "Einschlag",
+   "description": "Richte mit einem einzigen Treffer 50 Schaden an.",
+   "comment": "Irgendwo in der Galaxis wettet jemand auf dich. Er gewinnt gerade.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_maxtreffer_100",
+   "name": "Abrissbirne",
+   "description": "Richte mit einem einzigen Treffer 100 Schaden an.",
+   "comment": "Die Monster haben eine Gewerkschaft gegründet. Du bist Thema der nächsten Sitzung.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_maxtreffer_200",
+   "name": "Weltuntergang im Kleinen",
+   "description": "Richte mit einem einzigen Treffer 200 Schaden an.",
+   "comment": "Zweihundert Schaden. Mit einem Schlag. Die Physikabteilung der Show hat gekündigt.",
+   "tier": "platin",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_killserie_2",
+   "name": "Doppelschlag",
+   "description": "Besiege 2 Gegner kurz hintereinander.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_killserie_3",
+   "name": "Hattrick",
+   "description": "Besiege 3 Gegner kurz hintereinander.",
+   "comment": "Die Monster haben eine Gewerkschaft gegründet. Du bist Thema der nächsten Sitzung.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_killserie_5",
+   "name": "Schlachtfest",
+   "description": "Besiege 5 Gegner kurz hintereinander.",
+   "comment": "Fünf in Folge. Die Putzkolonne hat Überstunden beantragt.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_sauber_5",
+   "name": "Unberührt",
+   "description": "Besiege 5 Gegner, ohne zwischendurch getroffen zu werden.",
+   "comment": "Die Monster haben eine Gewerkschaft gegründet. Du bist Thema der nächsten Sitzung.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_sauber_15",
+   "name": "Unantastbar",
+   "description": "Besiege 15 Gegner, ohne zwischendurch getroffen zu werden.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_sauber_30",
+   "name": "Kein Kratzer",
+   "description": "Besiege 30 Gegner, ohne zwischendurch getroffen zu werden.",
+   "comment": "Die Monster haben eine Gewerkschaft gegründet. Du bist Thema der nächsten Sitzung.",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_staerker_10",
+   "name": "Goliath-Serie",
+   "description": "Besiege 10 Gegner, die mindestens drei Stufen über dir stehen.",
+   "comment": "Blut, Schweiß und Statistik. Vor allem Statistik.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_staerker_50",
+   "name": "Gegen den Strom",
+   "description": "Besiege 50 Gegner, die mindestens drei Stufen über dir stehen.",
+   "comment": "Blut, Schweiß und Statistik. Vor allem Statistik.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_harmlos_25",
+   "name": "Mobbing",
+   "description": "Besiege 25 Gegner, die weit unter deiner Stufe stehen.",
+   "comment": "Die Kleinen verprügeln. Sehr heldenhaft. Die Zuschauer buhen leise.",
+   "tier": "bronze",
+   "box": null,
+   "category": "kampf"
+  },
+  {
+   "id": "fam_harmlos_100",
+   "name": "Kleinkrieg",
+   "description": "Besiege 100 Gegner, die weit unter deiner Stufe stehen.",
+   "comment": "Erfahrung gibt das keine mehr. Nur schlechte Presse.",
+   "tier": "bronze",
+   "box": null,
+   "category": "kampf"
+  },
+  {
+   "id": "fam_schlafend_1",
+   "name": "Gute Nacht",
+   "description": "Besiege 1 schlafende Gegner.",
+   "comment": "Irgendwo in der Galaxis wettet jemand auf dich. Er gewinnt gerade.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_schlafend_10",
+   "name": "Sandmännchen",
+   "description": "Besiege 10 schlafende Gegner.",
+   "comment": "Die Monster haben eine Gewerkschaft gegründet. Du bist Thema der nächsten Sitzung.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_schlafend_40",
+   "name": "Schlafende Hunde",
+   "description": "Besiege 40 schlafende Gegner.",
+   "comment": "Man soll sie nicht wecken. Du weckst sie auch nicht. Nie wieder.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_fliehend_1",
+   "name": "Kein Entkommen",
+   "description": "Besiege 1 fliehende Gegner.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_fliehend_10",
+   "name": "Kopfgeldjagd",
+   "description": "Besiege 10 fliehende Gegner.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "silber",
+   "box": "wurf",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_liegend_10",
+   "name": "Nachtreten",
+   "description": "Besiege 10 Gegner, die am Boden liegen.",
+   "comment": "Irgendwo in der Galaxis wettet jemand auf dich. Er gewinnt gerade.",
+   "tier": "bronze",
+   "box": "schuh",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_liegend_50",
+   "name": "Bodenpersonal",
+   "description": "Besiege 50 Gegner, die am Boden liegen.",
+   "comment": "Irgendwo in der Galaxis wettet jemand auf dich. Er gewinnt gerade.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_liegend_150",
+   "name": "Wer liegt, der liegt",
+   "description": "Besiege 150 Gegner, die am Boden liegen.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "gold",
+   "box": "schuh",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_fasttot_5",
+   "name": "Mit dem Rücken zur Wand",
+   "description": "Besiege 5 Gegner mit weniger als 20 % deiner Lebenspunkte.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_fasttot_25",
+   "name": "Todesmutig",
+   "description": "Besiege 25 Gegner mit weniger als 20 % deiner Lebenspunkte.",
+   "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_umwerfen_50",
+   "name": "Fallobst",
+   "description": "Wirf 50 Gegner zu Boden.",
+   "comment": "Blut, Schweiß und Statistik. Vor allem Statistik.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_umwerfen_150",
+   "name": "Schwerkraftbehörde",
+   "description": "Wirf 150 Gegner zu Boden.",
+   "comment": "Die Monster haben eine Gewerkschaft gegründet. Du bist Thema der nächsten Sitzung.",
+   "tier": "gold",
+   "box": "schuh",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_teil_faust_25",
+   "name": "Knöchelknacken",
+   "description": "Besiege 25 Gegner mit Faustschlägen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_faust_100",
+   "name": "Faustrecht",
+   "description": "Besiege 100 Gegner mit Faustschlägen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_faust_300",
+   "name": "Die Faust im Keller",
+   "description": "Besiege 300 Gegner mit Faustschlägen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_tritt_25",
+   "name": "Fußarbeit",
+   "description": "Besiege 25 Gegner mit Tritten.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "bronze",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_tritt_100",
+   "name": "Spann und Spitze",
+   "description": "Besiege 100 Gegner mit Tritten.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_tritt_300",
+   "name": "Der Tritt des Jahrhunderts",
+   "description": "Besiege 300 Gegner mit Tritten.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "gold",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_knie_25",
+   "name": "Kniebeuge",
+   "description": "Besiege 25 Gegner mit Kniestößen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_knie_100",
+   "name": "Kniescheibenreich",
+   "description": "Besiege 100 Gegner mit Kniestößen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_knie_250",
+   "name": "Das Knie des Schicksals",
+   "description": "Besiege 250 Gegner mit Kniestößen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_ellbogen_25",
+   "name": "Spitze Argumente",
+   "description": "Besiege 25 Gegner mit Ellbogenchecks.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_ellbogen_100",
+   "name": "Ellbogenmentalität",
+   "description": "Besiege 100 Gegner mit Ellbogenchecks.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_ellbogen_250",
+   "name": "Ellbogen aus Stahl",
+   "description": "Besiege 250 Gegner mit Ellbogenchecks.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_kopf_25",
+   "name": "Stirnrunzeln",
+   "description": "Besiege 25 Gegner mit Kopfstößen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "kleidung",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_kopf_100",
+   "name": "Harter Schädel",
+   "description": "Besiege 100 Gegner mit Kopfstößen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "kleidung",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_kopf_250",
+   "name": "Der Kopf ist rund",
+   "description": "Besiege 250 Gegner mit Kopfstößen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "gold",
+   "box": "kleidung",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_waffe_25",
+   "name": "Werkzeugkasten",
+   "description": "Besiege 25 Gegner mit Waffenhieben.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_waffe_100",
+   "name": "Improvisationstalent",
+   "description": "Besiege 100 Gegner mit Waffenhieben.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_waffe_300",
+   "name": "Waffenkammer",
+   "description": "Besiege 300 Gegner mit Waffenhieben.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "gold",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_wurf_25",
+   "name": "Wurfarm",
+   "description": "Besiege 25 Gegner mit Würfen.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_wurf_100",
+   "name": "Artillerie",
+   "description": "Besiege 100 Gegner mit Würfen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_wurf_250",
+   "name": "Katapult auf zwei Beinen",
+   "description": "Besiege 250 Gegner mit Würfen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "gold",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_zauber_5",
+   "name": "Zauberlehrling",
+   "description": "Besiege 5 Gegner mit Zaubern.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_zauber_25",
+   "name": "Hexerei",
+   "description": "Besiege 25 Gegner mit Zaubern.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_zauber_100",
+   "name": "Arkaner Albtraum",
+   "description": "Besiege 100 Gegner mit Zaubern.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_falle_3",
+   "name": "Stolperfalle",
+   "description": "Besiege 3 Gegner mit eigenen Fallen.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_falle_15",
+   "name": "Fallenstellerei",
+   "description": "Besiege 15 Gegner mit eigenen Fallen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_falle_50",
+   "name": "Hohe Schule der Hinterlist",
+   "description": "Besiege 50 Gegner mit eigenen Fallen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_bombe_3",
+   "name": "Feuerwerk",
+   "description": "Besiege 3 Gegner mit Sprengsätzen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_bombe_15",
+   "name": "Sprengkommando",
+   "description": "Besiege 15 Gegner mit Sprengsätzen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "silber",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_bombe_50",
+   "name": "Zündfreudig",
+   "description": "Besiege 50 Gegner mit Sprengsätzen.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "gold",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_haustier_5",
+   "name": "Kleine Hilfe",
+   "description": "Besiege 5 Gegner mit deinem Haustier.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "bronze",
+   "box": "haustier",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_haustier_25",
+   "name": "Rudeltier",
+   "description": "Besiege 25 Gegner mit deinem Haustier.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "silber",
+   "box": "haustier",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_haustier_100",
+   "name": "Bestie an der Leine",
+   "description": "Besiege 100 Gegner mit deinem Haustier.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "gold",
+   "box": "haustier",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_blutung_5",
+   "name": "Aderlass",
+   "description": "Besiege 5 Gegner mit Blutungen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_blutung_25",
+   "name": "Blutspur",
+   "description": "Besiege 25 Gegner mit Blutungen.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "silber",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_blutung_75",
+   "name": "Rote Flut",
+   "description": "Besiege 75 Gegner mit Blutungen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "gold",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_feuer_5",
+   "name": "Lagerfeuer",
+   "description": "Besiege 5 Gegner mit Flammen.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_feuer_25",
+   "name": "Flächenbrand",
+   "description": "Besiege 25 Gegner mit Flammen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "silber",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_feuer_75",
+   "name": "Inferno",
+   "description": "Besiege 75 Gegner mit Flammen.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "gold",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_gift_5",
+   "name": "Giftschrank",
+   "description": "Besiege 5 Gegner mit Gift.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_gift_25",
+   "name": "Schleichendes Ende",
+   "description": "Besiege 25 Gegner mit Gift.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_gift_75",
+   "name": "Giftküche",
+   "description": "Besiege 75 Gegner mit Gift.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "category": "technik"
+  },
+  {
+   "id": "fam_furcht_10",
+   "name": "Gruselfaktor",
+   "description": "Jage Gegnern 10-mal Angst ein.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "bronze",
+   "box": "fan",
+   "category": "technik"
+  },
+  {
+   "id": "fam_furcht_50",
+   "name": "Schreckgespenst",
+   "description": "Jage Gegnern 50-mal Angst ein.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "silber",
+   "box": "fan",
+   "category": "technik"
+  },
+  {
+   "id": "fam_blenden_10",
+   "name": "Sand in die Augen",
+   "description": "Blende Gegner 10-mal.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_blenden_50",
+   "name": "Blendwerk",
+   "description": "Blende Gegner 50-mal.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_aufschlitzen_25",
+   "name": "Schnittmuster",
+   "description": "Füge Gegnern 25-mal eine Blutung zu.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "fam_aufschlitzen_100",
+   "name": "Metzgerei",
+   "description": "Füge Gegnern 100-mal eine Blutung zu.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "silber",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "fam_anzuenden_10",
+   "name": "Zündler",
+   "description": "Setze Gegner 10-mal in Brand.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_anzuenden_50",
+   "name": "Feuerteufel",
+   "description": "Setze Gegner 50-mal in Brand.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "silber",
+   "box": "wurf",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_party_5",
+   "name": "Teamwork",
+   "description": "Besiege 5 Gegner mit deiner Party.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_party_25",
+   "name": "Truppführung",
+   "description": "Besiege 25 Gegner mit deiner Party.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "technik"
+  },
+  {
+   "id": "fam_teil_party_100",
+   "name": "Kommandostab",
+   "description": "Besiege 100 Gegner mit deiner Party.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "technik"
+  },
+  {
+   "id": "fam_konter_3",
+   "name": "Retourkutsche",
+   "description": "Besiege 3 Gegner mit einem Konter.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_konter_15",
+   "name": "Konterkunst",
+   "description": "Besiege 15 Gegner mit einem Konter.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_bewegung_sprung_10",
+   "name": "Luftnummer",
+   "description": "Besiege 10 Gegner mit Sprungangriffen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "bronze",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_bewegung_sprung_50",
+   "name": "Adlerschwinge",
+   "description": "Besiege 50 Gegner mit Sprungangriffen.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_bewegung_sprung_150",
+   "name": "Kellerkomet",
+   "description": "Besiege 150 Gegner mit Sprungangriffen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "gold",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_bewegung_stampfen_50",
+   "name": "Trampelpfad",
+   "description": "Besiege 50 Gegner mit Stampfern.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_bewegung_stampfen_150",
+   "name": "Dampfwalze",
+   "description": "Besiege 150 Gegner mit Stampfern.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "gold",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_bewegung_anlauf_25",
+   "name": "Rammbock",
+   "description": "Besiege 25 Gegner mit Sturmangriffen.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_bewegung_anlauf_100",
+   "name": "Güterzug",
+   "description": "Besiege 100 Gegner mit Sturmangriffen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "gold",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_zone_kopf_5",
+   "name": "Kopfsache",
+   "description": "Besiege 5 Gegner mit einem gezielten Kopftreffer.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "bronze",
+   "box": "kleidung",
+   "category": "technik"
+  },
+  {
+   "id": "fam_zone_kopf_25",
+   "name": "Kopfjagd",
+   "description": "Besiege 25 Gegner mit einem gezielten Kopftreffer.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "silber",
+   "box": "kleidung",
+   "category": "technik"
+  },
+  {
+   "id": "fam_zone_kopf_100",
+   "name": "Kopfgeld eingetrieben",
+   "description": "Besiege 100 Gegner mit einem gezielten Kopftreffer.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "gold",
+   "box": "kleidung",
+   "category": "technik"
+  },
+  {
+   "id": "fam_zone_beine_5",
+   "name": "Beinarbeit",
+   "description": "Besiege 5 Gegner mit einem Treffer auf die Beine.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "bronze",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_zone_beine_25",
+   "name": "Kniescheibenjagd",
+   "description": "Besiege 25 Gegner mit einem Treffer auf die Beine.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_zone_arme_5",
+   "name": "Armdrücken",
+   "description": "Besiege 5 Gegner mit einem Treffer auf die Arme.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_zone_arme_25",
+   "name": "Entwaffnend",
+   "description": "Besiege 25 Gegner mit einem Treffer auf die Arme.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_benommen_5",
+   "name": "Sternchen sehen",
+   "description": "Mache Gegner 5-mal benommen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_benommen_25",
+   "name": "Glockenläuten",
+   "description": "Mache Gegner 25-mal benommen.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_benommen_100",
+   "name": "Knockout-Kunst",
+   "description": "Mache Gegner 100-mal benommen.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_humpeln_10",
+   "name": "Humpelnde Horde",
+   "description": "Lass Gegner 10-mal humpeln.",
+   "comment": "Die Zuschauer erkennen deinen Stil schon am Geräusch.",
+   "tier": "bronze",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_humpeln_50",
+   "name": "Orthopädie",
+   "description": "Lass Gegner 50-mal humpeln.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "technik"
+  },
+  {
+   "id": "fam_schwaechen_10",
+   "name": "Schwächling!",
+   "description": "Schwäche Gegner 10-mal durch Armtreffer.",
+   "comment": "Du hast eine Handschrift. Sie ist rot und klebrig.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_schwaechen_50",
+   "name": "Armenhaus",
+   "description": "Schwäche Gegner 50-mal durch Armtreffer.",
+   "comment": "Übung macht den Meister. Und den Gegner platt.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "technik"
+  },
+  {
+   "id": "fam_bestiarium_10",
+   "name": "Hobby-Zoologie",
+   "description": "Besiege 10 verschiedene Monsterarten.",
+   "comment": "Die Naturkundler der Galaxis danken für die Feldforschung.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "fam_bestiarium_20",
+   "name": "Feldforschung des Grauens",
+   "description": "Besiege 20 verschiedene Monsterarten.",
+   "comment": "Ein neuer Eintrag im Bestiarium. Die Art findet das weniger lustig.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "fam_bestiarium_30",
+   "name": "Kellerbiologie",
+   "description": "Besiege 30 verschiedene Monsterarten.",
+   "comment": "Die Systemstimme ergänzt die Akte. Vermerk: gefährlich, aber nicht für dich.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "fam_bestiarium_45",
+   "name": "Wandelndes Monsterlexikon",
+   "description": "Besiege 45 verschiedene Monsterarten.",
+   "comment": "Die Systemstimme hat dir eine Kopie des Bestiariums geschickt. Du kennst es schon auswendig.",
+   "tier": "platin",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "fam_elite_viel_10",
+   "name": "Elitetruppe",
+   "description": "Besiege 10 Elite-Gegner.",
+   "comment": "Die Systemstimme ergänzt die Akte. Vermerk: gefährlich, aber nicht für dich.",
+   "tier": "gold",
+   "box": "waffen",
+   "category": "bestiarium"
+  },
+  {
+   "id": "fam_elite_viel_25",
+   "name": "Elitenschreck",
+   "description": "Besiege 25 Elite-Gegner.",
+   "comment": "Die Systemstimme ergänzt die Akte. Vermerk: gefährlich, aber nicht für dich.",
+   "tier": "platin",
+   "box": "waffen",
+   "category": "bestiarium"
+  },
+  {
+   "id": "fam_raeume_10",
+   "name": "Neugierig",
+   "description": "Betritt 10 verschiedene Räume.",
+   "comment": "Neugier ist eine Tugend. Bis sie Zähne hat.",
+   "tier": "bronze",
+   "box": null,
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_raeume_25",
+   "name": "Stadtrundgang",
+   "description": "Betritt 25 verschiedene Räume.",
+   "comment": "Neugier ist eine Tugend. Bis sie Zähne hat.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_raeume_60",
+   "name": "Kellerkunde",
+   "description": "Betritt 60 verschiedene Räume.",
+   "comment": "Irgendwo hinter der nächsten Ecke wartet etwas. Du gehst trotzdem.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_raeume_120",
+   "name": "Wandelnde Karte",
+   "description": "Betritt 120 verschiedene Räume.",
+   "comment": "Irgendwo hinter der nächsten Ecke wartet etwas. Du gehst trotzdem.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_erkundet_50",
+   "name": "Halbe Sachen",
+   "description": "Erkunde 50 % einer Etage.",
+   "comment": "Die Karte wächst. Deine Füße schmerzen.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_erkundet_75",
+   "name": "Gründlich",
+   "description": "Erkunde 75 % einer Etage.",
+   "comment": "Irgendwo hinter der nächsten Ecke wartet etwas. Du gehst trotzdem.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_erkundet_95",
+   "name": "Jeder Winkel",
+   "description": "Erkunde 95 % einer Etage.",
+   "comment": "Jede Ecke, jede Nische, jede tote Ratte. Kartografen weinen vor Rührung.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_tueren_1",
+   "name": "Klinkenputzen",
+   "description": "Öffne 1 Türen.",
+   "comment": "Neugier ist eine Tugend. Bis sie Zähne hat.",
+   "tier": "bronze",
+   "box": null,
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_tueren_10",
+   "name": "Türöffner",
+   "description": "Öffne 10 Türen.",
+   "comment": "Die Karte wächst. Deine Füße schmerzen.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_tueren_30",
+   "name": "Schlüsseldienst",
+   "description": "Öffne 30 Türen.",
+   "comment": "Neugier ist eine Tugend. Bis sie Zähne hat.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_schritte_1000",
+   "name": "Spaziergang",
+   "description": "Lege 1.000 Schritte zurück.",
+   "comment": "Neugier ist eine Tugend. Bis sie Zähne hat.",
+   "tier": "bronze",
+   "box": "schuh",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_schritte_5000",
+   "name": "Wanderschuhe",
+   "description": "Lege 5.000 Schritte zurück.",
+   "comment": "Die Karte wächst. Deine Füße schmerzen.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_schritte_20000",
+   "name": "Marathon im Keller",
+   "description": "Lege 20.000 Schritte zurück.",
+   "comment": "Irgendwo hinter der nächsten Ecke wartet etwas. Du gehst trotzdem.",
+   "tier": "gold",
+   "box": "schuh",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_saferooms_3",
+   "name": "Stammgast",
+   "description": "Entdecke 3 Safe Rooms.",
+   "comment": "Die Karte wächst. Deine Füße schmerzen.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_saferooms_10",
+   "name": "Ruhepol",
+   "description": "Entdecke 10 Safe Rooms.",
+   "comment": "Neugier ist eine Tugend. Bis sie Zähne hat.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_aufheben_60",
+   "name": "Sammelleidenschaft",
+   "description": "Hebe 60 Gegenstände auf.",
+   "comment": "Das Inventar platzt aus allen Nähten. Die Systemstimme ist stolz.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "beute"
+  },
+  {
+   "id": "fam_aufheben_200",
+   "name": "Messie",
+   "description": "Hebe 200 Gegenstände auf.",
+   "comment": "Das Inventar platzt aus allen Nähten. Die Systemstimme ist stolz.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "beute"
+  },
+  {
+   "id": "fam_aufheben_500",
+   "name": "Hamster des Untergangs",
+   "description": "Hebe 500 Gegenstände auf.",
+   "comment": "Glänzende Dinge! Deine Elstergene melden sich.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "beute"
+  },
+  {
+   "id": "fam_boxen_50",
+   "name": "Kistenstapel",
+   "description": "Öffne 50 Lootboxen.",
+   "comment": "Glänzende Dinge! Deine Elstergene melden sich.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "beute"
+  },
+  {
+   "id": "fam_boxen_100",
+   "name": "Unboxing-Profi",
+   "description": "Öffne 100 Lootboxen.",
+   "comment": "Glänzende Dinge! Deine Elstergene melden sich.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "beute"
+  },
+  {
+   "id": "fam_boxstufe_gold_1",
+   "name": "Goldrausch",
+   "description": "Öffne eine Box der Stufe Gold.",
+   "comment": "Das Inventar platzt aus allen Nähten. Die Systemstimme ist stolz.",
+   "tier": "silber",
+   "box": "fan",
+   "category": "beute"
+  },
+  {
+   "id": "fam_boxstufe_platin_1",
+   "name": "Platinstatus",
+   "description": "Öffne eine Box der Stufe Platin.",
+   "comment": "Das Inventar platzt aus allen Nähten. Die Systemstimme ist stolz.",
+   "tier": "gold",
+   "box": "fan",
+   "category": "beute"
+  },
+  {
+   "id": "fam_boxstufe_legendaer_1",
+   "name": "Legenden sind aus Kisten gemacht",
+   "description": "Öffne eine Box der Stufe Legendär.",
+   "comment": "Glänzende Dinge! Deine Elstergene melden sich.",
+   "tier": "platin",
+   "box": "fan",
+   "category": "beute"
+  },
+  {
+   "id": "fam_boxstufe_himmlisch_1",
+   "name": "Himmlische Verpackung",
+   "description": "Öffne eine Box der Stufe Himmlisch.",
+   "comment": "Das Inventar platzt aus allen Nähten. Die Systemstimme ist stolz.",
+   "tier": "legendaer",
+   "box": "fan",
+   "category": "beute"
+  },
+  {
+   "id": "fam_episch_1",
+   "name": "Episches Fundstück",
+   "description": "Finde 1 epische Gegenstände.",
+   "comment": "Glänzende Dinge! Deine Elstergene melden sich.",
+   "tier": "silber",
+   "box": "waffen",
+   "category": "beute"
+  },
+  {
+   "id": "fam_episch_5",
+   "name": "Epische Sammlung",
+   "description": "Finde 5 epische Gegenstände.",
+   "comment": "Glänzende Dinge! Deine Elstergene melden sich.",
+   "tier": "gold",
+   "box": "waffen",
+   "category": "beute"
+  },
+  {
+   "id": "fam_ausgegeben_100",
+   "name": "Konsumrausch",
+   "description": "Gib 100 Gold in Läden aus.",
+   "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_ausgegeben_500",
+   "name": "Stammkundschaft",
+   "description": "Gib 500 Gold in Läden aus.",
+   "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_ausgegeben_2000",
+   "name": "Wirtschaftsmotor",
+   "description": "Gib 2.000 Gold in Läden aus.",
+   "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_verkauft_10",
+   "name": "Flohmarkt",
+   "description": "Verkaufe 10 Gegenstände.",
+   "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_verkauft_50",
+   "name": "Händlerseele",
+   "description": "Verkaufe 50 Gegenstände.",
+   "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_verkauft_150",
+   "name": "Ramschparadies",
+   "description": "Verkaufe 150 Gegenstände.",
+   "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_gekauft_5",
+   "name": "Kundenkarte",
+   "description": "Kaufe 5 Gegenstände.",
+   "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_gekauft_25",
+   "name": "Shoppingtour",
+   "description": "Kaufe 25 Gegenstände.",
+   "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_feilschen_3",
+   "name": "Handeln lernen",
+   "description": "Gewinne 3 Preisverhandlungen.",
+   "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_feilschen_15",
+   "name": "Basarfuchs",
+   "description": "Gewinne 15 Preisverhandlungen.",
+   "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_feilschen_40",
+   "name": "Rabattschlacht",
+   "description": "Gewinne 40 Preisverhandlungen.",
+   "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_lose_5",
+   "name": "Glücksspiel",
+   "description": "Versuche dein Glück 5-mal mit einem Rubbellos.",
+   "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
+   "tier": "bronze",
+   "box": "fan",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_lose_25",
+   "name": "Rubbelfinger",
+   "description": "Versuche dein Glück 25-mal mit einem Rubbellos.",
+   "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
+   "tier": "silber",
+   "box": "fan",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_gold_verdient_1500",
+   "name": "Goldader",
+   "description": "Verdiene insgesamt 1.500 Gold.",
+   "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_gold_verdient_5000",
+   "name": "Schatzkammer",
+   "description": "Verdiene insgesamt 5.000 Gold.",
+   "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "fam_erlitten_500",
+   "name": "Nehmerqualitäten",
+   "description": "Stecke insgesamt 500 Schaden ein.",
+   "comment": "Du lebst noch. Das ist die einzige Statistik, die wirklich zählt.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_erlitten_2000",
+   "name": "Prellbock",
+   "description": "Stecke insgesamt 2.000 Schaden ein.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_erlitten_5000",
+   "name": "Unkaputtbar",
+   "description": "Stecke insgesamt 5.000 Schaden ein.",
+   "comment": "Du lebst noch. Das ist die einzige Statistik, die wirklich zählt.",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_ausweichen_25",
+   "name": "Flink",
+   "description": "Weiche 25 Angriffen aus.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "bronze",
+   "box": "schuh",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_ausweichen_100",
+   "name": "Aalglatt",
+   "description": "Weiche 100 Angriffen aus.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "silber",
+   "box": "schuh",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_ausweichen_300",
+   "name": "Schwer zu fassen",
+   "description": "Weiche 300 Angriffen aus.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "gold",
+   "box": "schuh",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_knapp_3",
+   "name": "Dem Tod von der Schippe",
+   "description": "Überlebe 3-mal einen Treffer mit weniger als 10 % Lebenspunkten.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_knapp_15",
+   "name": "Dauerkarte beim Sensenmann",
+   "description": "Überlebe 15-mal einen Treffer mit weniger als 10 % Lebenspunkten.",
+   "comment": "Du lebst noch. Das ist die einzige Statistik, die wirklich zählt.",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_traenke_30",
+   "name": "Tränkeparade",
+   "description": "Trinke 30 Tränke.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_traenke_100",
+   "name": "Wandelnde Hausapotheke",
+   "description": "Trinke 100 Tränke.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_mahlzeiten_20",
+   "name": "Guter Appetit",
+   "description": "Iss 20 Mahlzeiten.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_mahlzeiten_50",
+   "name": "Vielfraß",
+   "description": "Iss 50 Mahlzeiten.",
+   "comment": "Du lebst noch. Das ist die einzige Statistik, die wirklich zählt.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_toilette_1",
+   "name": "Geschäftsbesuch",
+   "description": "Benutze 1-mal eine Toilette.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "bronze",
+   "box": null,
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_toilette_10",
+   "name": "Stammgast der Kacheln",
+   "description": "Benutze 10-mal eine Toilette.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "bronze",
+   "box": "kleidung",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_toilette_25",
+   "name": "Porzellanthron",
+   "description": "Benutze 25-mal eine Toilette.",
+   "comment": "Die Regel ist dir heilig. Die Systemstimme ist beeindruckt und ein bisschen besorgt.",
+   "tier": "silber",
+   "box": "kleidung",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_fallen_gefunden_5",
+   "name": "Spürnase",
+   "description": "Entdecke 5 Fallen.",
+   "comment": "Du lebst noch. Das ist die einzige Statistik, die wirklich zählt.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_fallen_gefunden_20",
+   "name": "Fallensuche",
+   "description": "Entdecke 20 Fallen.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_fallen_gefunden_50",
+   "name": "Minensuche",
+   "description": "Entdecke 50 Fallen.",
+   "comment": "Du lebst noch. Das ist die einzige Statistik, die wirklich zählt.",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_fallen_entschaerft_5",
+   "name": "Ruhige Hände",
+   "description": "Entschärfe 5 Fallen.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_fallen_entschaerft_20",
+   "name": "Kampfmittelräumdienst",
+   "description": "Entschärfe 20 Fallen.",
+   "comment": "Du lebst noch. Das ist die einzige Statistik, die wirklich zählt.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_fallen_ausgeloest_3",
+   "name": "Pechsträhne",
+   "description": "Löse 3 Fallen selbst aus.",
+   "comment": "Du lebst noch. Das ist die einzige Statistik, die wirklich zählt.",
+   "tier": "bronze",
+   "box": null,
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_fallen_ausgeloest_10",
+   "name": "Fallenmagnet",
+   "description": "Löse 10 Fallen selbst aus.",
+   "comment": "Zehn Fallen. Mit dem eigenen Körper. Die Systemstimme hat dir eine Taschenlampe geschickt. Aus Mitleid.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_verbandszeug_10",
+   "name": "Hart im Nehmen",
+   "description": "Überstehe 10 Zustände wie Blutung, Brennen, Furcht oder Blindheit.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_verbandszeug_50",
+   "name": "Wandelndes Lazarett",
+   "description": "Überstehe 50 Zustände wie Blutung, Brennen, Furcht oder Blindheit.",
+   "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_befreit_5",
+   "name": "Houdini",
+   "description": "Befreie dich 5-mal aus einer Falle.",
+   "comment": "Du lebst noch. Das ist die einzige Statistik, die wirklich zählt.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_gezaubert_10",
+   "name": "Fingerübungen",
+   "description": "Wirke 10 Zauber.",
+   "comment": "Die Magie mag dich. Oder sie hat Angst vor dir.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "magie"
+  },
+  {
+   "id": "fam_gezaubert_50",
+   "name": "Zauberkundig",
+   "description": "Wirke 50 Zauber.",
+   "comment": "Die Magie mag dich. Oder sie hat Angst vor dir.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "magie"
+  },
+  {
+   "id": "fam_gezaubert_200",
+   "name": "Magieverschwendung",
+   "description": "Wirke 200 Zauber.",
+   "comment": "Deine Finger riechen nach Ozon und Selbstüberschätzung.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "magie"
+  },
+  {
+   "id": "fam_zauber_gelernt_2",
+   "name": "Bücherwurm",
+   "description": "Beherrsche 2 verschiedene Zauber.",
+   "comment": "Deine Finger riechen nach Ozon und Selbstüberschätzung.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "magie"
+  },
+  {
+   "id": "fam_zauber_gelernt_5",
+   "name": "Zauberbibliothek",
+   "description": "Beherrsche 5 verschiedene Zauber.",
+   "comment": "Die Magie mag dich. Oder sie hat Angst vor dir.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "magie"
+  },
+  {
+   "id": "fam_zauber_gelernt_9",
+   "name": "Allwissend",
+   "description": "Beherrsche 9 verschiedene Zauber.",
+   "comment": "Die Magie mag dich. Oder sie hat Angst vor dir.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "magie"
+  },
+  {
+   "id": "fam_gebaut_5",
+   "name": "Heimwerken",
+   "description": "Stelle 5 Dinge her.",
+   "comment": "Werkbank, Klebeband, Wahnsinn. Die heilige Dreifaltigkeit des Kellers.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_gebaut_25",
+   "name": "Tüftelei",
+   "description": "Stelle 25 Dinge her.",
+   "comment": "Werkbank, Klebeband, Wahnsinn. Die heilige Dreifaltigkeit des Kellers.",
+   "tier": "silber",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_gebaut_75",
+   "name": "Meisterwerkstatt",
+   "description": "Stelle 75 Dinge her.",
+   "comment": "Aus Müll wird Ausrüstung. Die Systemstimme nennt das Nachhaltigkeit.",
+   "tier": "gold",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_rezept_verband_1",
+   "name": "Sani-Kasten",
+   "description": "Stelle zum ersten Mal her: Verband.",
+   "comment": "Aus Müll wird Ausrüstung. Die Systemstimme nennt das Nachhaltigkeit.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_rezept_brandflasche_1",
+   "name": "Cocktailstunde",
+   "description": "Stelle zum ersten Mal her: Brandflasche.",
+   "comment": "Werkbank, Klebeband, Wahnsinn. Die heilige Dreifaltigkeit des Kellers.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_rezept_nagelbombe_1",
+   "name": "Doseninhalt: Ärger",
+   "description": "Stelle zum ersten Mal her: Nagelbombe.",
+   "comment": "Aus Müll wird Ausrüstung. Die Systemstimme nennt das Nachhaltigkeit.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_rezept_stachelfalle_1",
+   "name": "Spitze Idee",
+   "description": "Stelle zum ersten Mal her: Stachelfalle.",
+   "comment": "Aus Müll wird Ausrüstung. Die Systemstimme nennt das Nachhaltigkeit.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_rezept_schlingfalle_1",
+   "name": "Die Schlaufe",
+   "description": "Stelle zum ersten Mal her: Schlingfalle.",
+   "comment": "Aus Müll wird Ausrüstung. Die Systemstimme nennt das Nachhaltigkeit.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_rezept_sprengfalle_1",
+   "name": "Überraschungsei",
+   "description": "Stelle zum ersten Mal her: Sprengfalle.",
+   "comment": "Werkbank, Klebeband, Wahnsinn. Die heilige Dreifaltigkeit des Kellers.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_rezept_waffe_naegel_1",
+   "name": "Nagelprobe",
+   "description": "Stelle zum ersten Mal her: Waffe benageln.",
+   "comment": "Aus Müll wird Ausrüstung. Die Systemstimme nennt das Nachhaltigkeit.",
+   "tier": "bronze",
+   "box": "wurf",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_aufgestellt_5",
+   "name": "Hinterhältig",
+   "description": "Stelle 5 eigene Fallen auf.",
+   "comment": "Werkbank, Klebeband, Wahnsinn. Die heilige Dreifaltigkeit des Kellers.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_aufgestellt_20",
+   "name": "Minenfeld",
+   "description": "Stelle 20 eigene Fallen auf.",
+   "comment": "Aus Müll wird Ausrüstung. Die Systemstimme nennt das Nachhaltigkeit.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "handwerk"
+  },
+  {
+   "id": "fam_crawler_5",
+   "name": "Kontaktfreudig",
+   "description": "Sprich mit 5 anderen Crawlern.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "bronze",
+   "box": "fan",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_crawler_15",
+   "name": "Netzwerk",
+   "description": "Sprich mit 15 anderen Crawlern.",
+   "comment": "Du bist nicht allein da unten. Das ist gut. Meistens.",
+   "tier": "silber",
+   "box": "fan",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_crawler_40",
+   "name": "Kellergespräche",
+   "description": "Sprich mit 40 anderen Crawlern.",
+   "comment": "Du bist nicht allein da unten. Das ist gut. Meistens.",
+   "tier": "gold",
+   "box": "fan",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_party_3",
+   "name": "Personalabteilung",
+   "description": "Nimm 3 Crawler in deine Party auf.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_party_8",
+   "name": "Rekrutierungsbüro",
+   "description": "Nimm 8 Crawler in deine Party auf.",
+   "comment": "Du bist nicht allein da unten. Das ist gut. Meistens.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_auftraege_10",
+   "name": "Tagelohn",
+   "description": "Erledige 10 Aufträge.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_auftraege_25",
+   "name": "Für alles zu haben",
+   "description": "Erledige 25 Aufträge.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_tipps_5",
+   "name": "Neugierige Nase",
+   "description": "Frage 5 Crawler nach Tipps.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_samariter_1",
+   "name": "Erste-Hilfe-Kasten",
+   "description": "Versorge 1 verletzte Crawler.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_samariter_5",
+   "name": "Barmherzigkeit",
+   "description": "Versorge 5 verletzte Crawler.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_crawlerjagd_3",
+   "name": "Selbstjustiz",
+   "description": "Besiege 3 Crawler, die dich ausrauben wollten.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_crawlerjagd_10",
+   "name": "Sheriff",
+   "description": "Besiege 10 Crawler, die dich ausrauben wollten.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_haustier_stufe_10",
+   "name": "Alpha-Tier",
+   "description": "Bring dein Haustier auf Stufe 10.",
+   "comment": "Du bist nicht allein da unten. Das ist gut. Meistens.",
+   "tier": "gold",
+   "box": "haustier",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_haustier_stufe_15",
+   "name": "Monster an der Leine",
+   "description": "Bring dein Haustier auf Stufe 15.",
+   "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
+   "tier": "platin",
+   "box": "haustier",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_follower_2500",
+   "name": "Aufsteigender Stern",
+   "description": "Erreiche 2.500 Follower.",
+   "comment": "Die Galaxis schaut hin. Lächeln!",
+   "tier": "silber",
+   "box": "fan",
+   "category": "show"
+  },
+  {
+   "id": "fam_follower_25000",
+   "name": "Quotenrekord",
+   "description": "Erreiche 25.000 Follower.",
+   "comment": "Die Galaxis schaut hin. Lächeln!",
+   "tier": "gold",
+   "box": "fan",
+   "category": "show"
+  },
+  {
+   "id": "fam_follower_100000",
+   "name": "Galaktische Legende",
+   "description": "Erreiche 100.000 Follower.",
+   "comment": "Die Galaxis schaut hin. Lächeln!",
+   "tier": "platin",
+   "box": "fan",
+   "category": "show"
+  },
+  {
+   "id": "fam_sponsorwuensche_3",
+   "name": "Werbegesicht",
+   "description": "Erfülle 3 Wünsche deiner Sponsoren.",
+   "comment": "Die Galaxis schaut hin. Lächeln!",
+   "tier": "silber",
+   "box": "fan",
+   "category": "show"
+  },
+  {
+   "id": "fam_sponsorwuensche_10",
+   "name": "Markenbotschaft",
+   "description": "Erfülle 10 Wünsche deiner Sponsoren.",
+   "comment": "Die Galaxis schaut hin. Lächeln!",
+   "tier": "gold",
+   "box": "fan",
+   "category": "show"
+  },
+  {
+   "id": "fam_fangeschenke_1",
+   "name": "Fanpost",
+   "description": "Erhalte 1 Geschenke aus dem Publikum.",
+   "comment": "Die Galaxis schaut hin. Lächeln!",
+   "tier": "bronze",
+   "box": null,
+   "category": "show"
+  },
+  {
+   "id": "fam_fangeschenke_5",
+   "name": "Geschenkeflut",
+   "description": "Erhalte 5 Geschenke aus dem Publikum.",
+   "comment": "Die Galaxis schaut hin. Lächeln!",
+   "tier": "silber",
+   "box": "fan",
+   "category": "show"
+  },
+  {
+   "id": "fam_reiten_100",
+   "name": "Sonntagsausflug",
+   "description": "Lege 100 Schritte auf einem Reittier zurück.",
+   "comment": "Die Einschaltquote steigt. Deine Überlebenschance nicht zwingend.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "show"
+  },
+  {
+   "id": "fam_reiten_1000",
+   "name": "Kurierdienst",
+   "description": "Lege 1.000 Schritte auf einem Reittier zurück.",
+   "comment": "Die Einschaltquote steigt. Deine Überlebenschance nicht zwingend.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "show"
+  },
+  {
+   "id": "fam_rammkills_10",
+   "name": "Verkehrsrowdy",
+   "description": "Besiege 10 Gegner durch Rammen.",
+   "comment": "Die Galaxis schaut hin. Lächeln!",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "show"
+  },
+  {
+   "id": "fam_rammkills_30",
+   "name": "Fahrerflucht ausgeschlossen",
+   "description": "Besiege 30 Gegner durch Rammen.",
+   "comment": "Die Galaxis schaut hin. Lächeln!",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "show"
+  },
+  {
+   "id": "fam_stufe_3",
+   "name": "Kein Grünschnabel mehr",
+   "description": "Erreiche Stufe 3.",
+   "comment": "Du wirst besser. Die Monster auch. Es bleibt spannend.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_stufe_7",
+   "name": "Gestandener Crawler",
+   "description": "Erreiche Stufe 7.",
+   "comment": "Du wirst besser. Die Monster auch. Es bleibt spannend.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_stufe_12",
+   "name": "Dutzend voll",
+   "description": "Erreiche Stufe 12.",
+   "comment": "Du wirst besser. Die Monster auch. Es bleibt spannend.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_stufe_20",
+   "name": "Zwanzig und kein bisschen weise",
+   "description": "Erreiche Stufe 20.",
+   "comment": "Stufe um Stufe nach oben, Etage um Etage nach unten.",
+   "tier": "platin",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_skills_gelernt_3",
+   "name": "Lernwillig",
+   "description": "Lerne 3 Skills.",
+   "comment": "Stufe um Stufe nach oben, Etage um Etage nach unten.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_skills_gelernt_8",
+   "name": "Vielseitig begabt",
+   "description": "Lerne 8 Skills.",
+   "comment": "Du wirst besser. Die Monster auch. Es bleibt spannend.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_skills_gelernt_15",
+   "name": "Tausendsassa",
+   "description": "Lerne 15 Skills.",
+   "comment": "Du wirst besser. Die Monster auch. Es bleibt spannend.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_skills_gelernt_25",
+   "name": "Kann alles, außer sterben",
+   "description": "Lerne 25 Skills.",
+   "comment": "Stufe um Stufe nach oben, Etage um Etage nach unten.",
+   "tier": "platin",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_skill_stufe_5",
+   "name": "Fortgeschritten",
+   "description": "Bring einen Skill auf Stufe 5.",
+   "comment": "Du wirst besser. Die Monster auch. Es bleibt spannend.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_skill_stufe_15",
+   "name": "Großmeisterlich",
+   "description": "Bring einen Skill auf Stufe 15.",
+   "comment": "Stufe fünfzehn. Mehr geht nicht. Die Systemstimme überlegt, ob sie nachbessern muss.",
+   "tier": "platin",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_entdeckte_skills_1",
+   "name": "Beobachtet",
+   "description": "Lass den Beobachter 1 eigene Skills für dich entdecken.",
+   "comment": "Stufe um Stufe nach oben, Etage um Etage nach unten.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_entdeckte_skills_5",
+   "name": "Fallstudie",
+   "description": "Lass den Beobachter 5 eigene Skills für dich entdecken.",
+   "comment": "Stufe um Stufe nach oben, Etage um Etage nach unten.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_entdeckte_skills_10",
+   "name": "Forschungsobjekt",
+   "description": "Lass den Beobachter 10 eigene Skills für dich entdecken.",
+   "comment": "Stufe um Stufe nach oben, Etage um Etage nach unten.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_wert_12",
+   "name": "Überdurchschnittlich",
+   "description": "Steigere einen Grundwert auf 12.",
+   "comment": "Stufe um Stufe nach oben, Etage um Etage nach unten.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_wert_16",
+   "name": "Außergewöhnlich",
+   "description": "Steigere einen Grundwert auf 16.",
+   "comment": "Stufe um Stufe nach oben, Etage um Etage nach unten.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "fortschritt"
+  },
+  {
+   "id": "fam_wert_20",
+   "name": "Übermensch",
+   "description": "Steigere einen Grundwert auf 20.",
+   "comment": "Du wirst besser. Die Monster auch. Es bleibt spannend.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "fortschritt"
+  },
+  {
+   "id": "art_kellerratte_1",
+   "name": "Neu im Bestiarium: Kellerratte",
+   "description": "Besiege zum ersten Mal: Kellerratte.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kellerratte_2",
+   "name": "Routine: Kellerratte",
+   "description": "Besiege 10-mal: Kellerratte.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kellerratte_3",
+   "name": "Plage beseitigt: Kellerratte",
+   "description": "Besiege 30-mal: Kellerratte.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_riesenkakerlake_1",
+   "name": "Neu im Bestiarium: Riesenkakerlake",
+   "description": "Besiege zum ersten Mal: Riesenkakerlake.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_riesenkakerlake_2",
+   "name": "Routine: Riesenkakerlake",
+   "description": "Besiege 10-mal: Riesenkakerlake.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_riesenkakerlake_3",
+   "name": "Plage beseitigt: Riesenkakerlake",
+   "description": "Besiege 30-mal: Riesenkakerlake.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kobold_1",
+   "name": "Neu im Bestiarium: Kobold-Plünderer",
+   "description": "Besiege zum ersten Mal: Kobold-Plünderer.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kobold_2",
+   "name": "Routine: Kobold-Plünderer",
+   "description": "Besiege 10-mal: Kobold-Plünderer.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kobold_3",
+   "name": "Plage beseitigt: Kobold-Plünderer",
+   "description": "Besiege 30-mal: Kobold-Plünderer.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kobold_schleuder_1",
+   "name": "Neu im Bestiarium: Kobold-Schleuderer",
+   "description": "Besiege zum ersten Mal: Kobold-Schleuderer.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kobold_schleuder_2",
+   "name": "Routine: Kobold-Schleuderer",
+   "description": "Besiege 10-mal: Kobold-Schleuderer.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kobold_schleuder_3",
+   "name": "Plage beseitigt: Kobold-Schleuderer",
+   "description": "Besiege 30-mal: Kobold-Schleuderer.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schleim_1",
+   "name": "Neu im Bestiarium: Kellerschleim",
+   "description": "Besiege zum ersten Mal: Kellerschleim.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schleim_2",
+   "name": "Routine: Kellerschleim",
+   "description": "Besiege 10-mal: Kellerschleim.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schleim_3",
+   "name": "Plage beseitigt: Kellerschleim",
+   "description": "Besiege 30-mal: Kellerschleim.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_wolpertinger_1",
+   "name": "Neu im Bestiarium: Wolpertinger",
+   "description": "Besiege zum ersten Mal: Wolpertinger.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_wolpertinger_2",
+   "name": "Routine: Wolpertinger",
+   "description": "Besiege 10-mal: Wolpertinger.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_wolpertinger_3",
+   "name": "Plage beseitigt: Wolpertinger",
+   "description": "Besiege 30-mal: Wolpertinger.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_poltergeist_1",
+   "name": "Neu im Bestiarium: Poltergeist",
+   "description": "Besiege zum ersten Mal: Poltergeist.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_poltergeist_2",
+   "name": "Routine: Poltergeist",
+   "description": "Besiege 10-mal: Poltergeist.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_poltergeist_3",
+   "name": "Plage beseitigt: Poltergeist",
+   "description": "Besiege 30-mal: Poltergeist.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_grauer_spaeher_1",
+   "name": "Neu im Bestiarium: Grauer Späher",
+   "description": "Besiege zum ersten Mal: Grauer Späher.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_grauer_spaeher_2",
+   "name": "Routine: Grauer Späher",
+   "description": "Besiege 10-mal: Grauer Späher.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_grauer_spaeher_3",
+   "name": "Plage beseitigt: Grauer Späher",
+   "description": "Besiege 30-mal: Grauer Späher.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_muellsack_mimic_1",
+   "name": "Neu im Bestiarium: Hungriger Müllsack",
+   "description": "Besiege zum ersten Mal: Hungriger Müllsack.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_muellsack_mimic_2",
+   "name": "Routine: Hungriger Müllsack",
+   "description": "Besiege 10-mal: Hungriger Müllsack.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_muellsack_mimic_3",
+   "name": "Plage beseitigt: Hungriger Müllsack",
+   "description": "Besiege 30-mal: Hungriger Müllsack.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_tatzelwurm_1",
+   "name": "Neu im Bestiarium: Tatzelwurm",
+   "description": "Besiege zum ersten Mal: Tatzelwurm.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_tatzelwurm_2",
+   "name": "Routine: Tatzelwurm",
+   "description": "Besiege 10-mal: Tatzelwurm.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_tatzelwurm_3",
+   "name": "Plage beseitigt: Tatzelwurm",
+   "description": "Besiege 30-mal: Tatzelwurm.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_ghul_1",
+   "name": "Neu im Bestiarium: Kellerghul",
+   "description": "Besiege zum ersten Mal: Kellerghul.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_ghul_2",
+   "name": "Routine: Kellerghul",
+   "description": "Besiege 10-mal: Kellerghul.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_ghul_3",
+   "name": "Plage beseitigt: Kellerghul",
+   "description": "Besiege 30-mal: Kellerghul.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_gnom_buerokrat_1",
+   "name": "Neu im Bestiarium: Gnom-Bürokrat",
+   "description": "Besiege zum ersten Mal: Gnom-Bürokrat.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_gnom_buerokrat_2",
+   "name": "Routine: Gnom-Bürokrat",
+   "description": "Besiege 10-mal: Gnom-Bürokrat.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_gnom_buerokrat_3",
+   "name": "Plage beseitigt: Gnom-Bürokrat",
+   "description": "Besiege 30-mal: Gnom-Bürokrat.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rattenmensch_1",
+   "name": "Neu im Bestiarium: Rattenmensch",
+   "description": "Besiege zum ersten Mal: Rattenmensch.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rattenmensch_2",
+   "name": "Routine: Rattenmensch",
+   "description": "Besiege 10-mal: Rattenmensch.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rattenmensch_3",
+   "name": "Plage beseitigt: Rattenmensch",
+   "description": "Besiege 30-mal: Rattenmensch.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_toaster_mimic_1",
+   "name": "Neu im Bestiarium: Rauchender Toaster",
+   "description": "Besiege zum ersten Mal: Rauchender Toaster.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_toaster_mimic_2",
+   "name": "Routine: Rauchender Toaster",
+   "description": "Besiege 10-mal: Rauchender Toaster.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_toaster_mimic_3",
+   "name": "Plage beseitigt: Rauchender Toaster",
+   "description": "Besiege 30-mal: Rauchender Toaster.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kellerspinne_1",
+   "name": "Neu im Bestiarium: Kellerspinne",
+   "description": "Besiege zum ersten Mal: Kellerspinne.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kellerspinne_2",
+   "name": "Routine: Kellerspinne",
+   "description": "Besiege 10-mal: Kellerspinne.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kellerspinne_3",
+   "name": "Plage beseitigt: Kellerspinne",
+   "description": "Besiege 30-mal: Kellerspinne.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_fledermaus_1",
+   "name": "Neu im Bestiarium: Kellerfledermaus",
+   "description": "Besiege zum ersten Mal: Kellerfledermaus.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_fledermaus_2",
+   "name": "Routine: Kellerfledermaus",
+   "description": "Besiege 10-mal: Kellerfledermaus.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_fledermaus_3",
+   "name": "Plage beseitigt: Kellerfledermaus",
+   "description": "Besiege 30-mal: Kellerfledermaus.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_blaehkroete_1",
+   "name": "Neu im Bestiarium: Blähkröte",
+   "description": "Besiege zum ersten Mal: Blähkröte.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_blaehkroete_2",
+   "name": "Routine: Blähkröte",
+   "description": "Besiege 10-mal: Blähkröte.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_blaehkroete_3",
+   "name": "Plage beseitigt: Blähkröte",
+   "description": "Besiege 30-mal: Blähkröte.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_elster_goblin_1",
+   "name": "Neu im Bestiarium: Elster-Kobold",
+   "description": "Besiege zum ersten Mal: Elster-Kobold.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_elster_goblin_2",
+   "name": "Routine: Elster-Kobold",
+   "description": "Besiege 10-mal: Elster-Kobold.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_elster_goblin_3",
+   "name": "Plage beseitigt: Elster-Kobold",
+   "description": "Besiege 30-mal: Elster-Kobold.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rattenschamane_1",
+   "name": "Neu im Bestiarium: Rattenschamane",
+   "description": "Besiege zum ersten Mal: Rattenschamane.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rattenschamane_2",
+   "name": "Routine: Rattenschamane",
+   "description": "Besiege 10-mal: Rattenschamane.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rattenschamane_3",
+   "name": "Plage beseitigt: Rattenschamane",
+   "description": "Besiege 30-mal: Rattenschamane.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_heinzelmann_1",
+   "name": "Neu im Bestiarium: Heinzelmännchen",
+   "description": "Besiege zum ersten Mal: Heinzelmännchen.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_heinzelmann_2",
+   "name": "Routine: Heinzelmännchen",
+   "description": "Besiege 10-mal: Heinzelmännchen.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_heinzelmann_3",
+   "name": "Plage beseitigt: Heinzelmännchen",
+   "description": "Besiege 30-mal: Heinzelmännchen.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_gartenzwerg_1",
+   "name": "Neu im Bestiarium: Belebter Gartenzwerg",
+   "description": "Besiege zum ersten Mal: Belebter Gartenzwerg.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_gartenzwerg_2",
+   "name": "Routine: Belebter Gartenzwerg",
+   "description": "Besiege 10-mal: Belebter Gartenzwerg.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_gartenzwerg_3",
+   "name": "Plage beseitigt: Belebter Gartenzwerg",
+   "description": "Besiege 30-mal: Belebter Gartenzwerg.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_moorleiche_1",
+   "name": "Neu im Bestiarium: Moorleiche",
+   "description": "Besiege zum ersten Mal: Moorleiche.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_moorleiche_2",
+   "name": "Routine: Moorleiche",
+   "description": "Besiege 10-mal: Moorleiche.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_moorleiche_3",
+   "name": "Plage beseitigt: Moorleiche",
+   "description": "Besiege 30-mal: Moorleiche.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_irrlicht_1",
+   "name": "Neu im Bestiarium: Irrlicht",
+   "description": "Besiege zum ersten Mal: Irrlicht.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_irrlicht_2",
+   "name": "Routine: Irrlicht",
+   "description": "Besiege 10-mal: Irrlicht.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_irrlicht_3",
+   "name": "Plage beseitigt: Irrlicht",
+   "description": "Besiege 30-mal: Irrlicht.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_abflusstentakel_1",
+   "name": "Neu im Bestiarium: Tentakel aus dem Abfluss",
+   "description": "Besiege zum ersten Mal: Tentakel aus dem Abfluss.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_abflusstentakel_2",
+   "name": "Routine: Tentakel aus dem Abfluss",
+   "description": "Besiege 10-mal: Tentakel aus dem Abfluss.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_abflusstentakel_3",
+   "name": "Plage beseitigt: Tentakel aus dem Abfluss",
+   "description": "Besiege 30-mal: Tentakel aus dem Abfluss.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_waschmaschine_mimic_1",
+   "name": "Neu im Bestiarium: Schleudernde Waschmaschine",
+   "description": "Besiege zum ersten Mal: Schleudernde Waschmaschine.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_waschmaschine_mimic_2",
+   "name": "Routine: Schleudernde Waschmaschine",
+   "description": "Besiege 10-mal: Schleudernde Waschmaschine.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_waschmaschine_mimic_3",
+   "name": "Plage beseitigt: Schleudernde Waschmaschine",
+   "description": "Besiege 30-mal: Schleudernde Waschmaschine.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_grey_drohne_1",
+   "name": "Neu im Bestiarium: Späher-Drohne",
+   "description": "Besiege zum ersten Mal: Späher-Drohne.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_grey_drohne_2",
+   "name": "Routine: Späher-Drohne",
+   "description": "Besiege 10-mal: Späher-Drohne.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_grey_drohne_3",
+   "name": "Plage beseitigt: Späher-Drohne",
+   "description": "Besiege 30-mal: Späher-Drohne.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_chupacabra_1",
+   "name": "Neu im Bestiarium: Chupacabra",
+   "description": "Besiege zum ersten Mal: Chupacabra.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_chupacabra_2",
+   "name": "Routine: Chupacabra",
+   "description": "Besiege 10-mal: Chupacabra.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_chupacabra_3",
+   "name": "Plage beseitigt: Chupacabra",
+   "description": "Besiege 30-mal: Chupacabra.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_troll_lehrling_1",
+   "name": "Neu im Bestiarium: Troll-Lehrling",
+   "description": "Besiege zum ersten Mal: Troll-Lehrling.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_troll_lehrling_2",
+   "name": "Routine: Troll-Lehrling",
+   "description": "Besiege 10-mal: Troll-Lehrling.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_troll_lehrling_3",
+   "name": "Plage beseitigt: Troll-Lehrling",
+   "description": "Besiege 30-mal: Troll-Lehrling.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_knochenratte_1",
+   "name": "Neu im Bestiarium: Knochenratte",
+   "description": "Besiege zum ersten Mal: Knochenratte.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_knochenratte_2",
+   "name": "Routine: Knochenratte",
+   "description": "Besiege 10-mal: Knochenratte.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_knochenratte_3",
+   "name": "Plage beseitigt: Knochenratte",
+   "description": "Besiege 30-mal: Knochenratte.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_wechselbalg_1",
+   "name": "Neu im Bestiarium: Wechselbalg",
+   "description": "Besiege zum ersten Mal: Wechselbalg.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_wechselbalg_2",
+   "name": "Routine: Wechselbalg",
+   "description": "Besiege 10-mal: Wechselbalg.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_wechselbalg_3",
+   "name": "Plage beseitigt: Wechselbalg",
+   "description": "Besiege 30-mal: Wechselbalg.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kobold_bombe_1",
+   "name": "Neu im Bestiarium: Kobold-Sprengmeister",
+   "description": "Besiege zum ersten Mal: Kobold-Sprengmeister.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kobold_bombe_2",
+   "name": "Routine: Kobold-Sprengmeister",
+   "description": "Besiege 10-mal: Kobold-Sprengmeister.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kobold_bombe_3",
+   "name": "Plage beseitigt: Kobold-Sprengmeister",
+   "description": "Besiege 30-mal: Kobold-Sprengmeister.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kellermeister_1",
+   "name": "Neu im Bestiarium: Skelett des Kellermeisters",
+   "description": "Besiege zum ersten Mal: Skelett des Kellermeisters.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kellermeister_2",
+   "name": "Routine: Skelett des Kellermeisters",
+   "description": "Besiege 10-mal: Skelett des Kellermeisters.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kellermeister_3",
+   "name": "Plage beseitigt: Skelett des Kellermeisters",
+   "description": "Besiege 30-mal: Skelett des Kellermeisters.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_nachtmahr_1",
+   "name": "Neu im Bestiarium: Nachtmahr",
+   "description": "Besiege zum ersten Mal: Nachtmahr.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_nachtmahr_2",
+   "name": "Routine: Nachtmahr",
+   "description": "Besiege 10-mal: Nachtmahr.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_nachtmahr_3",
+   "name": "Plage beseitigt: Nachtmahr",
+   "description": "Besiege 30-mal: Nachtmahr.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_ghulhund_1",
+   "name": "Neu im Bestiarium: Ghulhund",
+   "description": "Besiege zum ersten Mal: Ghulhund.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_ghulhund_2",
+   "name": "Routine: Ghulhund",
+   "description": "Besiege 10-mal: Ghulhund.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_ghulhund_3",
+   "name": "Plage beseitigt: Ghulhund",
+   "description": "Besiege 30-mal: Ghulhund.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kanalkroko_1",
+   "name": "Neu im Bestiarium: Kanal-Krokodil",
+   "description": "Besiege zum ersten Mal: Kanal-Krokodil.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kanalkroko_2",
+   "name": "Routine: Kanal-Krokodil",
+   "description": "Besiege 10-mal: Kanal-Krokodil.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kanalkroko_3",
+   "name": "Plage beseitigt: Kanal-Krokodil",
+   "description": "Besiege 30-mal: Kanal-Krokodil.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_fischmensch_1",
+   "name": "Neu im Bestiarium: Fischmensch",
+   "description": "Besiege zum ersten Mal: Fischmensch.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_fischmensch_2",
+   "name": "Routine: Fischmensch",
+   "description": "Besiege 10-mal: Fischmensch.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_fischmensch_3",
+   "name": "Plage beseitigt: Fischmensch",
+   "description": "Besiege 30-mal: Fischmensch.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_morlock_1",
+   "name": "Neu im Bestiarium: Morlock",
+   "description": "Besiege zum ersten Mal: Morlock.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_morlock_2",
+   "name": "Routine: Morlock",
+   "description": "Besiege 10-mal: Morlock.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_morlock_3",
+   "name": "Plage beseitigt: Morlock",
+   "description": "Besiege 30-mal: Morlock.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_klaerschlamm_1",
+   "name": "Neu im Bestiarium: Klärschlamm-Elementar",
+   "description": "Besiege zum ersten Mal: Klärschlamm-Elementar.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_klaerschlamm_2",
+   "name": "Routine: Klärschlamm-Elementar",
+   "description": "Besiege 10-mal: Klärschlamm-Elementar.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_klaerschlamm_3",
+   "name": "Plage beseitigt: Klärschlamm-Elementar",
+   "description": "Besiege 30-mal: Klärschlamm-Elementar.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kanalhexe_1",
+   "name": "Neu im Bestiarium: Kanalhexe",
+   "description": "Besiege zum ersten Mal: Kanalhexe.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kanalhexe_2",
+   "name": "Routine: Kanalhexe",
+   "description": "Besiege 10-mal: Kanalhexe.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kanalhexe_3",
+   "name": "Plage beseitigt: Kanalhexe",
+   "description": "Besiege 30-mal: Kanalhexe.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_pilzmensch_1",
+   "name": "Neu im Bestiarium: Sporenmensch",
+   "description": "Besiege zum ersten Mal: Sporenmensch.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_pilzmensch_2",
+   "name": "Routine: Sporenmensch",
+   "description": "Besiege 10-mal: Sporenmensch.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_pilzmensch_3",
+   "name": "Plage beseitigt: Sporenmensch",
+   "description": "Besiege 30-mal: Sporenmensch.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_mottenmann_1",
+   "name": "Neu im Bestiarium: Mottenmann",
+   "description": "Besiege zum ersten Mal: Mottenmann.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_mottenmann_2",
+   "name": "Routine: Mottenmann",
+   "description": "Besiege 10-mal: Mottenmann.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_mottenmann_3",
+   "name": "Plage beseitigt: Mottenmann",
+   "description": "Besiege 30-mal: Mottenmann.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schmuggler_1",
+   "name": "Neu im Bestiarium: Schmuggler-Kobold",
+   "description": "Besiege zum ersten Mal: Schmuggler-Kobold.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schmuggler_2",
+   "name": "Routine: Schmuggler-Kobold",
+   "description": "Besiege 10-mal: Schmuggler-Kobold.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schmuggler_3",
+   "name": "Plage beseitigt: Schmuggler-Kobold",
+   "description": "Besiege 30-mal: Schmuggler-Kobold.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_neunauge_1",
+   "name": "Neu im Bestiarium: Riesen-Neunauge",
+   "description": "Besiege zum ersten Mal: Riesen-Neunauge.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_neunauge_2",
+   "name": "Routine: Riesen-Neunauge",
+   "description": "Besiege 10-mal: Riesen-Neunauge.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_neunauge_3",
+   "name": "Plage beseitigt: Riesen-Neunauge",
+   "description": "Besiege 30-mal: Riesen-Neunauge.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_taubenschwarm_1",
+   "name": "Neu im Bestiarium: Mutierte Stadttaube",
+   "description": "Besiege zum ersten Mal: Mutierte Stadttaube.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_taubenschwarm_2",
+   "name": "Routine: Mutierte Stadttaube",
+   "description": "Besiege 10-mal: Mutierte Stadttaube.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_taubenschwarm_3",
+   "name": "Plage beseitigt: Mutierte Stadttaube",
+   "description": "Besiege 30-mal: Mutierte Stadttaube.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  }
+ ]
+}

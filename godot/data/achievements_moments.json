@@ -1,0 +1,571 @@
+{
+ "MOMENT_ACHIEVEMENTS": [
+  {
+   "id": "mo_einschlag",
+   "name": "Ein Schlag, ein Grab",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Besiege einen Gegner mit einem Treffer, der mindestens so viel Schaden macht, wie er Lebenspunkte hat.",
+   "comment": "Kein Vorgeplänkel, kein zweiter Versuch. Die Regie hat die Zeitlupe gleich dreimal abgespielt.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_einschlag10",
+   "name": "Kurzer Prozess",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Besiege 10 Gegner mit jeweils einem einzigen Treffer.",
+   "comment": "Zehnmal ein Schlag. Die Monster haben angefangen, dir aus dem Weg zu gehen. Klug von ihnen.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_anatomie",
+   "name": "Anatomiestunde",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Triff denselben Gegner an Kopf, Armen und Beinen, bevor er fällt.",
+   "comment": "Gründlich. Sehr gründlich. Die Systemstimme schickt dir ein Diplom in Humanmedizin. Monstermedizin. Egal.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_erschoepft",
+   "name": "Auf dem Zahnfleisch",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Besiege einen Gegner mit deinem allerletzten Ausdauerpunkt.",
+   "comment": "Keine Luft mehr, aber noch ein Schlag. Die Zuschauer haben mitgekeucht.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_toedlich",
+   "name": "Unmöglich ist nur ein Wort",
+   "tier": "platin",
+   "box": "brawler",
+   "description": "Besiege einen Gegner, der als tödlich eingestuft ist (mindestens sechs Stufen über dir).",
+   "comment": "Die Wettbüros der Galaxis haben heute sehr viel Geld verloren. Sie sind nicht erfreut.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_elite_staerker",
+   "name": "Elite? Pah!",
+   "tier": "gold",
+   "box": "waffen",
+   "description": "Besiege einen Elite-Gegner, der mindestens drei Stufen über dir steht.",
+   "comment": "Elite heißt übersetzt: nicht gut genug für dich.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_riese",
+   "name": "Je größer sie sind",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Besiege einen riesigen Gegner.",
+   "comment": "... desto lauter fallen sie. Der Boden hat noch eine Weile nachgezittert.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_unbekannt",
+   "name": "Was war das eigentlich?",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Besiege einen Gegner, den du nicht einschätzen konntest.",
+   "comment": "Du weißt nicht, was es war. Du weißt nur, dass es jetzt tot ist. Reicht auch.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_tuer",
+   "name": "Türsteher",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Besiege einen Gegner, der gerade in einer Tür steht.",
+   "comment": "Hier kommt keiner rein. Und der da kommt auch nicht mehr raus.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_umzingelt",
+   "name": "Rücken frei? Fehlanzeige.",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Besiege 10 Gegner, während du von mindestens drei Gegnern umringt bist.",
+   "comment": "Umzingelt ist nur ein anderes Wort für: viele Ziele in Reichweite.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_nackt",
+   "name": "Nacktkampf",
+   "tier": "silber",
+   "box": "kleidung",
+   "description": "Besiege 10 Gegner, ohne irgendetwas angelegt zu haben.",
+   "comment": "Keine Rüstung, keine Hose, keine Scham. Die Zensurabteilung hat Überstunden gemacht.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_barfuss",
+   "name": "Barfußpfad",
+   "tier": "bronze",
+   "box": "schuh",
+   "description": "Besiege 25 Gegner barfuß.",
+   "comment": "Deine Fußsohlen sind inzwischen härter als die meisten Rüstungen hier unten.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_bademantel",
+   "name": "Frottee-Terror",
+   "tier": "silber",
+   "box": "kleidung",
+   "description": "Besiege 25 Gegner im Bademantel.",
+   "comment": "Der gefürchtetste Bademantel der Galaxis. Es gibt schon Fanartikel.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_angetrunken",
+   "name": "Kneipenschlägerei",
+   "tier": "bronze",
+   "box": "brawler",
+   "description": "Besiege 5 Gegner, während du angetrunken bist.",
+   "comment": "Dein Kampfstil ist unvorhersehbar. Für alle Beteiligten, dich eingeschlossen.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_feuertaufe",
+   "name": "Feuertaufe",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Besiege einen Gegner, während du selbst in Flammen stehst.",
+   "comment": "Du brennst, und trotzdem hast du zuerst an ihn gedacht. Das nennt man Prioritäten.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_blindflug",
+   "name": "Blindflug",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Besiege einen Gegner, während du geblendet bist.",
+   "comment": "Du hast nichts gesehen. Der Gegner leider schon.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_mut",
+   "name": "Mut ist, wenn man trotzdem zuschlägt",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Besiege einen Gegner, während du verängstigt bist.",
+   "comment": "Die Knie haben gezittert. Die Faust nicht.",
+   "category": "kampf"
+  },
+  {
+   "id": "mo_boss_makellos",
+   "name": "Makellos",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss, während du volle Lebenspunkte hast.",
+   "comment": "Nicht ein Kratzer. Der Boss hat sich beim Management beschwert. Abgelehnt.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_boss_zauber",
+   "name": "Abrakadabra",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss mit einem Zauber.",
+   "comment": "Ein Fingerschnippen, ein Boss weniger. Die Magieabteilung ist stolz auf dich.",
+   "category": "magie"
+  },
+  {
+   "id": "mo_boss_falle",
+   "name": "In die Falle gelockt",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss mit einer Falle oder einem Sprengsatz.",
+   "comment": "Planung schlägt Muskeln. Und Sprengstoff schlägt beides.",
+   "category": "handwerk"
+  },
+  {
+   "id": "mo_boss_haustier",
+   "name": "Braves Tier!",
+   "tier": "gold",
+   "box": "haustier",
+   "description": "Lass dein Haustier den letzten Treffer gegen einen Boss landen.",
+   "comment": "Du hast die Vorarbeit gemacht. Die Zuschauer jubeln trotzdem nur dem Tier zu.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_boss_party",
+   "name": "Gemeinsam stark",
+   "tier": "silber",
+   "box": "boss",
+   "description": "Lass ein Party-Mitglied den letzten Treffer gegen einen Boss landen.",
+   "comment": "Teamarbeit. Der Ruhm wird geteilt. Die Beute nicht.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_boss_sprung",
+   "name": "Todessprung",
+   "tier": "gold",
+   "box": "schuh",
+   "description": "Besiege einen Boss mit einem Sprungangriff.",
+   "comment": "Aus der Luft, mit vollem Gewicht. Die Kamera hat es aus sieben Winkeln.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_boss_kopf",
+   "name": "Kopf ab, Krone weg",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss mit einem gezielten Kopftreffer.",
+   "comment": "Genau zwischen die Augen. Oder wo auch immer dieses Ding seine Augen hatte.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_boss_gerammt",
+   "name": "Vorfahrt missachtet",
+   "tier": "platin",
+   "box": "boss",
+   "description": "Besiege einen Boss, indem du ihn mit deinem Reittier rammst.",
+   "comment": "Der Unfallbericht ist eindeutig. Der Boss hätte nicht auf der Fahrbahn stehen sollen.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_boss_konter",
+   "name": "Der Spieß umgedreht",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Besiege einen Boss mit einem Konter.",
+   "comment": "Er hat angegriffen. Du hast geantwortet. Das Gespräch ist beendet.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_boss_schlafend",
+   "name": "Gute-Nacht-Geschichte",
+   "tier": "gold",
+   "box": "boss",
+   "description": "Besiege einen Boss, der noch schläft.",
+   "comment": "Er ist nie aufgewacht. Die Zuschauer finden das unfair. Die Wettquoten fanden es großartig.",
+   "category": "bestiarium"
+  },
+  {
+   "id": "mo_explosion3",
+   "name": "Drei auf einen Streich",
+   "tier": "gold",
+   "box": "wurf",
+   "description": "Besiege drei Gegner mit einer einzigen Explosion.",
+   "comment": "Effizienz ist das neue Schwarz. Oder das neue Verkohlt.",
+   "category": "handwerk"
+  },
+  {
+   "id": "mo_eigentor",
+   "name": "Eigentor",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Werde von deinem eigenen Sprengsatz getroffen.",
+   "comment": "Die Druckwelle kennt keine Freunde. Das steht auch klein gedruckt auf der Packung.",
+   "category": "handwerk"
+  },
+  {
+   "id": "mo_befreit_kampf",
+   "name": "Entfesselungskunst",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Befreie dich aus einer Falle, während ein Gegner direkt auf dich zukommt.",
+   "comment": "Genau im richtigen Moment. Die Musik der Regie hat perfekt gepasst.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_weitwurf",
+   "name": "Weitwurf",
+   "tier": "bronze",
+   "box": "wurf",
+   "description": "Besiege einen Gegner mit einem Wurf aus mindestens fünf Feldern Entfernung.",
+   "comment": "Die Flugbahn war perfekt. Das Ziel war es danach nicht mehr.",
+   "category": "technik"
+  },
+  {
+   "id": "mo_ein_lp",
+   "name": "Ein einziger Lebenspunkt",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "description": "Überlebe einen Treffer mit genau einem Lebenspunkt.",
+   "comment": "Eins. Ein Punkt. Die Systemstimme hatte den Nachruf schon angefangen.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_trank_knapp",
+   "name": "Rettung aus der Flasche",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Trinke einen Trank mit weniger als 10 % deiner Lebenspunkte.",
+   "comment": "Ein Schluck zwischen dir und dem Jenseits. Er hat geschmeckt wie Hustensaft.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_rettung_haustier",
+   "name": "Gerettet von der Fellnase",
+   "tier": "silber",
+   "box": "haustier",
+   "description": "Dein Haustier besiegt einen Gegner, während du fast tot bist.",
+   "comment": "Das Tier hat dir das Leben gerettet. Es wird dich nie wieder vergessen lassen.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_rettung_party",
+   "name": "Rückendeckung",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Ein Party-Mitglied besiegt einen Gegner, während du fast tot bist.",
+   "comment": "Freunde sind Leute, die im richtigen Moment zuschlagen. Diesmal wörtlich.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_saferoom_knapp",
+   "name": "Rettendes Ufer",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Betritt einen Safe Room, während ein Gegner direkt hinter dir ist.",
+   "comment": "Der Türsteher hat nur kurz genickt. Dein Verfolger durfte draußen bleiben.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_tuer_zu",
+   "name": "Tür zu, es zieht!",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Schließe eine Tür, während ein wacher Gegner ganz in der Nähe ist.",
+   "comment": "Monster können Türen öffnen. Aber es ist die Geste, die zählt.",
+   "category": "erkundung"
+  },
+  {
+   "id": "mo_schlaflos",
+   "name": "Schlaflos im Keller",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Halte 24 Stunden durch, ohne zu schlafen.",
+   "comment": "Deine Augenringe haben eigene Augenringe. Die Zuschauer sind trotzdem begeistert.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "mo_umzingelt_aufstieg",
+   "name": "Aufstieg unter Druck",
+   "tier": "silber",
+   "box": "brawler",
+   "description": "Steige eine Stufe auf, während dich mindestens zwei Gegner bedrängen.",
+   "comment": "Du hast gelevelt. Die Monster nicht. Das wird ihnen gleich leidtun.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_doppelaufstieg",
+   "name": "Doppelter Aufstieg",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Steige mit einem einzigen Kill zwei Stufen auf einmal auf.",
+   "comment": "So viel Erfahrung auf einmal. Dein Kopf brummt, aber auf die gute Art.",
+   "category": "fortschritt"
+  },
+  {
+   "id": "mo_snack",
+   "name": "Snack zwischendurch",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "description": "Iss etwas, während ein Gegner direkt neben dir steht.",
+   "comment": "Hunger kennt keinen Waffenstillstand. Der Gegner war ehrlich gesagt beeindruckt.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_toilette_kampf",
+   "name": "Es war dringend",
+   "tier": "silber",
+   "box": "kleidung",
+   "description": "Benutze eine Toilette, während ein wacher Gegner in der Nähe ist.",
+   "comment": "Manche Dinge können nicht warten. Die Regie hat diskret weggeblendet. Fast.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_unfall",
+   "name": "Malheur",
+   "tier": "bronze",
+   "box": "kleidung",
+   "description": "Schaffe es nicht mehr rechtzeitig zur Toilette.",
+   "comment": "Das haben ungefähr vier Milliarden Zuschauer gesehen. Die Wiederholung läuft in Endlosschleife.",
+   "category": "momente"
+  },
+  {
+   "id": "mo_boxen_horten",
+   "name": "Lieber später auspacken",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "description": "Horte 10 ungeöffnete Boxen gleichzeitig.",
+   "comment": "Vorfreude ist die schönste Freude. Oder du hast einfach vergessen, sie zu öffnen.",
+   "category": "beute"
+  },
+  {
+   "id": "mo_goldbad",
+   "name": "Goldbad",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Besitze 2.000 Gold auf einmal.",
+   "comment": "Du könntest darin baden. Bitte tu es nicht. Die Zuschauer haben schon genug gesehen.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_feilschen_max",
+   "name": "Halsabschneider",
+   "tier": "silber",
+   "box": "abenteurer",
+   "description": "Handle mindestens 25 % Rabatt heraus.",
+   "comment": "Hinter der Theke wird leise geweint. Du hast kein Mitleid.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_feilschen_pleiten",
+   "name": "Beratungsresistent",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Scheitere dreimal hintereinander beim Feilschen.",
+   "comment": "Die Preise sind jetzt höher als vorher. Das nennt man wohl Verhandlungsgeschick.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_ausverkauf",
+   "name": "Alles muss raus",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Kaufe einen Laden komplett leer.",
+   "comment": "Das Regal ist leer, die Kasse ist voll. Der Laden macht heute früher zu.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_jackpot",
+   "name": "Drei goldene Kronen",
+   "tier": "gold",
+   "box": "fan",
+   "description": "Knacke den Jackpot eines Rubbelloses.",
+   "comment": "Die Chancen standen schlecht. Die Systemstimme prüft gerade, ob du geschummelt hast.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_nieten",
+   "name": "Dauerpech",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Ziehe 10 Nieten beim Rubbellos.",
+   "comment": "Zehn Nieten. Das Glücksspiel ist nicht dein Freund. Die Losbude sieht das anders.",
+   "category": "wirtschaft"
+  },
+  {
+   "id": "mo_kettenzauber",
+   "name": "Kettenreaktion",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Besiege drei Gegner mit einem einzigen Zauber.",
+   "comment": "Ein Zauber, drei Beerdigungen. Die Magieabteilung verlangt eine Gebühr für die Nutzung.",
+   "category": "magie"
+  },
+  {
+   "id": "mo_gerettet_party",
+   "name": "Vom Retter zum Freund",
+   "tier": "gold",
+   "box": "abenteurer",
+   "description": "Nimm einen Crawler in die Party auf, den du vorher versorgt hast.",
+   "comment": "Freundschaft beginnt mit einem Heiltrank. So steht es in keinem Buch, aber es stimmt.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_auftrag_verpatzt",
+   "name": "Versprochen ist versprochen",
+   "tier": "bronze",
+   "box": "fan",
+   "description": "Lass einen Auftrag scheitern.",
+   "comment": "Die Enttäuschung im Gesicht deines Auftraggebers war sehenswert. Die Zuschauer haben es genossen.",
+   "category": "sozial"
+  },
+  {
+   "id": "mo_etage2_frueh",
+   "name": "Mut zur Lücke",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "description": "Erreiche Etage 2 mit Stufe 3 oder weniger.",
+   "comment": "Unterlevelt, aber optimistisch. Die Systemstimme hat die Sterbeversicherung schon mal angefragt.",
+   "category": "erkundung"
+  },
+  {
+   "id": "mo_etage3_frueh",
+   "name": "Ins kalte Wasser",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "description": "Erreiche Etage 3 mit Stufe 6 oder weniger.",
+   "comment": "Die Kanalisation erwartet dich. Sie hat Hunger, und du bist sehr klein.",
+   "category": "erkundung"
+  },
+  {
+   "id": "mo_waffe_bratpfanne",
+   "name": "Gut durch",
+   "description": "Besiege 5 Gegner mit einer Bratpfanne.",
+   "comment": "Das Geräusch einer Bratpfanne auf einem Schädel ist Musik. Sagt die Tonabteilung.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_handtasche",
+   "name": "Handtaschen-Hieb",
+   "description": "Besiege 5 Gegner mit einer schweren Handtasche.",
+   "comment": "Was da wohl drin ist? Niemand wagt es zu fragen.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_regenschirm",
+   "name": "Bei jedem Wetter",
+   "description": "Besiege 5 Gegner mit einem Regenschirm.",
+   "comment": "Hier unten regnet es nie. Der Schirm hat trotzdem seinen Zweck gefunden.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_nudelholz",
+   "name": "Ausgerollt",
+   "description": "Besiege 5 Gegner mit einem Nudelholz.",
+   "comment": "Flach wie ein Pizzateig. Die Kochshow des Senders hat angefragt.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_golfschlaeger",
+   "name": "Einlochen",
+   "description": "Besiege 5 Gegner mit einem Golfschläger.",
+   "comment": "Ein sauberer Abschlag. Das Loch war allerdings ein Monster.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_tischtennis",
+   "name": "Rückhand",
+   "description": "Besiege 5 Gegner mit einem Tischtennisschläger.",
+   "comment": "Niemand hat das kommen sehen. Wirklich niemand.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_kettensaege",
+   "name": "Auch ohne Benzin",
+   "description": "Besiege 5 Gegner mit der Kettensäge ohne Benzin.",
+   "comment": "Sie läuft nicht. Sie ist trotzdem schwer. Das reicht.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  },
+  {
+   "id": "mo_waffe_schoepfkelle",
+   "name": "Nachschlag",
+   "description": "Besiege 5 Gegner mit Omas Schöpfkelle.",
+   "comment": "Es gibt noch Nachschlag. Für jeden. Ob er will oder nicht.",
+   "tier": "bronze",
+   "box": "waffen",
+   "category": "technik"
+  }
+ ]
+}

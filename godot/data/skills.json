@@ -1,0 +1,472 @@
+{
+ "SKILL_CATEGORY_NAMES": {
+  "kampf": "Kampf",
+  "verteidigung": "Verteidigung",
+  "bewegung": "Bewegung und Heimlichkeit",
+  "ueberleben": "Überleben",
+  "handwerk": "Handwerk",
+  "sozial": "Umgang und Show",
+  "magie": "Magie"
+ },
+ "SKILLS": [
+  {
+   "id": "faustkampf",
+   "name": "Faustkampf",
+   "category": "kampf",
+   "trigger": "technique",
+   "parts": [
+    "faust"
+   ],
+   "unlockAt": 15,
+   "maxLevel": 15,
+   "description": "+10 % Faustschaden pro Stufe.",
+   "perLevel": {},
+   "matchDamage": 10,
+   "unlockText": "Du haust gerne Dinge. Die Systemstimme respektiert das."
+  },
+  {
+   "id": "treten",
+   "name": "Treten",
+   "category": "kampf",
+   "trigger": "technique",
+   "parts": [
+    "tritt"
+   ],
+   "unlockAt": 15,
+   "maxLevel": 15,
+   "description": "+10 % Trittschaden und +2 % Umwerf-Chance pro Stufe.",
+   "perLevel": {},
+   "matchDamage": 10,
+   "knockdown": 2,
+   "unlockText": "Dein Fuß und das Gesicht deiner Feinde sind jetzt enge Freunde."
+  },
+  {
+   "id": "stampfen",
+   "name": "Stampfer",
+   "category": "kampf",
+   "trigger": "technique",
+   "moves": [
+    "stampfen"
+   ],
+   "unlockAt": 5,
+   "maxLevel": 15,
+   "description": "+15 % Stampfschaden pro Stufe.",
+   "perLevel": {},
+   "matchDamage": 15,
+   "unlockText": "Wer am Boden liegt, liegt dort nicht lange. Zumindest nicht lebendig."
+  },
+  {
+   "id": "sprungangriff",
+   "name": "Sprungangriff",
+   "category": "kampf",
+   "trigger": "technique",
+   "moves": [
+    "sprung"
+   ],
+   "unlockAt": 8,
+   "maxLevel": 15,
+   "description": "+10 % Schaden und +2 % Treffer bei Sprungangriffen pro Stufe.",
+   "perLevel": {},
+   "matchDamage": 10,
+   "matchTreffer": 2,
+   "unlockText": "Die Schwerkraft ist dein Verbündeter. Bis zur Landung."
+  },
+  {
+   "id": "sturmangriff",
+   "name": "Sturmangriff",
+   "category": "kampf",
+   "trigger": "technique",
+   "moves": [
+    "anlauf"
+   ],
+   "unlockAt": 8,
+   "maxLevel": 15,
+   "description": "+12 % Schaden bei Angriffen mit Anlauf pro Stufe, +2 % Umwerf-Chance.",
+   "perLevel": {},
+   "matchDamage": 12,
+   "knockdown": 2,
+   "unlockText": "Du rennst auf Dinge zu, die dich töten wollen. Mutig. Oder dumm."
+  },
+  {
+   "id": "ellbogen",
+   "name": "Ellbogengesellschaft",
+   "category": "kampf",
+   "trigger": "technique",
+   "parts": [
+    "ellbogen"
+   ],
+   "unlockAt": 10,
+   "maxLevel": 15,
+   "description": "+12 % Ellbogenschaden und +1 % Krit pro Stufe.",
+   "perLevel": {
+    "krit": 1
+   },
+   "matchDamage": 12,
+   "unlockText": "Spitz, hart und sozial akzeptiert. Zumindest hier unten."
+  },
+  {
+   "id": "knie",
+   "name": "Kniestoß",
+   "category": "kampf",
+   "trigger": "technique",
+   "parts": [
+    "knie"
+   ],
+   "unlockAt": 10,
+   "maxLevel": 15,
+   "description": "+12 % Knieschaden pro Stufe.",
+   "perLevel": {},
+   "matchDamage": 12,
+   "unlockText": "Das Knie: das unterschätzteste Körperteil. Bis heute."
+  },
+  {
+   "id": "kopfnuss",
+   "name": "Kopfnuss",
+   "category": "kampf",
+   "trigger": "technique",
+   "parts": [
+    "kopf"
+   ],
+   "unlockAt": 8,
+   "maxLevel": 15,
+   "description": "+15 % Kopfstoßschaden pro Stufe, weniger Selbstverletzung.",
+   "perLevel": {},
+   "matchDamage": 15,
+   "unlockText": "Du benutzt deinen Kopf. Nur nicht so, wie deine Lehrer es meinten."
+  },
+  {
+   "id": "werfen",
+   "name": "Werfen",
+   "category": "kampf",
+   "trigger": "technique",
+   "parts": [
+    "wurf"
+   ],
+   "unlockAt": 10,
+   "maxLevel": 15,
+   "description": "+10 % Wurfschaden und +3 % Treffer pro Stufe.",
+   "perLevel": {},
+   "matchDamage": 10,
+   "matchTreffer": 3,
+   "unlockText": "Steine. Flaschen. Dosen. Alles ist ein Geschoss, wenn man fest genug glaubt."
+  },
+  {
+   "id": "improvisation",
+   "name": "Improvisierte Waffen",
+   "category": "kampf",
+   "trigger": "technique",
+   "parts": [
+    "waffe"
+   ],
+   "unlockAt": 12,
+   "maxLevel": 15,
+   "description": "+10 % Waffenschaden pro Stufe.",
+   "perLevel": {},
+   "matchDamage": 10,
+   "unlockText": "Ein Stuhlbein ist ein Stuhlbein, bis es ein Knüppel ist."
+  },
+  {
+   "id": "wuchtschlag",
+   "name": "Wuchtschlag",
+   "category": "kampf",
+   "trigger": "technique",
+   "parts": [
+    "faust",
+    "tritt",
+    "knie",
+    "ellbogen",
+    "kopf"
+   ],
+   "unlockAt": 60,
+   "maxLevel": 15,
+   "description": "+20 % Schaden für alle unbewaffneten Angriffe pro Stufe.",
+   "perLevel": {},
+   "matchDamage": 20,
+   "unlockText": "Dein ganzer Körper ist jetzt eine Waffe. Das ist weniger sexy, als es klingt."
+  },
+  {
+   "id": "meteorstampfer",
+   "name": "Meteor-Stampfer",
+   "category": "kampf",
+   "trigger": "technique",
+   "moves": [
+    "sprung"
+   ],
+   "parts": [
+    "tritt"
+   ],
+   "unlockAt": 3,
+   "maxLevel": 10,
+   "description": "Sprungtritte: +20 % Schaden und +3 % Umwerf-Chance pro Stufe.",
+   "perLevel": {},
+   "matchDamage": 20,
+   "knockdown": 3,
+   "unlockText": "Du springst. Du trittst. Du landest auf jemandem. Die Physik weint."
+  },
+  {
+   "id": "hinterhalt",
+   "name": "Hinterhalt",
+   "category": "kampf",
+   "trigger": "ambush",
+   "unlockAt": 5,
+   "maxLevel": 15,
+   "description": "+25 % Schaden gegen Gegner, die dich nicht bemerkt haben, pro Stufe.",
+   "perLevel": {},
+   "unlockText": "Ehrlich kämpfen ist was für Leute mit Respawn."
+  },
+  {
+   "id": "anatomie",
+   "name": "Anatomie",
+   "category": "kampf",
+   "trigger": "zone",
+   "unlockAt": 12,
+   "maxLevel": 15,
+   "description": "Gezielte Treffer: pro Stufe +2 % Treffer auf Kopf, Arme und Beine und +2 % Chance auf ihre Wirkung (benommen, geschwächt, humpelt).",
+   "perLevel": {},
+   "unlockText": "Du weißt jetzt, wo es wehtut. Genau da, wo du hinhaust."
+  },
+  {
+   "id": "sprengmeister",
+   "name": "Sprengmeister",
+   "category": "kampf",
+   "trigger": "explode",
+   "unlockAt": 5,
+   "maxLevel": 15,
+   "description": "Explosionen: +8 % Schaden pro Stufe, eigener Explosionsschaden −5 % pro Stufe.",
+   "perLevel": {},
+   "unlockText": "Du hast aufgehört, dich beim Knall zu ducken. Das ist entweder Erfahrung oder Taubheit."
+  },
+  {
+   "id": "ausweichen",
+   "name": "Ausweichen",
+   "category": "verteidigung",
+   "trigger": "dodge",
+   "unlockAt": 10,
+   "maxLevel": 15,
+   "description": "+1,5 % Ausweichen pro Stufe.",
+   "perLevel": {
+    "ausweichen": 1.5
+   },
+   "unlockText": "Nicht getroffen werden ist auch eine Kampftechnik."
+  },
+  {
+   "id": "abwehr",
+   "name": "Abwehr",
+   "category": "verteidigung",
+   "trigger": "block",
+   "unlockAt": 6,
+   "maxLevel": 15,
+   "description": "Deckung wird besser: pro Stufe +2 % Ausweichen in Deckung, alle drei Stufen +1 Rüstung in Deckung.",
+   "perLevel": {},
+   "unlockText": "Arme hoch, Kinn runter. Die Grundlagen, endlich."
+  },
+  {
+   "id": "konter",
+   "name": "Konter",
+   "category": "verteidigung",
+   "trigger": "counter",
+   "unlockAt": 20,
+   "maxLevel": 15,
+   "description": "Nach einem ausgewichenen Nahkampfangriff +3 % Chance pro Stufe auf einen sofortigen Gegenschlag.",
+   "perLevel": {},
+   "unlockText": "Er verfehlt. Du nicht. So einfach ist das."
+  },
+  {
+   "id": "zaehigkeit",
+   "name": "Zähigkeit",
+   "category": "verteidigung",
+   "trigger": "hurt",
+   "unlockAt": 25,
+   "maxLevel": 15,
+   "description": "+3 max. HP pro Stufe.",
+   "perLevel": {
+    "maxHp": 3
+   },
+   "unlockText": "Du wurdest so oft verprügelt, dass dein Körper beschlossen hat, sich daran zu gewöhnen."
+  },
+  {
+   "id": "schmerzresistenz",
+   "name": "Schmerzresistenz",
+   "category": "verteidigung",
+   "trigger": "bighit",
+   "unlockAt": 8,
+   "maxLevel": 15,
+   "description": "Nach schweren Treffern gelernt: −1,5 % Schaden durch Monster pro Stufe.",
+   "perLevel": {},
+   "unlockText": "Der Schmerz ist noch da. Er ist dir nur egal geworden."
+  },
+  {
+   "id": "giftfestigkeit",
+   "name": "Giftfestigkeit",
+   "category": "verteidigung",
+   "trigger": "poison",
+   "unlockAt": 15,
+   "maxLevel": 15,
+   "description": "−6 % Giftschaden pro Stufe.",
+   "perLevel": {},
+   "unlockText": "Dein Körper hat so viel Gift gesehen, dass er es inzwischen höflich ignoriert."
+  },
+  {
+   "id": "schleichen",
+   "name": "Schleichen",
+   "category": "bewegung",
+   "trigger": "sneak",
+   "unlockAt": 8,
+   "maxLevel": 15,
+   "description": "Monster bemerken dich später: Pro Stufe −4 % Entdeckungschance, alle vier Stufen −1 Sichtweite der Monster; Schlafende wachen seltener auf.",
+   "perLevel": {},
+   "unlockText": "Leise Sohlen, flacher Atem. Die Monster merken nichts. Die Zuschauer schon."
+  },
+  {
+   "id": "wahrnehmung",
+   "name": "Wahrnehmung",
+   "category": "bewegung",
+   "trigger": "perceive",
+   "unlockAt": 10,
+   "maxLevel": 15,
+   "description": "Pro Stufe +3 % Fallen entdecken; alle fünf Stufen +1 Sichtweite; ab Stufe 8 erkennst du Monster besser.",
+   "perLevel": {
+    "lichtradius": 0.2
+   },
+   "unlockText": "Du siehst Dinge. Nicht auf die gruselige Art. Meistens."
+  },
+  {
+   "id": "kondition",
+   "name": "Kondition",
+   "category": "bewegung",
+   "trigger": "stamina",
+   "unlockAt": 25,
+   "maxLevel": 15,
+   "description": "+1 max. Ausdauer pro Stufe; ab Stufe 5 und 10 erholt sich die Ausdauer schneller.",
+   "perLevel": {
+    "maxAusdauer": 1
+   },
+   "unlockText": "Du schnaufst nicht mehr nach drei Schlägen. Erst nach fünf."
+  },
+  {
+   "id": "reiten",
+   "name": "Reiten",
+   "category": "bewegung",
+   "trigger": "ride",
+   "unlockAt": 60,
+   "maxLevel": 15,
+   "description": "Pro Stufe: Reittier nimmt −4 % Schaden, Rammen +8 % Schaden, 5 % Chance, kein Benzin zu verbrauchen.",
+   "perLevel": {},
+   "unlockText": "Du sitzt nicht mehr drauf wie ein Sack Kartoffeln. Eher wie ein Sack Kartoffeln mit Selbstvertrauen."
+  },
+  {
+   "id": "entfesseln",
+   "name": "Entfesseln",
+   "category": "bewegung",
+   "trigger": "struggle",
+   "unlockAt": 4,
+   "maxLevel": 10,
+   "description": "+8 % Chance pro Stufe, dich aus Fallen und Griffen zu befreien.",
+   "perLevel": {},
+   "unlockText": "Bärenfallen, Gruben, Schlingen. Du kennst sie alle von innen."
+  },
+  {
+   "id": "erste_hilfe",
+   "name": "Erste Hilfe",
+   "category": "ueberleben",
+   "trigger": "heal",
+   "unlockAt": 8,
+   "maxLevel": 15,
+   "description": "Heilgegenstände wirken +8 % stärker pro Stufe, Schlafen heilt +10 % mehr pro Stufe.",
+   "perLevel": {},
+   "unlockText": "Du weißt jetzt, wo das Pflaster hin muss. Meistens da, wo es blutet."
+  },
+  {
+   "id": "kochen",
+   "name": "Kochen",
+   "category": "ueberleben",
+   "trigger": "eat",
+   "unlockAt": 12,
+   "maxLevel": 15,
+   "description": "Essen heilt 15 % mehr pro Stufe.",
+   "perLevel": {},
+   "unlockText": "Du isst so oft Dosenfutter, dass du jetzt weißt, wie man es gut macht."
+  },
+  {
+   "id": "fallenkunde",
+   "name": "Fallenkunde",
+   "category": "ueberleben",
+   "trigger": "trap",
+   "unlockAt": 3,
+   "maxLevel": 15,
+   "description": "Fallen leichter entdecken (+6 % pro Stufe), sicherer entschärfen (+8 % pro Stufe), eigene Fallen richten mehr Schaden an.",
+   "perLevel": {},
+   "unlockText": "Du schaust jetzt auf jede Bodenplatte, als hätte sie dich persönlich beleidigt."
+  },
+  {
+   "id": "spielerfahrung",
+   "name": "Spielerfahrung",
+   "category": "ueberleben",
+   "trigger": "kill",
+   "unlockAt": 9999,
+   "maxLevel": 15,
+   "description": "+5 % XP pro Stufe.",
+   "perLevel": {
+    "xpBonus": 5
+   },
+   "unlockText": "Tausende Stunden vor dem Bildschirm. Endlich zahlt es sich aus."
+  },
+  {
+   "id": "handwerk",
+   "name": "Handwerk",
+   "category": "handwerk",
+   "trigger": "craft",
+   "unlockAt": 3,
+   "maxLevel": 15,
+   "description": "Hergestellte Sprengsätze richten +10 % Schaden pro Stufe an; ab Stufe 3 gelingt manchmal ein Stück extra.",
+   "perLevel": {},
+   "unlockText": "Klebeband, Nägel, schlechte Ideen. Du hast deine Berufung gefunden."
+  },
+  {
+   "id": "feilschen",
+   "name": "Feilschen",
+   "category": "sozial",
+   "trigger": "haggle",
+   "unlockAt": 3,
+   "maxLevel": 15,
+   "description": "Pro Stufe +4 % Chance beim Verhandeln, +1 % möglicher Rabatt, +2 % Verkaufspreis.",
+   "perLevel": {},
+   "unlockText": "Du hast gelernt, dass „Das ist mein letztes Angebot“ nie das letzte Angebot ist."
+  },
+  {
+   "id": "tierkunde",
+   "name": "Tierkunde",
+   "category": "sozial",
+   "trigger": "pet",
+   "unlockAt": 8,
+   "maxLevel": 15,
+   "description": "Pro Stufe: Haustier +6 % Schaden, +3 % Chance beim Zähmen.",
+   "perLevel": {},
+   "unlockText": "Du verstehst Tiere. Sie verstehen dich. Keiner von euch versteht die Monster."
+  },
+  {
+   "id": "rampenlicht",
+   "name": "Rampenlicht",
+   "category": "sozial",
+   "trigger": "show",
+   "unlockAt": 15,
+   "maxLevel": 15,
+   "description": "+5 % Follower-Zuwachs pro Stufe.",
+   "perLevel": {},
+   "unlockText": "Du spürst, wo die Kamera ist. Immer. Es ist ein bisschen unheimlich."
+  },
+  {
+   "id": "arkane_kunde",
+   "name": "Arkane Kunde",
+   "category": "magie",
+   "trigger": "cast",
+   "unlockAt": 10,
+   "maxLevel": 15,
+   "description": "Pro Stufe +1 max. Mana und +4 % Zauberwirkung; ab Stufe 5 und 10 regeneriert Mana schneller.",
+   "perLevel": {
+    "maxMp": 1
+   },
+   "unlockText": "Die Magie kribbelt nicht mehr in den Fingern. Sie gehorcht."
+  }
+ ]
+}
