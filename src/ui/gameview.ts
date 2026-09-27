@@ -475,6 +475,7 @@ export class GameView {
       const color = info.insight >= 3 ? '#b0a898' : mon.color;
       parts.push(`<b style="color:${color}">${esc(info.name)}</b>${info.rank ? ` <span class="muted">${info.rank}</span>` : ''}`);
       parts.push(`<span class="muted">${esc(info.level)} · ${esc(INSIGHT_NAMES[info.insight])}</span>`);
+      parts.push(`Herausforderung: <b style="color:${info.challenge.color}">${esc(info.challenge.name)}</b> <span class="muted small">(${esc(info.challenge.hint)})</span>`);
       parts.push(`${esc(info.health)}${mon.downed > 0 ? ' · <span style="color:#7cc4ff">am Boden</span>' : ''}${mon.asleep ? ' · <span style="color:#6ee07a">schläft</span>' : !mon.aware ? ' · <span style="color:#6ee07a">ahnungslos</span>' : ''}`);
       if (info.combat) parts.push(esc(info.combat));
       if (info.abilities) parts.push(`<span style="color:#ff9dff">${esc(info.abilities)}</span>`);
@@ -1201,7 +1202,7 @@ export class GameView {
       const state = [m.asleep ? 'schläft' : !m.aware ? 'ahnungslos' : '', m.downed > 0 ? 'am Boden' : '', m.stunned ? 'benommen' : '', m.slowed ? 'humpelt' : '', m.weakened ? 'geschwächt' : ''].filter(Boolean).join(', ');
       const sel = m.uid === this.targetUid;
       return `<div class="target ${sel ? 'sel' : ''}" data-action="target" data-uid="${m.uid}">
-        <div><b style="color:${info.insight >= 3 ? '#b0a898' : m.color}">${esc(info.name)}</b> <span class="muted small">${esc(info.level)} · ${d} ${d === 1 ? 'Feld' : 'Felder'}</span></div>
+        <div><b style="color:${info.insight >= 3 ? '#b0a898' : m.color}">${esc(info.name)}</b> <span class="muted small">${esc(info.level)} · ${d} ${d === 1 ? 'Feld' : 'Felder'}</span> <span class="small" style="color:${info.challenge.color}">${esc(info.challenge.name)}</span></div>
         <div class="small">${esc(info.health)}${state ? ` · <span style="color:#7cc4ff">${esc(state)}</span>` : ''}</div>
         <div class="row" style="gap:6px;align-items:center"><span class="small" style="flex:1;color:${blocker ? 'var(--muted)' : 'var(--ok)'}">${esc(blocker ?? chance)}</span>
         <button class="primary" data-action="strike" data-uid="${m.uid}" ${blocker ? 'disabled' : ''}>${this.pendingSpell ? 'Zaubern' : 'Angreifen'}</button></div>

@@ -5,6 +5,7 @@ import { MOUNTS } from '../data/mounts';
 import { LEVEL_UP_QUIPS } from '../data/world';
 import { addBonuses } from './bonuses';
 import { traitBonuses } from './traits';
+import { xpToNext } from './progression';
 import { emit } from './events';
 import { log, toast } from './log';
 import * as R from './rng';
@@ -58,9 +59,7 @@ export function lichtradius(s: GameState, b = totalBonuses(s)): number {
   return 6 + (b.lichtradius ?? 0);
 }
 
-export function xpToNext(level: number): number {
-  return Math.round(40 * Math.pow(level, 1.5));
-}
+export { xpToNext } from './progression';
 
 export function gainXp(s: GameState, amount: number) {
   const b = totalBonuses(s);

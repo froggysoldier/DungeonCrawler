@@ -12,6 +12,7 @@ import { crawlerAt, monsterHitsCrawler } from './crawlers';
 import { checkEvolve, petAbilityTurn, petBiteBonus } from './petevo';
 import { mountAbsorbs } from './mounts';
 import { playerSees } from './sight';
+import { levelGapHit } from './progression';
 import { dynDefenseBonus, targetFacets, trainDefense } from './observer';
 import { ausweichen, totalBonuses } from './player';
 import * as R from './rng';
@@ -103,7 +104,7 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
   const source = targetFacets(s, m).filter((f) => f !== 'z:ahnungslos');
   if (ranged && !source.includes('z:fernkampf')) source.push('z:fernkampf');
   const defense = dynDefenseBonus(s, source);
-  const hit = Math.max(5, Math.min(95, m.treffer - ausweichen(s, b) - defense.ausweichen - (ranged ? 5 : 0)));
+  const hit = Math.max(5, Math.min(95, m.treffer - ausweichen(s, b) - defense.ausweichen - (ranged ? 5 : 0) + levelGapHit(m.level, p.level)));
   const verb = ranged ? 'schießt auf dich' : 'greift an';
   if (ranged) shot(s, m.pos, p.pos, shotStyle(s, m));
   if (R.next(s) * 100 >= hit) {

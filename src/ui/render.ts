@@ -553,6 +553,14 @@ export function render(
     ctx.font = `bold ${boss ? 14 : r < 8 ? 10 : 12}px Montserrat, sans-serif`;
     ctx.fillText(unknown ? '?' : mo.glyph, cx, cy + 1);
     if (mo.hp < mo.maxHp && info.showHealthBar) healthBar(ctx, sx(p.x), sy(p.y) - 4, mo.hp / mo.maxHp, '#ff5a4a');
+    // Stufenmarke unten links: Farbe zeigt die Herausforderung
+    ctx.fillStyle = 'rgba(0,0,0,0.75)';
+    ctx.beginPath();
+    ctx.arc(cx - r + 1, cy + r - 1, 5.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = info.challenge.color;
+    ctx.font = 'bold 8px Montserrat, sans-serif';
+    ctx.fillText(info.insight <= 1 ? String(mo.level) : '?', cx - r + 1, cy + r - 0.5);
     ctx.font = 'bold 10px Montserrat, sans-serif';
     if (mo.asleep) {
       ctx.fillStyle = '#9fc4ff';

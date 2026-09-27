@@ -12,6 +12,7 @@ import { blast } from './traps';
 import { ramBonus } from './mounts';
 import { population } from './crawlers';
 import { playerSees } from './sight';
+import { CHALLENGES, killXp, levelGapHit } from './progression';
 import { makeNoise } from './ai';
 import { FX_COLORS, floatText, shot } from './fx';
 import { roomOf } from './mapgen';
@@ -123,6 +124,7 @@ export function hitChance(s: GameState, target: Monster, t: Technique): number {
   if (!target.aware) hit += 20;
   if (target.downed > 0) hit += 25;
   hit += zoneModifier(target, t);
+  hit += levelGapHit(s.player.level, target.level);
   const facets = attackFacets(s, target, t);
   hit += dynAttackBonus(s, facets, t).hit + traitAttackBonus(s, facets).hit;
   return Math.max(5, Math.min(95, Math.round(hit)));
@@ -358,8 +360,12 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
   // Was andere tun, erfährt man nur, wenn man es sieht
   const witnessed = killer === 'Du' || playerSees(s, m.pos);
   if (witnessed) log(s, `${killer === 'Du' ? 'Du tötest' : `${killer} tötet`} ${nameOf(s, m)}!`, 'kampf');
-  const xp = gainXp(s, m.xp);
-  if (witnessed) log(s, `+${xp} XP`, 'info');
+  const reward = killXp(s, m);
+  const xp = gainXp(s, reward.xp);
+  if (witnessed) {
+    const note = reward.diff <= -2 ? ` (${CHALLENGES[reward.challenge].hint} – der Gegner war schwächer als du)` : reward.diff >= 2 ? ` (${CHALLENGES[reward.challenge].hint} – ein stärkerer Gegner)` : '';
+    log(s, `+${xp} XP${note}`, 'info');
+  }
 
   // Beute
   for (const drop of rollMobDrop(s, m.level, m.rank === 'elite')) dropNear(s, drop, m.pos);

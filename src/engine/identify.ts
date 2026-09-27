@@ -2,6 +2,7 @@ import { RARITY_NAMES, SLOT_NAMES } from '../data/items';
 import { ABILITY_NAMES } from './abilities';
 import { describeBonuses } from './bonuses';
 import { effectiveStats, maxHp } from './player';
+import { CHALLENGES, challengeOf } from './progression';
 import type { GameState, Item, Monster, MonsterSize, Rarity } from './types';
 
 /**
@@ -92,6 +93,8 @@ export interface MonsterInfo {
   flavor: string | null;
   showHitChance: boolean;
   showHealthBar: boolean;
+  /** Herausforderung im Verhältnis zur eigenen Stufe (Farbe und Erfahrungshinweis). */
+  challenge: { name: string; color: string; hint: string };
 }
 
 export function describeMonster(s: GameState, m: Monster): MonsterInfo {
@@ -128,6 +131,9 @@ export function describeMonster(s: GameState, m: Monster): MonsterInfo {
     flavor: insight <= 2 ? m.flavor : null,
     showHitChance: insight <= 2,
     showHealthBar: insight <= 3,
+    challenge: insight <= 2
+      ? CHALLENGES[challengeOf(m.level - s.player.level)]
+      : { name: 'gefährlich oder schlimmer', color: CHALLENGES.gefaehrlich.color, hint: 'unbekannt viel Erfahrung' },
   };
 }
 
