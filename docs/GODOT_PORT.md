@@ -87,12 +87,27 @@ Kompatibilitäts-Renderer kein 2D-MSAA kennt.
 | 2 – Spielschleife | Bewegung, Züge, Kampf, KI, Zustände, Türen, Fallen | erledigt |
 | 3 – Systeme | Skills, Stufen, Achievements, Klassen, Rassen, Boxen, Sponsoren, Quests, Haustiere, Reittiere, Magie, Handwerk, Laden, Crawler, Talkshow, Zuschauer | erledigt |
 | 4 – Darstellung | Karte, Kreaturen, Kamera, Licht und Nebel, Theme, Log mit Schreibmaschinen-Effekt, Klänge, Versus-Bildschirm, Kampfbanner | erledigt |
-| 5 – Abschluss | Titel, Interview, Speichern und Laden, Exportvorlagen | erledigt, Export noch ungetestet |
+| 5 – Abschluss | Titel, Interview, Speichern und Laden, Export Web, Windows, Linux | erledigt |
 
 ## Export
 
-In `export_presets.cfg` stehen Vorlagen für Web, Windows und Linux. Zum
-Exportieren braucht der Editor die Export-Vorlagen von Godot 4.7.2
-(Editor → Export-Vorlagen verwalten). Die Web-Vorlage läuft ohne Threads und
-deshalb auf jedem einfachen Webserver. Die Klänge werden dort nacheinander
-erzeugt, ein Klang pro Bild.
+In `export_presets.cfg` stehen Vorlagen für Web, Windows und Linux. Der Editor
+braucht dafür die Export-Vorlagen von Godot 4.7.2 (Editor → Export-Vorlagen
+verwalten). Auf der Kommandozeile:
+
+```bash
+godot --headless --path godot --export-release Web ../build/godot-web/index.html
+godot --headless --path godot --export-release Linux ../build/godot-linux/DerGrosseAbstieg.x86_64
+godot --headless --path godot --export-release Windows ../build/godot-windows/DerGrosseAbstieg.exe
+```
+
+Geprüft: Die Linux-Version startet fehlerfrei. Die Web-Version läuft in
+Chromium mit Titel, Interview, Karte, Kampf und Tastatur. Die Web-Vorlage kommt
+ohne Threads aus und läuft deshalb auf jedem einfachen Webserver (etwa
+`python3 -m http.server` im Ausgabeordner). Die Klänge werden dort
+nacheinander erzeugt, ein Klang pro Bild. Die Ausgabe landet in `build/`, das
+nicht eingecheckt wird.
+
+Entwicklerschalter: `--schnellstart` startet direkt eine Partie (Seed 1, ohne
+Interview). Im Web geht das über `"args":["--schnellstart"]` in der
+erzeugten `index.html`.

@@ -56,7 +56,7 @@ static func _button(t: Theme, type: String, normal: StyleBoxFlat, hover: StyleBo
 	t.set_color("font_pressed_color", type, hover_color if hover_color.a > 0 else font_color)
 	t.set_color("font_hover_pressed_color", type, hover_color if hover_color.a > 0 else font_color)
 	t.set_color("font_focus_color", type, font_color)
-	t.set_color("font_disabled_color", type, Color(font_color, 0.38))
+	t.set_color("font_disabled_color", type, Color(MUTED, 0.6) if font_color.v < 0.2 else Color(font_color, 0.38))
 	t.set_font_size("font_size", type, size)
 	t.set_font("font", type, UiFonts.get_font(weight))
 
@@ -101,7 +101,8 @@ static func get_theme() -> Theme:
 	pn.shadow_offset = Vector2(0, 3)
 	var ph := box(Color("#f7c24a"), Color("#ffe08c"), 8, 1, pad)
 	var pp := box(Color("#e0a42a"), Color("#f7c65a"), 8, 1, Vector4(pad.x, pad.y + 1, pad.z, pad.w - 1))
-	var pd := box(Color("#f0b53a", 0.4), Color("#f7c65a", 0.4), 8, 1, pad)
+	# Deaktiviert grau wie in der Web-Version (nicht halb durchsichtiges Gold)
+	var pd := box(Color("#1a1d25"), LINE, 8, 1, pad)
 	_button(t, "PrimaryButton", pn, ph, pp, pd, Color("#1c1405"), Color("#1c1405"), 14, 700)
 	# Ausgewählt (Aktionsleiste, Kampf, Wahl)
 	var sn := box(Color("#2b2616"), ACCENT, 7, 1, pad)
@@ -109,7 +110,7 @@ static func get_theme() -> Theme:
 	# Kleine Knöpfe
 	var small_pad := Vector4(8, 3, 8, 3)
 	_button(t, "SmallButton", box(Color("#1f222c"), LINE_2, 7, 1, small_pad), box(Color("#262a35"), Color(ACCENT, 0.6), 7, 1, small_pad), box(Color("#181b22"), Color(ACCENT, 0.6), 7, 1, small_pad), box(Color("#1f222c", 0.6), Color(LINE_2, 0.6), 7, 1, small_pad), TEXT, Color(0, 0, 0, 0), 12)
-	_button(t, "SmallPrimary", box(Color("#f0b53a"), Color("#f7c65a"), 7, 1, small_pad), box(Color("#f7c24a"), Color("#ffe08c"), 7, 1, small_pad), box(Color("#e0a42a"), Color("#f7c65a"), 7, 1, small_pad), box(Color("#f0b53a", 0.4), Color("#f7c65a", 0.4), 7, 1, small_pad), Color("#1c1405"), Color("#1c1405"), 12, 700)
+	_button(t, "SmallPrimary", box(Color("#f0b53a"), Color("#f7c65a"), 7, 1, small_pad), box(Color("#f7c24a"), Color("#ffe08c"), 7, 1, small_pad), box(Color("#e0a42a"), Color("#f7c65a"), 7, 1, small_pad), box(Color("#1a1d25"), LINE, 7, 1, small_pad), Color("#1c1405"), Color("#1c1405"), 12, 700)
 	# Pillen in der Kopfzeile
 	var pill_pad := Vector4(11, 3, 11, 3)
 	_button(t, "PillButton", box(Color("#1f222c"), LINE_2, 99, 1, pill_pad), box(Color("#262a35"), Color(ACCENT, 0.6), 99, 1, pill_pad), box(Color("#181b22"), Color(ACCENT, 0.6), 99, 1, pill_pad), box(Color("#1f222c", 0.6), Color(LINE_2, 0.6), 99, 1, pill_pad), TEXT, Color(0, 0, 0, 0), 12)

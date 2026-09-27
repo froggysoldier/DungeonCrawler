@@ -19,6 +19,14 @@ func _ready() -> void:
 	add_child(screen_root)
 	modals = Modals.new()
 	add_child(modals)
+	# Entwicklerschalter: direkt eine Partie starten (Seed 1, ohne Interview)
+	var args := OS.get_cmdline_args() + OS.get_cmdline_user_args()
+	if args.has("--schnellstart"):
+		var s := Game.new_game({"name": "Test", "answers": {}, "seed": 1, "meta": Meta.load_meta()})
+		s.pendingDialogs.clear()
+		meta = Meta.load_meta()
+		start_game(s)
+		return
 	show_title()
 
 
