@@ -429,6 +429,8 @@ export interface Player {
   riding?: boolean;
   /** Zähler für Extraschritte beim Reiten. */
   mountSteps?: number;
+  /** Skills der gewählten Klasse (lernen 50 % schneller). */
+  classSkills?: string[];
   /** Bevorzugtes Wurfobjekt (Basis-ID). */
   wurfWahl?: string;
 }
@@ -638,11 +640,11 @@ export interface Dialog {
 // ---------------------------------------------------------------- Events
 
 export type GameEvent =
-  | { type: 'kill'; monster: Monster; technique: Technique | null; byPet?: boolean; facets?: string[] }
+  | { type: 'kill'; monster: Monster; technique: Technique | null; byPet?: boolean; byAlly?: boolean; facets?: string[] }
   | { type: 'attack'; technique: Technique; hit: boolean; crit: boolean; damage: number; target: Monster; thrown?: Item; facets?: string[] }
   | { type: 'damageTaken'; amount: number; source: string; facets?: string[] }
   | { type: 'dodged'; source: string; facets?: string[] }
-  | { type: 'enterRoom'; room: Room }
+  | { type: 'enterRoom'; room: Room; first?: boolean }
   | { type: 'pickup'; item: Item }
   | { type: 'equip'; item: Item }
   | { type: 'boxOpened'; item: Item; contents: Item[] }

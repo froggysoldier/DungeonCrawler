@@ -12,6 +12,7 @@ import { log } from './log';
 import { idx, tileAt } from './mapgen';
 import { selfFacets, targetFacets } from './observer';
 import { effectiveStats, skillLevel } from './player';
+import { trainSkill } from './skills';
 import * as R from './rng';
 import type { GameState, Item, Monster, Pos, Trap, TrapKind } from './types';
 
@@ -98,7 +99,7 @@ export function placeTraps(s: GameState, start: Pos) {
 
 export function detectChance(s: GameState, t: Trap, dist: number): number {
   const int = effectiveStats(s).int;
-  const base = 12 + (int - 5) * 4 + skillLevel(s, 'fallenkunde') * 6 - TRAP_DEFS[t.kind].hide - (dist - 1) * 6;
+  const base = 12 + (int - 5) * 4 + skillLevel(s, 'fallenkunde') * 6 + skillLevel(s, 'wahrnehmung') * 3 - TRAP_DEFS[t.kind].hide - (dist - 1) * 6;
   return Math.max(3, Math.min(90, base)) / 100;
 }
 
@@ -196,7 +197,8 @@ export function struggle(s: GameState): boolean {
   const p = s.player;
   if (!p.immobile) return true;
   const str = effectiveStats(s).str;
-  if (R.chance(s, Math.min(0.6, 0.1 + (str - 5) * 0.05))) {
+  trainSkill(s, 'struggle', 1);
+  if (R.chance(s, Math.min(0.9, 0.1 + (str - 5) * 0.05 + skillLevel(s, 'entfesseln') * 0.08))) {
     p.immobile = 0;
     log(s, 'Mit aller Kraft reißt du dich los.', 'info');
     return true;
@@ -326,7 +328,7 @@ export function blast(s: GameState, at: Pos, dmg: number, part: 'falle' | 'bombe
     }
   }
   if (s.status === 'playing' && chebyshev(s.player.pos, at) <= 1) {
-    const raw = Math.max(1, Math.round(dmg * 0.6));
+    const raw = Math.max(1, Math.round(dmg * 0.6 * (1 - Math.min(0.75, skillLevel(s, 'sprengmeister') * 0.05))));
     const taken = hasSpecial(s, 'explosionsschutz') ? Math.ceil(raw / 2) : raw;
     log(s, `Du stehst zu nah dran. Die Druckwelle erwischt dich für ${taken} Schaden.`, 'gefahr');
     if (!hurtPlayer(s, taken, selfCause)) emit(s, { type: 'explosion', damage: taken, source: 'eigener Sprengsatz' });

@@ -5,6 +5,8 @@ import { createItem } from './items';
 import { log, toast } from './log';
 import { roomOf } from './mapgen';
 import * as R from './rng';
+import { skillLevel } from './player';
+import { trainSkill } from './skills';
 import type { GameState, Item } from './types';
 
 /**
@@ -80,8 +82,10 @@ export function mountStep(s: GameState): boolean {
   const p = s.player;
   const m = p.mount!;
   const def = mountDef(s)!;
+  trainSkill(s, 'ride', 0.3);
   if (m.fuel !== undefined) {
-    m.fuel -= 1;
+    // Wer gut reitet, fährt sparsamer
+    if (!R.chance(s, Math.min(0.75, skillLevel(s, 'reiten') * 0.05))) m.fuel -= 1;
     if (m.fuel <= 0) {
       m.fuel = 0;
       p.riding = false;
@@ -107,6 +111,7 @@ export function mountAbsorbs(s: GameState, dmg: number, source: string): boolean
   const p = s.player;
   const m = p.mount!;
   const def = mountDef(s)!;
+  dmg = Math.max(1, Math.round(dmg * (1 - Math.min(0.6, skillLevel(s, 'reiten') * 0.04))));
   m.hp -= dmg;
   log(s, `${source} trifft ${m.name} für ${dmg} Schaden.`, 'kampf');
   if (m.hp > 0) return true;

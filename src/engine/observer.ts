@@ -8,6 +8,7 @@ import { chebyshev } from './fov';
 import { createBox } from './items';
 import { log, toast } from './log';
 import { sound } from './fx';
+import { learnFactor } from './skills';
 import { roomOf } from './mapgen';
 import { currentWeapon, maxHp } from './player';
 import * as R from './rng';
@@ -177,7 +178,7 @@ export function observe(s: GameState, e: GameEvent) {
       const keys = combos(e.facets).map((fs) => ({ fs, key: `kill|${[...fs].sort().join('+')}` }));
       for (const k of keys) bump(c, k.key);
       awardPatterns(s, keys);
-      trainDynSkills(s, e.facets, 2);
+      trainDynSkills(s, e.facets, 2 * learnFactor(s, e.monster.level));
       break;
     }
     case 'attack': {
@@ -186,7 +187,7 @@ export function observe(s: GameState, e: GameEvent) {
       for (const t of tech) bump(c, `total|hit|${t}`);
       const ctx = e.facets.filter((f) => (f.startsWith('z:') || f.startsWith('i:')) && facetDef(f)?.skill);
       for (const t of tech) for (const f of ctx) maybeUnlockSkill(s, 'angriff', t, f, bump(c, `hit|${t}+${f}`));
-      trainDynSkills(s, e.facets, 1);
+      trainDynSkills(s, e.facets, learnFactor(s, e.target.level));
       break;
     }
     case 'dodged':
@@ -293,7 +294,7 @@ function maybeUnlockSkill(s: GameState, kind: DynSkill['kind'], tech: string | n
   toast(s, `Neuer Skill: ${name}`, description, 'skill');
 }
 
-export const dynXpNeeded = (level: number) => 8 + level * 6;
+export const dynXpNeeded = (level: number) => 12 + level * 10;
 const DYN_MAX = 10;
 
 function matches(k: DynSkill, facets: string[], part?: AttackPart, move?: AttackMove): boolean {

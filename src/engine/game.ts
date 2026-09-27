@@ -21,7 +21,7 @@ import { clampVitals, lichtradius, maxAusdauer, maxHp, skillLevel, totalBonuses 
 import * as R from './rng';
 import { addToInventory, giveItem } from './inventory';
 import { describeMonster, itemName } from './identify';
-import { learnSkill } from './skills';
+import { learnSkill, trainSkill } from './skills';
 import { viewersTick } from './viewers';
 import { castSpell, learnSpell, magicTick, maxMp, readTome, type CastOptions } from './magic';
 import { addBladder, bladderTick, useToilet } from './bladder';
@@ -347,7 +347,8 @@ export function defend(s: GameState): ActionResult {
   if (s.pendingSelection) return fail(SELECT_FIRST);
   const p = s.player;
   p.buffs = p.buffs.filter((b) => b.name !== 'Deckung');
-  p.buffs.push({ name: 'Deckung', turns: 1, bonuses: { ausweichen: 20, ruestung: 2 } });
+  const guard = skillLevel(s, 'abwehr');
+  p.buffs.push({ name: 'Deckung', turns: 1, bonuses: { ausweichen: 20 + 2 * guard, ruestung: 2 + Math.floor(guard / 3) } });
   p.ausdauer = Math.min(maxAusdauer(s), p.ausdauer + 2);
   log(s, 'Du gehst in Deckung und hebst die Arme.', 'kampf');
   endTurn(s);
@@ -394,7 +395,10 @@ function tickTime(s: GameState, turns: number, before: number) {
   for (const b of p.buffs) {
     if (!b.dot) continue;
     const ticks = Math.min(turns, b.turns);
-    const dmg = b.dot * ticks;
+    // Giftfestigkeit dämpft Gift
+    const resist = b.name === 'Vergiftet' ? Math.min(0.9, skillLevel(s, 'giftfestigkeit') * 0.06) : 0;
+    const dmg = Math.max(b.name === 'Vergiftet' && resist >= 0.9 ? 0 : 1, Math.round(b.dot * ticks * (1 - resist)));
+    if (b.name === 'Vergiftet' && turns === 1) trainSkill(s, 'poison', 0.5);
     p.hp -= dmg;
     s.counters.poisonDamage += dmg;
     if (turns === 1) log(s, `${b.name}: −${dmg} HP.`, 'gefahr');
@@ -415,7 +419,7 @@ function tickTime(s: GameState, turns: number, before: number) {
   // Außerhalb von Kämpfen erholt man sich schneller
   const calm = !s.monsters.some((m) => m.aware && chebyshev(m.pos, p.pos) <= 10);
   if (turns === 1 && calm && s.turn % 3 === 0) p.hp = Math.min(maxHp(s, bon), p.hp + 1);
-  p.ausdauer = Math.min(maxAusdauer(s, bon), p.ausdauer + turns);
+  p.ausdauer = Math.min(maxAusdauer(s, bon), p.ausdauer + turns * (1 + Math.floor(skillLevel(s, 'kondition') / 5)));
   clampVitals(s);
 
   viewersTick(s, turns);
@@ -558,7 +562,7 @@ function onEnterRoom(s: GameState, room: NonNullable<ReturnType<typeof currentRo
       log(s, info.insight <= 2 ? `BOSS: ${def.name} (${info.level}). ${def.flavor}` : `BOSS: ${info.name}. ${info.level}. Du kannst nicht einschätzen, womit du es zu tun hast.`, 'gefahr');
     }
   }
-  emit(s, { type: 'enterRoom', room });
+  emit(s, { type: 'enterRoom', room, first });
 }
 
 function runTutorial(s: GameState) {
@@ -663,7 +667,8 @@ const FOOD = FOOD_IDS;
 function applyEffect(s: GameState, e: ConsumableEffect, isFood: boolean) {
   const p = s.player;
   if (e.heal || e.healPct) {
-    const boost = isFood ? 1 + 0.15 * skillLevel(s, 'kochen') : 1;
+    const boost = isFood ? 1 + 0.15 * skillLevel(s, 'kochen') : 1 + 0.08 * skillLevel(s, 'erste_hilfe');
+    if (!isFood) trainSkill(s, 'heal', 1);
     const amount = Math.round(((e.heal ?? 0) + ((e.healPct ?? 0) / 100) * maxHp(s)) * boost);
     p.hp = Math.min(maxHp(s), p.hp + amount);
     floatText(s, p.pos, `+${amount}`, FX_COLORS.heilung);

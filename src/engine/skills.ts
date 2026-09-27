@@ -1,6 +1,7 @@
-import { SKILLS, SKILL_BY_ID, skillXpNeeded, type SkillDef } from '../data/skills';
+import { SKILLS, SKILL_BY_ID, skillXpNeeded, type SkillDef, type SkillTrigger } from '../data/skills';
 import { emit } from './events';
 import { log, toast } from './log';
+import { levelDiffFactor } from './progression';
 import type { AttackMove, AttackPart, GameEvent, GameState, Technique } from './types';
 
 export const techniqueKey = (t: Technique) => `${t.part}+${t.move}`;
@@ -15,28 +16,16 @@ function matches(def: SkillDef, part: AttackPart, move: AttackMove): boolean {
 /** Wie oft wurde eine zum Skill passende Aktion schon ausgeführt? */
 export function skillProgress(s: GameState, def: SkillDef): number {
   const uses = s.player.techniqueUses;
-  switch (def.trigger) {
-    case 'technique':
-      return Object.entries(uses)
-        .filter(([k]) => !k.startsWith('_'))
-        .filter(([k]) => {
-          const [part, move] = k.split('+') as [AttackPart, AttackMove];
-          return matches(def, part, move);
-        })
-        .reduce((sum, [, v]) => sum + v, 0);
-    case 'dodge':
-      return uses['_dodge'] ?? 0;
-    case 'hurt':
-      return uses['_hurt'] ?? 0;
-    case 'ambush':
-      return uses['_ambush'] ?? 0;
-    case 'trap':
-      return uses['_trap'] ?? 0;
-    case 'craft':
-      return uses['_craft'] ?? 0;
-    default:
-      return 0;
+  if (def.trigger === 'technique') {
+    return Object.entries(uses)
+      .filter(([k]) => !k.startsWith('_'))
+      .filter(([k]) => {
+        const [part, move] = k.split('+') as [AttackPart, AttackMove];
+        return matches(def, part, move);
+      })
+      .reduce((sum, [, v]) => sum + v, 0);
   }
+  return uses[`_${def.trigger}`] ?? 0;
 }
 
 /** Skills, die zu einer Technik passen – für Schaden- und Trefferboni. */
@@ -60,18 +49,25 @@ export function learnSkill(s: GameState, id: string, level = 1, silent = false) 
   emit(s, { type: 'skillLearned', skillId: id });
 }
 
+/** Klassenskills lernen schneller (siehe Klassen). */
+function skillXpMultiplier(s: GameState, id: string): number {
+  return s.player.classSkills?.includes(id) ? 1.5 : 1;
+}
+
 function addSkillXp(s: GameState, id: string, amount: number) {
   const st = s.player.skills.find((k) => k.id === id);
   const def = SKILL_BY_ID[id];
   if (!st || !def || st.level >= def.maxLevel) return;
-  st.xp += amount;
+  // Bruchteile sammeln sich an, damit auch kleine Beträge zählen
+  st.xp += amount * skillXpMultiplier(s, id);
   while (st.level < def.maxLevel && st.xp >= skillXpNeeded(st.level)) {
     st.xp -= skillXpNeeded(st.level);
     st.level += 1;
     log(s, `Skill verbessert: ${def.name} ist jetzt Stufe ${st.level}.`, 'system');
-    toast(s, `${def.name} Stufe ${st.level}`, def.description, 'skill');
+    toast(s, `${def.name} Stufe ${st.level}`, def.effect ? def.effect(st.level) : def.description, 'skill');
     emit(s, { type: 'skillUp', skillId: id, level: st.level });
   }
+  if (st.level >= def.maxLevel) st.xp = 0;
 }
 
 /** Zählt eine Aktion und prüft, ob dadurch Skills entstehen oder wachsen. */
@@ -84,51 +80,86 @@ function trainTrigger(s: GameState, filter: (d: SkillDef) => boolean, amount: nu
   }
 }
 
-const bump = (s: GameState, key: string) => {
-  s.player.techniqueUses[key] = (s.player.techniqueUses[key] ?? 0) + 1;
+const bump = (s: GameState, key: string, by = 1) => {
+  s.player.techniqueUses[key] = (s.player.techniqueUses[key] ?? 0) + by;
 };
+
+/**
+ * Trainiert alle Skills eines Auslösers: zählt die Aktion (für die
+ * Freischaltung) und gibt Skill-XP.
+ */
+export function trainSkill(s: GameState, trigger: Exclude<SkillTrigger, 'technique'>, amount = 1) {
+  bump(s, `_${trigger}`);
+  trainTrigger(s, (d) => d.trigger === trigger, amount);
+}
+
+/** Lernfaktor nach Gegnerstärke: an viel schwächeren Gegnern lernt man kaum etwas. */
+export function learnFactor(s: GameState, targetLevel: number): number {
+  return Math.max(0.1, Math.min(1.5, levelDiffFactor(targetLevel - s.player.level)));
+}
 
 export function skillsOnEvent(s: GameState, e: GameEvent) {
   switch (e.type) {
     case 'attack': {
       bump(s, techniqueKey(e.technique));
-      trainTrigger(s, (d) => matches(d, e.technique.part, e.technique.move), e.hit ? 2 : 1);
+      const f = learnFactor(s, e.target.level);
+      trainTrigger(s, (d) => matches(d, e.technique.part, e.technique.move), (e.hit ? 2 : 1) * f);
       break;
     }
     case 'kill': {
-      if (e.technique) trainTrigger(s, (d) => matches(d, e.technique!.part, e.technique!.move), 2);
-      trainTrigger(s, (d) => d.trigger === 'kill', 1);
+      const f = learnFactor(s, e.monster.level);
+      if (e.technique) trainTrigger(s, (d) => matches(d, e.technique!.part, e.technique!.move), 2 * f);
+      trainTrigger(s, (d) => d.trigger === 'kill', f);
+      if (e.byPet && !e.byAlly) trainSkill(s, 'pet', f);
+      if (e.facets?.includes('t:bombe')) trainSkill(s, 'explode', 2 * f);
       break;
     }
     case 'dodged':
-      bump(s, '_dodge');
-      trainTrigger(s, (d) => d.trigger === 'dodge', 1);
+      trainSkill(s, 'dodge', 1);
       break;
     case 'damageTaken':
-      bump(s, '_hurt');
-      trainTrigger(s, (d) => d.trigger === 'hurt', 1);
+      trainSkill(s, 'hurt', 1);
       break;
     case 'sleep':
-      trainTrigger(s, (d) => d.trigger === 'rest', 4);
+      trainSkill(s, 'heal', 3);
       break;
     case 'eat':
-      trainTrigger(s, (d) => d.trigger === 'eat', 3);
+      trainSkill(s, 'eat', 3);
       break;
     case 'trapDetected':
+      trainSkill(s, 'trap', 3);
+      trainSkill(s, 'perceive', 2);
+      break;
     case 'trapDisarmed':
     case 'trapPlaced':
-      bump(s, '_trap');
-      trainTrigger(s, (d) => d.trigger === 'trap', 3);
+      trainSkill(s, 'trap', 3);
       break;
     case 'trapTriggered':
-      if (!e.onPlayer) {
-        bump(s, '_trap');
-        trainTrigger(s, (d) => d.trigger === 'trap', 2);
-      }
+      if (!e.onPlayer) trainSkill(s, 'trap', 2);
       break;
     case 'crafted':
-      bump(s, '_craft');
-      trainTrigger(s, (d) => d.trigger === 'craft', 3);
+      trainSkill(s, 'craft', 3);
+      break;
+    case 'enterRoom':
+      if (e.first) trainSkill(s, 'perceive', 1);
+      break;
+    case 'haggle':
+      trainSkill(s, 'haggle', e.success ? 3 : 1);
+      break;
+    case 'petGained':
+      trainSkill(s, 'pet', 3);
+      break;
+    case 'petLevel':
+      trainSkill(s, 'pet', 2);
+      break;
+    case 'spellCast':
+      trainSkill(s, 'cast', 2);
+      break;
+    case 'poisoned':
+      trainSkill(s, 'poison', 1);
+      break;
+    case 'rammed':
+      trainSkill(s, 'ride', 2);
       break;
     default:
       break;
@@ -137,6 +168,21 @@ export function skillsOnEvent(s: GameState, e: GameEvent) {
 
 /** Wird bei einem Angriff auf einen ahnungslosen Gegner aufgerufen. */
 export function trainAmbush(s: GameState) {
-  bump(s, '_ambush');
-  trainTrigger(s, (d) => d.trigger === 'ambush', 2);
+  trainSkill(s, 'ambush', 2);
+}
+
+/** Wirkung eines Skills auf einer Stufe als Klartext (für die Anzeige). */
+export function skillEffectText(def: SkillDef, level: number): string {
+  if (def.effect) return def.effect(level);
+  const parts: string[] = [];
+  if (def.matchDamage) parts.push(`+${def.matchDamage * level} % Schaden`);
+  if (def.matchTreffer) parts.push(`+${def.matchTreffer * level} % Treffer`);
+  if (def.knockdown) parts.push(`+${def.knockdown * level} % Umwerfen`);
+  const b = def.perLevel;
+  if (b.krit) parts.push(`+${b.krit * level} % Krit`);
+  if (b.ausweichen) parts.push(`+${(b.ausweichen * level).toString().replace('.', ',')} % Ausweichen`);
+  if (b.maxHp) parts.push(`+${b.maxHp * level} max. HP`);
+  if (b.maxAusdauer) parts.push(`+${b.maxAusdauer * level} max. Ausdauer`);
+  if (b.xpBonus) parts.push(`+${b.xpBonus * level} % XP`);
+  return parts.join(' · ') || def.description;
 }

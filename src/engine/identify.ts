@@ -24,7 +24,9 @@ export const INSIGHT_NAMES: Record<Insight, string> = {
 
 /** Bonus durch Intelligenz: je 3 Punkte über 5 eine Stufe mehr. */
 export function intelligenceBonus(s: GameState): number {
-  return Math.max(0, Math.floor((effectiveStats(s).int - 5) / 3));
+  // Wahrnehmung ab Stufe 8 hilft zusätzlich beim Einschätzen
+  const perception = (s.player.skills.find((k) => k.id === 'wahrnehmung')?.level ?? 0) >= 8 ? 1 : 0;
+  return Math.max(0, Math.floor((effectiveStats(s).int - 5) / 3)) + perception;
 }
 
 /** Bonus durch Erfahrung: je 3 besiegte Exemplare dieses Typs eine Stufe (max. 2). */

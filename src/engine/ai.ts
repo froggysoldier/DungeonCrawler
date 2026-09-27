@@ -1,5 +1,5 @@
 import { NameOf, nameOf } from './identify';
-import { isInSafeRoom, killMonster } from './combat';
+import { counterStrike, isInSafeRoom, killMonster } from './combat';
 import { emit } from './events';
 import { chebyshev, hasLineOfSight } from './fov';
 import { log } from './log';
@@ -14,7 +14,8 @@ import { mountAbsorbs } from './mounts';
 import { playerSees } from './sight';
 import { levelGapHit } from './progression';
 import { dynDefenseBonus, targetFacets, trainDefense } from './observer';
-import { ausweichen, totalBonuses } from './player';
+import { ausweichen, maxHp, skillLevel, totalBonuses } from './player';
+import { learnFactor, trainSkill } from './skills';
 import * as R from './rng';
 import type { Fx, GameState, Monster, Pos } from './types';
 import { FX_COLORS, floatText, shot } from './fx';
@@ -107,12 +108,18 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
   const hit = Math.max(5, Math.min(95, m.treffer - ausweichen(s, b) - defense.ausweichen - (ranged ? 5 : 0) + levelGapHit(m.level, p.level)));
   const verb = ranged ? 'schießt auf dich' : 'greift an';
   if (ranged) shot(s, m.pos, p.pos, shotStyle(s, m));
+  const covered = p.buffs.some((x) => x.name === 'Deckung');
+  if (covered) trainSkill(s, 'block', learnFactor(s, m.level));
   if (R.next(s) * 100 >= hit) {
     floatText(s, p.pos, 'ausgewichen', FX_COLORS.info);
     s.counters.hitTakenStreak = 0;
     log(s, `${NameOf(s, m)} ${verb} – du weichst aus.`, 'kampf');
     trainDefense(s, source, 'ausweichen');
     emit(s, { type: 'dodged', source: m.name, facets: source });
+    if (!ranged) {
+      trainSkill(s, 'counter', learnFactor(s, m.level));
+      if (R.chance(s, skillLevel(s, 'konter') * 0.03)) counterStrike(s, m);
+    }
     return;
   }
   let raw = R.int(s, m.dmg[0], m.dmg[1]);
@@ -130,8 +137,10 @@ function attackPlayer(s: GameState, m: Monster, ranged: boolean) {
     emit(s, { type: 'dodged', source: m.name, facets: source });
     return;
   }
-  const dmg = Math.max(1, Math.round((raw - Math.floor(b.ruestung ?? 0)) * (1 - defense.reduktion / 100)));
+  const pain = Math.min(0.25, skillLevel(s, 'schmerzresistenz') * 0.015);
+  const dmg = Math.max(1, Math.round((raw - Math.floor(b.ruestung ?? 0)) * (1 - defense.reduktion / 100) * (1 - pain)));
   if (mountAbsorbs(s, dmg, NameOf(s, m))) return;
+  if (dmg >= maxHp(s, b) * 0.15) trainSkill(s, 'bighit', learnFactor(s, m.level));
   if (defense.reduktion) trainDefense(s, source, 'abhaertung');
   p.hp -= dmg;
   floatText(s, p.pos, `-${dmg}`, FX_COLORS.gegenSpieler);
@@ -172,7 +181,17 @@ function perceptionRange(s: GameState, m: Monster): number {
   let r = m.behavior === 'ranged' || m.range ? 9 : 8;
   if (m.size === 'winzig') r -= 1;
   if (s.player.buffs.some((b) => b.name === 'Schattenmantel')) r = Math.floor(r / 2);
-  return r;
+  r -= Math.floor(skillLevel(s, 'schleichen') / 4);
+  return Math.max(2, r);
+}
+
+/** Chance, den Crawler bei Sichtkontakt zu entdecken (Schleichen senkt sie). */
+function spotChance(s: GameState, d: number): number {
+  const sneak = skillLevel(s, 'schleichen') * 0.04;
+  if (d <= 1) return 1;
+  if (d <= 2) return Math.max(0.6, 1 - sneak);
+  if (d <= 5) return Math.max(0.3, 0.95 - sneak);
+  return Math.max(0.1, 0.6 - sneak);
 }
 
 /** Wann ein Monster flieht – nur wenn es zu seiner Art passt. */
@@ -241,7 +260,9 @@ export function monsterTurn(s: GameState, m: Monster) {
   if (m.weakened) m.weakened -= 1;
   // Schlafende bemerken nur, was direkt neben ihnen passiert
   if (m.asleep) {
-    if (chebyshev(m.pos, s.player.pos) <= 1 && R.chance(s, 0.5)) spotPlayer(s, m, `${NameOf(s, m)} wacht auf und sieht dich!`);
+    if (chebyshev(m.pos, s.player.pos) <= 1 && R.chance(s, Math.max(0.15, 0.5 - skillLevel(s, 'schleichen') * 0.025))) {
+      spotPlayer(s, m, `${NameOf(s, m)} wacht auf und sieht dich!`);
+    } else if (chebyshev(m.pos, s.player.pos) <= 2) trainSkill(s, 'sneak', learnFactor(s, m.level));
     return;
   }
   startOfTurn(s, m);
@@ -253,8 +274,9 @@ export function monsterTurn(s: GameState, m: Monster) {
   if (!m.aware) {
     if (m.homeRoom !== undefined) {
       if (roomOf(s.map, p.pos)?.id === m.homeRoom) spotPlayer(s, m, `${NameOf(s, m)} bemerkt dich!`);
-    } else if (sees && (d <= 5 || R.chance(s, 0.6))) {
-      spotPlayer(s, m, `${NameOf(s, m)} hat dich entdeckt!`);
+    } else if (sees) {
+      if (R.chance(s, spotChance(s, d))) spotPlayer(s, m, `${NameOf(s, m)} hat dich entdeckt!`);
+      else trainSkill(s, 'sneak', learnFactor(s, m.level));
     }
   }
   if (!m.aware) {
@@ -377,7 +399,7 @@ export function petTurn(s: GameState) {
         log(s, `${pet.name} schnappt nach ${nameOf(s, t)}, verfehlt aber.`, 'kampf');
         continue;
       }
-      let dmg = R.int(s, pet.dmg[0], pet.dmg[1]) + petBiteBonus(s);
+      let dmg = Math.round((R.int(s, pet.dmg[0], pet.dmg[1]) + petBiteBonus(s)) * (1 + skillLevel(s, 'tierkunde') * 0.06));
       if (Object.values(p.equipment).some((i) => i?.special === 'katzenfreund')) dmg = Math.round(dmg * 1.5);
       const dealt = Math.max(1, dmg - t.ruestung);
       t.hp -= dealt;

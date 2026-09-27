@@ -1,6 +1,6 @@
 import { ACHIEVEMENTS } from '../data/achievements';
 import { RARITY_COLORS, RARITY_NAMES, SLOT_NAMES } from '../data/items';
-import { SKILLS, skillXpNeeded } from '../data/skills';
+import { SKILLS, SKILL_BY_ID, SKILL_CATEGORY_NAMES, skillXpNeeded, type SkillCategory } from '../data/skills';
 import { BOX_TIER_COLORS, FLOORS, RESTAURANT_HOSTS, RESTAURANT_MENU, SHOW_NAME } from '../data/world';
 import { monsterAt } from '../engine/ai';
 import { CLASS_BY_ID } from '../data/classes';
@@ -42,7 +42,7 @@ import { canStep } from '../engine/path';
 import {
   ausweichen, currentWeapon, effectiveStats, lichtradius, maxAusdauer, maxHp, throwables, totalBonuses, xpToNext,
 } from '../engine/player';
-import { skillProgress } from '../engine/skills';
+import { skillEffectText, skillProgress } from '../engine/skills';
 import type { AttackMove, AttackPart, EquipSlot, GameState, HitZone, Item, MetaState, Pos, StatKey, Technique } from '../engine/types';
 import { bindActions, esc, formatTime } from './dom';
 import { confirmBox, isModalOpen, showCustom, showDialog, showHtml, showToast } from './modal';
@@ -827,7 +827,7 @@ export class GameView {
           : `<button data-action="throwpick" data-id="${it.baseId}">Als Nächstes werfen</button>`);
       }
       actions.push(`<button data-action="drop" data-uid="${it.uid}">Ablegen</button>`);
-      if (from === 'inv' && currentRoom(this.s)?.kind === 'safe' && it.kind !== 'box' && !it.questId) actions.push(`<button data-action="sell" data-uid="${it.uid}">Verkaufen (${sellPrice(it)} G)</button>`);
+      if (from === 'inv' && currentRoom(this.s)?.kind === 'safe' && it.kind !== 'box' && !it.questId) actions.push(`<button data-action="sell" data-uid="${it.uid}">Verkaufen (${sellPrice(it, this.s)} G)</button>`);
     }
     return `<div class="name" style="color:${color}">${esc(known.name)}${it.menge && it.menge > 1 && it.kind !== 'gold' ? ` ×${it.menge}` : ''}</div>
       <div class="meta">${esc(bits.join(' · '))}</div>
@@ -1052,12 +1052,24 @@ export class GameView {
     if (!hasUnlock(s, 'skills')) html += '<div class="locked" style="margin-bottom:8px">Gesperrt: Die Skill-Übersicht gibt’s nach dem Tutorial. Gelernt wird trotzdem schon!</div>';
     html += `<div class="section">Gelernte Skills</div>`;
     if (!p.skills.length) html += '<div class="muted">Noch keine. Kämpfe – der Dungeon beobachtet dich.</div>';
+    const byCat = new Map<SkillCategory, typeof p.skills>();
     for (const st of p.skills) {
-      const def = SKILLS.find((d) => d.id === st.id)!;
-      const need = skillXpNeeded(st.level);
-      html += `<div class="skill"><div class="top"><b>${esc(def.name)}</b><span>Stufe ${st.level}/${def.maxLevel}</span></div>
-        <div class="muted small">${esc(def.description)}</div>
-        ${hasUnlock(s, 'skills') ? `<div class="progress"><div style="width:${(100 * st.xp) / need}%"></div></div>` : ''}</div>`;
+      const def = SKILL_BY_ID[st.id];
+      if (!def) continue;
+      byCat.set(def.category, [...(byCat.get(def.category) ?? []), st]);
+    }
+    for (const [cat, list] of byCat) {
+      html += `<div class="muted small" style="margin:8px 0 3px;text-transform:uppercase;letter-spacing:1px">${esc(SKILL_CATEGORY_NAMES[cat])}</div>`;
+      for (const st of list) {
+        const def = SKILL_BY_ID[st.id];
+        const need = skillXpNeeded(st.level);
+        const max = st.level >= def.maxLevel;
+        const cls = p.classSkills?.includes(st.id) ? ' <span class="small" style="color:var(--accent-2)">Klassenskill</span>' : '';
+        html += `<div class="skill"><div class="top"><b>${esc(def.name)}</b>${cls}<span>Stufe ${st.level}/${def.maxLevel}</span></div>
+          <div class="small" style="color:var(--ok)">Jetzt: ${esc(skillEffectText(def, st.level))}</div>
+          ${max ? '<div class="muted small">Gemeistert.</div>' : `<div class="muted small">Nächste Stufe: ${esc(skillEffectText(def, st.level + 1))}</div>`}
+          ${hasUnlock(s, 'skills') && !max ? `<div class="progress" title="${Math.floor(st.xp)} von ${need}"><div style="width:${(100 * st.xp) / need}%"></div></div>` : ''}</div>`;
+      }
     }
     const dyn = p.dynSkills ?? [];
     html += `<div class="section">Vom Beobachter entdeckt</div>`;

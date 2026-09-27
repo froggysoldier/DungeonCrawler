@@ -56,7 +56,7 @@ export function ausweichen(s: GameState, b = totalBonuses(s)): number {
 }
 
 export function lichtradius(s: GameState, b = totalBonuses(s)): number {
-  return 6 + (b.lichtradius ?? 0);
+  return Math.max(2, Math.floor(6 + (b.lichtradius ?? 0) + 1e-9));
 }
 
 export { xpToNext } from './progression';

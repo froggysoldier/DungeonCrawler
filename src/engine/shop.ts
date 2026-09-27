@@ -4,7 +4,7 @@ import { giveItem } from './inventory';
 import { createItem, generateEquipment, isStackable } from './items';
 import { log } from './log';
 import { randomTome } from './magic';
-import { effectiveStats } from './player';
+import { effectiveStats, skillLevel } from './player';
 import * as R from './rng';
 import type { GameState, Item, Room, Shop } from './types';
 
@@ -55,8 +55,9 @@ export function offerPrice(price: number, it: Item): number {
   return price * (isStackable(it.kind) ? (it.menge ?? 1) : 1);
 }
 
-export function sellPrice(it: Item): number {
-  const each = Math.max(1, Math.round((it.wert || 1) * SELL_FACTOR));
+export function sellPrice(it: Item, s?: GameState): number {
+  const bonus = s ? 1 + skillLevel(s, 'feilschen') * 0.02 : 1;
+  const each = Math.max(1, Math.round((it.wert || 1) * SELL_FACTOR * bonus));
   return each * (isStackable(it.kind) ? (it.menge ?? 1) : 1);
 }
 
@@ -80,7 +81,7 @@ export function sell(s: GameState, uid: string): { ok: boolean; message?: string
   if (!it) return { ok: false, message: 'Das hast du nicht.' };
   if (it.kind === 'box') return { ok: false, message: 'Lootboxen kann man nicht verkaufen.' };
   if (it.questId) return { ok: false, message: 'Das gehört jemandem, der darauf wartet.' };
-  const price = sellPrice(it);
+  const price = sellPrice(it, s);
   p.inventory = p.inventory.filter((i) => i.uid !== uid);
   p.gold += price;
   s.counters.goldEarned += price;
@@ -101,11 +102,12 @@ export function haggle(s: GameState, room: Room, index: number): { ok: boolean; 
   if (offer.haggled) return { ok: false, message: 'Über diesen Preis wurde schon verhandelt.' };
   offer.haggled = true;
   const cha = effectiveStats(s).cha;
-  const chance = Math.max(0.1, Math.min(0.9, 0.3 + (cha - 5) * 0.05 + (shop.mood - 100) / 200));
+  const haggler = skillLevel(s, 'feilschen');
+  const chance = Math.max(0.1, Math.min(0.92, 0.3 + (cha - 5) * 0.05 + (shop.mood - 100) / 200 + haggler * 0.04));
   const base = basePrice(offer.item);
   if (R.next(s) < chance) {
     const pct = Math.round(5 + R.next(s) * 20 * Math.min(1.5, cha / 10));
-    const discount = Math.min(MAX_DISCOUNT * 100, pct);
+    const discount = Math.min(MAX_DISCOUNT * 100 + haggler, pct + Math.floor(haggler / 2));
     offer.price = Math.max(1, Math.round(base * (1 - discount / 100)));
     log(s, `Du verhandelst geschickt. ${shop.keeper} seufzt und gibt ${discount} % Rabatt.`, 'dialog');
     emit(s, { type: 'haggle', success: true, percent: discount });

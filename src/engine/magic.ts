@@ -89,8 +89,12 @@ function trainSpell(s: GameState, id: string, amount: number) {
 }
 
 /** Zauberschaden an einem Monster; Kills gehen durch den normalen Kampfweg. */
+/** Arkane Kunde verstärkt alle Zauberwirkungen. */
+const arcane = (s: GameState) => 1 + 0.04 * (s.player.skills.find((k) => k.id === 'arkane_kunde')?.level ?? 0);
+
 function spellHurt(s: GameState, m: Monster, dmg: number, label: string): boolean {
   const facets = ['t:zauber', ...targetFacets(s, m), ...selfFacets(s)];
+  dmg *= arcane(s);
   const final = Math.max(1, Math.round(dmg - m.ruestung / 2));
   m.hp -= final;
   m.aware = true;
@@ -134,7 +138,7 @@ export function castSpell(s: GameState, id: string, opts: CastOptions = {}): { o
 
   switch (id) {
     case 'heilen': {
-      const amount = Math.round(maxHp(s) * (0.2 + 0.03 * (level - 1)));
+      const amount = Math.round(maxHp(s) * (0.2 + 0.03 * (level - 1)) * arcane(s));
       p.hp = Math.min(maxHp(s), p.hp + amount);
       floatText(s, p.pos, `+${amount}`, FX_COLORS.heilung);
       log(s, `Warmes Licht umhüllt dich. +${amount} HP.`, 'info');
@@ -152,7 +156,7 @@ export function castSpell(s: GameState, id: string, opts: CastOptions = {}): { o
       log(s, 'Ein kleines Licht schwebt über deinem Kopf.', 'info');
       break;
     case 'irrlichtruestung': {
-      const shield = 6 + level * 2 + st.int;
+      const shield = Math.round((6 + level * 2 + st.int) * arcane(s));
       p.buffs = p.buffs.filter((b) => b.name !== 'Irrlichtrüstung');
       p.buffs.push({ name: 'Irrlichtrüstung', turns: 60, bonuses: {}, absorb: shield });
       log(s, `Irrlichter tanzen um dich herum. Schild: ${shield}.`, 'info');
@@ -216,7 +220,9 @@ export function magicTick(s: GameState, turns: number) {
     for (const k of Object.keys(p.spellCooldowns)) p.spellCooldowns[k] = Math.max(0, p.spellCooldowns[k] - turns);
   }
   if (p.spells?.length) {
-    const ticks = Math.floor(s.turn / 6) - Math.floor((s.turn - turns) / 6);
+    const lvl = p.skills.find((k) => k.id === 'arkane_kunde')?.level ?? 0;
+    const every = lvl >= 10 ? 4 : lvl >= 5 ? 5 : 6;
+    const ticks = Math.floor(s.turn / every) - Math.floor((s.turn - turns) / every);
     p.mp = Math.min(maxMp(s), (p.mp ?? 0) + ticks);
   }
 }

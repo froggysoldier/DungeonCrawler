@@ -10,6 +10,7 @@ import { randomTome } from './magic';
 import { checkEvolve } from './petevo';
 import { targetFacets } from './observer';
 import { effectiveStats } from './player';
+import { skillLevel } from './player';
 import * as R from './rng';
 import type { GameState, Item, Monster, Pet, Pos } from './types';
 
@@ -95,7 +96,7 @@ export function tryTame(s: GameState): { handled: boolean } {
     (m) => chebyshev(m.pos, p.pos) <= 1 && TAMEABLE[m.defId] && m.rank === 'normal' && m.hp <= m.maxHp * 0.4,
   );
   if (!cand) return { handled: false };
-  const chance = Math.min(0.9, 0.35 + (effectiveStats(s).cha - 5) * 0.04);
+  const chance = Math.min(0.95, 0.35 + (effectiveStats(s).cha - 5) * 0.04 + skillLevel(s, 'tierkunde') * 0.03);
   if (R.next(s) < chance) {
     const species = TAMEABLE[cand.defId];
     s.monsters = s.monsters.filter((m) => m !== cand);

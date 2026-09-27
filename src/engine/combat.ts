@@ -18,7 +18,7 @@ import { FX_COLORS, floatText, shot } from './fx';
 import { roomOf } from './mapgen';
 import { currentWeapon, effectiveStats, gainXp, maxHp, skillLevel, throwables, totalBonuses } from './player';
 import * as R from './rng';
-import { matchingSkills, techniqueKey, trainAmbush } from './skills';
+import { learnFactor, matchingSkills, techniqueKey, trainAmbush, trainSkill } from './skills';
 import type { AttackMove, AttackPart, GameState, HitZone, Item, Monster, Pos, Technique } from './types';
 
 export const MOVE_NAMES: Record<AttackMove, string> = {
@@ -52,9 +52,11 @@ export const ZONES: Record<HitZone, { name: string; treffer: number; schaden: nu
 export const HIT_ZONES: HitZone[] = ['kopf', 'koerper', 'arme', 'beine'];
 
 /** Zusätzliche Treffer-Anpassung je Zone und Gegnergröße/-lage. */
-function zoneModifier(target: Monster, t: Technique): number {
+function zoneModifier(s: GameState, target: Monster, t: Technique): number {
   const zone = t.zone ?? 'koerper';
   let mod = ZONES[zone].treffer;
+  // Anatomie: gezielte Treffer werden leichter
+  if (zone !== 'koerper') mod += Math.min(15, skillLevel(s, 'anatomie') * 2);
   if (zone === 'kopf') {
     if (target.downed > 0) mod += 25; // Wer liegt, hält den Kopf hin
     else if (target.size === 'riesig') mod -= 20;
@@ -123,7 +125,7 @@ export function hitChance(s: GameState, target: Monster, t: Technique): number {
   if (t.part === 'wurf') hit -= 5 + chebyshev(s.player.pos, target.pos) * 2;
   if (!target.aware) hit += 20;
   if (target.downed > 0) hit += 25;
-  hit += zoneModifier(target, t);
+  hit += zoneModifier(s, target, t);
   hit += levelGapHit(s.player.level, target.level);
   const facets = attackFacets(s, target, t);
   hit += dynAttackBonus(s, facets, t).hit + traitAttackBonus(s, facets).hit;
@@ -143,8 +145,9 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   const st = effectiveStats(s, b);
   const skills = matchingSkills(s, t);
   const ambush = !target.aware;
-  const ram = t.move === 'anlauf' ? ramBonus(s) : 0;
+  const ram = t.move === 'anlauf' ? Math.round(ramBonus(s) * (1 + 0.08 * skillLevel(s, 'reiten'))) : 0;
   p.ausdauer -= ram ? 1 : attackCost(t);
+  if (!ram && attackCost(t) >= 3) trainSkill(s, 'stamina', learnFactor(s, target.level));
 
   // --- Wurfobjekt bestimmen und verbrauchen
   let thrown: Item | null = null;
@@ -195,6 +198,7 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
   if (ambush) {
     pct += 25 * skillLevel(s, 'hinterhalt');
     trainAmbush(s);
+    if (target.asleep) trainSkill(s, 'sneak', 2 * learnFactor(s, target.level));
   }
   const zone = t.zone ?? 'koerper';
   let dmg = base * MOVE_MULT[t.move] * ZONES[zone].schaden * (1 + pct / 100) * (0.8 + R.next(s) * 0.4);
@@ -285,23 +289,40 @@ export function playerAttack(s: GameState, target: Monster, t: Technique): Attac
 
 /** Sprengsatz geht hoch: Schaden im Umkreis von einem Feld. */
 function detonate(s: GameState, thrown: Item, at: Pos) {
-  const dmg = Math.round((thrown.explosion ?? 0) * (1 + 0.1 * skillLevel(s, 'handwerk')) + effectiveStats(s).ges / 3);
+  const dmg = Math.round((thrown.explosion ?? 0) * (1 + 0.1 * skillLevel(s, 'handwerk') + 0.08 * skillLevel(s, 'sprengmeister')) + effectiveStats(s).ges / 3);
+  trainSkill(s, 'explode', 1);
   log(s, thrown.baseId === 'brandflasche' ? 'Die Brandflasche zerplatzt in einer Feuerwolke!' : `${thrown.name} detoniert mit ohrenbetäubendem Knall!`, 'kampf');
   blast(s, at, dmg, 'bombe', `vom eigenen Sprengsatz (${thrown.name}) zerlegt`);
 }
 
 function applyZoneEffect(s: GameState, m: Monster, zone: HitZone, dmg: number) {
   const bigHit = dmg >= m.maxHp * 0.15;
-  if (zone === 'kopf' && m.rank !== 'boroughboss' && R.chance(s, bigHit ? 0.35 : 0.15)) {
+  const skill = skillLevel(s, 'anatomie') * 0.02;
+  if (zone !== 'koerper') trainSkill(s, 'zone', learnFactor(s, m.level));
+  if (zone === 'kopf' && m.rank !== 'boroughboss' && R.chance(s, (bigHit ? 0.35 : 0.15) + skill)) {
     m.stunned = Math.max(m.stunned ?? 0, 1);
     log(s, `${NameOf(s, m)} ist benommen und taumelt.`, 'kampf');
-  } else if (zone === 'arme' && R.chance(s, 0.4)) {
+  } else if (zone === 'arme' && R.chance(s, 0.4 + skill)) {
     m.weakened = Math.max(m.weakened ?? 0, 3);
     log(s, `${NameOf(s, m)} kann den Arm kaum noch heben. Seine Angriffe werden schwächer.`, 'kampf');
-  } else if (zone === 'beine' && R.chance(s, 0.35)) {
+  } else if (zone === 'beine' && R.chance(s, 0.35 + skill)) {
     m.slowed = Math.max(m.slowed ?? 0, 4);
     log(s, `${NameOf(s, m)} humpelt.`, 'kampf');
   }
+}
+
+/** Konter: sofortiger Gegenschlag nach einem ausgewichenen Nahkampfangriff. */
+export function counterStrike(s: GameState, m: Monster) {
+  if (!s.monsters.includes(m) || isInSafeRoom(s, s.player.pos)) return;
+  const st = effectiveStats(s);
+  const lvl = skillLevel(s, 'konter');
+  const dmg = Math.max(1, Math.round((3 + st.str / 2) * (1 + 0.1 * lvl) * (0.8 + R.next(s) * 0.4) - m.ruestung));
+  m.hp -= dmg;
+  s.counters.damageDealt += dmg;
+  floatText(s, m.pos, String(dmg), FX_COLORS.schaden);
+  log(s, `Du weichst aus und konterst sofort: ${dmg} Schaden an ${nameOf(s, m)}.`, 'kampf');
+  const t: Technique = { part: 'faust', move: 'normal' };
+  if (m.hp <= 0) killMonster(s, m, t, false, attackFacets(s, m, t));
 }
 
 export function dropNear(s: GameState, item: Item, pos: Pos) {
@@ -396,6 +417,6 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
   }
   if (m.defId === 'abtruenniger_crawler') population(s).alive -= 1;
   if (facets?.includes('t:falle') || facets?.includes('t:bombe')) s.counters.trapKills += 1;
-  emit(s, { type: 'kill', monster: m, technique: t, byPet: !!byPet, facets });
+  emit(s, { type: 'kill', monster: m, technique: t, byPet: !!byPet, byAlly: typeof byPet === 'string', facets });
   if (has(m, 'explodiert')) explode(s, m);
 }
