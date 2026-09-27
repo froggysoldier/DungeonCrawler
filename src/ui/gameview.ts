@@ -51,10 +51,10 @@ import { monsterDefById } from '../engine/monsters';
 import type { AttackMove, AttackPart, EquipSlot, GameState, HitZone, Item, MetaState, Pos, StatKey, Technique } from '../engine/types';
 import { bindActions, esc, formatTime } from './dom';
 import { confirmBox, isModalOpen, showCustom, showDialog, showHtml, showToast } from './modal';
-import { render, tileFromMouse, type View } from './render';
+import { render, tileFromMouse, zoom, zoomBounds, type View } from './render';
 import { TypeQueue, typeText, type Typing } from './typewriter';
 import { Animator, STEP_MS } from './animator';
-import { playSfx, setSoundEnabled, soundEnabled } from './sound';
+import { playSfx, setSoundEnabled, setTypingSoundEnabled, soundEnabled, typeClick, typingSoundEnabled } from './sound';
 import { TONE_NAMES } from '../data/talkshow';
 import { showSelection } from './selection';
 
@@ -185,6 +185,7 @@ export class GameView {
         <div class="mapwrap">
           <canvas></canvas>
           <div class="roomlabel"></div>
+          <div class="zoomctl"><button data-zoom="-1" title="Herauszoomen (Taste -)">−</button><button data-zoom="1" title="Hineinzoomen (Taste +)">+</button></div>
           <div class="tooltip" hidden></div>
         </div>
         <div class="side">
@@ -222,6 +223,23 @@ export class GameView {
       e.preventDefault();
       this.examine(e);
     });
+    this.canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      this.zoomMap(e.deltaY < 0 ? 1 : -1);
+    }, { passive: false });
+    this.root.querySelectorAll<HTMLButtonElement>('.zoomctl button').forEach((b) =>
+      b.addEventListener('click', () => this.zoomMap(Number(b.dataset.zoom))),
+    );
+  }
+
+  /** Karte vergrößern oder verkleinern. */
+  private zoomMap(delta: number) {
+    if (!zoom(delta)) return;
+    const bounds = zoomBounds();
+    const [out, inn] = this.root.querySelectorAll<HTMLButtonElement>('.zoomctl button');
+    if (out) out.disabled = bounds.min;
+    if (inn) inn.disabled = bounds.max;
+    this.draw();
   }
 
   // ---------------------------------------------------------------- Aktionen
@@ -602,6 +620,10 @@ export class GameView {
       this.act(() => pickup(s));
     } else if (e.key === 'Enter' && onStairs(s)) {
       this.askDescend();
+    } else if (e.key === '+' || e.key === '=' || e.code === 'NumpadAdd') {
+      this.zoomMap(1);
+    } else if (e.key === '-' || e.code === 'NumpadSubtract') {
+      this.zoomMap(-1);
     } else if (e.key === 'Escape') {
       this.traveling = false;
       if (this.pendingSpell) {
@@ -672,12 +694,18 @@ export class GameView {
       ${hasUnlock(s, 'inventar') ? `<span class="muted" title="Lebende Crawler laut letzter Zählung">Crawler übrig ${population(s).alive.toLocaleString('de-DE')}</span>` : ''}
       <span style="color:#ffd700">Gold ${p.gold}</span>
       <button class="soundtoggle" data-action="sound" title="Klänge für Lootboxen, Level-Aufstieg und Achievements">Ton: ${soundEnabled() ? 'an' : 'aus'}</button>
+      <button class="soundtoggle" data-action="typing" title="Weiches Tastenklicken, wenn Texte getippt werden" ${soundEnabled() ? '' : 'disabled'}>Tippen: ${typingSoundEnabled() ? 'an' : 'aus'}</button>
       <span>Lootboxen ${p.boxes.length}</span>
       ${pet ? `<span style="color:#ffb3e6">Haustier ${esc(pet.name)} ${pet.alive ? `${pet.hp}/${pet.maxHp}` : '(bewusstlos)'}</span>` : ''}`;
     bindActions(this.root.querySelector('.topbar') as HTMLElement, {
       sound: () => {
         setSoundEnabled(!soundEnabled());
         if (soundEnabled()) playSfx([{ kind: 'skill' }]);
+        this.refreshTop();
+      },
+      typing: () => {
+        setTypingSoundEnabled(!typingSoundEnabled());
+        if (typingSoundEnabled()) typeClick('taste');
         this.refreshTop();
       },
     });

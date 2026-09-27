@@ -155,6 +155,104 @@ function playSkill() {
   tone(note(19), 0.08, 0.5, 'sine', 0.08);
 }
 
+// ================================================================ Tippgeräusch
+
+const TYPE_KEY = 'grosser-abstieg-tippen';
+
+function storedTyping(): boolean {
+  try {
+    return localStorage.getItem(TYPE_KEY) !== 'aus';
+  } catch {
+    return true;
+  }
+}
+
+let typingOn = storedTyping();
+
+export function typingSoundEnabled(): boolean {
+  return typingOn;
+}
+
+export function setTypingSoundEnabled(on: boolean) {
+  typingOn = on;
+  try {
+    localStorage.setItem(TYPE_KEY, on ? 'an' : 'aus');
+  } catch {
+    // nur für diese Sitzung
+  }
+}
+
+let clickBus: GainNode | null = null;
+let clickNoise: AudioBuffer | null = null;
+
+/**
+ * Eigene, trockene Leitung für das Tippen: kein Hall, oben etwas gedämpft,
+ * damit es weich klingt. Das Rauschen wird einmal erzeugt und wiederverwendet.
+ */
+function clickChain(ac: AudioContext): GainNode {
+  if (clickBus) return clickBus;
+  clickBus = ac.createGain();
+  clickBus.gain.value = 0.8;
+  const soft = ac.createBiquadFilter();
+  soft.type = 'lowpass';
+  soft.frequency.value = 4800;
+  soft.Q.value = 0.4;
+  clickBus.connect(soft);
+  soft.connect(ac.destination);
+  const len = Math.floor(ac.sampleRate * 0.045);
+  clickNoise = ac.createBuffer(1, len, ac.sampleRate);
+  const d = clickNoise.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 5);
+  return clickBus;
+}
+
+/**
+ * Ein weicher Tastenanschlag: ein kurzes, gedämpftes Klicken und darunter ein
+ * leiser, tiefer Körper. Die Leertaste klingt tiefer und runder.
+ * Tonhöhe und Lautstärke schwanken leicht, damit es natürlich wirkt.
+ */
+export function typeClick(kind: 'taste' | 'leer' = 'taste', loud = 1) {
+  if (!enabled || !typingOn) return;
+  const a = audio();
+  if (!a) return;
+  const { ac } = a;
+  const bus = clickChain(ac);
+  const t0 = ac.currentTime + 0.002;
+  const v = loud * (0.8 + Math.random() * 0.35);
+  const space = kind === 'leer';
+  // Klick: gefiltertes Rauschen
+  const src = ac.createBufferSource();
+  src.buffer = clickNoise;
+  src.playbackRate.value = 0.8 + Math.random() * 0.4;
+  const band = ac.createBiquadFilter();
+  band.type = 'bandpass';
+  band.frequency.value = space ? 850 + Math.random() * 200 : 2000 + Math.random() * 1300;
+  band.Q.value = 0.9;
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime((space ? 0.12 : 0.17) * v, t0 + 0.0015);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + (space ? 0.05 : 0.028));
+  src.connect(band);
+  band.connect(g);
+  g.connect(bus);
+  src.start(t0);
+  src.stop(t0 + 0.06);
+  // Körper: kurzer, tiefer Anschlag
+  const osc = ac.createOscillator();
+  osc.type = 'sine';
+  const f = space ? 140 + Math.random() * 20 : 240 + Math.random() * 70;
+  osc.frequency.setValueAtTime(f, t0);
+  osc.frequency.exponentialRampToValueAtTime(f * 0.62, t0 + (space ? 0.06 : 0.03));
+  const og = ac.createGain();
+  og.gain.setValueAtTime(0.0001, t0);
+  og.gain.exponentialRampToValueAtTime((space ? 0.09 : 0.06) * v, t0 + 0.003);
+  og.gain.exponentialRampToValueAtTime(0.0001, t0 + (space ? 0.08 : 0.04));
+  osc.connect(og);
+  og.connect(bus);
+  osc.start(t0);
+  osc.stop(t0 + 0.1);
+}
+
 export function playSfx(list: Sfx[]) {
   if (!enabled || !list.length) return;
   // Mehrere gleichzeitige Klänge nicht übereinanderstapeln: der wichtigste zählt
