@@ -5,7 +5,8 @@ import { hasUnlock, visibleTiles } from '../engine/game';
 import { lichtradius } from '../engine/player';
 import { describeMonster } from '../engine/identify';
 import { idx, inBounds, isWalkable } from '../engine/mapgen';
-import type { GameState, Item, Pos, Room, TrapKind } from '../engine/types';
+import type { FurnitureKind, GameState, Item, Pos, Room, TrapKind } from '../engine/types';
+import { drawHero, drawSprite, spriteFor } from './sprites';
 
 /**
  * Die Karte als Canvas-Grafik. Alle Texturen sind prozedural (keine
@@ -16,16 +17,16 @@ import type { GameState, Item, Pos, Room, TrapKind } from '../engine/types';
 
 // ================================================================ Zoom
 
-const ZOOM_STEPS = [22, 26, 32, 38, 46];
-const ZOOM_KEY = 'grosser-abstieg-zoom';
+const ZOOM_STEPS = [22, 26, 32, 38, 46, 56];
+const ZOOM_KEY = 'grosser-abstieg-zoom-v2';
 
 function storedZoom(): number {
   try {
     const raw = localStorage.getItem(ZOOM_KEY);
     const n = raw === null ? NaN : Number(raw);
-    return Number.isInteger(n) && n >= 0 && n < ZOOM_STEPS.length ? n : 2;
+    return Number.isInteger(n) && n >= 0 && n < ZOOM_STEPS.length ? n : 3;
   } catch {
-    return 2;
+    return 3;
   }
 }
 
@@ -110,6 +111,8 @@ export function tileFromMouse(view: View, canvas: HTMLCanvasElement, ev: MouseEv
 export interface RenderExtras {
   hover: Pos | null;
   path: Pos[] | null;
+  /** Untersuchtes Feld (Info-Karte offen). */
+  selected?: Pos | null;
 }
 
 // ================================================================ Hilfen
@@ -494,8 +497,8 @@ function aoTexture(side: 'n' | 's' | 'w' | 'e' | 'nw' | 'ne' | 'sw' | 'se'): HTM
 
 // ================================================================ Türen
 
-function doorTexture(open: boolean, horizontal: boolean): HTMLCanvasElement {
-  return texture(`d:${open ? 1 : 0}:${horizontal ? 1 : 0}`, (c) => {
+function doorTexture(open: boolean, horizontal: boolean, boss = false): HTMLCanvasElement {
+  return texture(`d:${open ? 1 : 0}:${horizontal ? 1 : 0}:${boss ? 1 : 0}`, (c) => {
     c.save();
     if (!horizontal) {
       c.translate(U / 2, U / 2);
@@ -512,7 +515,7 @@ function doorTexture(open: boolean, horizontal: boolean): HTMLCanvasElement {
       // Türblatt: Bretter, Eisenbänder, Klinke
       c.fillStyle = 'rgba(0,0,0,0.45)';
       c.fillRect(4, mid - 4, U - 8, 9);
-      bevel(c, 4, mid - 5, U - 8, 9, 1, '#8e5e2f', 0.18, 0.35);
+      bevel(c, 4, mid - 5, U - 8, 9, 1, boss ? '#5a1c18' : '#8e5e2f', 0.18, 0.35);
       c.strokeStyle = 'rgba(40,20,8,0.7)';
       c.lineWidth = 0.7;
       for (let x = 9; x < U - 5; x += 5) {
@@ -521,9 +524,15 @@ function doorTexture(open: boolean, horizontal: boolean): HTMLCanvasElement {
         c.lineTo(x, mid + 3.5);
         c.stroke();
       }
-      c.fillStyle = '#6f6a62';
+      c.fillStyle = boss ? '#c0392b' : '#6f6a62';
       c.fillRect(5, mid - 3.2, U - 10, 1.4);
       c.fillRect(5, mid + 1.2, U - 10, 1.4);
+      if (boss) {
+        // Nieten und ein schweres Schloss
+        c.fillStyle = '#e8b04a';
+        for (let x = 7; x < U - 6; x += 4) c.fillRect(x, mid - 0.6, 1.4, 1.4);
+        bevel(c, U / 2 - 3, mid - 3.5, 6, 7, 1, '#2a2a2e', 0.2, 0.4);
+      }
       c.fillStyle = '#e7c46a';
       c.beginPath();
       c.arc(U - 9, mid - 0.5, 1.6, 0, Math.PI * 2);
@@ -651,9 +660,23 @@ export function render(
         drawProp(ctx, px, py, k, Math.floor(hash(x, y, 6) * 5));
       }
       if (tile === 'stairs') drawStairs(ctx, px, py, k, vis.has(i), time);
+      const furn = room?.furniture?.find((f) => f.pos.x === x && f.pos.y === y);
+      if (furn) drawFurniture(ctx, furn.kind, px, py, k, time);
       if (tile === 'door' || tile === 'dooropen') {
         const horizontal = !isWalkable(m, x - 1, y) && m.tiles[idx(m, x - 1, y)] !== 'door';
-        ctx.drawImage(doorTexture(tile === 'dooropen', horizontal), px, py, TILE, TILE);
+        const lairDoor = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => {
+          const ri = inBounds(m, x + dx, y + dy) ? m.roomAt[idx(m, x + dx, y + dy)] : -1;
+          return ri >= 0 && (m.rooms[ri].kind === 'boss' || m.rooms[ri].kind === 'arena');
+        });
+        if (lairDoor && vis.has(i)) {
+          const pulse = 0.25 + 0.15 * Math.sin(time / 400);
+          const g = ctx.createRadialGradient(px + TILE / 2, py + TILE / 2, 1, px + TILE / 2, py + TILE / 2, TILE);
+          g.addColorStop(0, `rgba(255,60,40,${pulse})`);
+          g.addColorStop(1, 'rgba(255,60,40,0)');
+          ctx.fillStyle = g;
+          ctx.fillRect(px - TILE / 2, py - TILE / 2, TILE * 2, TILE * 2);
+        }
+        ctx.drawImage(doorTexture(tile === 'dooropen', horizontal, lairDoor), px, py, TILE, TILE);
       }
     }
   }
@@ -735,7 +758,8 @@ export function render(
     const cy = sy(p.y) + TILE / 2;
     const col = c.party ? '#7fe0a0' : '#7cc4ff';
     const r = 9.5 * k;
-    token(ctx, cx, cy, r, k, { ring: col, glyph: c.name.charAt(0), glyphColor: col });
+    groundRing(ctx, cx, cy + r * 0.72, r, k, alpha(col, 0.6));
+    drawSprite(ctx, 'crawler', c.party ? '#4f9a6a' : '#4a7fb0', cx, cy - 1.5 * k, r * 2.7, { time });
     if (c.hp < c.maxHp) hpBar(ctx, cx, cy - r - 5 * k, r * 2, k, c.hp / c.maxHp, '#6ee07a');
   }
 
@@ -749,26 +773,17 @@ export function render(
     const elite = mo.rank === 'elite';
     const info = describeMonster(s, mo);
     const unknown = info.insight >= 3;
-    const color = unknown ? '#a39a8c' : mo.color;
-    const base = boss ? 14.5 : mo.size === 'winzig' ? 8.5 : mo.size === 'klein' ? 10 : mo.size === 'gross' || mo.size === 'riesig' ? 13 : 11.5;
+    const color = mo.color;
+    const base = boss ? 14.5 : mo.size === 'winzig' ? 10.5 : mo.size === 'klein' ? 12 : mo.size === 'gross' || mo.size === 'riesig' ? 14 : 13;
     const r = base * k;
-    if (mo.aware && !mo.asleep) {
-      // Pulsierender roter Rand: dieser Gegner ist hinter dir her
-      const pulse = 0.3 + 0.3 * (0.5 + 0.5 * Math.sin(time / 170));
-      ctx.strokeStyle = `rgba(255,76,60,${pulse})`;
-      ctx.lineWidth = 1.6 * k;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r + 4 * k, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-    token(ctx, cx, cy, r, k, {
-      ring: color,
-      glyph: unknown ? '?' : mo.glyph,
-      glyphColor: color,
-      fill: elite ? ['#3c1a1c', '#150809'] : boss ? ['#3a2e14', '#120d05'] : undefined,
-      outer: boss ? '#ffcc33' : elite ? '#ff5a4a' : undefined,
-      crown: boss,
+    // Bodenmarke: Farbe zeigt Herausforderung, pulsiert rot, wenn der Gegner dich jagt
+    groundRing(ctx, cx, cy + r * 0.72, r * 1.05, k, mo.aware && !mo.asleep ? `rgba(255,76,60,${0.45 + 0.35 * (0.5 + 0.5 * Math.sin(time / 170))})` : alpha(info.challenge.color.length === 7 ? info.challenge.color : '#a39a8c', 0.55), boss ? '#ffcc33' : elite ? '#ff5a4a' : undefined);
+    const bob = mo.asleep ? 0 : Math.sin(time / 260 + mo.pos.x * 1.7) * 0.8 * k;
+    ctx.globalAlpha = mo.asleep ? 0.85 : 1;
+    drawSprite(ctx, spriteFor(mo.defId, mo.rank === 'geist'), color, cx, cy - 2 * k + bob, r * 3.1, {
+      time, flip: p.x > (anim?.pos('p', s.player.pos).x ?? s.player.pos.x), crown: boss, unknown,
     });
+    ctx.globalAlpha = 1;
     // Brennende Gegner flackern
     if ((mo.conditions?.brennen?.turns ?? 0) > 0) {
       const flicker = 0.45 + 0.35 * Math.sin(time / 70 + mo.pos.x);
@@ -813,7 +828,8 @@ export function render(
     const p = at('pet', pet.pos);
     const cx = sx(p.x) + TILE / 2;
     const cy = sy(p.y) + TILE / 2;
-    token(ctx, cx, cy, 8 * k, k, { ring: '#ffb3e6', glyph: pet.name.charAt(0), glyphColor: '#ffb3e6', fill: ['#3a2233', '#150a12'] });
+    groundRing(ctx, cx, cy + 6 * k, 8.5 * k, k, 'rgba(255,179,230,0.6)');
+    drawSprite(ctx, 'haustier', '#e0a0c8', cx, cy - 1 * k, 19 * k, { time });
     if (pet.hp < pet.maxHp) hpBar(ctx, cx, cy - 13 * k, 16 * k, k, pet.hp / pet.maxHp, '#ff8ad8');
   }
 
@@ -867,6 +883,22 @@ export function render(
     ctx.stroke();
   }
 
+  // --- Untersuchtes Feld: Eckklammern
+  if (extras.selected) {
+    const qx = sx(extras.selected.x);
+    const qy = sy(extras.selected.y);
+    const L = TILE * 0.3;
+    ctx.strokeStyle = 'rgba(140, 200, 255, 0.95)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (const [cx, cy, dx, dy] of [[qx, qy, 1, 1], [qx + TILE, qy, -1, 1], [qx, qy + TILE, 1, -1], [qx + TILE, qy + TILE, -1, -1]]) {
+      ctx.moveTo(cx + dx * L, cy + dy * 1);
+      ctx.lineTo(cx + dx * 1, cy + dy * 1);
+      ctx.lineTo(cx + dx * 1, cy + dy * L);
+    }
+    ctx.stroke();
+  }
+
   // --- Vignette: Ränder weich abdunkeln
   const vg = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.35, w / 2, h / 2, Math.max(w, h) * 0.75);
   vg.addColorStop(0, 'rgba(0,0,0,0)');
@@ -879,80 +911,21 @@ export function render(
 
 // ================================================================ Figuren
 
-interface TokenStyle {
-  ring: string;
-  glyph?: string;
-  glyphColor?: string;
-  /** Füllung innen (hell) und außen (dunkel). */
-  fill?: [string, string];
-  /** Zusätzlicher Außenring (Elite, Boss). */
-  outer?: string;
-  /** Drei Zacken oben: Boss. */
-  crown?: boolean;
-}
-
-/** Eine runde Spielfigur: Schatten, Scheibe mit Glanz, Farbring, Buchstabe. */
-function token(ctx: Ctx, cx: number, cy: number, r: number, k: number, st: TokenStyle) {
-  // Schatten
-  const sh = ctx.createRadialGradient(cx, cy + r * 0.8, 0, cx, cy + r * 0.8, r * 1.1);
-  sh.addColorStop(0, 'rgba(0,0,0,0.55)');
-  sh.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = sh;
+/** Leuchtender Ring am Boden unter einer Figur. */
+function groundRing(ctx: Ctx, cx: number, cy: number, r: number, k: number, color: string, outer?: string) {
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
   ctx.beginPath();
-  ctx.ellipse(cx, cy + r * 0.8, r * 1.1, r * 0.45, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy, r, r * 0.42, 0, 0, Math.PI * 2);
   ctx.fill();
-  if (st.crown && st.outer) {
-    ctx.fillStyle = st.outer;
-    for (const a of [-0.55, 0, 0.55]) {
-      const ang = -Math.PI / 2 + a;
-      const bx = cx + Math.cos(ang) * (r + 1 * k);
-      const by = cy + Math.sin(ang) * (r + 1 * k);
-      ctx.beginPath();
-      ctx.moveTo(bx + Math.cos(ang + Math.PI / 2) * 3 * k, by + Math.sin(ang + Math.PI / 2) * 3 * k);
-      ctx.lineTo(cx + Math.cos(ang) * (r + 6.5 * k), cy + Math.sin(ang) * (r + 6.5 * k));
-      ctx.lineTo(bx - Math.cos(ang + Math.PI / 2) * 3 * k, by - Math.sin(ang + Math.PI / 2) * 3 * k);
-      ctx.closePath();
-      ctx.fill();
-    }
-  }
-  // Scheibe
-  const [f1, f2] = st.fill ?? ['#2d323c', '#0e1016'];
-  const g = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.45, r * 0.1, cx, cy, r);
-  g.addColorStop(0, f1);
-  g.addColorStop(1, f2);
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.fill();
-  // Kontrastrand und Farbring
-  ctx.strokeStyle = 'rgba(0,0,0,0.75)';
-  ctx.lineWidth = 3.4 * k;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.8 * k;
   ctx.stroke();
-  ctx.strokeStyle = st.ring;
-  ctx.lineWidth = 1.9 * k;
-  ctx.stroke();
-  if (st.outer) {
-    ctx.strokeStyle = st.outer;
-    ctx.lineWidth = 1.3 * k;
+  if (outer) {
+    ctx.strokeStyle = outer;
+    ctx.lineWidth = 1.2 * k;
     ctx.beginPath();
-    ctx.arc(cx, cy, r + 2.6 * k, 0, Math.PI * 2);
+    ctx.ellipse(cx, cy, r + 3 * k, (r + 3 * k) * 0.42, 0, 0, Math.PI * 2);
     ctx.stroke();
-  }
-  // Glanz oben
-  ctx.strokeStyle = 'rgba(255,255,255,0.16)';
-  ctx.lineWidth = 1.2 * k;
-  ctx.beginPath();
-  ctx.arc(cx, cy, r - 2.4 * k, Math.PI * 1.15, Math.PI * 1.85);
-  ctx.stroke();
-  if (st.glyph) {
-    const size = Math.max(8, r * 1.1);
-    ctx.font = `800 ${size}px Montserrat, sans-serif`;
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = 'rgba(0,0,0,0.7)';
-    ctx.lineWidth = 2.2 * k;
-    ctx.strokeText(st.glyph, cx, cy + size * 0.06);
-    ctx.fillStyle = st.glyphColor ?? st.ring;
-    ctx.fillText(st.glyph, cx, cy + size * 0.06);
   }
 }
 
@@ -1027,49 +1000,25 @@ function drawPlayer(ctx: Ctx, s: GameState, px: number, py: number, k: number, t
     ctx.lineWidth = 1.6 * k;
     ctx.stroke();
   }
-  // Schatten
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.beginPath();
-  ctx.ellipse(px, py + r * 0.85, r * 0.95, r * 0.38, 0, 0, Math.PI * 2);
-  ctx.fill();
-  // Richtung
+  // Bodenring in Gold, darauf die Figur
+  groundRing(ctx, px, py + r * 0.75, r * 1.05, k, 'rgba(255,214,90,0.9)');
   const dir = p.lastMoveDir;
-  if (dir && (dir.x || dir.y)) {
-    const len = Math.hypot(dir.x, dir.y);
-    const ux = dir.x / len;
-    const uy = dir.y / len;
-    const tip = r + 6 * k;
-    ctx.fillStyle = 'rgba(255,245,210,0.9)';
+  const flip = !!dir && dir.x < 0;
+  drawHero(ctx, px, py - 2 * k + Math.sin(time / 300) * 0.6 * k, r * 3.1, flip);
+  if (p.buffs.some((b) => b.name === 'Vergiftet')) {
+    ctx.strokeStyle = 'rgba(155,224,74,0.8)';
+    ctx.lineWidth = 1.6 * k;
     ctx.beginPath();
-    ctx.moveTo(px + ux * tip, py + uy * tip);
-    ctx.lineTo(px + ux * (r + 1.5 * k) - uy * 3.2 * k, py + uy * (r + 1.5 * k) + ux * 3.2 * k);
-    ctx.lineTo(px + ux * (r + 1.5 * k) + uy * 3.2 * k, py + uy * (r + 1.5 * k) - ux * 3.2 * k);
-    ctx.closePath();
-    ctx.fill();
+    ctx.ellipse(px, py + r * 0.75, r * 1.3, r * 0.55, 0, 0, Math.PI * 2);
+    ctx.stroke();
   }
-  // Scheibe
-  const poisoned = p.buffs.some((b) => b.name === 'Vergiftet');
-  const g = ctx.createRadialGradient(px - r * 0.35, py - r * 0.4, r * 0.1, px, py, r);
-  g.addColorStop(0, '#fff6d2');
-  g.addColorStop(0.55, poisoned ? '#b6e25a' : '#ffd45a');
-  g.addColorStop(1, poisoned ? '#6f9a2a' : '#d99a24');
-  ctx.fillStyle = g;
-  ctx.beginPath();
-  ctx.arc(px, py, r, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-  ctx.lineWidth = 3 * k;
-  ctx.stroke();
-  ctx.strokeStyle = '#fff4cc';
-  ctx.lineWidth = 1.8 * k;
-  ctx.stroke();
   // Zustände des Crawlers als Außenring
   const ail = [['Blutung', '#e0434a'], ['Brennen', '#ff8a2a'], ['Furcht', '#b38cff'], ['Geblendet', '#d9d9d9']].filter(([n]) => p.buffs.some((b) => b.name === n));
   ail.forEach(([, col], n) => {
     ctx.strokeStyle = alpha(col, 0.55 + 0.3 * Math.sin(time / 150 + n));
     ctx.lineWidth = 1.6 * k;
     ctx.beginPath();
-    ctx.arc(px, py, r + (3 + n * 2.5) * k, 0, Math.PI * 2);
+    ctx.ellipse(px, py + r * 0.75, r * 1.3 + (2 + n * 2.5) * k, (r * 1.3 + (2 + n * 2.5) * k) * 0.42, 0, 0, Math.PI * 2);
     ctx.stroke();
   });
 }
@@ -1279,6 +1228,73 @@ function drawItem(ctx: Ctx, it: Item, cx: number, cy: number, k: number, visible
 }
 
 // ================================================================ Einrichtung, Treppe, Fallen, Geschosse
+
+/** Einrichtung der Safe Rooms: Automat, Händler, Wirt, Bett, Toilette. */
+function drawFurniture(ctx: Ctx, kind: FurnitureKind, px: number, py: number, k: number, time: number) {
+  const cx = px + TILE / 2;
+  const cy = py + TILE / 2;
+  if (kind === 'haendler' || kind === 'wirt') {
+    // Theke, dahinter die Figur
+    drawSprite(ctx, 'mensch', kind === 'wirt' ? '#8a4a3a' : '#3a6a8a', cx, cy - 6 * k, 24 * k, { time });
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.scale(k, k);
+    bevel(ctx, 2, 18, 28, 12, 2, '#6e4a2a', 0.22, 0.4);
+    ctx.fillStyle = kind === 'wirt' ? '#e7c46a' : '#9fd0ff';
+    ctx.fillRect(6, 22, 20, 1.5);
+    ctx.restore();
+    return;
+  }
+  ctx.save();
+  ctx.translate(px, py);
+  ctx.scale(k, k);
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.beginPath();
+  ctx.ellipse(16, 28, 12, 3.5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  switch (kind) {
+    case 'automat': {
+      const glow = 0.5 + 0.3 * Math.sin(time / 350);
+      const g = ctx.createRadialGradient(16, 14, 2, 16, 14, 22);
+      g.addColorStop(0, `rgba(120,220,255,${glow * 0.5})`);
+      g.addColorStop(1, 'rgba(120,220,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(-8, -8, 48, 48);
+      bevel(ctx, 6, 1, 20, 28, 2.5, '#2e5f8a', 0.25, 0.4);
+      ctx.fillStyle = `rgba(170,235,255,${0.55 + glow * 0.3})`;
+      ctx.fillRect(9, 4, 14, 12);
+      ctx.fillStyle = '#ffe14a';
+      ctx.fillRect(10, 6, 3, 3);
+      ctx.fillStyle = '#ff7a6a';
+      ctx.fillRect(15, 6, 3, 3);
+      ctx.fillStyle = '#9fffb0';
+      ctx.fillRect(10, 11, 3, 3);
+      ctx.fillStyle = '#111';
+      ctx.fillRect(9, 20, 14, 4);
+      break;
+    }
+    case 'bett':
+      bevel(ctx, 4, 3, 24, 26, 3, '#5a3a22', 0.2, 0.4);
+      bevel(ctx, 6, 9, 20, 18, 2, '#3f6ea8', 0.25, 0.3);
+      bevel(ctx, 7, 4, 18, 6, 2.5, '#efe8d8', 0.3, 0.2);
+      break;
+    case 'toilette':
+      bevel(ctx, 10, 2, 12, 8, 2, '#e8ecef', 0.3, 0.25);
+      ctx.fillStyle = '#e8ecef';
+      ctx.strokeStyle = '#9aa2a8';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.ellipse(16, 19, 8, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#9fd0e8';
+      ctx.beginPath();
+      ctx.ellipse(16, 20, 4.5, 5.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+  }
+  ctx.restore();
+}
 
 /** Einzelne Flecken, Risse und Pfützen – selten, an zufälliger Stelle. */
 function drawDecal(ctx: Ctx, px: number, py: number, k: number, x: number, y: number, floor: number) {

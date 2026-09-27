@@ -16,6 +16,13 @@ export type Tile = 'wall' | 'floor' | 'stairs' | 'door' | 'dooropen';
 
 export type RoomKind = 'start' | 'normal' | 'guild' | 'safe' | 'boss' | 'arena';
 
+export type FurnitureKind = 'automat' | 'haendler' | 'wirt' | 'bett' | 'toilette';
+
+export interface Furniture {
+  kind: FurnitureKind;
+  pos: Pos;
+}
+
 export interface Room {
   id: number;
   x: number;
@@ -30,6 +37,12 @@ export interface Room {
   safeVariant?: 'freebie' | 'restaurant';
   /** Crawler hat den Gratis-Gegenstand dieses Safe Rooms schon abgeholt. */
   freebieTaken?: boolean;
+  /** Einrichtung (Safe Rooms): Automat, Händler, Wirt, Bett, Toilette. */
+  furniture?: Furniture[];
+  /** Vorraum einer Boss-Kammer (ID der Kammer). */
+  antechamberOf?: number;
+  /** Der Versus-Bildschirm wurde für diese Kammer schon gezeigt. */
+  versusShown?: boolean;
   /** Laden im Safe Room (wird beim ersten Betreten gefüllt). */
   shop?: Shop;
   /** Der Laden hat schon einen Auftrag angeboten. */
@@ -650,6 +663,10 @@ export interface GameState {
   dynAchievements?: DynAchievement[];
   /** Rassen- und Klassenwahl steht an (Etage 3). */
   pendingSelection: boolean;
+  /** Gegenstände, die die Oberfläche gleich groß zeigen soll (z. B. vom Automaten). */
+  pendingReveal?: { title: string; items: Item[] };
+  /** Boss, gegen den gleich der Versus-Bildschirm gezeigt wird. */
+  pendingVersus?: string;
   toasts: Toast[];
 }
 

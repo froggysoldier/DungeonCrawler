@@ -203,6 +203,14 @@ export function rollGroundItem(s: GameState): Item {
   return createItem(s, id);
 }
 
+/** Was man in normalen Räumen findet: Material zum Basteln und Wurfkram. */
+const MATERIAL_EXTRA = ['stein', 'ziegel', 'flasche', 'dose', 'schraubenmutter'];
+
+export function rollMaterial(s: GameState): Item {
+  const pool = BASE_ITEMS.filter((b) => b.ground && (b.kind === 'schrott' || MATERIAL_EXTRA.includes(b.id))).map((b) => [b.id, b.ground!] as [string, number]);
+  return createItem(s, R.weighted(s, pool));
+}
+
 /** Mob-Drops: meist nichts, manchmal Gold oder Kleinkram. */
 export function rollMobDrop(s: GameState, level: number, elite: boolean): Item[] {
   const out: Item[] = [];

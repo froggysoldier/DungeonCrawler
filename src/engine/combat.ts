@@ -454,6 +454,7 @@ export function killMonster(s: GameState, m: Monster, t: Technique | null, byPet
     dropNear(s, createAreaMap(s, m.hood), m.pos);
     s.player.boxes.push(createBox(s, 'boss', s.floor >= 2 ? 'gold' : 'silber'));
     log(s, `Nachbarschafts-Boss besiegt! Im ${hood?.name ?? 'Viertel'} spawnen keine neuen Monster mehr. Eine Gebietskarte liegt am Boden. Du erhältst eine Boss-Box.`, 'system');
+    log(s, 'Mit einem Klacken entriegelt sich die Tür der Kammer.', 'system');
   }
   if (m.rank === 'boroughboss') {
     s.counters.bossKills += 1;

@@ -1,4 +1,4 @@
-# Der Große Abstieg – Game Design Dokument (v0.9)
+# Der Große Abstieg – Game Design Dokument (v0.10)
 
 > Inspiriert von der Buchreihe *Dungeon Crawler Carl* von Matt Dinniman.
 > **Spoiler-Regel:** Aus den Büchern werden nur Spielmechaniken und die
@@ -68,6 +68,12 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
 - **Einsturz-Timer**: 5 Tage (2400 Züge). Warnungen bei 24 h, 6 h, 1 h.
 - Treppenhäuser: eins hinter dem Borough-Boss, zwei in abgelegenen Räumen.
 - Boss-Kammern und Arena sind **Sackgassen mit genau einem Zugang**.
+- **Boss-Kammern** haben rote Eisentüren (pulsierendes Glühen, Hinweis im
+  Tooltip) und einen **Vorraum** mit 2–3 normalen Wachen: Man läuft nie
+  unvermittelt hinein. Beim Betreten verriegelt sich die Tür, bis der Boss
+  fällt; ein **Versus-Bildschirm** zeigt Crawler gegen Boss.
+- **Bodenfunde:** In normalen Räumen liegt nur Handwerksmaterial (Schrott,
+  Steine, Flaschen …). Echte Beute liegt nur im Vorraum der Boss-Kammern.
 - **Gilden und Safe Rooms** haben Mauern und **Türen**. Geschlossene Türen
   versperren Weg und Sicht und müssen erst geöffnet werden (ein Zug, nie
   schräg); man kann sie wieder schließen. Monster öffnen sie nicht.
@@ -78,6 +84,15 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
 - **Bewegung:** Figuren gleiten von Feld zu Feld, die Kamera folgt weich.
   Solange kein Gegner hinter dir her ist, läuft man mit gehaltener
   Richtungstaste flüssig weiter; Klick-Reisen öffnen Türen unterwegs.
+- **Untersuchen ohne Hinlaufen:** Ein Klick auf Gegenstände, Möbel, Fallen
+  oder die Treppe zeigt eine Info-Karte; erst der zweite Klick läuft hin.
+- **Kampfmodus:** Sobald ein wacher Gegner dich bemerkt, erscheint ein
+  Banner, die Karte bekommt einen roten Rahmen, ein Klang ertönt und jeder
+  Zug zählt einzeln (kein automatisches Weiterlaufen). Am Ende zeigt ein
+  Banner die Bilanz (Züge, Besiegte, Erfahrung, verlorene Lebenspunkte).
+- **Figuren:** Crawler und Monster sind gezeichnete Kreaturen (Ratte,
+  Spinne, Kobold, Schleim …); unbekannte Monster zeigen ihre Gestalt mit
+  einer Fragezeichen-Marke.
 - **Sichtbare Geschosse:** Würfe (im Bogen), Pfeile, Schleim, Zauber und
   Haustier-Magie fliegen sichtbar; Schaden, Heilung und Fehlschläge steigen
   als Zahlen auf.
@@ -181,8 +196,10 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
 
 ### 3.7 Safe Rooms
 - Keine Gewalt; Mobs, die angreifen, werden weggebeamt.
-- Zufällig **Gratis-Automat** (1 Gegenstand pro Crawler) oder **Restaurant**
-  mit NPC-Wirt und Buff-Essen.
+- **Eingerichtet:** Jeder Safe Room hat einen **Gratis-Automaten** (1 Gegenstand
+  pro Crawler; meist nützlich, manchmal ein Scherzartikel), einen Händler,
+  ein Bett und eine Toilette. **Restaurants** haben zusätzlich einen Wirt mit
+  Buff-Essen und Zimmer. Möbel benutzt man, indem man hineinläuft.
 - Nur hier: **Lootboxen öffnen** und **schlafen** (8 h, heilt, Haustier kehrt zurück).
 - **Toilette:** Erleichtern darf man sich nur hier (siehe Blase).
 - **Laden** mit wechselnder Besitzerin oder wechselndem Besitzer: kaufen,

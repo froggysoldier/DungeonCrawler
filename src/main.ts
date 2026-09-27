@@ -55,6 +55,7 @@ function startGame(s: GameState) {
     endScreen(root, ended, meta, showInterview, showTitle);
   });
   if (import.meta.env.DEV) (window as unknown as { __dc: () => GameState | undefined }).__dc = () => view?.state;
+  if (import.meta.env.DEV) (window as unknown as { __dcv: () => unknown }).__dcv = () => view;
   // Offene Dialoge (z. B. Intro) direkt anzeigen
   view.flushDialogs();
 }

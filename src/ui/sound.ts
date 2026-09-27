@@ -273,3 +273,27 @@ export function playSfx(list: Sfx[]) {
       break;
   }
 }
+
+// ================================================================ Kampf und Boss
+
+/** Kampfbeginn: dumpfer Schlag und zwei scharfe, fallende Töne. */
+export function playCombatStart() {
+  tone(90, 0, 0.35, 'sine', 0.45, 45);
+  noise(0, 0.18, 0.3, 2400, 600);
+  tone(note(-5), 0.04, 0.16, 'sawtooth', 0.07, note(-12));
+  tone(note(-6), 0.18, 0.22, 'sawtooth', 0.07, note(-14));
+}
+
+/** Kampfende: kurze, aufgelöste Kadenz. */
+export function playCombatEnd() {
+  tone(note(-5), 0, 0.2, 'triangle', 0.1);
+  tone(note(0), 0.12, 0.45, 'triangle', 0.1);
+  bell(note(12), 0.12, 0.08, 0.8);
+}
+
+/** Versus-Bildschirm: Trommelschläge und ein tiefes Blech. */
+export function playVersus() {
+  for (let i = 0; i < 3; i++) tone(70, i * 0.16, 0.3, 'sine', 0.5, 40);
+  noise(0.48, 0.6, 0.35, 3000, 300);
+  for (const s of [-24, -17, -12]) tone(note(s), 0.5, 1.2, 'sawtooth', 0.05);
+}

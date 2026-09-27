@@ -2,10 +2,10 @@ import { HOOD_BOSSES } from '../data/monsters';
 import {
   ARRIVAL_ROOM, FLOORS, GUILD_ROOM, HOOD_NAMES, ROOM_FLAVORS, SAFE_ROOM_FREEBIE, SAFE_ROOM_RESTAURANT, START_ROOM,
 } from '../data/world';
-import { createItem, rollGroundItem } from './items';
+import { createItem, rollGroundItem, rollMaterial } from './items';
 import { clampLevel, pickMonsterDef, spawnBoss, spawnGhost, spawnMonster } from './monsters';
 import * as R from './rng';
-import type { FloorMap, GameState, GhostRecord, Item, Monster, Pos, Room, RoomKind, Tile } from './types';
+import type { FloorMap, Furniture, FurnitureKind, GameState, GhostRecord, Item, Monster, Pos, Room, RoomKind, Tile } from './types';
 
 export const MAP_W = 72;
 export const MAP_H = 52;
@@ -265,7 +265,8 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
   // Safe Rooms: einer je Viertel, plus einer zusätzlich
   for (let h = 0; h < 5; h++) {
     const hood = h < 4 ? h : R.int(s, 0, 3);
-    const cands = hoodRooms(hood).filter((r) => r.w * r.h <= 48);
+    // Groß genug für Einrichtung (innen mindestens 5 × 3)
+    const cands = hoodRooms(hood).filter((r) => r.w >= 7 && r.h >= 5 && r.w * r.h <= 60);
     const room = cands.length ? R.pick(s, cands) : R.pick(s, hoodRooms(hood));
     if (!room) continue;
     const variant = R.chance(s, 0.5) ? 'freebie' : 'restaurant';
@@ -308,8 +309,15 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
       .slice(0, 3);
     edges.push([a.id, R.pick(s, near).id]);
   }
+  // Jede Kammer hat genau einen Zugang – über ihren Vorraum
+  const antechambers: Room[] = [];
   for (const lair of m.rooms.filter(isLair)) {
-    const nearest = [...hubs].sort((p, q) => dist(center(lair), center(p)) - dist(center(lair), center(q)))[0];
+    const nearest = [...hubs]
+      .filter((r) => r.kind === 'normal' && r.antechamberOf === undefined)
+      .sort((p, q) => dist(center(lair), center(p)) - dist(center(lair), center(q)))[0];
+    if (!nearest) continue;
+    nearest.antechamberOf = lair.id;
+    antechambers.push(nearest);
     edges.push([nearest.id, lair.id]);
   }
   // Boss-Kammern und Arena (inkl. Rand) sind für fremde Gänge tabu
@@ -327,8 +335,10 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
     if (!carveCorridor(m, from, to, forbiddenFor([a, b]))) carveCorridor(m, from, to, new Set());
   }
 
-  // Gilden und Safe Rooms: Mauern und Türen
-  for (const r of m.rooms) if (r.kind === 'guild' || r.kind === 'safe') addWallsAndDoors(m, r);
+  // Gilden, Safe Rooms und Kammern: Mauern und Türen
+  for (const r of m.rooms) if (r.kind === 'guild' || r.kind === 'safe' || isLair(r)) addWallsAndDoors(m, r);
+
+  for (const r of m.rooms) if (r.kind === 'safe') furnish(s, m, r);
 
   // Übrige Räume bekommen Namen und Beschreibungen
   const flavors = R.shuffle(s, [...(def.flavors ?? ROOM_FLAVORS)]);
@@ -338,6 +348,11 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
     const f = flavors[fi++ % flavors.length];
     r.name = f.name;
     r.description = f.description;
+    if (r.antechamberOf !== undefined) {
+      const lair = m.rooms[r.antechamberOf];
+      r.name = `Vorraum: ${f.name}`;
+      r.description = `${f.description} Eine schwere, mit rotem Eisen beschlagene Tür führt von hier in ${lair.kind === 'arena' ? 'das Große Gewölbe' : 'eine Boss-Kammer'}. Wer sie durchschreitet, kommt erst wieder heraus, wenn der Boss besiegt ist. Hier haben andere ihre Sachen zurückgelassen.`;
+    }
   }
 
   // --- Treppenhäuser: eins in der Arena, zwei in abgelegenen Räumen
@@ -379,7 +394,7 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
   for (const r of m.rooms) {
     if (r.kind !== 'normal') continue;
     const d = dist(center(r), start) / maxDist;
-    const count = R.weighted(s, [[0, 2], [1, 4], [2, 3], [3, 1]] as [number, number][]);
+    const count = r.antechamberOf !== undefined ? R.int(s, 2, 3) : R.weighted(s, [[0, 2], [1, 4], [2, 3], [3, 1]] as [number, number][]);
     let i = 0;
     while (i < count) {
       const level = Math.max(def.mobLevel[0], Math.round(def.mobLevel[0] + d * 1.6 * (def.mobLevel[1] - def.mobLevel[0]) + R.int(s, -1, 0)));
@@ -410,12 +425,22 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
     const p = randomFloorIn(s, m, startRoom, occupied);
     if (p) items.push({ pos: p, item: createItem(s, 'stein') });
   }
+  // Normale Räume: nur Material zum Basteln. Echte Beute liegt nur in den
+  // Vorräumen der Kammern – dort, wo sich andere nicht weitergetraut haben.
   for (const r of m.rooms) {
-    if (r.kind !== 'normal' && r.kind !== 'boss') continue;
-    const n = R.weighted(s, [[0, 3], [1, 4], [2, 2]] as [number, number][]);
+    if (r.kind !== 'normal') continue;
+    if (r.antechamberOf !== undefined) {
+      const n = R.int(s, 2, 4);
+      for (let i = 0; i < n; i++) {
+        const p = randomFloorIn(s, m, r, occupied);
+        if (p) items.push({ pos: p, item: rollGroundItem(s) });
+      }
+      continue;
+    }
+    const n = R.weighted(s, [[0, 4], [1, 4], [2, 1]] as [number, number][]);
     for (let i = 0; i < n; i++) {
       const p = randomFloorIn(s, m, r, occupied);
-      if (p) items.push({ pos: p, item: rollGroundItem(s) });
+      if (p) items.push({ pos: p, item: rollMaterial(s) });
     }
   }
 
@@ -427,6 +452,83 @@ export function generateFloor(s: GameState, floor: number, ghosts: GhostRecord[]
     r.name = name;
     r.description = description;
   }
+}
+
+/**
+ * Safe Rooms einrichten: Gratis-Automat, Händler, Bett, Toilette und im
+ * Restaurant ein Wirt. Alles steht am Rand, weg von der Tür, und jeder
+ * freie Platz bleibt erreichbar.
+ */
+function furnish(s: GameState, m: FloorMap, r: Room) {
+  const kinds: FurnitureKind[] = ['automat', ...(r.safeVariant === 'restaurant' ? ['wirt' as const] : []), 'haendler', 'bett', 'toilette'];
+  const doorWithin = (x: number, y: number, d: number) => {
+    for (let dy = -d; dy <= d; dy++) for (let dx = -d; dx <= d; dx++) {
+      const t2 = tileAt(m, x + dx, y + dy);
+      if (t2 === 'door' || t2 === 'dooropen') return true;
+    }
+    return false;
+  };
+  const edge = (x: number, y: number) => x === r.x || y === r.y || x === r.x + r.w - 1 || y === r.y + r.h - 1;
+  const floorTiles: Pos[] = [];
+  for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) if (m.tiles[idx(m, x, y)] === 'floor') floorTiles.push({ x, y });
+  // Oben die „Theken“ (Automat, Wirt, Händler), unten die Möbel; abwechselnd, damit Lücken zum Hinstellen bleiben
+  const top = floorTiles.filter((p) => p.y === r.y && !doorWithin(p.x, p.y, 2)).sort((a, b) => a.x - b.x);
+  const rest = floorTiles.filter((p) => p.y !== r.y && edge(p.x, p.y) && !doorWithin(p.x, p.y, 2)).sort((a, b) => b.y - a.y || a.x - b.x);
+  const preferred = [...top.filter((_, i) => i % 2 === 0), ...rest.filter((_, i) => i % 2 === 0), ...top.filter((_, i) => i % 2 === 1), ...rest.filter((_, i) => i % 2 === 1)];
+  // Notfalls näher an die Tür oder in die Raummitte
+  const fallback = floorTiles.filter((p) => !doorWithin(p.x, p.y, 1)).sort((a, b) => Number(edge(b.x, b.y)) - Number(edge(a.x, a.y)));
+  const pool = [...preferred, ...fallback.filter((p) => !preferred.some((q) => q.x === p.x && q.y === p.y))];
+  r.furniture = [];
+  for (const kind of kinds) {
+    while (pool.length) {
+      const pos = pool.shift()!;
+      r.furniture.push({ kind, pos });
+      // Nichts darf den Raum zerschneiden
+      if (roomConnected(m, r) && r.furniture.every((f) => hasFreeSide(m, r, f.pos))) break;
+      r.furniture.pop();
+    }
+  }
+  void s;
+}
+
+/** Ein Möbelstück braucht eine freie Seite, von der aus man es benutzt. */
+function hasFreeSide(m: FloorMap, r: Room, p: Pos): boolean {
+  return [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => {
+    const x = p.x + dx;
+    const y = p.y + dy;
+    if (x < r.x || y < r.y || x >= r.x + r.w || y >= r.y + r.h) return false;
+    return m.tiles[idx(m, x, y)] === 'floor' && !(r.furniture ?? []).some((f) => f.pos.x === x && f.pos.y === y);
+  });
+}
+
+function roomConnected(m: FloorMap, r: Room): boolean {
+  const blocked = new Set((r.furniture ?? []).map((f) => `${f.pos.x},${f.pos.y}`));
+  const free: Pos[] = [];
+  for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++) {
+    if (m.tiles[idx(m, x, y)] !== 'wall' && !blocked.has(`${x},${y}`)) free.push({ x, y });
+  }
+  if (!free.length) return false;
+  const seen = new Set([`${free[0].x},${free[0].y}`]);
+  const queue = [free[0]];
+  while (queue.length) {
+    const c = queue.shift()!;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const n = { x: c.x + dx, y: c.y + dy };
+      const key = `${n.x},${n.y}`;
+      if (seen.has(key) || blocked.has(key)) continue;
+      if (n.x < r.x || n.y < r.y || n.x >= r.x + r.w || n.y >= r.y + r.h) continue;
+      if (m.tiles[idx(m, n.x, n.y)] === 'wall') continue;
+      seen.add(key);
+      queue.push(n);
+    }
+  }
+  return seen.size === free.length;
+}
+
+export function furnitureAt(m: FloorMap, p: Pos): Furniture | undefined {
+  const r = inBounds(m, p.x, p.y) ? m.roomAt[idx(m, p.x, p.y)] : -1;
+  if (r < 0) return undefined;
+  return m.rooms[r].furniture?.find((f) => f.pos.x === p.x && f.pos.y === p.y);
 }
 
 /** Zufällige begehbare Position, die nicht in einem Safe Room liegt. */

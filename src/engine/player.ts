@@ -71,6 +71,8 @@ export function gainXp(s: GameState, amount: number) {
   const gained = Math.round(amount * (1 + (b.xpBonus ?? 0) / 100));
   const p = s.player;
   p.xp += gained;
+  s.stats ??= {};
+  s.stats['xp.gesamt'] = (s.stats['xp.gesamt'] ?? 0) + gained;
   while (p.xp >= xpToNext(p.level)) {
     p.xp -= xpToNext(p.level);
     p.level += 1;

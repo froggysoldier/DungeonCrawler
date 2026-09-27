@@ -12,9 +12,9 @@ import { isInSafeRoom, playerAttack } from './combat';
 import { handleLethal } from './death';
 import { emit } from './events';
 import { chebyshev, computeFov } from './fov';
-import { createItem, generateEquipment, rollBoxContents } from './items';
+import { baseExists, createItem, generateEquipment, rollBoxContents } from './items';
 import { log, toast } from './log';
-import { MAP_H, MAP_W, generateFloor, hoodOf, idx, inBounds, isWalkable, roomOf, tileAt } from './mapgen';
+import { MAP_H, MAP_W, furnitureAt, generateFloor, hoodOf, idx, inBounds, isWalkable, roomOf, tileAt } from './mapgen';
 import { spawnForFloor } from './monsters';
 import { canStep, findPath, isDoor } from './path';
 import { clampVitals, lichtradius, maxAusdauer, maxHp, skillLevel, totalBonuses } from './player';
@@ -42,8 +42,7 @@ import { dismountForSafeRoom, gainMount, isMountItem, mountStep, refuel, restMou
 import { acceptQuest, declineQuest, offerQuest, questOf, questsOnDescend, questsTick, turnIn } from './quests';
 import { answerShow, floorRecap, snapshotFloor, startTalkShow, type ShowAnswerResult } from './talkshow';
 import type {
-  ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique,
-} from './types';
+  ConsumableEffect, EquipSlot, GameState, Item, MetaState, Pet, Pos, Rarity, StatKey, Technique, Furniture } from './types';
 
 export const SAVE_VERSION = 1;
 
@@ -255,7 +254,7 @@ export function planPath(s: GameState, target: Pos): Pos[] | null {
   const known = (x: number, y: number) => s.map.explored[idx(s.map, x, y)];
   if (!known(target.x, target.y)) return null;
   const isTarget = (x: number, y: number) => x === target.x && y === target.y;
-  const ok = (x: number, y: number) => known(x, y) && !monsterAt(s, { x, y });
+  const ok = (x: number, y: number) => known(x, y) && !monsterAt(s, { x, y }) && (isTarget(x, y) || !furnitureAt(s.map, { x, y }));
   // Bekannte Fallen umgehen – wenn es gar nicht anders geht, eben mitten durch. Türen werden unterwegs geöffnet.
   return findPath(s.map, s.player.pos, target, (x, y) => ok(x, y) && (isTarget(x, y) || !avoidTile(s, x, y)), 6000, true)
     ?? findPath(s.map, s.player.pos, target, ok, 6000, true);
@@ -270,6 +269,10 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
   if (s.pendingSelection) return fail(SELECT_FIRST);
   const p = s.player;
   if (chebyshev(p.pos, to) !== 1) return fail('Nur ein Feld pro Zug.');
+  const furn = furnitureAt(s.map, to);
+  if (furn) return useFurniture(s, furn);
+  const lair = lockedLair(s);
+  if (lair && roomOf(s.map, to)?.id !== lair.id) return fail('Die Tür ist verriegelt. Hier kommst du erst wieder heraus, wenn der Boss besiegt ist.');
   if (tileAt(s.map, to.x, to.y) === 'door') return openDoor(s, to);
   if (!canStep(s.map, p.pos, to)) return fail(isDoor(s.map, to.x, to.y) || isDoor(s.map, p.pos.x, p.pos.y) ? 'Durch einen Türrahmen geht es nur gerade hindurch.' : 'Da ist eine Wand.');
   if (monsterAt(s, to)) return fail('Da steht ein Gegner.');
@@ -293,6 +296,21 @@ export function moveStep(s: GameState, to: Pos): ActionResult {
   // Reiten: mehrere Schritte pro Zug
   if (mountStep(s)) endTurn(s, { keepMoveDir: true });
   return OK;
+}
+
+/** Die Boss-Kammer, in der der Crawler gerade eingeschlossen ist (solange der Boss lebt). */
+export function lockedLair(s: GameState) {
+  const room = currentRoom(s);
+  if (!room || (room.kind !== 'boss' && room.kind !== 'arena')) return null;
+  return s.monsters.some((m) => m.homeRoom === room.id && (m.rank === 'nachbarschaftsboss' || m.rank === 'boroughboss')) ? room : null;
+}
+
+/** Ist diese Tür der Eingang zu einer Boss-Kammer oder dem Großen Gewölbe? */
+export function isLairDoor(s: GameState, at: Pos): boolean {
+  return [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => {
+    const r = roomOf(s.map, { x: at.x + dx, y: at.y + dy });
+    return !!r && (r.kind === 'boss' || r.kind === 'arena');
+  });
 }
 
 /** Eine geschlossene Tür öffnen (kostet einen Zug). */
@@ -566,6 +584,23 @@ function onEnterRoom(s: GameState, room: NonNullable<ReturnType<typeof currentRo
     }
     log(s, 'Hier drin kann dir niemand etwas tun. Hier kannst du Lootboxen öffnen und schlafen.', 'system');
   }
+  if ((room.kind === 'boss' || room.kind === 'arena') && lockedLair(s)) {
+    // Die Tür fällt hinter dem Crawler zu
+    for (let y = room.y - 1; y <= room.y + room.h; y++) {
+      for (let x = room.x - 1; x <= room.x + room.w; x++) {
+        if (tileAt(s.map, x, y) === 'dooropen' && isLairDoor(s, { x, y })) s.map.tiles[idx(s.map, x, y)] = 'door';
+      }
+    }
+    log(s, 'Hinter dir fällt die schwere Tür ins Schloss. Ein Riegel schnappt zu. Jetzt gibt es nur noch einen Weg hinaus.', 'gefahr');
+    const boss = s.monsters.find((m) => m.homeRoom === room.id);
+    if (boss && !room.versusShown) {
+      room.versusShown = true;
+      s.pendingVersus = boss.uid;
+    }
+  }
+  if (room.antechamberOf !== undefined && first) {
+    log(s, 'Hinter der rot beschlagenen Tür rumort etwas Großes. Das hier ist der Vorraum einer Boss-Kammer.', 'gefahr');
+  }
   if ((room.kind === 'boss' || room.kind === 'arena') && first) {
     const boss = s.monsters.find((m) => m.homeRoom === room.id);
     const def = boss && HOOD_BOSSES.find((b) => b.id === boss.defId);
@@ -832,16 +867,61 @@ export function openBox(s: GameState, uid: string): { ok: boolean; message?: str
   return { ok: true, contents };
 }
 
+const FREEBIE_JOKES = ['clownsnase', 'partyhut', 'aluhut', 'kaffeetasse', 'porzellanpuppe', 'rubbellos'];
+
+/**
+ * Jeder Safe Room hat einen Gratis-Automaten. Meist spuckt er etwas
+ * Brauchbares aus – manchmal hat die Systemstimme aber auch Humor.
+ */
 export function takeFreebie(s: GameState): { ok: boolean; message?: string; item?: Item } {
   const room = currentRoom(s);
-  if (room?.kind !== 'safe' || room.safeVariant !== 'freebie') return fail('Hier gibt es keinen Gratis-Automaten.');
+  if (room?.kind !== 'safe') return fail('Hier gibt es keinen Gratis-Automaten.');
   if (room.freebieTaken) return fail('„ERROR: Du hattest deinen Gratis-Gegenstand schon, Crawler.“');
   room.freebieTaken = true;
-  const rarity = R.weighted<Rarity>(s, [['ungewoehnlich', 60], ['selten', 35], ['episch', 5]]);
-  const item = R.chance(s, 0.25) ? createItem(s, 'heiltrank', 2) : generateEquipment(s, rarity);
+  const roll = R.next(s);
+  let item: Item;
+  let note = '';
+  if (roll < 0.45) item = generateEquipment(s, R.weighted<Rarity>(s, [['ungewoehnlich', 60], ['selten', 35], ['episch', 5]]));
+  else if (roll < 0.68) item = createItem(s, R.pick(s, ['heiltrank', 'kleiner_heiltrank', 'kleiner_manatrank', 'gegengift', 'verband']), 2);
+  else if (roll < 0.84) item = createItem(s, R.pick(s, ['brandflasche', 'rattengift', 'staubbeutel', 'nagelbombe']), 2);
+  else {
+    const id = R.pick(s, FREEBIE_JOKES.filter((x) => baseExists(x)));
+    item = createItem(s, id);
+    note = ' Die Systemstimme kichert.';
+  }
   giveItem(s, item);
-  log(s, `Der Automat spuckt aus: ${itemName(s, item)}${item.menge && item.menge > 1 ? ` ×${item.menge}` : ''}.`, 'loot');
+  log(s, `Der Automat rattert und spuckt aus: ${itemName(s, item)}${item.menge && item.menge > 1 ? ` ×${item.menge}` : ''}.${note}`, 'loot');
   return { ok: true, item };
+}
+
+/** In ein Möbelstück oder eine Figur „hineinlaufen“ heißt: benutzen oder ansprechen. */
+export function useFurniture(s: GameState, f: Furniture): ActionResult {
+  const room = currentRoom(s);
+  switch (f.kind) {
+    case 'automat': {
+      const res = takeFreebie(s);
+      if (!res.ok || !res.item) return res;
+      s.pendingReveal = { title: 'Gratis-Automat', items: [res.item] };
+      endTurn(s);
+      return OK;
+    }
+    case 'bett':
+      return sleep(s);
+    case 'toilette':
+      return toilet(s);
+    case 'wirt': {
+      const host = RESTAURANT_HOSTS[(room?.id ?? 0) % RESTAURANT_HOSTS.length];
+      log(s, `${host.name}: „Was darf’s sein? Essen gibt’s an der Theke, schlafen kannst du oben.“`, 'dialog');
+      return OK;
+    }
+    case 'haendler': {
+      const shop = room ? ensureShop(s, room) : null;
+      if (shop) log(s, `${shop.keeper.split(',')[0]}: „Schau dich um. Anfassen kostet nichts. Kaufen schon.“`, 'dialog');
+      return OK;
+    }
+    default:
+      return OK;
+  }
 }
 
 export function buyMeal(s: GameState, menuId: string): ActionResult {

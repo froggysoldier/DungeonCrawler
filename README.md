@@ -40,7 +40,8 @@ SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simula
 | Falle entschärfen / aufstellen | Button im Seitenbereich / im Inventar | – |
 | Handwerk | Tab „Handwerk“ | – |
 | Reittier auf- / absteigen | Button im Crawler-Tab | M |
-| Untersuchen | Rechtsklick | – |
+| Untersuchen | Klick auf Gegenstand, Möbel, Falle oder Treppe (zweiter Klick läuft hin) / Rechtsklick | – |
+| Safe-Room-Möbel benutzen | Hineinlaufen (Automat, Wirt, Händler, Bett, Toilette) | Pfeiltaste |
 | Zoom | Mausrad / Knöpfe unten rechts | + / - |
 | Übersichtskarte vergrößern | Klick auf die kleine Karte | K |
 | Hilfe (alle Tasten) | Knopf „Hilfe“ | H |
@@ -52,6 +53,10 @@ SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simula
 - 49 Klassen und 24 Rassen mit Begabungen, Sondereigenschaften und 25 Fähigkeiten
 - Zustände im Kampf: Blutung, Brennen, Gift, Furcht, Blindheit
 - Statistik über alles, was du im Dungeon tust
+- Eingerichtete Safe Rooms: Gratis-Automat in jedem, Wirt im Restaurant, Händler, Bett und Toilette
+- Boss-Kammern mit Vorraum und roter Eisentür: drinnen verriegelt, Versus-Bildschirm zum Auftakt
+- Kampfmodus mit Banner, rotem Rahmen und Bilanz am Ende
+- Am Boden liegt nur Handwerksmaterial; echte Beute gibt es im Vorraum der Boss-Kammern
 
 ## Dokumentation
 

@@ -34,11 +34,11 @@ import type { Quest } from '../engine/types';
 import {
   allocateStat, attack, buyMeal, currentRoom, descend, drainToasts, dropItem, equip, hasUnlock, itemsAt,
   buyOffer, cast, haggleOffer, moveStep, sellItem, onStairs, openBox, pickup, planPath, sleep, takeFreebie, timeLeft, toilet, unequip, useItem, wait,
-  chooseThrowable, craftItem, disarmTrap, placeTrap, closeDoor, adjacentOpenDoors,
+  isLairDoor, chooseThrowable, craftItem, disarmTrap, placeTrap, closeDoor, adjacentOpenDoors,
   drainFx, drainSfx, defend, askCrawlerTip, dismissCrawler, healCrawler, inviteCrawler, talkCrawler, answerTalkShow, acceptSponsorOffer, declineSponsorOffer, acceptQuestOffer, declineQuestOffer, turnInQuest, evolvePetTo, petGearOn, petGearOff, rideToggle, refuelMount,
   type ActionResult,
 } from '../engine/game';
-import { idx, isWalkable, tileAt } from '../engine/mapgen';
+import { furnitureAt, idx, isWalkable, tileAt } from '../engine/mapgen';
 import { saveRun, syncMeta, saveMeta } from '../engine/meta';
 import { canStep } from '../engine/path';
 import {
@@ -51,10 +51,11 @@ import { monsterDefById } from '../engine/monsters';
 import type { AttackMove, AttackPart, EquipSlot, GameState, HitZone, Item, MetaState, Pos, StatKey, Technique } from '../engine/types';
 import { bindActions, esc, formatTime } from './dom';
 import { confirmBox, isModalOpen, showCustom, showDialog, showHtml, showToast } from './modal';
-import { render, renderMinimap, tileFromMouse, zoom, zoomBounds, type View } from './render';
+import { TILE, render, renderMinimap, tileFromMouse, zoom, zoomBounds, type View } from './render';
 import { TypeQueue, typeText, type Typing } from './typewriter';
 import { Animator, STEP_MS } from './animator';
-import { playSfx, setSoundEnabled, setTypingSoundEnabled, soundEnabled, typeClick, typingSoundEnabled } from './sound';
+import { drawHero, drawSprite, spriteFor } from './sprites';
+import { playCombatEnd, playCombatStart, playSfx, playVersus, setSoundEnabled, setTypingSoundEnabled, soundEnabled, typeClick, typingSoundEnabled } from './sound';
 import { TONE_NAMES } from '../data/talkshow';
 import { showSelection } from './selection';
 
@@ -98,6 +99,10 @@ export class GameView {
   /** Im Kampf ausgewähltes Ziel (UID). */
   private targetUid: string | null = null;
   private hover: Pos | null = null;
+  /** Werte beim Kampfbeginn – für die Zusammenfassung am Ende. */
+  private fight: { kills: number; xp: number; turn: number; hp: number } | null = null;
+  /** Per Klick untersuchtes Feld: erst ansehen, beim zweiten Klick hingehen. */
+  private inspected: Pos | null = null;
   private view: View | null = null;
   private visible = new Set<number>();
   private traveling = false;
@@ -156,6 +161,54 @@ export class GameView {
   /** Kampf läuft, sobald ein wacher Gegner, der dich bemerkt hat, in Sicht ist. */
   inCombat(): boolean {
     return this.s.monsters.some((m) => m.aware && !m.asleep && this.visible.has(idx(this.s.map, m.pos.x, m.pos.y)));
+  }
+
+  /** Kampfmodus: klarer Einstieg (Banner, roter Rahmen, Klang) und Ausstieg mit Bilanz. */
+  private updateCombatMode() {
+    const s = this.s;
+    const now = s.status === 'playing' && this.inCombat();
+    const wrap = this.root.querySelector('.mapwrap') as HTMLElement | null;
+    wrap?.classList.toggle('combat', now);
+    if (now && !this.fight) {
+      this.fight = { kills: s.stats?.kills ?? 0, xp: s.stats?.['xp.gesamt'] ?? 0, turn: s.turn, hp: s.player.hp };
+      this.traveling = false;
+      this.held = null;
+      const foes = this.combatTargets().filter((m) => m.aware);
+      const names = [...new Set(foes.map((m) => describeMonster(s, m).name))];
+      const who = names.length > 2 ? `${names.slice(0, 2).join(', ')} und weitere` : names.join(' und ');
+      s.log.push({ turn: s.turn, text: `Kampf! ${who} ${foes.length > 1 ? 'haben' : 'hat'} dich entdeckt. Ab jetzt zählt jeder Zug einzeln.`, kind: 'gefahr' });
+      // Beim Betreten einer Boss-Kammer übernimmt der Versus-Bildschirm den Auftritt
+      if (!s.pendingVersus) {
+        this.banner('Kampf', who, 'start');
+        playCombatStart();
+      }
+    } else if (!now && this.fight) {
+      const f = this.fight;
+      this.fight = null;
+      if (s.status !== 'playing') return;
+      const kills = (s.stats?.kills ?? 0) - f.kills;
+      const xp = (s.stats?.['xp.gesamt'] ?? 0) - f.xp;
+      const turns = s.turn - f.turn;
+      const lost = Math.max(0, f.hp - s.player.hp);
+      const bits = [`${turns} ${turns === 1 ? 'Zug' : 'Züge'}`];
+      if (kills) bits.push(`${kills} besiegt`);
+      if (xp) bits.push(`+${xp} Erfahrung`);
+      if (lost) bits.push(`${lost} Lebenspunkte verloren`);
+      s.log.push({ turn: s.turn, text: `Kampf vorbei: ${bits.join(', ')}.`, kind: 'kampf' });
+      this.banner(kills ? 'Sieg' : 'Kampf vorbei', bits.join(' · '), 'end');
+      playCombatEnd();
+    }
+  }
+
+  private banner(title: string, sub: string, kind: 'start' | 'end') {
+    const wrap = this.root.querySelector('.mapwrap');
+    if (!wrap) return;
+    wrap.querySelector('.fightbanner')?.remove();
+    const el = document.createElement('div');
+    el.className = `fightbanner ${kind}`;
+    el.innerHTML = `<div class="fb-title">${esc(title)}</div>${sub ? `<div class="fb-sub">${esc(sub)}</div>` : ''}`;
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), kind === 'start' ? 1700 : 2200);
   }
 
   private stepDir(dir: Pos) {
@@ -256,6 +309,10 @@ export class GameView {
     if (this.s.status !== 'playing' || isModalOpen()) return false;
     const before = this.anim.snapshot(this.s);
     const floor = this.s.floor;
+    if (this.inspected) {
+      this.inspected = null;
+      (this.root.querySelector(".tooltip") as HTMLElement).hidden = true;
+    }
     const res = fn();
     if (this.s.floor !== floor) this.anim.reset();
     else this.anim.after(this.s, before, drainFx(this.s));
@@ -295,7 +352,64 @@ export class GameView {
       });
     }
     saveRun(this.s);
+    const reveal = this.s.pendingReveal;
+    if (reveal) {
+      this.s.pendingReveal = undefined;
+      this.revealItems(reveal.title, reveal.items);
+    }
+    this.maybeVersus();
     this.maybeSelect();
+  }
+
+  /** Versus-Bildschirm beim Betreten einer Boss-Kammer: Crawler gegen Boss. */
+  private maybeVersus() {
+    const s = this.s;
+    const uid = s.pendingVersus;
+    if (!uid) return;
+    s.pendingVersus = undefined;
+    const boss = s.monsters.find((m) => m.uid === uid);
+    if (!boss) return;
+    const info = describeMonster(s, boss);
+    const p = s.player;
+    const klass = p.klass ? CLASS_BY_ID[p.klass]?.name : null;
+    const race = p.race ? RACE_BY_ID[p.race]?.name.replace(' (bleiben, wie du bist)', '') : null;
+    const rank = boss.rank === 'boroughboss' ? 'Borough-Boss' : 'Nachbarschafts-Boss';
+    playVersus();
+    showCustom(
+      `<div class="versus">
+        <div class="vs-side vs-left"><canvas class="vs-hero" width="220" height="220"></canvas>
+          <div class="vs-name">${esc(p.name)}</div>
+          <div class="vs-sub">${esc([race, klass].filter(Boolean).join(' · ') || 'Crawler')} · Level ${p.level}</div>
+          <div class="vs-sub">HP ${Math.max(0, p.hp)} / ${maxHp(s)}</div></div>
+        <div class="vs-mid">VS</div>
+        <div class="vs-side vs-right"><canvas class="vs-boss" width="220" height="220"></canvas>
+          <div class="vs-name">${esc(info.name)}</div>
+          <div class="vs-sub">${rank} · ${esc(info.level)}</div>
+          <div class="vs-sub" style="color:${info.challenge.color}">${esc(info.challenge.name)}</div></div>
+      </div>
+      ${info.flavor ? `<div class="vs-flavor">${esc(info.flavor)}</div>` : ''}
+      <div class="foot"><span class="muted small">Die Tür ist verriegelt, bis einer von euch am Boden liegt.</span><button class="primary ok">Kampf!</button></div>`,
+      (root, close) => {
+        root.querySelector('.modal')!.classList.add('versus-modal');
+        const draw = (sel: string, fn: (c: CanvasRenderingContext2D) => void) => {
+          const cv = root.querySelector(sel) as HTMLCanvasElement;
+          const dpr = window.devicePixelRatio || 1;
+          cv.width = 220 * dpr;
+          cv.height = 220 * dpr;
+          const c = cv.getContext('2d')!;
+          c.scale(dpr, dpr);
+          fn(c);
+        };
+        draw('.vs-hero', (c) => drawHero(c, 110, 120, 190));
+        draw('.vs-boss', (c) => drawSprite(c, spriteFor(boss.defId), boss.color, 110, 120, 200, { crown: true, flip: true, unknown: info.insight >= 3 }));
+        const btn = root.querySelector('.ok') as HTMLButtonElement;
+        btn.focus();
+        btn.addEventListener('click', () => {
+          close();
+          this.refresh();
+        });
+      },
+    );
   }
 
   private selecting = false;
@@ -468,7 +582,16 @@ export class GameView {
       if (chebyshev(npc.pos, s.player.pos) <= 1) return void this.act(() => talkCrawler(s, npc.uid));
       return this.stepToward(npc.pos);
     }
-    if (t.x === s.player.pos.x && t.y === s.player.pos.y) {
+    const onPlayer = t.x === s.player.pos.x && t.y === s.player.pos.y;
+    const wasInspected = this.inspected && this.inspected.x === t.x && this.inspected.y === t.y;
+    if (!onPlayer && !wasInspected && this.worthInspecting(t)) {
+      this.inspected = t;
+      this.draw();
+      this.showCard(t);
+      return;
+    }
+    this.inspected = null;
+    if (onPlayer) {
       if (itemsAt(s, t).length) this.act(() => pickup(s));
       else if (onStairs(s)) this.askDescend();
       else this.act(() => wait(s));
@@ -480,8 +603,38 @@ export class GameView {
       return;
     }
     const path = planPath(s, t);
-    if (path?.length) this.travel(path);
-    else this.say('Dorthin kennst du keinen Weg.');
+    if (!path?.length) this.say('Dorthin kennst du keinen Weg.');
+    // Im Kampf geht es nur Schritt für Schritt voran
+    else if (this.inCombat()) this.act(() => moveStep(s, path[0]));
+    else this.travel(path);
+  }
+
+  /** Felder, die man per Klick erst ansieht, statt sofort loszulaufen. */
+  private worthInspecting(t: Pos): boolean {
+    const s = this.s;
+    const i = idx(s.map, t.x, t.y);
+    if (t.x < 0 || t.y < 0 || t.x >= s.map.width || t.y >= s.map.height || !s.map.explored[i]) return false;
+    if (!this.visible.has(i)) return false;
+    const fu = furnitureAt(s.map, t);
+    if (fu) return chebyshev(t, s.player.pos) > 1;
+    if (itemsAt(s, t).length || knownTrapAt(s, t) || s.map.tiles[i] === 'stairs') return true;
+    return (s.map.tiles[i] === 'door' || s.map.tiles[i] === 'dooropen') && isLairDoor(s, t) && chebyshev(t, s.player.pos) > 1;
+  }
+
+  /** Feste Info-Karte am untersuchten Feld. */
+  private showCard(t: Pos) {
+    const tip = this.root.querySelector('.tooltip') as HTMLElement;
+    const html = this.tooltipFor(t, true);
+    if (!html || !this.view) return;
+    tip.innerHTML = `${html}<div class="tipfoot">Nochmal klicken, um hinzugehen</div>`;
+    tip.hidden = false;
+    const r = this.canvas.getBoundingClientRect();
+    const px = (t.x - this.view.ox + 1) * TILE + 8;
+    const py = (t.y - this.view.oy) * TILE;
+    const x = px + 290 > r.width ? px - TILE - 300 : px;
+    const y = py + tip.offsetHeight > r.height ? r.height - tip.offsetHeight - 8 : py;
+    tip.style.left = `${Math.max(4, x)}px`;
+    tip.style.top = `${Math.max(4, y)}px`;
   }
 
   private onHover(e: MouseEvent) {
@@ -490,10 +643,11 @@ export class GameView {
     if (this.hover && this.hover.x === t.x && this.hover.y === t.y) return;
     this.hover = t;
     this.draw();
-    this.updateTooltip(e);
+    if (this.inspected && (this.inspected.x !== t.x || this.inspected.y !== t.y)) this.inspected = null;
+    if (!this.inspected) this.updateTooltip(e);
   }
 
-  private tooltipFor(t: Pos): string | null {
+  private tooltipFor(t: Pos, detail = false): string | null {
     const s = this.s;
     const i = idx(s.map, t.x, t.y);
     const visible = this.visible.has(i);
@@ -524,9 +678,23 @@ export class GameView {
     const trap = knownTrapAt(s, t);
     if (trap) parts.push(`<b style="color:${trap.owner === 'crawler' ? '#6ee07a' : 'var(--danger)'}">${trap.owner === 'crawler' ? 'Deine ' : ''}${esc(trapName(trap.kind))}</b>`);
     const items = itemsAt(s, t);
-    if (items.length) parts.push(items.map((e) => `<span style="color:${RARITY_COLORS[e.item.rarity]}">${esc(itemName(s, e.item))}</span>`).join('<br>'));
+    if (items.length)
+      parts.push(items.map((e) => {
+        const d = detail ? describeItem(s, e.item) : null;
+        const extra = d ? [d.bonuses.join(', '), d.note ?? d.flavor].filter(Boolean).join(' – ') : null;
+        return `<span style="color:${RARITY_COLORS[e.item.rarity]}">${esc(itemName(s, e.item))}</span>${extra ? `<br><span class="muted small">${esc(extra)}</span>` : ''}`;
+      }).join('<br>'));
     const room = s.map.roomAt[i] >= 0 ? s.map.rooms[s.map.roomAt[i]] : null;
+    const fu = furnitureAt(s.map, t);
+    if (fu) {
+      const FT: Record<string, string> = {
+        automat: 'Gratis-Automat – ein Gegenstand pro Crawler', haendler: 'Händler – kaufen, verkaufen, feilschen', wirt: 'Wirt – Essen und ein Zimmer zum Schlafen',
+        bett: 'Bett – acht Stunden Schlaf', toilette: 'Toilette – die Regel gilt',
+      };
+      parts.push(`<b style="color:#9fd0ff">${esc(FT[fu.kind])}</b><br><span class="muted small">Hineinlaufen zum Benutzen</span>`);
+    }
     if (s.map.tiles[i] === 'stairs') parts.push('<b style="color:#ffcc33">Treppenhaus nach unten</b>');
+    if ((s.map.tiles[i] === 'door' || s.map.tiles[i] === 'dooropen') && isLairDoor(s, t)) parts.push('<b style="color:#ff7a6a">Tür zur Boss-Kammer</b><br><span class="muted small">Sie verriegelt sich hinter dir, bis der Boss besiegt ist.</span>');
     if (room && room.visited) parts.push(`<span class="muted small">${esc(room.name)}</span>`);
     return parts.length ? parts.join('<br>') : null;
   }
@@ -661,6 +829,7 @@ export class GameView {
 
   refresh() {
     this.draw();
+    this.updateCombatMode();
     this.refreshTop();
     this.refreshHere();
     this.refreshSide();
@@ -681,7 +850,7 @@ export class GameView {
       }
       path = this.pathCache.path;
     }
-    const res = render(this.s, this.canvas, { hover: this.hover, path }, this.anim.frame(this.s, now));
+    const res = render(this.s, this.canvas, { hover: this.hover, path, selected: this.inspected }, this.anim.frame(this.s, now));
     this.view = res.view;
     this.visible = res.visible;
     const room = currentRoom(this.s);
@@ -809,19 +978,30 @@ export class GameView {
     if (room?.kind === 'safe') {
       const inside = isInSafeRoom(s, s.player.pos);
       let html = `<div class="section">Safe Room</div>`;
-      if (room.safeVariant === 'freebie') {
-        html += `<div class="row" style="margin-bottom:6px"><button data-action="freebie" ${room.freebieTaken ? 'disabled' : ''}>${room.freebieTaken ? 'Gratis-Gegenstand abgeholt' : 'Gratis-Gegenstand abholen'}</button></div>`;
-      } else {
+      const furn = room.furniture ?? [];
+      const near = (kind: string) => furn.some((f) => f.kind === kind && chebyshev(f.pos, s.player.pos) <= 1);
+      const legacy = !furn.length;
+      const any = furn.some((f) => chebyshev(f.pos, s.player.pos) <= 1);
+      if (inside && !legacy && !any) {
+        const names: Record<string, string> = { automat: 'Gratis-Automat', haendler: `Händler (${room.shop?.keeper.split(',')[0] ?? 'Laden'})`, wirt: 'Wirt an der Theke', bett: 'Bett', toilette: 'Toilette' };
+        html += `<div class="muted small">Hier gibt es: ${furn.map((f) => esc(names[f.kind])).join(' · ')}. Lauf hinein oder klicke zweimal darauf, um sie zu benutzen.</div>`;
+      }
+      if (legacy || near('automat')) {
+        html += `<div class="subhead">Gratis-Automat</div><div class="row" style="margin-bottom:6px"><button data-action="freebie" ${room.freebieTaken ? 'disabled' : ''}>${room.freebieTaken ? 'Gratis-Gegenstand abgeholt' : 'Gratis-Gegenstand ziehen'}</button></div>`;
+      }
+      if (room.safeVariant === 'restaurant' && (legacy || near('wirt'))) {
         const host = RESTAURANT_HOSTS[room.id % RESTAURANT_HOSTS.length];
-        html += `<div class="muted small">${esc(host.name)} (${esc(host.race)}) serviert:</div>`;
+        html += `<div class="subhead">${esc(host.name)} (${esc(host.race)}) serviert</div>`;
         html += RESTAURANT_MENU.map(
           (m) => `<div class="row" style="margin:3px 0"><span style="flex:1">${esc(m.name)} <span class="muted small">${esc(m.effekt.buff?.name ?? '')}</span></span><button data-action="meal" data-id="${m.id}" ${s.player.gold < m.price ? 'disabled' : ''}>${m.price} G</button></div>`,
         ).join('');
+        html += `<div class="row" style="margin-top:6px"><button data-action="sleep">Zimmer nehmen und schlafen (8 Std.)</button></div>`;
       }
       if (inside) {
-        html += `<div class="row" style="margin-top:6px"><button data-action="sleep">Schlafen (8 Std.)</button><button data-action="toilet">Toilette benutzen</button></div>`;
-        if (room.shop) {
-          html += `<div class="section">Laden</div><div class="muted small">${esc(room.shop.keeper)}${room.shop.mood < 70 ? ' – wirkt verstimmt' : ''}</div>`;
+        if (legacy || near('bett')) html += `<div class="row" style="margin-top:6px"><button data-action="sleep">Schlafen (8 Std.)</button></div>`;
+        if (legacy || near('toilette')) html += `<div class="row" style="margin-top:6px"><button data-action="toilet">Toilette benutzen</button></div>`;
+        if (room.shop && (legacy || near('haendler'))) {
+          html += `<div class="subhead">Laden</div><div class="muted small">${esc(room.shop.keeper)}${room.shop.mood < 70 ? ' – wirkt verstimmt' : ''}</div>`;
           html += room.shop.offers
             .map((o, i) => {
               const total = offerPrice(o.price, o.item, s);
