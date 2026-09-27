@@ -125,7 +125,7 @@ type Material =
 const texCache = new Map<string, HTMLCanvasElement>();
 
 /** Deterministischer Zufall je Kachel (damit sich nichts beim Neuzeichnen verändert). */
-function hash(x: number, y: number, salt = 0): number {
+export function hash(x: number, y: number, salt = 0): number {
   let h = (x * 374761393 + y * 668265263 + salt * 2147483647) | 0;
   h = (h ^ (h >>> 13)) * 1274126177;
   return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
@@ -370,7 +370,7 @@ function floorTexture(mat: Material, v: number): HTMLCanvasElement {
   });
 }
 
-function roomMaterial(r: Room | null): Material {
+export function roomMaterial(r: Room | null): Material {
   if (!r) return 'pflaster';
   switch (r.kind) {
     case 'safe': return 'teppich';

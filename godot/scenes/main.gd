@@ -1,20 +1,68 @@
 extends Control
-## Platzhalter-Startbildschirm während des Umbaus: zeigt, dass Projekt und
-## Daten geladen sind. Wird durch Titelbildschirm und Interview ersetzt.
+## Einstieg (Port von src/main.ts): Titel, Interview, Spiel, Endbildschirm.
+## Dialoge und Einblendungen liegen darüber, die Klänge laufen nebenher.
 
-@onready var _info: Label = %Info
+var meta: Dictionary
+var view: GameView
+var screen_root: Control
+var modals: Modals
+var sound: SoundBox
 
 
 func _ready() -> void:
-	var counts := [
-		["Gegenstände", GameData.get_table("items", "BASE_ITEMS")],
-		["Monster", GameData.get_table("monsters", "MONSTERS")],
-		["Klassen", GameData.get_table("classes", "CLASSES")],
-		["Rassen", GameData.get_table("races", "RACES")],
-		["Skills", GameData.get_table("skills", "SKILLS")],
-		["Achievements", GameData.get_table("achievements", "ACHIEVEMENTS")],
-	]
-	var lines := PackedStringArray()
-	for c in counts:
-		lines.append("%s: %d" % [c[0], (c[1] as Array).size() if c[1] is Array else 0])
-	_info.text = "\n".join(lines)
+	theme = UiTheme.get_theme()
+	set_anchors_preset(Control.PRESET_FULL_RECT)
+	sound = SoundBox.new()
+	add_child(sound)
+	screen_root = Control.new()
+	screen_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(screen_root)
+	modals = Modals.new()
+	add_child(modals)
+	show_title()
+
+
+func _clear() -> void:
+	if view != null and is_instance_valid(view):
+		view.queue_free()
+	view = null
+	modals.clear_toasts()
+	Kit.clear(screen_root)
+
+
+func show_title() -> void:
+	_clear()
+	meta = Meta.load_meta()
+	var save = Meta.load_run()
+	Screens.title_screen(screen_root, meta, save != null, func(): _new_season(save), func(): start_game(save))
+
+
+func _new_season(save: Variant) -> void:
+	if save != null:
+		var ok = await modals.confirm("Neue Staffel?", "Dein laufender Crawl wird als gescheitert gewertet (Hardcore!). Wirklich neu beginnen?", "Ja, neue Staffel").closed
+		if not ok:
+			return
+		save.status = "dead"
+		save.deathCause = "hat die Show verlassen"
+		meta = Meta.record_run_end(meta, save)
+	show_interview()
+
+
+func show_interview() -> void:
+	_clear()
+	Screens.interview_screen(screen_root, func(r: Dictionary):
+		var s := Game.new_game({"name": r.name, "answers": r.answers, "petName": r.petName, "meta": meta})
+		Meta.save_run(s)
+		start_game(s))
+
+
+func start_game(s: Dictionary) -> void:
+	_clear()
+	view = GameView.new(s, meta)
+	screen_root.add_child(view)
+	view.ended.connect(func(ended: Dictionary):
+		meta = Meta.record_run_end(meta, ended)
+		_clear()
+		Screens.end_screen(screen_root, ended, meta, show_interview, show_title))
+	# Offene Dialoge (z. B. Intro) direkt anzeigen
+	view.flush_dialogs.call_deferred()

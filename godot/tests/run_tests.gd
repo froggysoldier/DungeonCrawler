@@ -22,6 +22,8 @@ class Checker:
 
 
 func _initialize() -> void:
+	# Erst nach dem ersten Bild ist der Baum bereit (für Oberflächen-Tests)
+	await process_frame
 	# Autoloads sind bei -s nicht automatisch geladen: Daten selbst laden
 	var data = load("res://scripts/autoload/game_data.gd").new()
 	data.name = "GameData"
@@ -43,7 +45,8 @@ func _initialize() -> void:
 				continue
 			t.current = "%s › %s" % [file.get_basename(), m.name]
 			var before := t.failures.size()
-			inst.call(m.name, t)
+			# Tests dürfen auf Bilder warten (await)
+			await inst.call(m.name, t)
 			print(("  ok    " if t.failures.size() == before else "  FEHLER") + "  " + t.current)
 	print("\n%d Prüfungen, %d Fehler" % [t.checks, t.failures.size()])
 	for f in t.failures:

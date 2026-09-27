@@ -4,6 +4,7 @@ import { RARITY_COLORS, RARITY_NAMES, SLOT_NAMES } from '../data/items';
 import { SKILLS, SKILL_BY_ID, SKILL_CATEGORY_NAMES, skillXpNeeded, type SkillCategory } from '../data/skills';
 import { BOX_TIER_COLORS, FLOORS, RESTAURANT_HOSTS, RESTAURANT_MENU, SHOW_NAME } from '../data/world';
 import { monsterAt } from '../engine/ai';
+import { log } from '../engine/log';
 import { ABILITIES, ARCHETYPE_NAMES, CLASS_BY_ID } from '../data/classes';
 import { SPECIAL_TEXT } from '../data/specials';
 import { RACE_BY_ID } from '../data/races';
@@ -176,7 +177,7 @@ export class GameView {
       const foes = this.combatTargets().filter((m) => m.aware);
       const names = [...new Set(foes.map((m) => describeMonster(s, m).name))];
       const who = names.length > 2 ? `${names.slice(0, 2).join(', ')} und weitere` : names.join(' und ');
-      s.log.push({ turn: s.turn, text: `Kampf! ${who} ${foes.length > 1 ? 'haben' : 'hat'} dich entdeckt. Ab jetzt zählt jeder Zug einzeln.`, kind: 'gefahr' });
+      log(s, `Kampf! ${who} ${foes.length > 1 ? 'haben' : 'hat'} dich entdeckt. Ab jetzt zählt jeder Zug einzeln.`, 'gefahr');
       // Beim Betreten einer Boss-Kammer übernimmt der Versus-Bildschirm den Auftritt
       if (!s.pendingVersus) {
         this.banner('Kampf', who, 'start');
@@ -194,7 +195,7 @@ export class GameView {
       if (kills) bits.push(`${kills} besiegt`);
       if (xp) bits.push(`+${xp} Erfahrung`);
       if (lost) bits.push(`${lost} Lebenspunkte verloren`);
-      s.log.push({ turn: s.turn, text: `Kampf vorbei: ${bits.join(', ')}.`, kind: 'kampf' });
+      log(s, `Kampf vorbei: ${bits.join(', ')}.`, 'kampf');
       this.banner(kills ? 'Sieg' : 'Kampf vorbei', bits.join(' · '), 'end');
       playCombatEnd();
     }
@@ -317,7 +318,7 @@ export class GameView {
     if (this.s.floor !== floor) this.anim.reset();
     else this.anim.after(this.s, before, drainFx(this.s));
     playSfx(drainSfx(this.s));
-    if (!res.ok && res.message) this.s.log.push({ turn: this.s.turn, text: res.message, kind: 'info' });
+    if (!res.ok && res.message) log(this.s, res.message, 'info');
     this.afterAction();
     return res.ok;
   }
@@ -509,7 +510,7 @@ export class GameView {
   }
 
   private say(text: string) {
-    this.s.log.push({ turn: this.s.turn, text, kind: 'info' });
+    log(this.s, text, 'info');
     this.refreshLog();
   }
 

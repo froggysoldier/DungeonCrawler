@@ -7,7 +7,9 @@
     250,
     500,
     1000
-   ]
+   ],
+   "text": "Besiege insgesamt {n} Gegner.",
+   "category": "kampf"
   },
   {
    "id": "krits",
@@ -15,7 +17,9 @@
    "stages": [
     100,
     300
-   ]
+   ],
+   "text": "Lande {n} kritische Treffer.",
+   "category": "kampf"
   },
   {
    "id": "schaden",
@@ -24,7 +28,9 @@
     500,
     2500,
     10000
-   ]
+   ],
+   "text": "Teile insgesamt {n} Schaden aus.",
+   "category": "kampf"
   },
   {
    "id": "maxtreffer",
@@ -33,7 +39,9 @@
     50,
     100,
     200
-   ]
+   ],
+   "text": "Richte mit einem einzigen Treffer {n} Schaden an.",
+   "category": "kampf"
   },
   {
    "id": "killserie",
@@ -42,7 +50,9 @@
     2,
     3,
     5
-   ]
+   ],
+   "text": "Besiege {n} Gegner kurz hintereinander.",
+   "category": "kampf"
   },
   {
    "id": "sauber",
@@ -51,7 +61,9 @@
     5,
     15,
     30
-   ]
+   ],
+   "text": "Besiege {n} Gegner, ohne zwischendurch getroffen zu werden.",
+   "category": "kampf"
   },
   {
    "id": "staerker",
@@ -59,7 +71,9 @@
    "stages": [
     10,
     50
-   ]
+   ],
+   "text": "Besiege {n} Gegner, die mindestens drei Stufen über dir stehen.",
+   "category": "kampf"
   },
   {
    "id": "harmlos",
@@ -67,7 +81,9 @@
    "stages": [
     25,
     100
-   ]
+   ],
+   "text": "Besiege {n} Gegner, die weit unter deiner Stufe stehen.",
+   "category": "kampf"
   },
   {
    "id": "schlafend",
@@ -76,7 +92,9 @@
     1,
     10,
     40
-   ]
+   ],
+   "text": "Besiege {n} schlafende Gegner.",
+   "category": "kampf"
   },
   {
    "id": "fliehend",
@@ -84,7 +102,9 @@
    "stages": [
     1,
     10
-   ]
+   ],
+   "text": "Besiege {n} fliehende Gegner.",
+   "category": "kampf"
   },
   {
    "id": "liegend",
@@ -93,7 +113,9 @@
     10,
     50,
     150
-   ]
+   ],
+   "text": "Besiege {n} Gegner, die am Boden liegen.",
+   "category": "kampf"
   },
   {
    "id": "fasttot",
@@ -101,7 +123,9 @@
    "stages": [
     5,
     25
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit weniger als 20 % deiner Lebenspunkte.",
+   "category": "kampf"
   },
   {
    "id": "umwerfen",
@@ -109,7 +133,9 @@
    "stages": [
     50,
     150
-   ]
+   ],
+   "text": "Wirf {n} Gegner zu Boden.",
+   "category": "kampf"
   },
   {
    "id": "teil_faust",
@@ -118,7 +144,9 @@
     25,
     100,
     300
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Faustschlägen.",
+   "category": "technik"
   },
   {
    "id": "teil_tritt",
@@ -127,7 +155,9 @@
     25,
     100,
     300
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Tritten.",
+   "category": "technik"
   },
   {
    "id": "teil_knie",
@@ -136,7 +166,9 @@
     25,
     100,
     250
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Kniestößen.",
+   "category": "technik"
   },
   {
    "id": "teil_ellbogen",
@@ -145,7 +177,9 @@
     25,
     100,
     250
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Ellbogenchecks.",
+   "category": "technik"
   },
   {
    "id": "teil_kopf",
@@ -154,7 +188,9 @@
     25,
     100,
     250
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Kopfstößen.",
+   "category": "technik"
   },
   {
    "id": "teil_waffe",
@@ -163,7 +199,9 @@
     25,
     100,
     300
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Waffenhieben.",
+   "category": "technik"
   },
   {
    "id": "teil_wurf",
@@ -172,7 +210,9 @@
     25,
     100,
     250
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Würfen.",
+   "category": "technik"
   },
   {
    "id": "teil_zauber",
@@ -181,7 +221,9 @@
     5,
     25,
     100
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Zaubern.",
+   "category": "technik"
   },
   {
    "id": "teil_falle",
@@ -190,7 +232,9 @@
     3,
     15,
     50
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit eigenen Fallen.",
+   "category": "technik"
   },
   {
    "id": "teil_bombe",
@@ -199,7 +243,9 @@
     3,
     15,
     50
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Sprengsätzen.",
+   "category": "technik"
   },
   {
    "id": "teil_haustier",
@@ -208,7 +254,9 @@
     5,
     25,
     100
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit deinem Haustier.",
+   "category": "technik"
   },
   {
    "id": "teil_blutung",
@@ -217,7 +265,9 @@
     5,
     25,
     75
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Blutungen.",
+   "category": "technik"
   },
   {
    "id": "teil_feuer",
@@ -226,7 +276,9 @@
     5,
     25,
     75
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Flammen.",
+   "category": "technik"
   },
   {
    "id": "teil_gift",
@@ -235,7 +287,9 @@
     5,
     25,
     75
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Gift.",
+   "category": "technik"
   },
   {
    "id": "furcht",
@@ -243,7 +297,9 @@
    "stages": [
     10,
     50
-   ]
+   ],
+   "text": "Jage Gegnern {n}-mal Angst ein.",
+   "category": "technik"
   },
   {
    "id": "blenden",
@@ -251,7 +307,9 @@
    "stages": [
     10,
     50
-   ]
+   ],
+   "text": "Blende Gegner {n}-mal.",
+   "category": "technik"
   },
   {
    "id": "aufschlitzen",
@@ -259,7 +317,9 @@
    "stages": [
     25,
     100
-   ]
+   ],
+   "text": "Füge Gegnern {n}-mal eine Blutung zu.",
+   "category": "technik"
   },
   {
    "id": "anzuenden",
@@ -267,7 +327,9 @@
    "stages": [
     10,
     50
-   ]
+   ],
+   "text": "Setze Gegner {n}-mal in Brand.",
+   "category": "technik"
   },
   {
    "id": "teil_party",
@@ -276,7 +338,9 @@
     5,
     25,
     100
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit deiner Party.",
+   "category": "technik"
   },
   {
    "id": "konter",
@@ -284,7 +348,9 @@
    "stages": [
     3,
     15
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit einem Konter.",
+   "category": "technik"
   },
   {
    "id": "bewegung_sprung",
@@ -293,7 +359,9 @@
     10,
     50,
     150
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Sprungangriffen.",
+   "category": "technik"
   },
   {
    "id": "bewegung_stampfen",
@@ -301,7 +369,9 @@
    "stages": [
     50,
     150
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Stampfern.",
+   "category": "technik"
   },
   {
    "id": "bewegung_anlauf",
@@ -309,7 +379,9 @@
    "stages": [
     25,
     100
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit Sturmangriffen.",
+   "category": "technik"
   },
   {
    "id": "zone_kopf",
@@ -318,7 +390,9 @@
     5,
     25,
     100
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit einem gezielten Kopftreffer.",
+   "category": "technik"
   },
   {
    "id": "zone_beine",
@@ -326,7 +400,9 @@
    "stages": [
     5,
     25
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit einem Treffer auf die Beine.",
+   "category": "technik"
   },
   {
    "id": "zone_arme",
@@ -334,7 +410,9 @@
    "stages": [
     5,
     25
-   ]
+   ],
+   "text": "Besiege {n} Gegner mit einem Treffer auf die Arme.",
+   "category": "technik"
   },
   {
    "id": "benommen",
@@ -343,7 +421,9 @@
     5,
     25,
     100
-   ]
+   ],
+   "text": "Mache Gegner {n}-mal benommen.",
+   "category": "technik"
   },
   {
    "id": "humpeln",
@@ -351,7 +431,9 @@
    "stages": [
     10,
     50
-   ]
+   ],
+   "text": "Lass Gegner {n}-mal humpeln.",
+   "category": "technik"
   },
   {
    "id": "schwaechen",
@@ -359,7 +441,9 @@
    "stages": [
     10,
     50
-   ]
+   ],
+   "text": "Schwäche Gegner {n}-mal durch Armtreffer.",
+   "category": "technik"
   },
   {
    "id": "bestiarium",
@@ -369,7 +453,9 @@
     20,
     30,
     45
-   ]
+   ],
+   "text": "Besiege {n} verschiedene Monsterarten.",
+   "category": "bestiarium"
   },
   {
    "id": "elite_viel",
@@ -377,7 +463,9 @@
    "stages": [
     10,
     25
-   ]
+   ],
+   "text": "Besiege {n} Elite-Gegner.",
+   "category": "bestiarium"
   },
   {
    "id": "raeume",
@@ -387,7 +475,9 @@
     25,
     60,
     120
-   ]
+   ],
+   "text": "Betritt {n} verschiedene Räume.",
+   "category": "erkundung"
   },
   {
    "id": "erkundet",
@@ -396,7 +486,9 @@
     50,
     75,
     95
-   ]
+   ],
+   "text": "Erkunde {n} % einer Etage.",
+   "category": "erkundung"
   },
   {
    "id": "tueren",
@@ -405,7 +497,9 @@
     1,
     10,
     30
-   ]
+   ],
+   "text": "Öffne {n} Türen.",
+   "category": "erkundung"
   },
   {
    "id": "schritte",
@@ -414,7 +508,9 @@
     1000,
     5000,
     20000
-   ]
+   ],
+   "text": "Lege {n} Schritte zurück.",
+   "category": "erkundung"
   },
   {
    "id": "saferooms",
@@ -422,7 +518,9 @@
    "stages": [
     3,
     10
-   ]
+   ],
+   "text": "Entdecke {n} Safe Rooms.",
+   "category": "erkundung"
   },
   {
    "id": "aufheben",
@@ -431,7 +529,9 @@
     60,
     200,
     500
-   ]
+   ],
+   "text": "Hebe {n} Gegenstände auf.",
+   "category": "beute"
   },
   {
    "id": "boxen",
@@ -439,35 +539,45 @@
    "stages": [
     50,
     100
-   ]
+   ],
+   "text": "Öffne {n} Lootboxen.",
+   "category": "beute"
   },
   {
    "id": "boxstufe_gold",
    "stat": "boxen.stufe.gold",
    "stages": [
     1
-   ]
+   ],
+   "text": "Öffne eine Box der Stufe Gold.",
+   "category": "beute"
   },
   {
    "id": "boxstufe_platin",
    "stat": "boxen.stufe.platin",
    "stages": [
     1
-   ]
+   ],
+   "text": "Öffne eine Box der Stufe Platin.",
+   "category": "beute"
   },
   {
    "id": "boxstufe_legendaer",
    "stat": "boxen.stufe.legendaer",
    "stages": [
     1
-   ]
+   ],
+   "text": "Öffne eine Box der Stufe Legendär.",
+   "category": "beute"
   },
   {
    "id": "boxstufe_himmlisch",
    "stat": "boxen.stufe.himmlisch",
    "stages": [
     1
-   ]
+   ],
+   "text": "Öffne eine Box der Stufe Himmlisch.",
+   "category": "beute"
   },
   {
    "id": "episch",
@@ -475,7 +585,9 @@
    "stages": [
     1,
     5
-   ]
+   ],
+   "text": "Finde {n} epische Gegenstände.",
+   "category": "beute"
   },
   {
    "id": "ausgegeben",
@@ -484,7 +596,9 @@
     100,
     500,
     2000
-   ]
+   ],
+   "text": "Gib {n} Gold in Läden aus.",
+   "category": "wirtschaft"
   },
   {
    "id": "verkauft",
@@ -493,7 +607,9 @@
     10,
     50,
     150
-   ]
+   ],
+   "text": "Verkaufe {n} Gegenstände.",
+   "category": "wirtschaft"
   },
   {
    "id": "gekauft",
@@ -501,7 +617,9 @@
    "stages": [
     5,
     25
-   ]
+   ],
+   "text": "Kaufe {n} Gegenstände.",
+   "category": "wirtschaft"
   },
   {
    "id": "feilschen",
@@ -510,7 +628,9 @@
     3,
     15,
     40
-   ]
+   ],
+   "text": "Gewinne {n} Preisverhandlungen.",
+   "category": "wirtschaft"
   },
   {
    "id": "lose",
@@ -518,7 +638,9 @@
    "stages": [
     5,
     25
-   ]
+   ],
+   "text": "Versuche dein Glück {n}-mal mit einem Rubbellos.",
+   "category": "wirtschaft"
   },
   {
    "id": "gold_verdient",
@@ -526,7 +648,9 @@
    "stages": [
     1500,
     5000
-   ]
+   ],
+   "text": "Verdiene insgesamt {n} Gold.",
+   "category": "wirtschaft"
   },
   {
    "id": "erlitten",
@@ -535,7 +659,9 @@
     500,
     2000,
     5000
-   ]
+   ],
+   "text": "Stecke insgesamt {n} Schaden ein.",
+   "category": "ueberleben"
   },
   {
    "id": "ausweichen",
@@ -544,7 +670,9 @@
     25,
     100,
     300
-   ]
+   ],
+   "text": "Weiche {n} Angriffen aus.",
+   "category": "ueberleben"
   },
   {
    "id": "knapp",
@@ -552,7 +680,9 @@
    "stages": [
     3,
     15
-   ]
+   ],
+   "text": "Überlebe {n}-mal einen Treffer mit weniger als 10 % Lebenspunkten.",
+   "category": "ueberleben"
   },
   {
    "id": "traenke",
@@ -560,7 +690,9 @@
    "stages": [
     30,
     100
-   ]
+   ],
+   "text": "Trinke {n} Tränke.",
+   "category": "ueberleben"
   },
   {
    "id": "mahlzeiten",
@@ -568,7 +700,9 @@
    "stages": [
     20,
     50
-   ]
+   ],
+   "text": "Iss {n} Mahlzeiten.",
+   "category": "ueberleben"
   },
   {
    "id": "toilette",
@@ -577,7 +711,9 @@
     1,
     10,
     25
-   ]
+   ],
+   "text": "Benutze {n}-mal eine Toilette.",
+   "category": "ueberleben"
   },
   {
    "id": "fallen_gefunden",
@@ -586,7 +722,9 @@
     5,
     20,
     50
-   ]
+   ],
+   "text": "Entdecke {n} Fallen.",
+   "category": "ueberleben"
   },
   {
    "id": "fallen_entschaerft",
@@ -594,7 +732,9 @@
    "stages": [
     5,
     20
-   ]
+   ],
+   "text": "Entschärfe {n} Fallen.",
+   "category": "ueberleben"
   },
   {
    "id": "fallen_ausgeloest",
@@ -602,7 +742,9 @@
    "stages": [
     3,
     10
-   ]
+   ],
+   "text": "Löse {n} Fallen selbst aus.",
+   "category": "ueberleben"
   },
   {
    "id": "verbandszeug",
@@ -610,14 +752,18 @@
    "stages": [
     10,
     50
-   ]
+   ],
+   "text": "Überstehe {n} Zustände wie Blutung, Brennen, Furcht oder Blindheit.",
+   "category": "ueberleben"
   },
   {
    "id": "befreit",
    "stat": "befreit",
    "stages": [
     5
-   ]
+   ],
+   "text": "Befreie dich {n}-mal aus einer Falle.",
+   "category": "ueberleben"
   },
   {
    "id": "gezaubert",
@@ -626,7 +772,9 @@
     10,
     50,
     200
-   ]
+   ],
+   "text": "Wirke {n} Zauber.",
+   "category": "magie"
   },
   {
    "id": "zauber_gelernt",
@@ -635,7 +783,9 @@
     2,
     5,
     9
-   ]
+   ],
+   "text": "Beherrsche {n} verschiedene Zauber.",
+   "category": "magie"
   },
   {
    "id": "gebaut",
@@ -644,56 +794,72 @@
     5,
     25,
     75
-   ]
+   ],
+   "text": "Stelle {n} Dinge her.",
+   "category": "handwerk"
   },
   {
    "id": "rezept_verband",
    "stat": "hergestellt.verband",
    "stages": [
     1
-   ]
+   ],
+   "text": "Stelle zum ersten Mal her: Verband.",
+   "category": "handwerk"
   },
   {
    "id": "rezept_brandflasche",
    "stat": "hergestellt.brandflasche",
    "stages": [
     1
-   ]
+   ],
+   "text": "Stelle zum ersten Mal her: Brandflasche.",
+   "category": "handwerk"
   },
   {
    "id": "rezept_nagelbombe",
    "stat": "hergestellt.nagelbombe",
    "stages": [
     1
-   ]
+   ],
+   "text": "Stelle zum ersten Mal her: Nagelbombe.",
+   "category": "handwerk"
   },
   {
    "id": "rezept_stachelfalle",
    "stat": "hergestellt.stachelfalle",
    "stages": [
     1
-   ]
+   ],
+   "text": "Stelle zum ersten Mal her: Stachelfalle.",
+   "category": "handwerk"
   },
   {
    "id": "rezept_schlingfalle",
    "stat": "hergestellt.schlingfalle",
    "stages": [
     1
-   ]
+   ],
+   "text": "Stelle zum ersten Mal her: Schlingfalle.",
+   "category": "handwerk"
   },
   {
    "id": "rezept_sprengfalle",
    "stat": "hergestellt.sprengfalle",
    "stages": [
     1
-   ]
+   ],
+   "text": "Stelle zum ersten Mal her: Sprengfalle.",
+   "category": "handwerk"
   },
   {
    "id": "rezept_waffe_naegel",
    "stat": "hergestellt.waffe_naegel",
    "stages": [
     1
-   ]
+   ],
+   "text": "Stelle zum ersten Mal her: Waffe benageln.",
+   "category": "handwerk"
   },
   {
    "id": "aufgestellt",
@@ -701,7 +867,9 @@
    "stages": [
     5,
     20
-   ]
+   ],
+   "text": "Stelle {n} eigene Fallen auf.",
+   "category": "handwerk"
   },
   {
    "id": "crawler",
@@ -710,7 +878,9 @@
     5,
     15,
     40
-   ]
+   ],
+   "text": "Sprich mit {n} anderen Crawlern.",
+   "category": "sozial"
   },
   {
    "id": "party",
@@ -718,7 +888,9 @@
    "stages": [
     3,
     8
-   ]
+   ],
+   "text": "Nimm {n} Crawler in deine Party auf.",
+   "category": "sozial"
   },
   {
    "id": "auftraege",
@@ -726,14 +898,18 @@
    "stages": [
     10,
     25
-   ]
+   ],
+   "text": "Erledige {n} Aufträge.",
+   "category": "sozial"
   },
   {
    "id": "tipps",
    "stat": "tipps",
    "stages": [
     5
-   ]
+   ],
+   "text": "Frage {n} Crawler nach Tipps.",
+   "category": "sozial"
   },
   {
    "id": "samariter",
@@ -741,7 +917,9 @@
    "stages": [
     1,
     5
-   ]
+   ],
+   "text": "Versorge {n} verletzte Crawler.",
+   "category": "sozial"
   },
   {
    "id": "crawlerjagd",
@@ -749,7 +927,9 @@
    "stages": [
     3,
     10
-   ]
+   ],
+   "text": "Besiege {n} Crawler, die dich ausrauben wollten.",
+   "category": "sozial"
   },
   {
    "id": "haustier_stufe",
@@ -757,7 +937,9 @@
    "stages": [
     10,
     15
-   ]
+   ],
+   "text": "Bring dein Haustier auf Stufe {n}.",
+   "category": "sozial"
   },
   {
    "id": "follower",
@@ -766,7 +948,9 @@
     2500,
     25000,
     100000
-   ]
+   ],
+   "text": "Erreiche {n} Follower.",
+   "category": "show"
   },
   {
    "id": "sponsorwuensche",
@@ -774,7 +958,9 @@
    "stages": [
     3,
     10
-   ]
+   ],
+   "text": "Erfülle {n} Wünsche deiner Sponsoren.",
+   "category": "show"
   },
   {
    "id": "fangeschenke",
@@ -782,7 +968,9 @@
    "stages": [
     1,
     5
-   ]
+   ],
+   "text": "Erhalte {n} Geschenke aus dem Publikum.",
+   "category": "show"
   },
   {
    "id": "reiten",
@@ -790,7 +978,9 @@
    "stages": [
     100,
     1000
-   ]
+   ],
+   "text": "Lege {n} Schritte auf einem Reittier zurück.",
+   "category": "show"
   },
   {
    "id": "rammkills",
@@ -798,7 +988,9 @@
    "stages": [
     10,
     30
-   ]
+   ],
+   "text": "Besiege {n} Gegner durch Rammen.",
+   "category": "show"
   },
   {
    "id": "stufe",
@@ -808,7 +1000,9 @@
     7,
     12,
     20
-   ]
+   ],
+   "text": "Erreiche Stufe {n}.",
+   "category": "fortschritt"
   },
   {
    "id": "skills_gelernt",
@@ -818,7 +1012,9 @@
     8,
     15,
     25
-   ]
+   ],
+   "text": "Lerne {n} Skills.",
+   "category": "fortschritt"
   },
   {
    "id": "skill_stufe",
@@ -826,7 +1022,9 @@
    "stages": [
     5,
     15
-   ]
+   ],
+   "text": "Bring einen Skill auf Stufe {n}.",
+   "category": "fortschritt"
   },
   {
    "id": "entdeckte_skills",
@@ -835,7 +1033,9 @@
     1,
     5,
     10
-   ]
+   ],
+   "text": "Lass den Beobachter {n} eigene Skills für dich entdecken.",
+   "category": "fortschritt"
   },
   {
    "id": "wert",
@@ -844,7 +1044,9 @@
     12,
     16,
     20
-   ]
+   ],
+   "text": "Steigere einen Grundwert auf {n}.",
+   "category": "fortschritt"
   }
  ]
 }

@@ -734,6 +734,7 @@ function hashIndex(id: string, n: number): number {
 export function familyTable() {
   return FAMILIES.map((f) => ({
     id: f.id, stat: (f.value as { statKey?: string }).statKey ?? null, stages: f.stages.map((x) => x.n),
+    text: f.text, category: f.category,
   }));
 }
 

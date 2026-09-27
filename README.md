@@ -21,6 +21,18 @@ npm run build:artifact   # eine einzige HTML-Datei für den Web-Link
 SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simulation (30 Bot-Runs)
 ```
 
+### Godot-Version
+
+Das Spiel gibt es auch als Godot-4.7.2-Projekt in `godot/`: `godot/project.godot`
+im Editor öffnen und starten. Es rechnet bitgenau wie die Web-Version und sieht
+genauso aus. Details, Tests und Export stehen in
+[`docs/GODOT_PORT.md`](docs/GODOT_PORT.md).
+
+```bash
+npm run export:godot   # Inhalte aus src/data nach godot/data
+npm run test:godot     # Godot-Tests (GODOT=/pfad/zu/godot, falls nicht im PATH)
+```
+
 ## Steuerung
 
 | Aktion | Maus | Tastatur |

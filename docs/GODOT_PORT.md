@@ -1,62 +1,98 @@
 # Umbau auf Godot 4.7.2
 
-Ziel: dasselbe Spiel in Godot, mit echter Grafik (Sprites, Licht, Animationen)
-und Export für Desktop und Web. Die Web-Version bleibt als **Referenz**
-bestehen, bis die Godot-Version alles kann; erst dann wird sie entfernt.
+Das ganze Spiel läuft jetzt auch in Godot: Spiellogik, Karte, Figuren,
+Oberfläche, Dialoge, Klänge und Speichern. Die Web-Version bleibt als
+**Referenz** bestehen. Beide Versionen rechnen bitgenau gleich; das prüfen die
+Vergleichstests bei jedem Testlauf.
+
+Starten: `godot/project.godot` im Godot-Editor 4.7.2 öffnen und F5 drücken.
+Die Hauptszene ist `scenes/main.tscn`.
 
 ## Aufbau
 
 ```
 godot/
   project.godot          Godot 4.7, GL Compatibility (läuft auch im Browser)
+  export_presets.cfg     Vorlagen für den Export: Web, Windows, Linux
   data/*.json            Inhalte, erzeugt aus src/data (nicht von Hand ändern)
-  scripts/autoload/      GameData: lädt alle JSON-Tabellen
-  scripts/core/          Spiellogik ohne Grafik (Port von src/engine)
-  scenes/                Szenen und Oberfläche
-  assets/                Sprites, Schriften, Klänge
+  scripts/core/          Zufall, Sichtfeld, Wegfindung, Datenzugriff, JS-Hilfen
+  scripts/engine/        Spiellogik (Port von src/engine), ohne Grafik
+  scripts/ui/            Oberfläche (Port von src/ui)
+  scenes/main.*          Einstieg: Titel, Interview, Spiel, Endbildschirm
+  assets/fonts/          Montserrat (SIL Open Font License, siehe OFL.txt)
   tests/                 Testlauf, Tests und Vergleichswerte (fixtures)
+  tools/                 Entwicklerwerkzeuge für Bildschirmfotos
 ```
+
+### Oberfläche (`scripts/ui`)
+
+| Datei | Inhalt | Vorbild |
+|---|---|---|
+| `pen.gd` | Nachbau der Canvas-2D-Schnittstelle (Pfade, Kurven, Verläufe, Text) | Browser-Canvas |
+| `tiles.gd` | Böden, Mauern, Türen und Schatten als Texturen, einmal erzeugt | `render.ts` |
+| `map_view.gd` | Karte: statische Ebene (nur bei Änderungen neu), bewegte Ebene, Licht, Effekte | `render.ts` |
+| `sprites.gd` | Kreaturen und Spielfigur | `sprites.ts` |
+| `animator.gd` | Gleiten, Kamera, Geschosse, aufsteigende Zahlen | `animator.ts` |
+| `game_view.gd` | Spielansicht, Eingabe, Kampfmodus, Log | `gameview.ts` |
+| `game_here.gd`, `game_tabs.gd`, `game_combat.gd`, `game_dialogs.gd` | Seitenleiste, Reiter, Kampfsequenz, Tooltip, Versus, Talkshow, Hilfe | `gameview.ts` |
+| `selection.gd`, `screens.gd` | Rassen- und Klassenwahl, Titel, Interview, Ende | `selection.ts`, `screens.ts` |
+| `modals.gd`, `typing.gd` | Dialoge mit Warteschlange, Schreibmaschinen-Effekt | `modal.ts`, `typewriter.ts` |
+| `sound.gd` | Klänge im Spiel erzeugt, ohne Audiodateien | `sound.ts` |
+| `ui_theme.gd`, `kit.gd`, `click_panel.gd` | Designsystem (Farben, Knöpfe, Karten) und Bausteine | `style.css` |
+
+Die Zeichnungen sind Zeile für Zeile aus der Web-Version übertragen. `Pen`
+bildet dafür die Canvas-Befehle nach. Verläufe werden wie im Browser
+vormultipliziert gemischt. Kanten werden weich gezeichnet, weil der
+Kompatibilitäts-Renderer kein 2D-MSAA kennt.
 
 ## Werkzeuge
 
 | Befehl | Zweck |
 |---|---|
 | `npm run export:godot` | Inhalte aus `src/data` nach `godot/data` und Vergleichswerte nach `godot/tests/fixtures` schreiben |
-| `npm run test:godot` | Godot-Tests headless ausführen (Godot-Pfad per `GODOT=…`, sonst `godot` im PATH) |
+| `npm run test:godot` | Godot-Tests headless ausführen (Godot-Pfad per `GODOT=…`, sonst `godot` im PATH). Laufzeitfehler (SCRIPT ERROR) zählen als Fehlschlag. |
+| `UI_SMOKE_ALL=1 npm run test:godot -- ui_smoke` | Alle aufgezeichneten Partien (bis Etage 3) durch die Oberfläche spielen, dauert einige Minuten |
+| `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte) |
+| `xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- bild.png` | Alle Kreaturen als Bogen, zum Vergleich mit der Web-Version |
 
-`godot/data/EXPORT_REPORT.md` listet, welche Regeln nur als Funktion
-existieren (Achievement-Bedingungen, Skill-Effekte …) und in GDScript
-nachgebaut werden müssen.
+## Tests
+
+| Test | Prüft |
+|---|---|
+| `test_rng`, `test_map`, `test_data` | Zufall, Sichtfeld, Wegfindung, Daten |
+| `test_replay` | Drei aufgezeichnete Partien (bis Etage 3): jeder Zug identisch zur TypeScript-Version |
+| `test_ui_parity` | Anzeige-Helfer (Uhrzeit, nächste Ziele, Bodenmaterial, Zufall je Kachel, Beschreibungen) identisch zur TypeScript-Version |
+| `test_ui_smoke` | Eine Partie komplett über die Spielansicht gespielt: keine Laufzeitfehler, Spielverlauf unverändert |
+| `test_sound` | Klänge hörbar und nicht übersteuert |
 
 ## Grundsätze
 
-- **Eine Quelle für Inhalte:** Während des Umbaus werden Inhalte nur in
-  `src/data` geändert und exportiert. Danach wandern sie ganz nach Godot.
-- **Bitgenau gleiche Logik:** Jeder portierte Baustein bekommt einen Test,
-  der ihn mit der TypeScript-Version vergleicht (gleicher Seed, gleiches
-  Ergebnis). So fällt jeder Übertragungsfehler sofort auf.
-- **Spielstand als JSON:** Der Zustand bleibt ein einfaches Dictionary im
-  selben Format wie in TypeScript. Dadurch lassen sich Zustände direkt
-  vergleichen, und Spielstände bleiben übertragbar.
-- **Logik und Darstellung getrennt:** `scripts/core` kennt keine Nodes und
-  keine Grafik; Szenen lesen den Zustand und zeigen ihn an.
+- **Eine Quelle für Inhalte:** Inhalte werden nur in `src/data` geändert und
+  mit `npm run export:godot` exportiert.
+- **Bitgenau gleiche Logik:** Jeder portierte Baustein hat einen Vergleichstest
+  gegen die TypeScript-Version (gleicher Seed, gleiches Ergebnis).
+- **Spielstand als JSON:** Der Zustand ist ein Dictionary im selben Format wie
+  in TypeScript; Spielstände liegen in `user://run.json` und `user://meta.json`.
+- **Logik und Darstellung getrennt:** `scripts/engine` kennt keine Nodes.
 - **GDScript statt C#:** C# lässt sich in Godot 4 nicht für das Web exportieren.
 - Projektregeln aus `CLAUDE.md` gelten weiter (Deutsch, keine Emojis,
   Anzeige über die Identify-Funktionen, Spoiler-Regel).
 
-## Fahrplan
+## Stand
 
-| Phase | Inhalt | Prüfung |
+| Phase | Inhalt | Stand |
 |---|---|---|
-| 0 – Fundament (erledigt) | Projekt, Datenexport, Zufall, Sichtfeld, Wegfindung, Testlauf | Zufall, Sichtfeld und Wege identisch zu TypeScript |
-| 1 – Welt | Spielstand, Kartengenerator, Monster und Gegenstände erzeugen, Identifizieren | Gleicher Seed ergibt gleiche Etage |
-| 2 – Spielschleife | Bewegung, Züge, Kampf, KI, Zustände, Türen, Fallen | Aufgezeichnete Zugfolgen ergeben in beiden Versionen denselben Zustand |
-| 3 – Systeme | Skills, Stufen, Achievements, Statistik, Klassen, Rassen, Boxen, Sponsoren, Quests, Haustiere, Reittiere, Magie, Handwerk, Laden, Crawler, Talkshow, Zuschauer | wie Phase 2, dazu die bestehenden Vitest-Fälle als GDScript-Tests |
-| 4 – Darstellung | TileMap mit Tileset, animierte Kreaturen-Sprites, Kamera, Licht und Nebel, Oberfläche mit eigenem Theme, Log mit Schreibmaschinen-Effekt, Klänge, Versus-Bildschirm, Kampfbanner | Durchspielen und Screenshots |
-| 5 – Abschluss | Interview und Titelbildschirm, Speichern und Laden, Export (Web, Windows, Linux, macOS) | Komplettes Durchspielen von Etage 1–3 |
+| 0 – Fundament | Projekt, Datenexport, Zufall, Sichtfeld, Wegfindung, Testlauf | erledigt |
+| 1 – Welt | Spielstand, Kartengenerator, Monster und Gegenstände, Identifizieren | erledigt |
+| 2 – Spielschleife | Bewegung, Züge, Kampf, KI, Zustände, Türen, Fallen | erledigt |
+| 3 – Systeme | Skills, Stufen, Achievements, Klassen, Rassen, Boxen, Sponsoren, Quests, Haustiere, Reittiere, Magie, Handwerk, Laden, Crawler, Talkshow, Zuschauer | erledigt |
+| 4 – Darstellung | Karte, Kreaturen, Kamera, Licht und Nebel, Theme, Log mit Schreibmaschinen-Effekt, Klänge, Versus-Bildschirm, Kampfbanner | erledigt |
+| 5 – Abschluss | Titel, Interview, Speichern und Laden, Exportvorlagen | erledigt, Export noch ungetestet |
 
-## Offene Entscheidungen
+## Export
 
-- **Grafikstil:** Pixel-Art (z. B. freie CC0-Pakete oder eigene Sprites) oder
-  gezeichneter Stil. Davon hängen Tile-Größe und Kamera ab.
-- **Zielplattformen:** Nur Desktop oder auch Web und Mobil.
+In `export_presets.cfg` stehen Vorlagen für Web, Windows und Linux. Zum
+Exportieren braucht der Editor die Export-Vorlagen von Godot 4.7.2
+(Editor → Export-Vorlagen verwalten). Die Web-Vorlage läuft ohne Threads und
+deshalb auf jedem einfachen Webserver. Die Klänge werden dort nacheinander
+erzeugt, ein Klang pro Bild.

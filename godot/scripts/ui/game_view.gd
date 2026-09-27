@@ -1,0 +1,1116 @@
+class_name GameView
+extends Control
+## Die Spielansicht (Port von src/ui/gameview.ts): Kopfzeile, Karte mit
+## Übersichtskarte und Tooltips, Seitenleiste mit Reitern, Aktionsleiste
+## (im Kampf die Kampfsequenz) und das getippte Log.
+
+signal ended(s: Dictionary)
+
+const STEP_MS := Animator.STEP_MS
+
+const PART_KEYS := {"faust": "1", "tritt": "2", "knie": "3", "ellbogen": "4", "kopf": "5", "waffe": "6", "wurf": "7"}
+const MOVE_KEYS := {"normal": "Q", "sprung": "W", "stampfen": "E", "anlauf": "R"}
+const ZONE_KEYS := {"kopf": "Y", "koerper": "X", "arme": "C", "beine": "V"}
+const DIR_KEYS := {
+	KEY_UP: Vector2i(0, -1), KEY_DOWN: Vector2i(0, 1), KEY_LEFT: Vector2i(-1, 0), KEY_RIGHT: Vector2i(1, 0),
+	KEY_KP_8: Vector2i(0, -1), KEY_KP_2: Vector2i(0, 1), KEY_KP_4: Vector2i(-1, 0), KEY_KP_6: Vector2i(1, 0),
+	KEY_KP_7: Vector2i(-1, -1), KEY_KP_9: Vector2i(1, -1), KEY_KP_1: Vector2i(-1, 1), KEY_KP_3: Vector2i(1, 1),
+}
+
+var s: Dictionary
+var meta: Dictionary
+
+var tab := "crawler"
+var show_all_boxes := false
+var minimap_big := false
+var achv_view := "erfolge"
+var achv_open := {}
+var part := "faust"
+var pending_spell: Variant = null
+var missile_mana := 4
+var move := "normal"
+var zone := "koerper"
+var target_uid: Variant = null
+var hover: Variant = null
+var fight: Variant = null
+var inspected: Variant = null
+var traveling := false
+var is_ended := false
+var selecting := false
+var held: Variant = null
+var last_step := 0.0
+var _path_cache := {"key": "", "path": null}
+var _minimap_key := ""
+var _last_log_id := -1
+var _typer := Typing.Queue.new()
+
+var anim := Animator.new()
+var tiles: Tiles
+var map: MapView
+var minimap: Minimap
+
+var _top: HBoxContainer
+var _mapwrap: Control
+var _room_label: Label
+var _mini_wrap: PanelContainer
+var _zoom_out: Button
+var _zoom_in: Button
+var _tip: PanelContainer
+var _tip_text: RichTextLabel
+var _combat_frame: Control
+var _here: VBoxContainer
+var _here_scroll: ScrollContainer
+var _tabs: HBoxContainer
+var _tab_content: VBoxContainer
+var _tab_scroll: ScrollContainer
+var _actionbar: PanelContainer
+var _log_scroll: ScrollContainer
+var _log: VBoxContainer
+var _banner: Control
+
+
+func _init(state: Dictionary, meta_state: Dictionary) -> void:
+	s = state
+	meta = meta_state
+	theme = UiTheme.get_theme()
+	set_anchors_preset(Control.PRESET_FULL_RECT)
+	# Klänge vom Spielstart nicht nachträglich abspielen
+	Fx.drain_sfx(s)
+	Fx.drain_fx(s)
+
+
+func _ready() -> void:
+	_build()
+	_typer.on_step = _scroll_log
+	refresh()
+
+
+static func modals() -> Modals:
+	return Modals.instance
+
+
+static func sound() -> SoundBox:
+	return SoundBox.instance
+
+
+func modal_open() -> bool:
+	return Modals.instance != null and Modals.instance.is_open()
+
+
+# ---------------------------------------------------------------- Aufbau
+
+func _build() -> void:
+	var bg := ColorRect.new()
+	bg.color = UiTheme.BG
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
+	var root := VBoxContainer.new()
+	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.add_theme_constant_override("separation", 0)
+	add_child(root)
+	# Kopfzeile
+	var top_panel := PanelContainer.new()
+	top_panel.theme_type_variation = "TopBar"
+	top_panel.custom_minimum_size = Vector2(0, 46)
+	root.add_child(top_panel)
+	# Zu viele Einträge werden rechts abgeschnitten, statt die Ansicht zu verbreitern
+	var top_clip := ScrollContainer.new()
+	top_clip.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	top_clip.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	top_clip.mouse_filter = Control.MOUSE_FILTER_PASS
+	top_panel.add_child(top_clip)
+	_top = HBoxContainer.new()
+	_top.add_theme_constant_override("separation", 8)
+	_top.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top_clip.add_child(_top)
+	_line(root)
+	var body := HBoxContainer.new()
+	body.add_theme_constant_override("separation", 0)
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	root.add_child(body)
+	var left := VBoxContainer.new()
+	left.add_theme_constant_override("separation", 0)
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_child(left)
+	# Karte
+	_mapwrap = Control.new()
+	_mapwrap.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_mapwrap.clip_contents = true
+	left.add_child(_mapwrap)
+	tiles = Tiles.new()
+	add_child(tiles)
+	map = MapView.new()
+	map.s = s
+	map.anim = anim
+	map.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_mapwrap.add_child(map)
+	map.tile_hovered.connect(_on_hover)
+	map.tile_clicked.connect(_on_map_click)
+	map.zoom_requested.connect(zoom_map)
+	tiles.build()
+	tiles.ready_changed.connect(func(): map.tiles = tiles)
+	# Innerer Schatten und roter Kampfrahmen
+	_combat_frame = FrameGlow.new()
+	_combat_frame.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_combat_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_mapwrap.add_child(_combat_frame)
+	var rl := PanelContainer.new()
+	rl.theme_type_variation = "RoomLabel"
+	rl.position = Vector2(12, 12)
+	rl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_mapwrap.add_child(rl)
+	_room_label = Kit.label(rl, "", 13, Color("#d8d4ca"), 600)
+	# Übersichtskarte
+	_mini_wrap = PanelContainer.new()
+	_mini_wrap.theme_type_variation = "MiniWrap"
+	_mini_wrap.visible = false
+	_mini_wrap.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_mini_wrap.gui_input.connect(func(ev):
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			toggle_minimap())
+	_mapwrap.add_child(_mini_wrap)
+	minimap = Minimap.new()
+	minimap.s = s
+	minimap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_mini_wrap.add_child(minimap)
+	var hint := Kit.label(_mini_wrap, "Karte · K", 10, "muted")
+	hint.size_flags_horizontal = Control.SIZE_SHRINK_END
+	hint.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	# Zoom
+	var zc := VBoxContainer.new()
+	zc.add_theme_constant_override("separation", 6)
+	_mapwrap.add_child(zc)
+	_zoom_out = Kit.button(null, "−", func(): zoom_map(-1), "RoundButton", false, "Herauszoomen (Taste -)")
+	_zoom_in = Kit.button(null, "+", func(): zoom_map(1), "RoundButton", false, "Hineinzoomen (Taste +)")
+	for zb in [_zoom_out, _zoom_in]:
+		zb.custom_minimum_size = Vector2(34, 34)
+	zc.add_child(_zoom_out)
+	zc.add_child(_zoom_in)
+	_mapwrap.resized.connect(func():
+		zc.position = _mapwrap.size - Vector2(12 + 34, 12 + 74)
+		_layout_minimap())
+	# Tooltip
+	_tip = PanelContainer.new()
+	_tip.theme_type_variation = "Tip"
+	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_tip.visible = false
+	_tip.z_index = 5
+	_mapwrap.add_child(_tip)
+	_tip_text = Kit.text(_tip, "", 13, null, 4)
+	_tip_text.custom_minimum_size = Vector2(266, 0)
+	# Unten: Aktionsleiste und Log
+	var bottom := PanelContainer.new()
+	bottom.theme_type_variation = "Bottom"
+	left.add_child(bottom)
+	var bv := VBoxContainer.new()
+	bv.add_theme_constant_override("separation", 0)
+	bottom.add_child(bv)
+	_line(bv)
+	_actionbar = PanelContainer.new()
+	_actionbar.theme_type_variation = "ActionBar"
+	bv.add_child(_actionbar)
+	_line(bv)
+	_log_scroll = ScrollContainer.new()
+	_log_scroll.custom_minimum_size = Vector2(0, 170)
+	_log_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	bv.add_child(_log_scroll)
+	var lm := Kit.margin(_log_scroll, 14, 8, 14, 8)
+	_log = Kit.vbox(lm, 2)
+	_log_scroll.gui_input.connect(func(ev):
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_typer.finish_all())
+	# Seitenleiste
+	var vline := ColorRect.new()
+	vline.color = UiTheme.LINE
+	vline.custom_minimum_size = Vector2(1, 0)
+	body.add_child(vline)
+	var side := PanelContainer.new()
+	side.theme_type_variation = "Side"
+	side.custom_minimum_size = Vector2(340, 0)
+	body.add_child(side)
+	var sv := VBoxContainer.new()
+	sv.add_theme_constant_override("separation", 0)
+	side.add_child(sv)
+	_here_scroll = ScrollContainer.new()
+	_here_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sv.add_child(_here_scroll)
+	var hm := Kit.margin(_here_scroll, 14, 2, 14, 0)
+	_here = Kit.vbox(hm, 4)
+	_here.minimum_size_changed.connect(_fit_here)
+	var tabs_panel := PanelContainer.new()
+	tabs_panel.theme_type_variation = "Tabs"
+	sv.add_child(tabs_panel)
+	_tabs = HBoxContainer.new()
+	_tabs.add_theme_constant_override("separation", 3)
+	tabs_panel.add_child(_tabs)
+	_line(sv)
+	_tab_scroll = ScrollContainer.new()
+	_tab_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_tab_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sv.add_child(_tab_scroll)
+	var tm := Kit.margin(_tab_scroll, 14, 12, 14, 12)
+	_tab_content = Kit.vbox(tm, 5)
+
+
+static func _line(parent: Node) -> void:
+	var l := ColorRect.new()
+	l.color = UiTheme.LINE
+	l.custom_minimum_size = Vector2(0, 1)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(l)
+
+
+func _fit_here() -> void:
+	var h := _here.get_combined_minimum_size().y
+	var sv_h := size.y - 46
+	_here_scroll.custom_minimum_size.y = minf(h + 2, sv_h * 0.45) if h > 1 else 0.0
+
+
+func _layout_minimap() -> void:
+	var w := _mapwrap.size
+	var sz := Vector2(minf(520, w.x * 0.7), minf(360, w.y * 0.7)) if minimap_big else Vector2(190, 130)
+	_mini_wrap.size = sz
+	_mini_wrap.position = Vector2(12, w.y - sz.y - 12)
+	minimap.queue_redraw()
+
+
+## Innerer Schatten der Karte, im Kampf mit pulsierendem roten Rahmen.
+class FrameGlow:
+	extends Control
+	var combat := false
+
+	func _process(_d: float) -> void:
+		if combat:
+			queue_redraw()
+
+	func _draw() -> void:
+		var w := size.x
+		var h := size.y
+		var pen := Pen.new(self)
+		var depth := 40.0
+		var a := 0.55
+		var col := Color(0, 0, 0)
+		var edges := [[Vector2(0, 0), Vector2(0, depth), Rect2(0, 0, w, depth)], [Vector2(0, h), Vector2(0, h - depth), Rect2(0, h - depth, w, depth)], [Vector2(0, 0), Vector2(depth, 0), Rect2(0, 0, depth, h)], [Vector2(w, 0), Vector2(w - depth, 0), Rect2(w - depth, 0, depth, h)]]
+		if combat:
+			var t := Time.get_ticks_msec() / 2400.0 * TAU
+			var k := 0.5 - 0.5 * cos(t)
+			col = Color(200 / 255.0, 30 / 255.0, 20 / 255.0)
+			a = 0.28 + 0.14 * k
+			depth = 50 + 30 * k
+		for e in edges:
+			var g := pen.linear_gradient(e[0].x, e[0].y, e[1].x, e[1].y)
+			g.add(0, Color(col, a))
+			g.add(1, Color(col, 0))
+			pen.fill_style = g
+			var r: Rect2 = e[2]
+			pen.fill_rect(r.position.x, r.position.y, r.size.x, r.size.y)
+		if combat:
+			var k2 := 0.5 - 0.5 * cos(Time.get_ticks_msec() / 2400.0 * TAU)
+			draw_rect(Rect2(1, 1, w - 2, h - 2), Color(230 / 255.0 + 25 / 255.0 * k2, 70 / 255.0 + 25 / 255.0 * k2, 55 / 255.0 + 20 / 255.0 * k2, 0.85 + 0.1 * k2), false, 2.0)
+
+
+## Karte vergrößern oder verkleinern.
+func zoom_map(delta: int) -> void:
+	if not map.zoom(delta):
+		return
+	var bounds := map.zoom_bounds()
+	_zoom_out.disabled = bounds.min
+	_zoom_in.disabled = bounds.max
+
+
+# ---------------------------------------------------------------- Bild für Bild
+
+func _process(_delta: float) -> void:
+	var now := Animator.now_ms()
+	if held != null and not modal_open() and s.status == "playing" and now - last_step >= STEP_MS:
+		if in_combat():
+			# Im Kampf zählt jeder Schritt einzeln
+			held = null
+		else:
+			last_step = now
+			step_dir(held.dir)
+	_draw_frame()
+
+
+func _draw_frame() -> void:
+	var path: Variant = null
+	if hover != null and not traveling and held == null and Ai.monster_at(s, _pos(hover)) == null and s.status == "playing":
+		var key := "%d,%d|%d,%d|%d" % [hover.x, hover.y, s.player.pos.x, s.player.pos.y, s.turn]
+		if _path_cache.key != key:
+			var m: Dictionary = s.map
+			var inside: bool = hover.x >= 0 and hover.y >= 0 and hover.x < m.width and hover.y < m.height
+			var ok := false
+			if inside:
+				var i := MapGen.idx(m, hover.x, hover.y)
+				ok = m.explored[i] and (MapGen.is_walkable(m, hover.x, hover.y) or MapGen.tile_at(m, hover.x, hover.y) == "door")
+			_path_cache = {"key": key, "path": Game.plan_path(s, _pos(hover)) if ok else null}
+		path = _path_cache.path
+	map.hover = hover
+	map.path = path
+	map.selected = inspected
+	map.redraw()
+	var room = Game.current_room(s)
+	_room_label.text = room.name if room != null else "Gang"
+	_draw_minimap()
+
+
+static func _pos(v: Variant) -> Dictionary:
+	return {"x": int(v.x), "y": int(v.y)}
+
+
+func visible_set() -> Dictionary:
+	return map.visible_set
+
+
+func _draw_minimap() -> void:
+	var on := Game.has_unlock(s, "minimap")
+	_mini_wrap.visible = on
+	if not on:
+		return
+	var key := "%d|%d|%d,%d|%s" % [s.floor, s.turn, s.player.pos.x, s.player.pos.y, minimap_big]
+	if key == _minimap_key:
+		return
+	_minimap_key = key
+	_layout_minimap()
+
+
+func toggle_minimap() -> void:
+	minimap_big = not minimap_big
+	_minimap_key = ""
+	_draw_minimap()
+
+
+# ---------------------------------------------------------------- Kampfmodus
+
+## Kampf läuft, sobald ein wacher Gegner, der dich bemerkt hat, in Sicht ist.
+func in_combat() -> bool:
+	var vis := _vis_now()
+	for m in s.monsters:
+		if m.get("aware", false) and not m.get("asleep", false) and vis.has(MapGen.idx(s.map, m.pos.x, m.pos.y)):
+			return true
+	return false
+
+
+## Sichtbare Felder zum aktuellen Stand (nach einer Aktion sofort neu).
+func _vis_now() -> Dictionary:
+	var key := "%d|%d|%d|%d" % [s.turn, s.player.pos.x, s.player.pos.y, s.floor]
+	if key != _vis_key:
+		_vis_key = key
+		_vis_cache = Game.visible_tiles(s)
+	return _vis_cache
+
+
+var _vis_key := ""
+var _vis_cache: Dictionary = {}
+
+
+func _update_combat_mode() -> void:
+	var now: bool = s.status == "playing" and in_combat()
+	_combat_frame.combat = now
+	_combat_frame.queue_redraw()
+	if now and fight == null:
+		fight = {"kills": Stats.stat(s, "kills"), "xp": Stats.stat(s, "xp.gesamt"), "turn": s.turn, "hp": s.player.hp}
+		traveling = false
+		held = null
+		var foes := combat_targets().filter(func(m): return m.get("aware", false))
+		var names := J.uniq(foes.map(func(m): return Identify.describe_monster(s, m).name))
+		var who := ("%s und weitere" % ", ".join(names.slice(0, 2))) if names.size() > 2 else " und ".join(names)
+		Log.add(s, "Kampf! %s %s dich entdeckt. Ab jetzt zählt jeder Zug einzeln." % [who, "haben" if foes.size() > 1 else "hat"], "gefahr")
+		# Beim Betreten einer Boss-Kammer übernimmt der Versus-Bildschirm den Auftritt
+		if s.get("pendingVersus") == null:
+			banner("Kampf", who, "start")
+			if sound():
+				sound().play_combat_start()
+	elif not now and fight != null:
+		var f: Dictionary = fight
+		fight = null
+		if s.status != "playing":
+			return
+		var kills := int(Stats.stat(s, "kills") - f.kills)
+		var xp := int(Stats.stat(s, "xp.gesamt") - f.xp)
+		var turns: int = s.turn - f.turn
+		var lost := maxi(0, f.hp - s.player.hp)
+		var bits := ["%d %s" % [turns, "Zug" if turns == 1 else "Züge"]]
+		if kills:
+			bits.append("%d besiegt" % kills)
+		if xp:
+			bits.append("+%d Erfahrung" % xp)
+		if lost:
+			bits.append("%d Lebenspunkte verloren" % lost)
+		Log.add(s, "Kampf vorbei: %s." % ", ".join(bits), "kampf")
+		banner("Sieg" if kills else "Kampf vorbei", " · ".join(bits), "end")
+		if sound():
+			sound().play_combat_end()
+
+
+## Banner quer über die Karte bei Kampfbeginn und -ende.
+func banner(title: String, sub: String, kind: String) -> void:
+	if _banner and is_instance_valid(_banner):
+		_banner.queue_free()
+	var b := Banner.new()
+	b.title = title
+	b.sub = sub
+	b.kind = kind
+	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_mapwrap.add_child(b)
+	b.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_banner = b
+
+
+class Banner:
+	extends Control
+	var title := ""
+	var sub := ""
+	var kind := "start"
+	var _t0 := Time.get_ticks_msec()
+
+	func _process(_d: float) -> void:
+		queue_redraw()
+		var life := 1700 if kind == "start" else 2200
+		if Time.get_ticks_msec() - _t0 > life:
+			queue_free()
+
+	func _draw() -> void:
+		var t := (Time.get_ticks_msec() - _t0) / 1000.0
+		var fade_at := 1.2 if kind == "start" else 1.7
+		var a := clampf(t / 0.35, 0.0, 1.0)
+		var dy := 0.0
+		if t > fade_at:
+			var k := clampf((t - fade_at) / 0.5, 0.0, 1.0)
+			a *= 1.0 - k
+			dy = -10 * k
+		var sy := clampf(0.2 + t / 0.35 * 0.8, 0.2, 1.0)
+		var w := size.x
+		var h := 92.0 * sy
+		var y := size.y * 0.34 + dy + (92.0 - h) / 2
+		var col := Color(120 / 255.0, 12 / 255.0, 8 / 255.0, 0.82) if kind == "start" else Color(20 / 255.0, 40 / 255.0, 28 / 255.0, 0.85)
+		var pen := Pen.new(self)
+		var g := pen.linear_gradient(0, 0, w, 0)
+		g.add(0, Color(col, 0))
+		g.add(0.2, col)
+		g.add(0.8, col)
+		g.add(1, Color(col, 0))
+		pen.alpha = a
+		pen.fill_style = g
+		pen.fill_rect(0, y, w, h)
+		if sy < 0.9:
+			return
+		var f := UiFonts.get_font(800, false, 12)
+		var fs := 38
+		var tw := f.get_string_size(title.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var glow := Color(1, 90 / 255.0, 60 / 255.0, 0.6 * a) if kind == "start" else Color(110 / 255.0, 224 / 255.0, 122 / 255.0, 0.5 * a)
+		draw_string_outline(f, Vector2((w - tw) / 2, y + 50), title.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 8, Color(glow, glow.a * 0.4))
+		draw_string(f, Vector2((w - tw) / 2, y + 52), title.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0, 0, 0, 0.5 * a))
+		draw_string(f, Vector2((w - tw) / 2, y + 50), title.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1, 1, 1, a))
+		if sub != "":
+			var f2 := UiFonts.get_font(500)
+			var sw := f2.get_string_size(sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+			draw_string(f2, Vector2((w - sw) / 2, y + 76), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1, 1, 1, 0.85 * a))
+
+
+# ---------------------------------------------------------------- Aktionen
+
+## Führt eine Engine-Aktion aus und kümmert sich um alles danach.
+func act(fn: Callable) -> bool:
+	if s.status != "playing" or modal_open():
+		return false
+	var before := anim.snapshot(s)
+	var floor: int = s.floor
+	if inspected != null:
+		inspected = null
+		_tip.visible = false
+	var res: Dictionary = fn.call()
+	if s.floor != floor:
+		anim.reset()
+	else:
+		anim.after(s, before, Fx.drain_fx(s))
+	var sfx := Fx.drain_sfx(s)
+	if sound():
+		sound().play_sfx(sfx)
+	if not res.get("ok", false) and res.get("message") != null:
+		Log.add(s, res.message, "info")
+	after_action()
+	return res.get("ok", false)
+
+
+func after_action() -> void:
+	# Einblendungen nur noch für Warnungen – alles andere steht im Log
+	for t in Game.drain_toasts(s):
+		if t.kind == "warnung" and modals():
+			modals().toast(t.title, t.text, t.kind)
+	Meta.sync_meta(meta, s)
+	Meta.save_meta(meta)
+	if s.status == "playing":
+		Meta.save_run(s)
+	refresh()
+	flush_dialogs()
+	if s.status != "playing" and not is_ended:
+		is_ended = true
+		traveling = false
+		var title := "Geschafft!" if s.status == "victory" else "Tot."
+		await get_tree().create_timer(0.3).timeout
+		var text := "Du hast alle bisher gebauten Etagen überlebt." if s.status == "victory" else "Todesursache: %s." % J.nn(s, "deathCause", "unbekannt")
+		await modals().html(title, func(root): Modals.page(root, Kit.esc(text)), "Weiter").closed
+		ended.emit(s)
+
+
+func flush_dialogs() -> void:
+	while not s.pendingDialogs.is_empty():
+		var d: Dictionary = s.pendingDialogs.pop_front()
+		var job: Modals.Job
+		if d.get("kind") == "talkshow":
+			job = GameDialogs.run_talk_show(self, d.title, d.pages)
+		else:
+			job = modals().dialog(d.title, d.get("speaker"), d.pages)
+		job.closed.connect(func(_r):
+			refresh()
+			maybe_select())
+	Meta.save_run(s)
+	var reveal = s.get("pendingReveal")
+	if reveal != null:
+		s.erase("pendingReveal")
+		GameDialogs.reveal_items(self, reveal.title, reveal.items)
+	GameDialogs.maybe_versus(self)
+	maybe_select()
+
+
+## Öffnet die Rassen-/Klassenwahl, sobald keine anderen Dialoge mehr offen sind.
+func maybe_select() -> void:
+	if not s.get("pendingSelection", false) or selecting or modal_open():
+		return
+	selecting = true
+	var job := Selection.show_selection(self)
+	job.closed.connect(func(_r):
+		selecting = false
+		after_action())
+
+
+func technique() -> Dictionary:
+	return {"part": part, "move": move, "zone": zone}
+
+
+func attack_monster(uid: String) -> void:
+	act(func(): return Game.attack(s, uid, technique()))
+
+
+func step_dir(dir: Vector2i) -> void:
+	var to := {"x": s.player.pos.x + dir.x, "y": s.player.pos.y + dir.y}
+	var mon = Ai.monster_at(s, to)
+	if mon != null:
+		attack_monster(mon.uid)
+	else:
+		act(func(): return Game.move_step(s, to))
+
+
+func step_toward(target: Dictionary) -> void:
+	var path = Game.plan_path(s, target)
+	var next = path[0] if path is Array and not path.is_empty() else null
+	if next != null and Ai.monster_at(s, next) == null:
+		act(func(): return Game.move_step(s, next))
+	else:
+		say("Kein Weg dorthin.")
+
+
+func say(text: String) -> void:
+	Log.add(s, text, "info")
+	refresh_log()
+
+
+func visible_monsters() -> Array:
+	var vis := _vis_now()
+	return s.monsters.filter(func(m): return vis.has(MapGen.idx(s.map, m.pos.x, m.pos.y)))
+
+
+func travel(path: Array) -> void:
+	if traveling:
+		return
+	traveling = true
+	var seen_before := {}
+	for m in visible_monsters():
+		seen_before[m.uid] = true
+	var k := 0
+	while k < path.size():
+		var step: Dictionary = path[k]
+		if not traveling or s.status != "playing" or modal_open():
+			break
+		# Tür auf dem Weg: erst öffnen, dann hindurch
+		if MapGen.tile_at(s.map, step.x, step.y) == "door":
+			if not act(func(): return Game.move_step(s, step)):
+				break
+			await get_tree().create_timer(STEP_MS / 1000.0).timeout
+			continue
+		var hp_before: int = s.player.hp
+		var room_before = s.get("currentRoom")
+		var traps_before := J.arr(s, "traps").filter(func(x): return not x.get("hidden", false)).size()
+		if not act(func(): return Game.move_step(s, step)):
+			break
+		if J.arr(s, "traps").filter(func(x): return not x.get("hidden", false)).size() > traps_before:
+			break
+		if s.player.pos.x != step.x or s.player.pos.y != step.y:
+			break
+		var fresh = null
+		for m in visible_monsters():
+			if not seen_before.has(m.uid) or m.get("aware", false):
+				fresh = m
+				break
+		if fresh != null:
+			say("Du hältst an: %s in Sicht." % Identify.describe_monster(s, fresh).name)
+			break
+		if s.player.hp < hp_before:
+			break
+		if s.get("currentRoom") != room_before:
+			break
+		if not Game.items_at(s, s.player.pos).is_empty() or Game.on_stairs(s):
+			break
+		k += 1
+		await get_tree().create_timer(STEP_MS / 1000.0).timeout
+	traveling = false
+
+
+# ---------------------------------------------------------------- Eingabe
+
+func _on_hover(t: Variant) -> void:
+	hover = t
+	if t == null:
+		_tip.visible = false
+		return
+	if inspected != null and (inspected.x != t.x or inspected.y != t.y):
+		inspected = null
+	if inspected == null:
+		_update_tooltip()
+
+
+func _on_map_click(t: Vector2i, button: int) -> void:
+	if modal_open():
+		return
+	if button == MOUSE_BUTTON_RIGHT:
+		examine(t)
+		return
+	if traveling:
+		traveling = false
+		return
+	var tp := _pos(t)
+	var vis := _vis_now()
+	var i := MapGen.idx(s.map, t.x, t.y) if MapGen.in_bounds(s.map, t.x, t.y) else -1
+	var seen := i >= 0 and vis.has(i)
+	var mon = Ai.monster_at(s, tp)
+	# Zauber mit Ziel: der nächste Klick bestimmt das Ziel
+	if pending_spell != null:
+		var sp: String = pending_spell
+		pending_spell = null
+		var target = mon if mon != null and seen else null
+		act(func(): return Game.cast(s, sp, {"targetUid": target.uid if target != null else null, "pos": tp, "mana": missile_mana}))
+		return
+	if mon != null and seen:
+		var blocker = Combat.technique_blocker(s, mon, technique())
+		if blocker == null:
+			attack_monster(mon.uid)
+			return
+		var d := Fov.chebyshev(s.player.pos, mon.pos)
+		if d > 1 and part != "wurf":
+			step_toward(mon.pos)
+			return
+		say(blocker)
+		return
+	var npc = Crawlers.crawler_at(s, tp)
+	if npc != null and seen and not npc.get("party", false):
+		if Fov.chebyshev(npc.pos, s.player.pos) <= 1:
+			act(func(): return Game.talk_crawler(s, npc.uid))
+			return
+		step_toward(npc.pos)
+		return
+	var on_player: bool = t.x == s.player.pos.x and t.y == s.player.pos.y
+	var was_inspected: bool = inspected != null and inspected.x == t.x and inspected.y == t.y
+	if not on_player and not was_inspected and worth_inspecting(t):
+		inspected = t
+		_show_card(t)
+		return
+	inspected = null
+	if on_player:
+		if not Game.items_at(s, tp).is_empty():
+			act(func(): return Game.pickup(s))
+		elif Game.on_stairs(s):
+			ask_descend()
+		else:
+			act(func(): return Game.wait(s))
+		return
+	var closed_door := MapGen.in_bounds(s.map, t.x, t.y) and MapGen.tile_at(s.map, t.x, t.y) == "door"
+	if Fov.chebyshev(tp, s.player.pos) == 1 and (Pathfinding.can_step(s.map, s.player.pos, tp) or closed_door):
+		act(func(): return Game.move_step(s, tp))
+		return
+	var path = Game.plan_path(s, tp)
+	if not (path is Array) or path.is_empty():
+		say("Dorthin kennst du keinen Weg.")
+	elif in_combat():
+		# Im Kampf geht es nur Schritt für Schritt voran
+		act(func(): return Game.move_step(s, path[0]))
+	else:
+		travel(path)
+
+
+## Felder, die man per Klick erst ansieht, statt sofort loszulaufen.
+func worth_inspecting(t: Vector2i) -> bool:
+	var m: Dictionary = s.map
+	if t.x < 0 or t.y < 0 or t.x >= m.width or t.y >= m.height:
+		return false
+	var i := MapGen.idx(m, t.x, t.y)
+	if not m.explored[i] or not _vis_now().has(i):
+		return false
+	var tp := _pos(t)
+	var fu = MapGen.furniture_at(m, tp)
+	if fu != null:
+		return Fov.chebyshev(tp, s.player.pos) > 1
+	if not Game.items_at(s, tp).is_empty() or Traps.known_trap_at(s, tp) != null or m.tiles[i] == "stairs":
+		return true
+	return (m.tiles[i] == "door" or m.tiles[i] == "dooropen") and Game.is_lair_door(s, tp) and Fov.chebyshev(tp, s.player.pos) > 1
+
+
+## Feste Info-Karte am untersuchten Feld.
+func _show_card(t: Vector2i) -> void:
+	var bb = GameDialogs.tooltip_for(self, t, true)
+	if bb == null:
+		return
+	_tip_text.text = bb + "\n[font_size=11][color=#8cc8ff]NOCHMAL KLICKEN, UM HINZUGEHEN[/color][/font_size]"
+	_tip.visible = true
+	_tip.reset_size()
+	var tl := map.tile_px
+	var px := (t.x - map.ox + 1) * tl + 8
+	var py := (t.y - map.oy) * tl
+	var w := _mapwrap.size
+	var x := px - tl - 300 if px + 290 > w.x else px
+	await get_tree().process_frame
+	var th := _tip.size.y
+	var y := w.y - th - 8 if py + th > w.y else py
+	_tip.position = Vector2(maxf(4, x), maxf(4, y))
+
+
+func _update_tooltip() -> void:
+	var bb = GameDialogs.tooltip_for(self, hover) if hover != null else null
+	if bb == null:
+		_tip.visible = false
+		return
+	_tip_text.text = bb
+	_tip.visible = true
+	_tip.reset_size()
+	var mp := _mapwrap.get_local_mouse_position()
+	var w := _mapwrap.size
+	var x := mp.x + 16
+	var y := mp.y + 16
+	if x + 290 > w.x:
+		x = mp.x - 290
+	var th := _tip.get_combined_minimum_size().y
+	if y + th > w.y:
+		y = mp.y - th - 8
+	_tip.position = Vector2(maxf(4, x), maxf(4, y))
+
+
+func examine(t: Vector2i) -> void:
+	var tp := _pos(t)
+	if not MapGen.in_bounds(s.map, t.x, t.y):
+		return
+	var mon = Ai.monster_at(s, tp) if _vis_now().has(MapGen.idx(s.map, t.x, t.y)) else null
+	if mon != null:
+		var info := Identify.describe_monster(s, mon)
+		var conds := ", ".join(Conditions.condition_list(mon).map(func(c): return c.state))
+		var parts := ["%s (%s, %s)" % [info.name, info.level, Identify.INSIGHT_NAMES[info.insight]], info.health, conds, info.combat, info.abilities, info.flavor]
+		say(". ".join(parts.filter(func(x): return x != null and String(x) != "")))
+		return
+	var items := Game.items_at(s, tp)
+	if not items.is_empty():
+		say(" | ".join(items.map(func(e):
+			var d := Identify.describe_item(s, e.item)
+			return "%s: %s" % [d.name, J.nn(d, "flavor", J.nn(d, "note", ""))])))
+		return
+	var ri: int = s.map.roomAt[MapGen.idx(s.map, t.x, t.y)]
+	if ri >= 0 and s.map.rooms[ri].get("visited", false):
+		say("%s: %s" % [s.map.rooms[ri].name, s.map.rooms[ri].description])
+
+
+func _unhandled_input(ev: InputEvent) -> void:
+	if ev is InputEventKey and not ev.pressed:
+		if held != null and held.code == ev.keycode:
+			held = null
+		return
+	if not (ev is InputEventKey) or not ev.pressed:
+		return
+	if modal_open() or s.status != "playing":
+		return
+	var k: int = ev.keycode
+	var ch := String.chr(ev.unicode).to_lower() if ev.unicode > 0 else ""
+	var dir = DIR_KEYS.get(k)
+	if dir != null:
+		get_viewport().set_input_as_handled()
+		traveling = false
+		if ev.echo:
+			return
+		held = {"code": k, "dir": dir}
+		last_step = Animator.now_ms()
+		step_dir(dir)
+		return
+	if ev.echo:
+		return
+	for p in PART_KEYS:
+		if ch == PART_KEYS[p] and k != KEY_KP_1 and k != KEY_KP_2 and k != KEY_KP_3 and k != KEY_KP_4 and k != KEY_KP_5 and k != KEY_KP_6 and k != KEY_KP_7:
+			part = p
+			if p == "wurf":
+				move = "normal"
+			refresh_actions()
+			get_viewport().set_input_as_handled()
+			return
+	for mv in MOVE_KEYS:
+		if ch == MOVE_KEYS[mv].to_lower():
+			move = mv
+			if mv == "stampfen":
+				part = "tritt"
+			refresh_actions()
+			get_viewport().set_input_as_handled()
+			return
+	for z in ZONE_KEYS:
+		if ch == ZONE_KEYS[z].to_lower():
+			zone = z
+			refresh_actions()
+			get_viewport().set_input_as_handled()
+			return
+	get_viewport().set_input_as_handled()
+	if k == KEY_TAB and in_combat():
+		var list := combat_targets()
+		var idx := -1
+		for n in list.size():
+			if list[n].uid == target_uid:
+				idx = n
+		target_uid = list[(idx + 1) % maxi(1, list.size())].uid if not list.is_empty() else null
+		refresh_actions()
+		return
+	var enter: bool = k == KEY_ENTER or k == KEY_KP_ENTER
+	if enter and in_combat() and target_uid != null and not Game.on_stairs(s):
+		strike(target_uid)
+		return
+	if k == KEY_SPACE or k == KEY_KP_5:
+		act(func(): return Game.wait(s))
+	elif ch == "f" and Classes.current_ability(s) != null:
+		act(func(): return Classes.use_ability(s, technique()))
+	elif ch == "m" and s.player.get("mount") != null:
+		act(func(): return Game.ride_toggle(s))
+	elif ch == "g":
+		act(func(): return Game.pickup(s))
+	elif enter and Game.on_stairs(s):
+		ask_descend()
+	elif ch == "k":
+		toggle_minimap()
+	elif ch == "h" or ch == "?":
+		GameDialogs.show_help(self)
+	elif ch == "+" or ch == "=" or k == KEY_KP_ADD:
+		zoom_map(1)
+	elif ch == "-" or k == KEY_KP_SUBTRACT:
+		zoom_map(-1)
+	elif k == KEY_ESCAPE:
+		traveling = false
+		if pending_spell != null:
+			pending_spell = null
+			say("Zauber abgebrochen.")
+			refresh_actions()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		held = null
+
+
+func ask_descend() -> void:
+	var next: int = s.floor + 1
+	var def = null
+	for f in Db.world("FLOORS"):
+		if f.floor == next:
+			def = f
+	var boxes: int = s.player.boxes.size()
+	var text := "Auf Etage %d%s hinabsteigen? Es gibt kein Zurück.%s" % [next, (" („%s“)" % def.name) if def != null else "", (" Du hast noch %d ungeöffnete Box(en) – die bleiben dir erhalten." % boxes) if boxes else ""]
+	var ok = await modals().confirm("Treppenhaus", text, "Hinabsteigen").closed
+	if ok:
+		act(func(): return Game.descend(s, meta))
+
+
+# ---------------------------------------------------------------- Darstellung
+
+func refresh() -> void:
+	_vis_key = ""
+	_draw_frame()
+	_update_combat_mode()
+	refresh_top()
+	refresh_here()
+	refresh_side()
+	refresh_actions()
+	refresh_log()
+
+
+func refresh_top() -> void:
+	Kit.clear(_top)
+	var p: Dictionary = s.player
+	var def = Db.floor_def(s.floor)
+	var left := Game.time_left(s)
+	var show := Kit.label(_top, Db.world("SHOW_NAME"), 15, UiTheme.ACCENT, 800)
+	show.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var wide := size.x > 1500
+	if wide:
+		_pill("Staffel %d" % s.season, "muted")
+	_pill_bb("Etage [b]%d[/b]: %s" % [s.floor, Kit.esc(def.name if def else "")])
+	_pill("Einsturz in %s" % ViewHelpers.format_time(left), "text" if left > 120 else "danger", "PillWarn" if left <= 120 else "PillTimer", 700, "Zeit bis zum Einsturz")
+	var sp := Control.new()
+	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_top.add_child(sp)
+	_pill_bb("%s · Lv [b]%d[/b]" % [Kit.esc(p.name), p.level])
+	if Game.has_unlock(s, "zuschauer"):
+		_pill("Zuschauer %s · Follower %s · Hype %d" % [J.de(Viewers.live_viewers(s)), J.de(s.viewers.follower), J.rnd(s.viewers.hype)], "achv")
+	if Game.has_unlock(s, "inventar") and wide:
+		_pill("Crawler übrig %s" % J.de(Crawlers.population(s).alive), "muted", "Pill", 400, "Lebende Crawler laut letzter Zählung")
+	_pill("Gold %s" % J.s(p.gold), Color("#ffd700"))
+	for b in [
+		["Hilfe", func(): GameDialogs.show_help(self), "Alle Tasten (H)", false],
+		["Ton: %s" % ("an" if sound() and sound().enabled else "aus"), _toggle_sound, "Klänge für Lootboxen, Level-Aufstieg und Achievements", false],
+		["Tippen: %s" % ("an" if sound() and sound().typing_on else "aus"), _toggle_typing, "Weiches Tastenklicken, wenn Texte getippt werden", not (sound() and sound().enabled)],
+	]:
+		var btn := Kit.button(_top, b[0], b[1], "PillButton", b[3], b[2])
+		btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_pill("Lootboxen %d" % p.boxes.size(), "text")
+	var pet = p.get("pet")
+	if pet != null:
+		_pill("Haustier %s %s" % [pet.name, ("%d/%d" % [pet.hp, pet.maxHp]) if pet.alive else "(bewusstlos)"], Color("#ffb3e6"))
+
+
+func _pill(text: String, color: Variant, variant: String = "Pill", weight: int = 400, tip: String = "") -> void:
+	var pc := PanelContainer.new()
+	pc.theme_type_variation = variant
+	pc.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	if tip != "":
+		pc.tooltip_text = tip
+	_top.add_child(pc)
+	Kit.label(pc, text, 13, color, weight)
+
+
+func _pill_bb(bb: String) -> void:
+	var pc := PanelContainer.new()
+	pc.theme_type_variation = "Pill"
+	pc.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_top.add_child(pc)
+	var rt := Kit.text(pc, bb, 13)
+	rt.autowrap_mode = TextServer.AUTOWRAP_OFF
+	rt.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+
+
+func _toggle_sound() -> void:
+	if not sound():
+		return
+	sound().set_enabled(not sound().enabled)
+	if sound().enabled:
+		sound().play_sfx([{"kind": "skill"}])
+	refresh_top()
+
+
+func _toggle_typing() -> void:
+	if not sound():
+		return
+	sound().set_typing(not sound().typing_on)
+	if sound().typing_on:
+		sound().type_click(false, 1.0, 0.0)
+	refresh_top()
+
+
+func refresh_here() -> void:
+	Kit.clear(_here)
+	GameHere.build(self, _here)
+	_fit_here.call_deferred()
+
+
+func refresh_side() -> void:
+	Kit.clear(_tabs)
+	for t in [["crawler", "Crawler"], ["inventar", "Inventar"], ["handwerk", "Handwerk"], ["skills", "Skills"], ["erfolge", "Erfolge"]]:
+		var id: String = t[0]
+		var b := Kit.button(_tabs, t[1], func():
+			tab = id
+			refresh_side(), "TabActive" if tab == id else "TabButton")
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if tab == id:
+			# Goldene Unterkante wie in der Web-Version
+			b.draw.connect(func(): b.draw_rect(Rect2(1, b.size.y - 2, b.size.x - 2, 2), UiTheme.ACCENT))
+	Kit.clear(_tab_content)
+	match tab:
+		"crawler": GameTabs.crawler_tab(self, _tab_content)
+		"inventar": GameTabs.inventory_tab(self, _tab_content)
+		"handwerk": GameTabs.craft_tab(self, _tab_content)
+		"skills": GameTabs.skills_tab(self, _tab_content)
+		"erfolge": GameTabs.achievements_tab(self, _tab_content)
+
+
+func refresh_actions() -> void:
+	var fighting := in_combat()
+	_actionbar.theme_type_variation = "CombatBar" if fighting else "ActionBar"
+	Kit.clear(_actionbar)
+	if fighting:
+		GameCombat.render_combat(self, _actionbar)
+	else:
+		GameCombat.render_actions(self, _actionbar)
+
+
+## Gegner, die gerade zu sehen sind – nach Entfernung sortiert.
+func combat_targets() -> Array:
+	var list := visible_monsters()
+	return J.sort(list, func(a, b): return Fov.chebyshev(a.pos, s.player.pos) - Fov.chebyshev(b.pos, s.player.pos))
+
+
+## Angriff (oder Zauber) auf ein Ziel aus der Kampfsequenz.
+func strike(uid: String) -> void:
+	target_uid = uid
+	if pending_spell != null:
+		var sp: String = pending_spell
+		pending_spell = null
+		var m = J.find(s.monsters, func(x): return x.uid == uid)
+		act(func(): return Game.cast(s, sp, {"targetUid": uid, "pos": m.pos if m != null else null, "mana": missile_mana}))
+		return
+	attack_monster(uid)
+
+
+const LOG_COLORS := {
+	"kampf": "#e8e0d4", "info": "#b8ad9e", "system": "#f4c24f", "gefahr": "#ff5d5d", "loot": "#ffd27a",
+	"achievement": "#d58cff", "dialog": "#6cc4ff",
+}
+
+
+## Neue Log-Zeilen werden angehängt und Zeichen für Zeichen getippt.
+func refresh_log() -> void:
+	var entries: Array = s.log
+	var first := _last_log_id < 0
+	var fresh: Array = []
+	if first:
+		fresh = entries.slice(maxi(0, entries.size() - 120))
+	else:
+		fresh = entries.filter(func(l): return int(J.nn(l, "id", 0)) > _last_log_id)
+	if fresh.is_empty() and not first:
+		return
+	for l in fresh:
+		var color: String = LOG_COLORS.get(l.kind, "#e9e5dc")
+		var body := Kit.esc(l.text)
+		if l.kind == "dialog":
+			body = "[i]%s[/i]" % body
+		var bb := "[font_size=11][color=#555b69][b]%s[/b][/color][/font_size]  [color=%s]%s[/color]" % [ViewHelpers.format_time(l.turn), color, body]
+		var rt := Kit.text(_log, "", 13, null, 3)
+		if first:
+			rt.text = bb
+		else:
+			rt.visible = false
+			_typer.push(rt, bb)
+	var last = entries.back() if not entries.is_empty() else null
+	if last != null and last.get("id") != null:
+		_last_log_id = int(last.id)
+	elif first:
+		_last_log_id = 0
+	while _log.get_child_count() > 150:
+		var old := _log.get_child(0)
+		_log.remove_child(old)
+		old.queue_free()
+	_scroll_log()
+
+
+func _scroll_log() -> void:
+	await get_tree().process_frame
+	if is_instance_valid(_log_scroll):
+		_log_scroll.scroll_vertical = int(_log_scroll.get_v_scroll_bar().max_value)

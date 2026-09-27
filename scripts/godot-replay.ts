@@ -273,3 +273,56 @@ export function replays() {
     makeReplay(8, ANSWERS[2], 400, 100),
   ];
 }
+
+/**
+ * Vergleichswerte für die Oberflächen-Hilfen: spielt eine aufgezeichnete
+ * Partie nach und hält alle `every` Aktionen fest, was die Anzeige berechnet.
+ */
+export async function uiChecks(r: ReturnType<typeof makeReplay>, every: number) {
+  const { nextGoals } = await import('../src/data/achievement_families');
+  const { formatTime } = await import('../src/ui/dom');
+  const { hash, roomMaterial } = await import('../src/ui/render');
+  const { describeBonuses } = await import('../src/engine/bonuses');
+  const { describeCrawler, talkableCrawlers } = await import('../src/engine/crawlers');
+  const { disarmableTraps } = await import('../src/engine/traps');
+  const { sponsorStates } = await import('../src/engine/sponsors');
+  const { petFormName } = await import('../src/engine/petevo');
+  const { skillEffectText } = await import('../src/engine/skills');
+  const { SKILL_BY_ID } = await import('../src/data/skills');
+  const s = G.newGame({ ...r.opts, meta: emptyMeta() });
+  const API = {
+    moveStep: G.moveStep, attack: G.attack, wait: G.wait, pickup: G.pickup, useItem: G.useItem, equip: G.equip,
+    openBox: G.openBox, sleep: G.sleep, descend: G.descend, cast: G.cast, defend: G.defend, closeDoor: G.closeDoor,
+    chooseRaceAndClass, useAbility, talkCrawler: G.talkCrawler, inviteCrawler: G.inviteCrawler, toilet: G.toilet,
+    buyOffer: G.buyOffer, allocateStat: G.allocateStat, craftItem: G.craftItem, answerTalkShow: G.answerTalkShow,
+    testHeal: (st: GameState) => {
+      st.player.hp = maxHp(st);
+      return { ok: true };
+    },
+  } as Record<string, (s: GameState, ...a: never[]) => { ok: boolean }>;
+  const out: unknown[] = [];
+  const record = (step: number) => {
+    const items = [...s.player.inventory, ...Object.values(s.player.equipment).filter(Boolean)];
+    out.push({
+      step,
+      time: formatTime(s.turn),
+      goals: nextGoals(s),
+      materials: s.map.rooms.map((room) => roomMaterial(room)),
+      bonuses: items.map((it) => describeBonuses(it!.bonuses)),
+      crawlers: (s.crawlers ?? []).map((c) => describeCrawler(c)),
+      talkable: talkableCrawlers(s).map((c) => c.uid),
+      traps: disarmableTraps(s).map((t) => t.uid),
+      sponsors: sponsorStates(s).map((x) => `${x.id}:${x.status}`),
+      pet: s.player.pet ? petFormName(s.player.pet) : null,
+      skills: s.player.skills.map((k) => [skillEffectText(SKILL_BY_ID[k.id], k.level), skillEffectText(SKILL_BY_ID[k.id], k.level + 1)]),
+    });
+  };
+  record(0);
+  r.actions.forEach((a, i) => {
+    API[a.a](s, ...(a.args as never[]));
+    if ((i + 1) % every === 0 || i === r.actions.length - 1) record(i + 1);
+  });
+  const hashes: number[] = [];
+  for (let y = -3; y < 60; y += 7) for (let x = -2; x < 90; x += 11) for (const salt of [0, 3, 5, 6, 41, 50, 99]) hashes.push(hash(x, y, salt));
+  return { seed: r.seed, every, checks: out, hashes, times: [0, 1, 19, 20, 479, 480, 481, 2399, 12345].map((t) => formatTime(t)) };
+}

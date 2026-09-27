@@ -70,6 +70,8 @@ async function writeFixtures() {
   const RP = await server.ssrLoadModule('/scripts/godot-replay.ts');
   const reps = RP.replays();
   writeFileSync(join(FIX, 'replays.json'), JSON.stringify(reps) + '\n');
+  const ui = await RP.uiChecks(reps.find((r) => r.seed === 5), 250);
+  writeFileSync(join(FIX, 'ui.json'), JSON.stringify(ui) + '\n');
   console.log(`Replays: ${reps.map((r) => `Seed ${r.seed}: ${r.actions.length} Aktionen`).join(', ')}`);
 }
 

@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "build:artifact": "vite build && node scripts/build-artifact.mjs",
     "export:godot": "node scripts/export-godot-data.mjs",
-    "test:godot": "${GODOT:-godot} --headless --path godot --import >/dev/null 2>&1; ${GODOT:-godot} --headless --path godot -s res://tests/run_tests.gd"
+    "test:godot": "${GODOT:-godot} --headless --path godot --import >/dev/null 2>&1; node scripts/run-godot-tests.mjs"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
