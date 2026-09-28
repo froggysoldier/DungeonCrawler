@@ -1111,6 +1111,12 @@ func refresh_log() -> void:
 
 
 func _scroll_log() -> void:
-	await get_tree().process_frame
+	# Erst im nächsten Bild steht die neue Höhe fest. Die Verbindung löst sich
+	# mit der Spielansicht, falls diese vorher verschwindet.
+	if not get_tree().process_frame.is_connected(_scroll_log_now):
+		get_tree().process_frame.connect(_scroll_log_now, CONNECT_ONE_SHOT)
+
+
+func _scroll_log_now() -> void:
 	if is_instance_valid(_log_scroll):
 		_log_scroll.scroll_vertical = int(_log_scroll.get_v_scroll_bar().max_value)
