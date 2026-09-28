@@ -1,6 +1,6 @@
 class_name Typing
 extends Node
-## Schreibmaschinen-Effekt (Port von src/ui/typewriter.ts): Text erscheint
+## Schreibmaschinen-Effekt: Text erscheint
 ## Zeichen für Zeichen mit weichem Tastenklicken und blinkender Schreibmarke.
 ## finish() zeigt sofort den ganzen Text.
 

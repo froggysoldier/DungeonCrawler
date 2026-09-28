@@ -1,5 +1,5 @@
 extends RefCounted
-## Safe Rooms, Bodenfunde und Boss-Kammern (Port von tests/saferooms.test.ts).
+## Safe Rooms, Bodenfunde und Boss-Kammern.
 
 
 func _floors(seed: int) -> Array:

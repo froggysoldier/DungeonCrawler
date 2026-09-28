@@ -1,6 +1,6 @@
 class_name GameCombat
 extends RefCounted
-## Aktionsleiste und Kampfsequenz (Port aus gameview.ts): 1. womit, 2. wie,
+## Aktionsleiste und Kampfsequenz: 1. womit, 2. wie,
 ## 3. wohin, 4. wen. Jede Wahl zeigt, was sie kostet und bewirkt; das Ziel
 ## zeigt die Trefferchance für genau diese Kombination.
 

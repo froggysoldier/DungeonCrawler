@@ -1,6 +1,6 @@
 class_name Fov
 extends RefCounted
-## Sichtfeld und Sichtlinie (Port von src/engine/fov.ts).
+## Sichtfeld und Sichtlinie.
 
 
 ## Sichtfeld per Strahlenwurf. Gibt die sichtbaren Kachel-Indizes als Menge zurück.

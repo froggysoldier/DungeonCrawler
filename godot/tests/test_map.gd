@@ -1,11 +1,11 @@
 extends RefCounted
-## Sichtfeld und Wegfindung liefern auf echten Etagen dasselbe wie TypeScript.
+## Sichtfeld und Wegfindung liefern auf echten Etagen dasselbe wie aufgezeichnet.
 
 func _maps() -> Array:
 	return J.load_json("res://tests/fixtures/maps.json")
 
 
-func test_fov_matches_typescript(t) -> void:
+func test_fov_matches_recording(t) -> void:
 	for f in _maps():
 		var m: Dictionary = f
 		var vis := Fov.compute(m, f.from, 7).keys()
@@ -13,11 +13,11 @@ func test_fov_matches_typescript(t) -> void:
 		t.eq(vis, f.fov.map(func(x): return int(x)), "Seed %d: Sichtfeld" % f.seed)
 
 
-func test_path_matches_typescript(t) -> void:
+func test_path_matches_recording(t) -> void:
 	for f in _maps():
 		var m: Dictionary = f
 		var path = Pathfinding.find_path(m, f.from, f.to, Callable(), 20000, true)
-		t.eq(path, f.path, "Seed %d: gleicher Weg wie TypeScript" % f.seed)
+		t.eq(path, f.path, "Seed %d: gleicher Weg wie aufgezeichnet" % f.seed)
 
 
 func test_line_of_sight(t) -> void:

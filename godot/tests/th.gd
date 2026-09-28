@@ -1,6 +1,6 @@
 class_name TH
 extends RefCounted
-## Hilfen für die Spiellogik-Tests (Port der Hilfsfunktionen aus den Vitest-Dateien).
+## Hilfen für die Spiellogik-Tests.
 
 
 static func make(seed: int = 1234, answers: Variant = [0, 0, 0, 0, 0], meta: Variant = null) -> Dictionary:

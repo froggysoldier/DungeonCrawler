@@ -1,6 +1,6 @@
 class_name R
 extends RefCounted
-## Zufall über den Spielstand (Port von src/engine/rng.ts): Der Zustand liegt
+## Zufall über den Spielstand: Der Zustand liegt
 ## in s.rng und wird mit dem Spielstand gespeichert.
 
 

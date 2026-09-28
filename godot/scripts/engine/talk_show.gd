@@ -1,6 +1,6 @@
 class_name TalkShow
 extends RefCounted
-## Rückblick und Talkshow beim Abstieg (Port von src/engine/talkshow.ts).
+## Rückblick und Talkshow beim Abstieg.
 
 const COUNTER_KEYS := ["kills", "steps", "itemsPicked", "boxesOpened", "missStreak", "hitTakenStreak", "throws", "bossKills", "damageDealt", "damageTaken", "goldEarned", "goldStolen", "poisonDamage", "mealsEaten", "potionsDrunk", "sleeps", "crits", "knockdowns", "eliteKills", "trapsFound", "trapsTriggered", "trapsDisarmed", "trapKills", "crafted"]
 

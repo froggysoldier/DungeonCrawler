@@ -1,5 +1,5 @@
 extends RefCounted
-## Sponsoren (Port von tests/sponsors.test.ts).
+## Sponsoren.
 
 
 func _stomp_kill(s: Dictionary) -> void:

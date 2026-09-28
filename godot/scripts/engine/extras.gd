@@ -1,7 +1,6 @@
 class_name Extras
 extends RefCounted
-## Pässe, Haustiere aus Eiern, Zähmen, besondere Gegenstände
-## (Port von src/engine/extras.ts).
+## Pässe, Haustiere aus Eiern, Zähmen, besondere Gegenstände.
 
 const TATTOOS := {
 	"tattoo_kobold": {"facet": "z:kobold", "text": "Ein Kobold grinst jetzt von deinem Unterarm. Kobolde halten dich für einen der ihren."},

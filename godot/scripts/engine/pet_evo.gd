@@ -1,6 +1,6 @@
 class_name PetEvo
 extends RefCounted
-## Haustier-Entwicklung und Halsband (Port von src/engine/petevo.ts).
+## Haustier-Entwicklung und Halsband.
 
 
 static func _forms() -> Dictionary:

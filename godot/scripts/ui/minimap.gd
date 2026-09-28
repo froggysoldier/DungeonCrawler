@@ -1,7 +1,7 @@
 class_name Minimap
 extends Control
 ## Kleine Übersichtskarte aller bekannten Felder: Räume nach Art eingefärbt,
-## Treppe und Crawler hervorgehoben (Port von renderMinimap).
+## Treppe und Crawler hervorgehoben.
 
 const ROOM_COLORS := {"safe": "#c9973a", "guild": "#4f7fc9", "boss": "#b0413a", "arena": "#9a6a3a", "start": "#6b6f7a"}
 

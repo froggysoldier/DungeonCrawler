@@ -1,6 +1,6 @@
 class_name GameTabs
 extends RefCounted
-## Die Reiter der Seitenleiste (Port aus gameview.ts): Crawler, Inventar,
+## Die Reiter der Seitenleiste: Crawler, Inventar,
 ## Handwerk, Skills, Erfolge (mit Statistik) und die Gegenstandskarte.
 
 const EQUIP_ORDER := [

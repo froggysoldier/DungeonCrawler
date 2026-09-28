@@ -1,6 +1,6 @@
 class_name Db
 extends RefCounted
-## Alle Spielinhalte aus res://data/*.json (erzeugt aus src/data). Wird beim
+## Alle Spielinhalte aus res://data/*.json. Wird beim
 ## ersten Zugriff geladen. Zahlen sind normalisiert (ganze Zahlen als int).
 
 const DATA_DIR := "res://data"

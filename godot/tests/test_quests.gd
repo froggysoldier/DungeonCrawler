@@ -1,5 +1,5 @@
 extends RefCounted
-## Aufträge (Port von tests/quests.test.ts).
+## Aufträge.
 
 
 func _setup() -> Dictionary:

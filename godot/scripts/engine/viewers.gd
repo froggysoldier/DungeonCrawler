@@ -1,6 +1,6 @@
 class_name Viewers
 extends RefCounted
-## Zuschauer-System ab Etage 2 (Port von src/engine/viewers.ts).
+## Zuschauer-System ab Etage 2.
 
 
 static func active(s: Dictionary) -> bool:

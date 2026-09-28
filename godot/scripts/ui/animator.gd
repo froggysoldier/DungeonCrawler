@@ -1,6 +1,6 @@
 class_name Animator
 extends RefCounted
-## Weiche Bewegung und Effekte (Port von src/ui/animator.ts): Figuren gleiten
+## Weiche Bewegung und Effekte: Figuren gleiten
 ## von Feld zu Feld, die Kamera folgt sanft, Geschosse fliegen sichtbar,
 ## Schadenszahlen steigen auf. Die Spiellogik bleibt rundenbasiert.
 

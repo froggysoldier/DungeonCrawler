@@ -1,6 +1,6 @@
 class_name Sponsors
 extends RefCounted
-## Sponsoren (Port von src/engine/sponsors.ts).
+## Sponsoren.
 
 const TIERS := ["silber", "silber", "gold", "gold", "platin"]
 

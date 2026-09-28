@@ -1,5 +1,5 @@
 extends RefCounted
-## Gegnerverhalten (Port von tests/ai.test.ts).
+## Gegnerverhalten.
 
 
 func _arena(s: Dictionary) -> Callable:

@@ -1,6 +1,6 @@
 extends SceneTree
 ## Entwicklerwerkzeug: Ein einfacher Bot spielt 30 Partien bis Etage 3 und
-## gibt eine Tabelle aus (Port von tests/balance.sim.test.ts).
+## gibt eine Tabelle aus.
 ##   godot --headless --path godot -s res://tools/balance_sim.gd [-- anzahl]
 
 

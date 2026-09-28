@@ -1,8 +1,8 @@
 class_name Pathfinding
 extends RefCounted
-## A*-Suche mit 8 Richtungen (Port von src/engine/path.ts). Reihenfolge der
-## Richtungen und Auswahl aus der offenen Liste entsprechen der TypeScript-
-## Version, damit gleiche Wege entstehen.
+## A*-Suche mit 8 Richtungen. Reihenfolge der Richtungen und Auswahl aus
+## der offenen Liste sind festgelegt, damit bei gleichem Seed gleiche Wege
+## entstehen.
 
 const DIRS := [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
 

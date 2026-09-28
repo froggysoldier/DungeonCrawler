@@ -1,6 +1,6 @@
 class_name Modals
 extends Control
-## Dialoge und Einblendungen (Port von src/ui/modal.ts). Immer nur ein Dialog
+## Dialoge und Einblendungen. Immer nur ein Dialog
 ## ist offen; weitere warten in einer Schlange. Jeder Aufruf liefert einen
 ## Job, auf dessen Signal `closed(result)` man warten kann.
 
@@ -167,7 +167,7 @@ static func foot(parent: Node) -> Array:
 
 
 static func _bb(text: String) -> String:
-	# *Betonung* wie in der Web-Version kursiv
+	# *Betonung* kursiv
 	var re := RegEx.new()
 	re.compile("\\*(.+?)\\*")
 	return re.sub(Kit.esc(text), "[i]$1[/i]", true)

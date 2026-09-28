@@ -1,6 +1,6 @@
 class_name Death
 extends RefCounted
-## Tod – außer die Zweite-Chance-Klausel greift (Port von src/engine/death.ts).
+## Tod – außer die Zweite-Chance-Klausel greift.
 
 
 static func handle_lethal(s: Dictionary, cause: String) -> void:

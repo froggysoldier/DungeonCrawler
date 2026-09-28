@@ -1,6 +1,6 @@
 class_name Stats
 extends RefCounted
-## Statistik: Der Dungeon zählt alles mit (Port von src/engine/stats.ts).
+## Statistik: Der Dungeon zählt alles mit.
 
 
 static func stat(s: Dictionary, key: String) -> float:

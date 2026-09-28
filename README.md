@@ -1,37 +1,26 @@
 # Der Große Abstieg
 
-Ein textbasierter, rundenbasierter Dungeon-Crawler im Browser – inspiriert von
-*Dungeon Crawler Carl*. Du bewegst dich als leuchtender Punkt über eine
-klickbare Karte, kämpfst mit Fäusten, Füßen, Knien und Steinen, und eine
-zynische Systemstimme kommentiert alles.
+Ein rundenbasierter Dungeon-Crawler, gebaut mit Godot 4.7.2 – inspiriert von
+*Dungeon Crawler Carl*. Du bewegst dich über eine klickbare Karte, kämpfst mit
+Fäusten, Füßen, Knien und Steinen, und eine zynische Systemstimme kommentiert
+alles.
 
 ## Starten
 
-```bash
-npm install
-npm run dev      # Entwicklungsserver, dann http://localhost:5173 öffnen
-```
-
-Weitere Befehle:
+`godot/project.godot` im Godot-Editor 4.7.2 öffnen und F5 drücken.
 
 ```bash
-npm test         # Engine-Tests
-npm run build    # Typecheck + Produktions-Build nach dist/
-npm run build:artifact   # eine einzige HTML-Datei für den Web-Link
-SIM=1 npx vitest run tests/balance.sim.test.ts --silent=false   # Balance-Simulation (30 Bot-Runs)
+./test.sh                                                   # alle Tests (GODOT=/pfad/zu/godot, falls nicht im PATH)
+godot --headless --path godot -s res://tools/balance_sim.gd # Balance-Simulation (30 Bot-Partien)
+godot --headless --path godot -s res://tools/record_fixtures.gd  # Replay-Aufnahmen erneuern
 ```
 
-### Godot-Version
+Inhalte (Monster, Gegenstände, Skills, Achievements …) stehen in
+`godot/data/*.json`. Aufbau, Werkzeuge und Export (Web, Windows, Linux) stehen
+in [`docs/GODOT_PORT.md`](docs/GODOT_PORT.md).
 
-Das Spiel gibt es auch als Godot-4.7.2-Projekt in `godot/`: `godot/project.godot`
-im Editor öffnen und starten. Es rechnet bitgenau wie die Web-Version und sieht
-genauso aus. Details, Tests und Export stehen in
-[`docs/GODOT_PORT.md`](docs/GODOT_PORT.md).
-
-```bash
-npm run export:godot   # Inhalte aus src/data nach godot/data
-npm run test:godot     # Godot-Tests (GODOT=/pfad/zu/godot, falls nicht im PATH)
-```
+Die frühere Web-Version (TypeScript in `src/`) ist eingefroren und wird nicht
+mehr weiterentwickelt.
 
 ## Steuerung
 

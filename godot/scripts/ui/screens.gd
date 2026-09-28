@@ -1,6 +1,6 @@
 class_name Screens
 extends RefCounted
-## Titel, Interview und Endbildschirm (Port von src/ui/screens.ts).
+## Titel, Interview und Endbildschirm.
 
 
 ## Bildschirm mit zentrierter Karte; gibt den Inhalt der Karte zurück.

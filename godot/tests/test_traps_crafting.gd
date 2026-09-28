@@ -1,5 +1,5 @@
 extends RefCounted
-## Fallen und Handwerk (Port von tests/traps_crafting.test.ts).
+## Fallen und Handwerk.
 
 
 func _make(seed: int = 2100) -> Dictionary:

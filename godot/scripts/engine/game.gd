@@ -1,7 +1,7 @@
 class_name Game
 extends RefCounted
-## Spielablauf: Neues Spiel, Züge, Aktionen, Etagenwechsel
-## (Port von src/engine/game.ts). Aktionen geben {ok, message?} zurück.
+## Spielablauf: Neues Spiel, Züge, Aktionen, Etagenwechsel.
+## Aktionen geben {ok, message?} zurück.
 
 const SAVE_VERSION := 1
 const SELECT_FIRST := "Wähle zuerst deine Rasse und Klasse."

@@ -1,6 +1,6 @@
 class_name Tiles
 extends Node
-## Prozedurale Kacheltexturen der Karte (Port aus src/ui/render.ts): Böden je
+## Prozedurale Kacheltexturen der Karte: Böden je
 ## Raumart, Mauerwerk je Etage, weiche Schatten an Wänden und Türen.
 ## Alles wird einmal in einen Offscreen-Viewport gezeichnet, ausgelesen und als
 ## Textur mit Mipmaps zwischengespeichert. Eine Kachel ist 32 Design-Einheiten groß.
@@ -46,7 +46,7 @@ static func _i32(v: int) -> int:
 	return v - 0x100000000 if v >= 0x80000000 else v
 
 
-## Deterministischer Zufall je Kachel, bitgleich zur Web-Version.
+## Deterministischer Zufall je Kachel: jede Stelle sieht bei jedem Zeichnen gleich aus.
 static func hash(x: int, y: int, salt: int = 0) -> float:
 	var h := _i32(x * 374761393 + y * 668265263 + salt * 2147483647)
 	h = _i32(h ^ ((h & 0xFFFFFFFF) >> 13))

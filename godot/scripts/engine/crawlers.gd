@@ -1,6 +1,6 @@
 class_name Crawlers
 extends RefCounted
-## Andere Crawler, Party und Bevölkerung (Port von src/engine/crawlers.ts).
+## Andere Crawler, Party und Bevölkerung.
 
 const DIRS := [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
 

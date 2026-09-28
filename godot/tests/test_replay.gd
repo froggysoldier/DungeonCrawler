@@ -1,6 +1,8 @@
 extends RefCounted
-## Dieselben Partien wie in der TypeScript-Version nachspielen: Start, jeder
-## Zug (Kurzzustand) und Zwischenstände müssen exakt übereinstimmen.
+## Aufgezeichnete Partien nachspielen: Start, jeder Zug (Kurzzustand) und
+## Zwischenstände müssen exakt übereinstimmen. Weicht etwas ab, hat sich das
+## Spielverhalten geändert. War das Absicht (neue Inhalte, neue Regeln), die
+## Aufnahmen mit tools/record_fixtures.gd erneuern.
 
 
 func _replays() -> Array:

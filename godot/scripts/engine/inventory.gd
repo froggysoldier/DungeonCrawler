@@ -1,6 +1,6 @@
 class_name Inventory
 extends RefCounted
-## Inventar (Port von src/engine/inventory.ts).
+## Inventar.
 
 
 static func add_to_inventory(s: Dictionary, item: Dictionary) -> void:

@@ -1,6 +1,6 @@
 class_name Fx
 extends RefCounted
-## Sichtbare Effekte und Klänge für die Oberfläche (Port von src/engine/fx.ts).
+## Sichtbare Effekte und Klänge für die Oberfläche.
 
 const COLORS := {
 	"schaden": "#ffd0a0",

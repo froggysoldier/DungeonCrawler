@@ -1,7 +1,7 @@
 class_name Kit
 extends RefCounted
-## Bausteine für die Oberfläche: das, was in der Web-Version kleine HTML-Stücke
-## waren (Abschnitt, Karte, Zeile, Knopf, Balken), als Godot-Controls.
+## Bausteine für die Oberfläche (Abschnitt, Karte, Zeile, Knopf, Balken)
+## als Godot-Controls.
 ## Text mit Farben und Hervorhebungen läuft über BBCode in RichTextLabel.
 
 
@@ -326,7 +326,7 @@ static func progress(parent: Node, frac: float, tip: String = "") -> Bar:
 	return b
 
 
-## Gesperrter Bereich (gestrichelter Kasten in der Web-Version).
+## Gesperrter Bereich (gestrichelter Kasten).
 static func locked(parent: Node, bb: String) -> RichTextLabel:
 	var v := card(parent, "Locked")
 	var rt := text(v, "[center]%s[/center]" % bb, 14, "muted")

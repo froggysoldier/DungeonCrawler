@@ -1,6 +1,6 @@
 class_name GameView
 extends Control
-## Die Spielansicht (Port von src/ui/gameview.ts): Kopfzeile, Karte mit
+## Die Spielansicht: Kopfzeile, Karte mit
 ## Übersichtskarte und Tooltips, Seitenleiste mit Reitern, Aktionsleiste
 ## (im Kampf die Kampfsequenz) und das getippte Log.
 
@@ -1030,7 +1030,7 @@ func refresh_side() -> void:
 			refresh_side(), "TabActive" if tab == id else "TabButton")
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if tab == id:
-			# Goldene Unterkante wie in der Web-Version
+			# Goldene Unterkante
 			b.draw.connect(func(): b.draw_rect(Rect2(1, b.size.y - 2, b.size.x - 2, 2), UiTheme.ACCENT))
 	Kit.clear(_tab_content)
 	match tab:

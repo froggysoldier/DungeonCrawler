@@ -1,5 +1,5 @@
 extends RefCounted
-## Beobachter, Eigenschaften und Interview (Port von tests/observer.test.ts).
+## Beobachter, Eigenschaften und Interview.
 
 
 func _make(answers: Dictionary = {"beruf": 1}) -> Dictionary:

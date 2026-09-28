@@ -1,28 +1,8 @@
 extends RefCounted
-## Vergleichstest der Oberflächen-Hilfen gegen die TypeScript-Version:
-## Uhrzeit, nächste Achievement-Ziele, Bodenmaterial je Raum, Zufall je Kachel,
+## Anzeige-Helfer an festen Stellen einer aufgezeichneten Partie: Uhrzeit,
+## nächste Achievement-Ziele, Bodenmaterial je Raum, Zufall je Kachel,
 ## Bonus- und Crawler-Beschreibungen, nahe Fallen, Sponsoren, Haustier und
-## Skill-Texte – an festen Stellen einer aufgezeichneten Partie.
-
-
-func _record(s: Dictionary, step: int) -> Dictionary:
-	var items: Array = s.player.inventory.duplicate()
-	for slot in s.player.equipment:
-		if s.player.equipment[slot] != null:
-			items.append(s.player.equipment[slot])
-	return {
-		"step": step,
-		"time": ViewHelpers.format_time(s.turn),
-		"goals": ViewHelpers.next_goals(s),
-		"materials": s.map.rooms.map(func(r): return Tiles.room_material(r)),
-		"bonuses": items.map(func(it): return Bonuses.describe(it.get("bonuses"))),
-		"crawlers": J.arr(s, "crawlers").map(func(c): return Crawlers.describe(c)),
-		"talkable": Crawlers.talkable(s).map(func(c): return c.uid),
-		"traps": ViewHelpers.disarmable_traps(s).map(func(t): return t.uid),
-		"sponsors": Sponsors.states(s).map(func(x): return "%s:%s" % [x.id, x.status]),
-		"pet": PetEvo.form_name(s.player.pet) if s.player.get("pet") != null else null,
-		"skills": s.player.skills.map(func(k): return [Skills.effect_text(Db.skill(k.id), k.level), Skills.effect_text(Db.skill(k.id), k.level + 1)]),
-	}
+## Skill-Texte. Aufnahme mit tools/record_fixtures.gd.
 
 
 func test_ui_helpers_match(t) -> void:
@@ -37,7 +17,7 @@ func test_ui_helpers_match(t) -> void:
 	var compare := func(step: int) -> void:
 		var want: Dictionary = checks[ci.n]
 		t.eq(want.step, step, "Prüfpunkt")
-		var d := Parity.diff(_record(s, step), want)
+		var d := Parity.diff(ReplayBot.ui_record(s, step), want)
 		t.ok(d.is_empty(), "Schritt %d:\n    %s" % [step, "\n    ".join(d.slice(0, 12))])
 		ci.n += 1
 	compare.call(0)
@@ -61,7 +41,7 @@ func test_tile_hash_matches(t) -> void:
 	for i in got.size():
 		if absf(float(got[i]) - float(ui.hashes[i])) > 1e-12:
 			bad += 1
-	t.eq(bad, 0, "Zufall je Kachel wie im Browser")
+	t.eq(bad, 0, "Zufall je Kachel wie aufgezeichnet")
 
 
 func test_format_time_matches(t) -> void:

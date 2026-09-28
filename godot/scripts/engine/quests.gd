@@ -1,6 +1,6 @@
 class_name Quests
 extends RefCounted
-## Aufträge (Port von src/engine/quests.ts).
+## Aufträge.
 
 const REWARD_BASE := {"jagd": 25, "finden": 30, "liefern": 20, "retten": 45, "boss": 80}
 

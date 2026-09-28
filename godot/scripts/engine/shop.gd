@@ -1,6 +1,6 @@
 class_name Shop
 extends RefCounted
-## Läden in Safe Rooms (Port von src/engine/shop.ts).
+## Läden in Safe Rooms.
 
 const KEEPERS := [
 	"Pimbo, ein Gnom mit Monokel", "Frau Krätzig, eine Echsendame mit Lesebrille", "Oskar, ein sehr kleiner Oger",

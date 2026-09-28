@@ -1,6 +1,6 @@
 class_name Ai
 extends RefCounted
-## Monster, Haustier und ihre Züge (Port von src/engine/ai.ts).
+## Monster, Haustier und ihre Züge.
 
 const DIRS := [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
 

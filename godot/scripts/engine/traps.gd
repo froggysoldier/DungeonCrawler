@@ -1,6 +1,6 @@
 class_name Traps
 extends RefCounted
-## Fallen (Port von src/engine/traps.ts).
+## Fallen.
 
 const TRAP_DEFS := {
 	"pfeilplatte": {"name": "Pfeil-Druckplatte", "hide": 0, "fiddly": 0, "minFloor": 1, "weight": 4},

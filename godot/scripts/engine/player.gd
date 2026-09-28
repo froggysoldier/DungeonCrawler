@@ -1,6 +1,6 @@
 class_name Player
 extends RefCounted
-## Werte des Crawlers (Port von src/engine/player.ts).
+## Werte des Crawlers.
 
 const CURSE_EFFECTS := {
 	"Kleingedrucktes": {"maxHp": -5, "stats": {"cha": -1}},

@@ -1,7 +1,7 @@
 class_name Observer
 extends RefCounted
 ## Der Beobachter: zählt Merkmals-Kombinationen und leitet daraus dynamische
-## Achievements und Skills ab (Port von src/engine/observer.ts).
+## Achievements und Skills ab.
 
 const ABILITY_FACET := {
 	"gift": "giftig", "explodiert": "explosiv", "diebisch": "diebisch", "rufer": "rufer",

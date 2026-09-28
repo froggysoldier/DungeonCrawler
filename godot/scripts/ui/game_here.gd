@@ -1,6 +1,6 @@
 class_name GameHere
 extends RefCounted
-## Der Bereich „Hier“ oben in der Seitenleiste (Port von refreshHere):
+## Der Bereich „Hier“ oben in der Seitenleiste:
 ## Gegenstände am Boden, Treppe, Türen, andere Crawler, Fallen und alles,
 ## was ein Safe Room bietet (Automat, Wirt, Bett, Toilette, Laden, Boxen).
 

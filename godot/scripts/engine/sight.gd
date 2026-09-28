@@ -1,6 +1,6 @@
 class_name Sight
 extends RefCounted
-## Sieht der Crawler diese Stelle gerade? (Port von src/engine/sight.ts)
+## Sieht der Crawler diese Stelle gerade?
 
 
 static func player_sees(s: Dictionary, p: Dictionary) -> bool:

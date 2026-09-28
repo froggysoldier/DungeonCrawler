@@ -1,5 +1,5 @@
 extends RefCounted
-## Laden, Pässe, Haustiere, Rubbellose (Port von tests/shop_pets.test.ts).
+## Laden, Pässe, Haustiere, Rubbellose.
 
 
 func _make(seed: int = 1600) -> Dictionary:

@@ -1,5 +1,5 @@
 extends RefCounted
-## Etagen 2 und 3 (Port von tests/floors.test.ts).
+## Etagen 2 und 3.
 
 
 func _to_floor(s: Dictionary, floor: int) -> void:

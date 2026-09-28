@@ -1,7 +1,7 @@
 class_name Meta
 extends RefCounted
-## Meta-Fortschritt und Speichern (Port von src/engine/meta.ts).
-## Gespeichert wird in user:// als JSON im selben Format wie die Web-Version.
+## Meta-Fortschritt und Speichern.
+## Gespeichert wird in user:// als JSON.
 
 const META_PATH := "user://meta.json"
 const RUN_PATH := "user://run.json"

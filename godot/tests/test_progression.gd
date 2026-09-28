@@ -1,5 +1,5 @@
 extends RefCounted
-## Stufenverlauf (Port von tests/progression.test.ts).
+## Stufenverlauf.
 
 const THOROUGH := {"mobs": 1.0, "respawns": 0.8, "hoodBosses": 3, "borough": true}
 const CASUAL := {"mobs": 0.6, "respawns": 0.3, "hoodBosses": 1, "borough": false}

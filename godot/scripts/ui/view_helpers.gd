@@ -1,6 +1,6 @@
 class_name ViewHelpers
 extends RefCounted
-## Kleine Hilfen, die nur die Oberfläche braucht (Port aus der Web-Version):
+## Kleine Hilfen, die nur die Oberfläche braucht:
 ## Spielzeit als Uhrzeit, nahe Fallen, nächste Achievement-Ziele.
 
 const BEAST_STAGES := [1, 10, 30]

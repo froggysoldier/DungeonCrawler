@@ -1,5 +1,5 @@
 extends RefCounted
-## Haustier-Entwicklung (Port von tests/petevo.test.ts).
+## Haustier-Entwicklung.
 
 
 func _make() -> Dictionary:

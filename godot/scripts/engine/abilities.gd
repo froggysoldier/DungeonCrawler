@@ -1,6 +1,6 @@
 class_name Abilities
 extends RefCounted
-## Monster-Fähigkeiten und Sondereigenschaften (Port von src/engine/abilities.ts).
+## Monster-Fähigkeiten und Sondereigenschaften.
 
 const ABILITY_NAMES := {
 	"gift": "giftig",

@@ -1,6 +1,6 @@
 class_name MapView
 extends Control
-## Die Karte (Port von src/ui/render.ts). Böden, Wände und Türen kommen als
+## Die Karte. Böden, Wände und Türen kommen als
 ## zwischengespeicherte Texturen aus Tiles; Figuren, Gegenstände, Fallen,
 ## Nebel, Licht und Effekte werden jedes Bild neu gezeichnet.
 ## Gezeichnet wird in „Design-Einheiten“: eine Kachel ist 32 Einheiten groß.

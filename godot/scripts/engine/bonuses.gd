@@ -1,6 +1,6 @@
 class_name Bonuses
 extends RefCounted
-## Bonuswerte addieren und beschreiben (Port von src/engine/bonuses.ts).
+## Bonuswerte addieren und beschreiben.
 
 const SCALAR := ["maxHp", "maxMp", "maxAusdauer", "ruestung", "ausweichen", "treffer", "krit", "hpRegen", "xpBonus", "dornen", "lichtradius"]
 

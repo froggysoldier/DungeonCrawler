@@ -1,6 +1,6 @@
 class_name UiTheme
 extends RefCounted
-## Das Designsystem der Web-Version als Godot-Theme: Farben, Schrift,
+## Das Designsystem als Godot-Theme: Farben, Schrift,
 ## Knöpfe, Karten, Balken. Varianten werden über theme_type_variation gewählt.
 
 const BG := Color("#0b0c10")
@@ -101,7 +101,7 @@ static func get_theme() -> Theme:
 	pn.shadow_offset = Vector2(0, 3)
 	var ph := box(Color("#f7c24a"), Color("#ffe08c"), 8, 1, pad)
 	var pp := box(Color("#e0a42a"), Color("#f7c65a"), 8, 1, Vector4(pad.x, pad.y + 1, pad.z, pad.w - 1))
-	# Deaktiviert grau wie in der Web-Version (nicht halb durchsichtiges Gold)
+	# Deaktiviert grau (nicht halb durchsichtiges Gold)
 	var pd := box(Color("#1a1d25"), LINE, 8, 1, pad)
 	_button(t, "PrimaryButton", pn, ph, pp, pd, Color("#1c1405"), Color("#1c1405"), 14, 700)
 	# Ausgewählt (Aktionsleiste, Kampf, Wahl)

@@ -1,5 +1,5 @@
 extends RefCounted
-## Klassen und Rassen (Port von tests/classes.test.ts).
+## Klassen und Rassen.
 
 
 func test_viele_klassen_und_rassen(t) -> void:

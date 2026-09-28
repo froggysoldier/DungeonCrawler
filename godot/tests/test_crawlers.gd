@@ -1,5 +1,5 @@
 extends RefCounted
-## Andere Crawler (Port von tests/crawlers.test.ts).
+## Andere Crawler.
 
 
 func _tutorial(s: Dictionary) -> void:

@@ -1,6 +1,6 @@
 class_name Monsters
 extends RefCounted
-## Monster erzeugen (Port von src/engine/monsters.ts).
+## Monster erzeugen.
 
 
 static func _mid(s: Dictionary) -> String:

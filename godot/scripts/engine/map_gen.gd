@@ -1,6 +1,6 @@
 class_name MapGen
 extends RefCounted
-## Etagen erzeugen (Port von src/engine/mapgen.ts).
+## Etagen erzeugen.
 
 const MAP_W := 72
 const MAP_H := 52

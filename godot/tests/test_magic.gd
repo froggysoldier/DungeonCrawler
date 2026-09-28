@@ -1,5 +1,5 @@
 extends RefCounted
-## Magie, Tränke, Toiletten-Regel (Port von tests/magic.test.ts).
+## Magie, Tränke, Toiletten-Regel.
 
 
 func _make() -> Dictionary:

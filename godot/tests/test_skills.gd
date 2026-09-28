@@ -1,5 +1,5 @@
 extends RefCounted
-## Skills (Port von tests/skills.test.ts).
+## Skills.
 
 
 func _make(seed: int = 7300) -> Dictionary:

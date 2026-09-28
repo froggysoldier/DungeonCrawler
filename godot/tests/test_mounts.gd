@@ -1,5 +1,5 @@
 extends RefCounted
-## Reittiere und Fahrzeuge (Port von tests/mounts.test.ts).
+## Reittiere und Fahrzeuge.
 
 
 func _make() -> Dictionary:

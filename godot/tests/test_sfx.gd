@@ -1,5 +1,5 @@
 extends RefCounted
-## Klänge der Engine (Port von tests/sfx.test.ts).
+## Klänge der Engine.
 
 
 func test_klaenge_werden_angemeldet(t) -> void:

@@ -1,7 +1,6 @@
 class_name Conditions
 extends RefCounted
-## Zustände im Kampf: Blutung, Brennen, Gift, Furcht, Blindheit
-## (Port von src/engine/conditions.ts).
+## Zustände im Kampf: Blutung, Brennen, Gift, Furcht, Blindheit.
 
 const CONDITIONS := {
 	"blutung": {"name": "Blutung", "state": "blutet", "color": "#e0434a", "text": "verliert jeden Zug Lebenspunkte", "buff": "Blutung", "death": "verblutet"},

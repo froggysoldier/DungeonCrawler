@@ -1,5 +1,5 @@
 extends RefCounted
-## Inhalte und Monster-Fähigkeiten (Port von tests/content.test.ts).
+## Inhalte und Monster-Fähigkeiten.
 
 
 func _make(seed: int = 500) -> Dictionary:

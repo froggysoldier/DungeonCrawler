@@ -1,6 +1,6 @@
 class_name Progression
 extends RefCounted
-## Erfahrung und Stufen (Port von src/engine/progression.ts).
+## Erfahrung und Stufen.
 
 const XP_BASE := 60
 const XP_EXPONENT := 1.75

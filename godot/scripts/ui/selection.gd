@@ -1,6 +1,6 @@
 class_name Selection
 extends RefCounted
-## Rassen- und Klassenwahl auf Etage 3 (Port von src/ui/selection.ts).
+## Rassen- und Klassenwahl auf Etage 3.
 
 
 static func _item_label(id: String) -> String:

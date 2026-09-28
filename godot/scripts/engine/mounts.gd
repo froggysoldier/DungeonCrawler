@@ -1,6 +1,6 @@
 class_name Mounts
 extends RefCounted
-## Reittiere und Fahrzeuge (Port von src/engine/mounts.ts).
+## Reittiere und Fahrzeuge.
 
 
 static func mount_def(s: Dictionary) -> Variant:

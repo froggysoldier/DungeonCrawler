@@ -1,8 +1,7 @@
 class_name Rules
 extends RefCounted
-## Regeln, die in src/data als Funktionen stehen (und deshalb nicht im
-## JSON-Export landen): Skill- und Zauberstufen, Verzauberungen, Tutorial,
-## Interview-Bedingungen.
+## Regeln, die sich nicht als JSON ausdrücken lassen: Skill- und
+## Zauberstufen, Verzauberungen, Tutorial, Interview-Bedingungen.
 
 # ================================================================ Skills und Zauber
 

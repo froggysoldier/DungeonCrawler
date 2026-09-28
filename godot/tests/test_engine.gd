@@ -1,5 +1,5 @@
 extends RefCounted
-## Grundlegende Spielabläufe (Port von tests/engine.test.ts).
+## Grundlegende Spielabläufe.
 
 
 func _reachable(s: Dictionary, from: Dictionary) -> Dictionary:

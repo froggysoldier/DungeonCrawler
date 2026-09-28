@@ -1,5 +1,5 @@
 extends RefCounted
-## Trefferzonen (Port von tests/combat_zones.test.ts).
+## Trefferzonen.
 
 
 func _duel(t, s: Dictionary, id: String = "ghul") -> Dictionary:

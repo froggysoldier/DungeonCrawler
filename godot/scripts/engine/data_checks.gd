@@ -1,8 +1,10 @@
 class_name DataChecks
 extends RefCounted
-## Bedingungen aus src/data, die dort als Funktionen stehen: Achievements,
+## Bedingungen, die sich nicht als JSON ausdrücken lassen: Achievements,
 ## Rassen- und Klassenvoraussetzungen, Klassenbewertung, Überwinden von
-## Ängsten, Talkshow-Fragen.
+## Ängsten, Talkshow-Fragen. Die Einträge in data/*.json verweisen per id
+## hierher: Wer ein neues Achievement (oder eine Klasse, Rasse …) anlegt,
+## trägt hier die Bedingung ein.
 
 const UNDEAD := ["ghul", "moorleiche", "knochenratte", "kellermeister", "ghulhund"]
 const FLYERS := ["fledermaus", "poltergeist", "irrlicht", "grey_drohne", "nachtmahr", "mottenmann", "taubenschwarm"]
@@ -152,7 +154,7 @@ static func _build() -> void:
 	if not _table.is_empty():
 		return
 	var K := ["kill"]
-	# ------------------------------------------------ achievements.ts
+	# ------------------------------------------------ data/achievements.json
 	_add("willkommen", ["start"], func(e, s): return true)
 	_add("katzenlady", ["start"], func(e, s): return s.player.pet != null and s.player.pet.species == "Katze")
 	_add("hundemensch", ["start"], func(e, s): return s.player.pet != null and s.player.pet.species == "Hund")
@@ -210,7 +212,7 @@ static func _build() -> void:
 	_add("fruehaufsteher", ["descend"], func(e, s): return s.turn - s.floorStartTurn <= 480)
 	_add("last_minute", ["descend"], func(e, s): return s.collapseAt - s.turn <= 20)
 	_add("absteiger", ["descend"], func(e, s): return true)
-	# ------------------------------------------------ achievements_more.ts
+	# ------------------------------------------------ data/achievements_more.json
 	_add("spinnen", K, func(e, s): return _kill_of(e, "kellerspinne") and _killed(s, ["kellerspinne"]) == 5)
 	_add("fledermaus", K, func(e, s): return FLYERS.has(e.monster.defId) and _killed(s, FLYERS) == 10)
 	_add("kroete_fern", K, func(e, s): return _kill_of(e, "blaehkroete") and _tech(e, "part") == "wurf")
@@ -288,7 +290,7 @@ static func _build() -> void:
 		return r != null and r.get("requirement") != null)
 	_add("faehigkeit", ["abilityUsed"], func(e, s): return true)
 	_add("showtime", ["abilityUsed"], func(e, s): return e.ability == "showtime")
-	# ------------------------------------------------ achievements_social.ts
+	# ------------------------------------------------ data/achievements_social.json
 	_add("adlerauge", ["trapDetected"], func(e, s): return true)
 	_add("reingetreten", ["trapTriggered"], func(e, s): return e.onPlayer)
 	_add("entschaerfer", ["trapDisarmed"], func(e, s): return e.success)
@@ -316,7 +318,7 @@ static func _build() -> void:
 	_add("fahrzeughalter", ["mountGained"], func(e, s): return true)
 	_add("ueberrollt", ["rammed"], func(e, s): return e.kill)
 	_add("totalschaden", ["mountLost"], func(e, s): return true)
-	# ------------------------------------------------ achievements_moments.ts
+	# ------------------------------------------------ data/achievements_moments.json
 	for row in Db.t("achievements_moments", "momentTable"):
 		if row.stat != null:
 			var key: String = row.stat
@@ -326,7 +328,7 @@ static func _build() -> void:
 	_add("mo_kettenzauber", ["spellCast"], func(e, s): return e.kills >= 3)
 	_add("mo_etage2_frueh", ["descend"], func(e, s): return e.floor == 2 and s.player.level <= 3)
 	_add("mo_etage3_frueh", ["descend"], func(e, s): return e.floor == 3 and s.player.level <= 6)
-	# ------------------------------------------------ achievement_families.ts
+	# ------------------------------------------------ data/achievement_families.json
 	for fam in Db.t("achievement_families", "familyTable"):
 		var value := _family_value(fam)
 		for n in fam.stages:

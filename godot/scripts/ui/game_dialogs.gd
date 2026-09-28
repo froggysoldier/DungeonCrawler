@@ -1,6 +1,6 @@
 class_name GameDialogs
 extends RefCounted
-## Dialoge und Hinweise der Spielansicht (Port aus gameview.ts): Tooltip,
+## Dialoge und Hinweise der Spielansicht: Tooltip,
 ## Box-Inhalte, Versus-Bildschirm, Talkshow und die Tastenhilfe.
 
 const FURNITURE_TEXT := {

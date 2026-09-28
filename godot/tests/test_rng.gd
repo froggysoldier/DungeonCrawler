@@ -1,11 +1,11 @@
 extends RefCounted
-## Der Zufall muss bitgenau zur TypeScript-Version passen.
+## Der Zufall muss bitgenau gleich bleiben (Spielstände und Seeds hängen davon ab).
 
 func _fixtures() -> Array:
 	return JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/rng.json"))
 
 
-func test_rng_matches_typescript(t) -> void:
+func test_rng_matches_recording(t) -> void:
 	for f in _fixtures():
 		var r := Rng.new(int(f.seed))
 		# Als 32-Bit-Ganzzahl vergleichen: JSON-Kommazahlen verlieren sonst Stellen

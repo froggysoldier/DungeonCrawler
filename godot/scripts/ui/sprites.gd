@@ -1,6 +1,6 @@
 class_name Sprites
 extends RefCounted
-## Gezeichnete Kreaturen (Port von src/ui/sprites.ts): jede Monsterart hat eine
+## Gezeichnete Kreaturen: jede Monsterart hat eine
 ## erkennbare Silhouette. Gezeichnet wird in einem Raster von −50 bis 50 und
 ## skaliert, damit es auf der Karte und als großes Porträt gleich gut aussieht.
 

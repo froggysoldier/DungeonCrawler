@@ -1,5 +1,5 @@
 extends RefCounted
-## Türen (Port von tests/doors.test.ts).
+## Türen.
 
 
 func _doors_of(s: Dictionary, kind: String) -> Array:

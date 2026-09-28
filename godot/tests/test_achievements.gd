@@ -1,5 +1,5 @@
 extends RefCounted
-## Achievements und Statistik (Port von tests/achievements.test.ts).
+## Achievements und Statistik.
 
 
 func _make(seed: int = 5150) -> Dictionary:

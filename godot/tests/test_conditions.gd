@@ -1,5 +1,5 @@
 extends RefCounted
-## Zustände (Port von tests/conditions.test.ts).
+## Zustände.
 
 
 func _arena(s: Dictionary) -> Dictionary:

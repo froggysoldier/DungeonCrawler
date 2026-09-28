@@ -1,6 +1,6 @@
 class_name Traits
 extends RefCounted
-## Eigenschaften aus dem Vorleben (Port von src/engine/traits.ts).
+## Eigenschaften aus dem Vorleben.
 
 
 static func trait_bonuses(s: Dictionary) -> Dictionary:

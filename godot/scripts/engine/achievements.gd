@@ -1,6 +1,6 @@
 class_name Achievements
 extends RefCounted
-## Prüft alle Achievements gegen ein Ereignis (Port von src/engine/achievements.ts).
+## Prüft alle Achievements gegen ein Ereignis.
 ## Wer ein Achievement als Erster (über alle eigenen Staffeln) erreicht, bekommt
 ## eine Box-Stufe mehr.
 

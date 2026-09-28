@@ -1,8 +1,8 @@
 class_name Pen
 extends RefCounted
 ## Nachbildung der Canvas-2D-Schnittstelle des Browsers auf einem CanvasItem.
-## Damit lassen sich die prozeduralen Zeichnungen der Web-Version (Karte,
-## Kreaturen, Gegenstände) fast Zeile für Zeile übertragen: Pfade mit Kurven,
+## Damit lassen sich prozedurale Zeichnungen (Karte, Kreaturen, Gegenstände)
+## wie auf einem Canvas beschreiben: Pfade mit Kurven,
 ## Füllen und Konturen, Transformationen, Deckkraft und Farbverläufe.
 ##
 ## Nur innerhalb von _draw() des CanvasItems benutzen.
@@ -94,7 +94,7 @@ static func rgba(hex: Variant, a: float) -> Color:
 	return Color(c.r, c.g, c.b, a)
 
 
-## Farbe aufhellen oder abdunkeln (Faktor wie in der Web-Version, gerundet auf 0–255).
+## Farbe aufhellen oder abdunkeln (Faktor, gerundet auf 0–255).
 static func shade(hex: Variant, f: float) -> Color:
 	var c := css(hex)
 	return Color(

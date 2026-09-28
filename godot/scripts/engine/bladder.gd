@@ -1,6 +1,6 @@
 class_name Bladder
 extends RefCounted
-## Die Toiletten-Regel (Port von src/engine/bladder.ts).
+## Die Toiletten-Regel.
 
 const WARNINGS := [
 	[60, "Du müsstest mal. Nichts Dringendes. Noch nicht."],

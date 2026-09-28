@@ -1,6 +1,6 @@
 class_name Items
 extends RefCounted
-## Gegenstände erzeugen (Port von src/engine/items.ts).
+## Gegenstände erzeugen.
 
 const START_ONLY := ["bademantel", "schlafanzug", "anzug", "arbeitsjacke", "sportshirt", "hausschuhe", "eigener_ehering", "uniformjacke", "kasack", "kochjacke", "schlafanzughose"]
 const RARITY_VALUE := {"gewoehnlich": 1, "ungewoehnlich": 2, "selten": 4, "episch": 8, "legendaer": 20, "himmlisch": 60}

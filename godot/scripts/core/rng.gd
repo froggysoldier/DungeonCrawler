@@ -1,8 +1,8 @@
 class_name Rng
 extends RefCounted
-## Deterministischer Zufall (mulberry32), bitgenau wie src/engine/rng.ts.
-## Der Zustand ist ein vorzeichenbehafteter 32-Bit-Wert, genau wie im
-## TypeScript-Spielstand, damit Seeds und Spielstände übertragbar bleiben.
+## Deterministischer Zufall (mulberry32). Der Zustand ist ein
+## vorzeichenbehafteter 32-Bit-Wert im Spielstand, damit Seeds und
+## Spielstände übertragbar bleiben.
 
 const MASK := 0xFFFFFFFF
 

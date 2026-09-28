@@ -1,11 +1,11 @@
 class_name Parity
 extends RefCounted
-## Hilfen für den Vergleich mit der TypeScript-Version.
+## Hilfen für die Replay-Tests: Kurzzustand, Vergleich, Aktionen ausführen.
 
 const TILE_CHARS := {"wall": "#", "floor": ".", "stairs": ">", "door": "+", "dooropen": "'"}
 
 
-## Gleiche kompakte Form wie snapshot() in scripts/godot-replay.ts.
+## Kompakter Zustand für den Vergleich (Karte als Text statt riesiger Listen).
 static func snapshot(s: Dictionary) -> Dictionary:
 	var c: Dictionary = s.duplicate(true)
 	var m: Dictionary = c.map
@@ -34,7 +34,7 @@ static func diff(a: Variant, b: Variant, path: String = "", out: Array = [], lim
 		var fb := float(b)
 		# Godots JSON-Leser rundet in der letzten Stelle ungenau
 		if fa != fb and absf(fa - fb) > 1e-9 * maxf(1.0, maxf(absf(fa), absf(fb))):
-			out.append("%s: Godot %s, TS %s" % [path, J.s(a), J.s(b)])
+			out.append("%s: ist %s, soll %s" % [path, J.s(a), J.s(b)])
 		return out
 	if a is Dictionary and b is Dictionary:
 		var keys := {}
@@ -47,14 +47,14 @@ static func diff(a: Variant, b: Variant, path: String = "", out: Array = [], lim
 		return out
 	if a is Array and b is Array:
 		if a.size() != b.size():
-			out.append("%s: Länge Godot %d, TS %d" % [path, a.size(), b.size()])
+			out.append("%s: Länge ist %d, soll %d" % [path, a.size(), b.size()])
 		for i in mini(a.size(), b.size()):
 			diff(a[i], b[i], "%s[%d]" % [path, i], out, limit)
 		return out
 	if typeof(a) != typeof(b) or a != b:
 		var sa := str(a).substr(0, 160)
 		var sb := str(b).substr(0, 160)
-		out.append("%s: Godot %s, TS %s" % [path, sa, sb])
+		out.append("%s: ist %s, soll %s" % [path, sa, sb])
 	return out
 
 

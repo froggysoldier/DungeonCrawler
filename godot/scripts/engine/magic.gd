@@ -1,6 +1,6 @@
 class_name Magic
 extends RefCounted
-## Zauber und Mana (Port von src/engine/magic.ts).
+## Zauber und Mana.
 
 const TOME_VALUE := {"gewoehnlich": 10, "ungewoehnlich": 25, "selten": 60, "episch": 150, "legendaer": 400}
 

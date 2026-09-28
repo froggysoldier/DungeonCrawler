@@ -1,6 +1,6 @@
 class_name Crafting
 extends RefCounted
-## Handwerk (Port von src/engine/crafting.ts).
+## Handwerk.
 
 const MAX_WEAPON_UPGRADES := 3
 

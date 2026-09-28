@@ -1,6 +1,6 @@
 class_name Combat
 extends RefCounted
-## Nahkampf, Würfe, Treffer und Kills (Port von src/engine/combat.ts).
+## Nahkampf, Würfe, Treffer und Kills.
 
 const MOVE_NAMES := {"normal": "Normal", "sprung": "Sprung", "stampfen": "Stampfen", "anlauf": "Anlauf"}
 const ATTACK_PARTS := ["faust", "tritt", "knie", "ellbogen", "kopf", "waffe", "wurf"]

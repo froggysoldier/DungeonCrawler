@@ -1,6 +1,6 @@
 class_name Skills
 extends RefCounted
-## Skills lernen und trainieren (Port von src/engine/skills.ts).
+## Skills lernen und trainieren.
 
 
 static func technique_key(t: Dictionary) -> String:

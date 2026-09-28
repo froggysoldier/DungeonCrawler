@@ -1,5 +1,5 @@
 extends RefCounted
-## Identifikation (Port von tests/identify.test.ts).
+## Identifikation.
 
 
 func _make() -> Dictionary:

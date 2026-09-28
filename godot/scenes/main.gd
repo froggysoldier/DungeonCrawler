@@ -1,5 +1,5 @@
 extends Control
-## Einstieg (Port von src/main.ts): Titel, Interview, Spiel, Endbildschirm.
+## Einstieg: Titel, Interview, Spiel, Endbildschirm.
 ## Dialoge und Einblendungen liegen darüber, die Klänge laufen nebenher.
 
 var meta: Dictionary

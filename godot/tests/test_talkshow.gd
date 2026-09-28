@@ -1,5 +1,5 @@
 extends RefCounted
-## Rückblick und Talkshow (Port von tests/talkshow.test.ts).
+## Rückblick und Talkshow.
 
 
 func test_rueckblick_und_talkshow(t) -> void:

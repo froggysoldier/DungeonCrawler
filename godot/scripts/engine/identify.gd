@@ -1,6 +1,6 @@
 class_name Identify
 extends RefCounted
-## Was der Crawler über Monster und Gegenstände weiß (Port von src/engine/identify.ts).
+## Was der Crawler über Monster und Gegenstände weiß.
 ## Namen und Werte von Monstern und Gegenständen immer hierüber anzeigen.
 
 const INSIGHT_NAMES := {

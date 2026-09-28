@@ -1,6 +1,6 @@
 class_name Log
 extends RefCounted
-## Spiel-Log und Einblendungen (Port von src/engine/log.ts).
+## Spiel-Log und Einblendungen.
 
 const MAX_LOG := 300
 

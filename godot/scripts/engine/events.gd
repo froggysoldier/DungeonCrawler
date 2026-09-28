@@ -1,6 +1,6 @@
 class_name Events
 extends RefCounted
-## Zentrale Stelle für Spielereignisse (Port von src/engine/events.ts).
+## Zentrale Stelle für Spielereignisse.
 
 
 static func emit(s: Dictionary, e: Dictionary) -> void:

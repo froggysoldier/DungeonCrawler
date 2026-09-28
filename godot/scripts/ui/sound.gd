@@ -1,6 +1,6 @@
 class_name SoundBox
 extends Node
-## Klänge, im Spiel erzeugt (Port von src/ui/sound.ts, keine Audiodateien):
+## Klänge, im Spiel erzeugt:
 ## Lootbox, Level-Aufstieg, Achievement, neuer Skill, Kampfbeginn und -ende,
 ## Versus-Bildschirm und ein weiches Tippgeräusch. Die Klänge werden einmal im
 ## Hintergrund berechnet und dann nur noch abgespielt.
@@ -207,7 +207,7 @@ class Buf:
 			y1 = y
 			data[idx] += y * vol * pow(0.0001 / vol, t / dur)
 
-	## Kurzer Hall über eine Rückkopplung (wie die Verzögerung in der Web-Version).
+	## Kurzer Hall über eine Rückkopplung.
 	func reverb() -> void:
 		var d := int(0.11 * SoundBox.RATE)
 		var wet := PackedFloat32Array()

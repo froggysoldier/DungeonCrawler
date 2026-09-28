@@ -3,7 +3,33 @@ extends SceneTree
 ##   godot --headless --path godot -s res://tests/run_tests.gd
 ## Führt alle res://tests/test_*.gd aus. Jede Methode test_* bekommt einen
 ## Prüfer `t` mit ok(bedingung, text) und eq(ist, soll, text).
+## Laufzeitfehler (SCRIPT ERROR, push_error) zählen als Fehlschlag, denn
+## GDScript bricht bei ihnen nicht ab, sondern macht weiter.
 ## Beendet mit Code 1, wenn etwas fehlschlägt.
+
+
+## Fängt Fehlermeldungen der Engine ab, auch aus anderen Threads.
+class ErrorWatch:
+	extends Logger
+	var _mutex := Mutex.new()
+	var _errors := PackedStringArray()
+
+	func _log_error(function: String, file: String, line: int, code: String, rationale: String, _editor_notify: bool, error_type: int, _backtraces: Array[ScriptBacktrace]) -> void:
+		if error_type != ERROR_TYPE_ERROR and error_type != ERROR_TYPE_SCRIPT:
+			return
+		var text := rationale if rationale != "" else code
+		_mutex.lock()
+		_errors.append("Laufzeitfehler: %s (%s:%d, %s)" % [text, file, line, function])
+		_mutex.unlock()
+
+	## Gesammelte Fehler abholen und leeren.
+	func take() -> PackedStringArray:
+		_mutex.lock()
+		var out := _errors.duplicate()
+		_errors.clear()
+		_mutex.unlock()
+		return out
+
 
 class Checker:
 	var failures := PackedStringArray()
@@ -62,6 +88,8 @@ func _initialize() -> void:
 	data.name = "GameData"
 	data.load_all()
 	var t := Checker.new()
+	var watch := ErrorWatch.new()
+	OS.add_logger(watch)
 	var dir := DirAccess.open("res://tests")
 	var files := Array(dir.get_files()).filter(func(f): return f.begins_with("test_") and f.ends_with(".gd"))
 	files.sort()
@@ -86,9 +114,13 @@ func _initialize() -> void:
 			var before := t.failures.size()
 			# Tests dürfen auf Bilder warten (await)
 			await inst.call(m.name, t)
+			for e in watch.take():
+				t.checks += 1
+				t.failures.append("%s: %s" % [t.current, e])
 			print(("  ok    " if t.failures.size() == before else "  FEHLER") + "  " + t.current)
 	print("\n%d Prüfungen, %d Fehler" % [t.checks, t.failures.size()])
 	for f in t.failures:
 		printerr("  " + f)
+	OS.remove_logger(watch)
 	data.free()
 	quit(1 if t.failures.size() else 0)

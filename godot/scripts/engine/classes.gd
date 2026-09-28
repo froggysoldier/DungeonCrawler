@@ -1,6 +1,6 @@
 class_name Classes
 extends RefCounted
-## Rassen- und Klassenwahl, Klassenfähigkeiten (Port von src/engine/classes.ts).
+## Rassen- und Klassenwahl, Klassenfähigkeiten.
 
 const CLASS_LIST_SIZE := 10
 

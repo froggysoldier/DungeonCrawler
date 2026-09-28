@@ -1,6 +1,6 @@
 extends RefCounted
 ## Die Oberfläche einmal eine ganze Partie lang benutzen: dieselben Aktionen
-## wie in der aufgezeichneten TypeScript-Partie, aber über die Spielansicht
+## wie in der aufgezeichneten Partie (Replay), aber über die Spielansicht
 ## (mit Seitenleiste, Aktionsleiste, Tooltips und Dialogen). Die Oberfläche
 ## darf den Spielverlauf nicht verändern: Zufall, Zug, HP und Position müssen
 ## am Ende mit der Aufzeichnung übereinstimmen.

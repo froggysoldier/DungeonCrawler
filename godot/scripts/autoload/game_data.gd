@@ -1,6 +1,5 @@
 extends Node
-## Lädt alle Spielinhalte aus res://data/*.json (erzeugt von
-## `npm run export:godot` aus src/data) und baut Nachschlage-Tabellen auf.
+## Lädt alle Spielinhalte aus res://data/*.json und baut Nachschlage-Tabellen auf.
 ##
 ## Zugriff: GameData.get_table("items", "BASE_ITEMS")
 ##          GameData.by_id("items", "BASE_ITEMS", "heiltrank")
