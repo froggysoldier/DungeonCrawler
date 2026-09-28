@@ -1,9 +1,9 @@
 # Der Große Abstieg
 
-Ein rundenbasierter Dungeon-Crawler, gebaut mit Godot 4.7.2 – inspiriert von
-*Dungeon Crawler Carl*. Du bewegst dich über eine klickbare Karte, kämpfst mit
-Fäusten, Füßen, Knien und Steinen, und eine zynische Systemstimme kommentiert
-alles.
+Ein rundenbasierter Dungeon-Crawler in Pixel-Grafik, gebaut mit Godot 4.7.2 –
+inspiriert von *Dungeon Crawler Carl*. Du bewegst dich über eine klickbare
+Karte, kämpfst mit Fäusten, Füßen, Knien und Steinen, und eine zynische
+Systemstimme kommentiert alles.
 
 ## Starten
 
@@ -16,7 +16,8 @@ godot --headless --path godot -s res://tools/record_fixtures.gd  # Replay-Aufnah
 ```
 
 Inhalte (Monster, Gegenstände, Skills, Achievements …) stehen in
-`godot/data/*.json`. Aufbau, Werkzeuge und Export (Web, Windows, Linux) stehen
+`godot/data/*.json`, die Pixel-Grafik als bearbeitbare PNG-Bögen in
+`godot/assets/pixel`. Aufbau, Werkzeuge und Export (Web, Windows, Linux) stehen
 in [`docs/GODOT_PORT.md`](docs/GODOT_PORT.md).
 
 Die frühere Web-Version (TypeScript in `src/`) ist eingefroren und wird nicht

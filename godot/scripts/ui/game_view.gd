@@ -275,7 +275,7 @@ func _layout_minimap() -> void:
 	minimap.queue_redraw()
 
 
-## Innerer Schatten der Karte, im Kampf mit pulsierendem roten Rahmen.
+## Innerer Schatten der Karte in Stufen, im Kampf mit pulsierendem roten Pixelrahmen.
 class FrameGlow:
 	extends Control
 	var combat := false
@@ -287,27 +287,31 @@ class FrameGlow:
 	func _draw() -> void:
 		var w := size.x
 		var h := size.y
-		var pen := Pen.new(self)
-		var depth := 40.0
-		var a := 0.55
 		var col := Color(0, 0, 0)
-		var edges := [[Vector2(0, 0), Vector2(0, depth), Rect2(0, 0, w, depth)], [Vector2(0, h), Vector2(0, h - depth), Rect2(0, h - depth, w, depth)], [Vector2(0, 0), Vector2(depth, 0), Rect2(0, 0, depth, h)], [Vector2(w, 0), Vector2(w - depth, 0), Rect2(w - depth, 0, depth, h)]]
+		var a := 0.5
+		var bands := 5
+		var pulse := 0.0
 		if combat:
-			var t := Time.get_ticks_msec() / 2400.0 * TAU
-			var k := 0.5 - 0.5 * cos(t)
+			pulse = 0.5 - 0.5 * cos(Time.get_ticks_msec() / 2400.0 * TAU)
 			col = Color(200 / 255.0, 30 / 255.0, 20 / 255.0)
-			a = 0.28 + 0.14 * k
-			depth = 50 + 30 * k
-		for e in edges:
-			var g := pen.linear_gradient(e[0].x, e[0].y, e[1].x, e[1].y)
-			g.add(0, Color(col, a))
-			g.add(1, Color(col, 0))
-			pen.fill_style = g
-			var r: Rect2 = e[2]
-			pen.fill_rect(r.position.x, r.position.y, r.size.x, r.size.y)
+			a = 0.3 + 0.12 * roundf(pulse * 2) / 2
+			bands = 6 + int(roundf(pulse * 2))
+		# Bänder von 8 px, nach innen durchsichtiger
+		for i in bands:
+			var ba := a * (1.0 - float(i) / bands)
+			var d := i * 8.0
+			var c := Color(col, ba)
+			draw_rect(Rect2(d, d, w - 2 * d, 8), c)
+			draw_rect(Rect2(d, h - d - 8, w - 2 * d, 8), c)
+			draw_rect(Rect2(d, d + 8, 8, h - 2 * d - 16), c)
+			draw_rect(Rect2(w - d - 8, d + 8, 8, h - 2 * d - 16), c)
 		if combat:
-			var k2 := 0.5 - 0.5 * cos(Time.get_ticks_msec() / 2400.0 * TAU)
-			draw_rect(Rect2(1, 1, w - 2, h - 2), Color(230 / 255.0 + 25 / 255.0 * k2, 70 / 255.0 + 25 / 255.0 * k2, 55 / 255.0 + 20 / 255.0 * k2, 0.85 + 0.1 * k2), false, 2.0)
+			var bright := roundf(pulse * 2) / 2
+			var edge := Color(0.9 + 0.1 * bright, 0.27 + 0.1 * bright, 0.2, 0.9)
+			draw_rect(Rect2(0, 0, w, 4), edge)
+			draw_rect(Rect2(0, h - 4, w, 4), edge)
+			draw_rect(Rect2(0, 4, 4, h - 8), edge)
+			draw_rect(Rect2(w - 4, 4, 4, h - 8), edge)
 
 
 ## Karte vergrößern oder verkleinern.
@@ -479,34 +483,37 @@ class Banner:
 		if t > fade_at:
 			var k := clampf((t - fade_at) / 0.5, 0.0, 1.0)
 			a *= 1.0 - k
-			dy = -10 * k
-		var sy := clampf(0.2 + t / 0.35 * 0.8, 0.2, 1.0)
+			dy = -8 * floorf(k * 3)
+		# Höhe wächst in 4-px-Stufen
+		var full := 96.0
+		var h := clampf(floorf((0.2 + t / 0.35 * 0.8) * full / 8) * 8, 16, full)
 		var w := size.x
-		var h := 92.0 * sy
-		var y := size.y * 0.34 + dy + (92.0 - h) / 2
-		var col := Color(120 / 255.0, 12 / 255.0, 8 / 255.0, 0.82) if kind == "start" else Color(20 / 255.0, 40 / 255.0, 28 / 255.0, 0.85)
-		var pen := Pen.new(self)
-		var g := pen.linear_gradient(0, 0, w, 0)
-		g.add(0, Color(col, 0))
-		g.add(0.2, col)
-		g.add(0.8, col)
-		g.add(1, Color(col, 0))
-		pen.alpha = a
-		pen.fill_style = g
-		pen.fill_rect(0, y, w, h)
-		if sy < 0.9:
+		var y := floorf(size.y * 0.34 / 4) * 4 + dy + (full - h) / 2
+		var col := Color(120 / 255.0, 12 / 255.0, 8 / 255.0, 0.85) if kind == "start" else Color(20 / 255.0, 40 / 255.0, 28 / 255.0, 0.88)
+		var edge := Color("#ff5a3c") if kind == "start" else Color("#6ee07a")
+		# Band mit gestuften Enden
+		var steps := 8
+		var sw := floorf(w * 0.2 / steps / 4) * 4
+		for i in steps:
+			var ca := Color(col, col.a * a * (i + 1) / (steps + 1))
+			draw_rect(Rect2(i * sw, y, sw, h), ca)
+			draw_rect(Rect2(w - (i + 1) * sw, y, sw, h), ca)
+		draw_rect(Rect2(steps * sw, y, w - 2 * steps * sw, h), Color(col, col.a * a))
+		draw_rect(Rect2(steps * sw, y, w - 2 * steps * sw, 4), Color(edge, 0.8 * a))
+		draw_rect(Rect2(steps * sw, y + h - 4, w - 2 * steps * sw, 4), Color(edge, 0.8 * a))
+		if h < full:
 			return
-		var f := UiFonts.get_font(800, false, 12)
-		var fs := 38
-		var tw := f.get_string_size(title.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-		var glow := Color(1, 90 / 255.0, 60 / 255.0, 0.6 * a) if kind == "start" else Color(110 / 255.0, 224 / 255.0, 122 / 255.0, 0.5 * a)
-		draw_string_outline(f, Vector2((w - tw) / 2, y + 50), title.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 8, Color(glow, glow.a * 0.4))
-		draw_string(f, Vector2((w - tw) / 2, y + 52), title.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0, 0, 0, 0.5 * a))
-		draw_string(f, Vector2((w - tw) / 2, y + 50), title.to_upper(), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1, 1, 1, a))
+		var f := UiFonts.pixel(700, 4)
+		var fs := 40
+		var up := title.to_upper()
+		var tw := f.get_string_size(up, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var x := roundf((w - tw) / 2)
+		draw_string(f, Vector2(x + 4, y + 56), up, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(0, 0, 0, 0.6 * a))
+		draw_string(f, Vector2(x, y + 52), up, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1, 1, 1, a))
 		if sub != "":
 			var f2 := UiFonts.get_font(500)
-			var sw := f2.get_string_size(sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
-			draw_string(f2, Vector2((w - sw) / 2, y + 76), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1, 1, 1, 0.85 * a))
+			var sw2 := f2.get_string_size(sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+			draw_string(f2, Vector2(roundf((w - sw2) / 2), y + 80), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1, 1, 1, 0.85 * a))
 
 
 # ---------------------------------------------------------------- Aktionen
@@ -948,7 +955,8 @@ func refresh_top() -> void:
 	var p: Dictionary = s.player
 	var def = Db.floor_def(s.floor)
 	var left := Game.time_left(s)
-	var show := Kit.label(_top, Db.world("SHOW_NAME"), 15, UiTheme.ACCENT, 800)
+	var show := Kit.label(_top, Db.world("SHOW_NAME"), 20, UiTheme.ACCENT)
+	show.add_theme_font_override("font", UiFonts.pixel(700))
 	show.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var wide := size.x > 1500
 	if wide:
@@ -984,7 +992,8 @@ func _pill(text: String, color: Variant, variant: String = "Pill", weight: int =
 	if tip != "":
 		pc.tooltip_text = tip
 	_top.add_child(pc)
-	Kit.label(pc, text, 13, color, weight)
+	var l := Kit.label(pc, text, 16, color)
+	l.add_theme_font_override("font", UiFonts.pixel(maxi(400, mini(700, weight))))
 
 
 func _pill_bb(bb: String) -> void:
@@ -992,7 +1001,11 @@ func _pill_bb(bb: String) -> void:
 	pc.theme_type_variation = "Pill"
 	pc.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_top.add_child(pc)
-	var rt := Kit.text(pc, bb, 13)
+	var rt := Kit.text(pc, bb, 16)
+	rt.add_theme_font_override("normal_font", UiFonts.pixel(400))
+	rt.add_theme_font_override("bold_font", UiFonts.pixel(700))
+	for k in ["normal_font_size", "bold_font_size"]:
+		rt.add_theme_font_size_override(k, 16)
 	rt.autowrap_mode = TextServer.AUTOWRAP_OFF
 	rt.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 

@@ -23,7 +23,8 @@ godot/
   scripts/engine/        Spiellogik (Port von src/engine), ohne Grafik
   scripts/ui/            Oberfläche (Port von src/ui)
   scenes/main.*          Einstieg: Titel, Interview, Spiel, Endbildschirm
-  assets/fonts/          Montserrat (SIL Open Font License, siehe OFL.txt)
+  assets/pixel/          Pixel-Bögen (PNG) und index.json mit der Lage jedes Bildes
+  assets/fonts/          Montserrat und Pixelify Sans (beide SIL Open Font License)
   tests/                 Testlauf, Tests, Replay-Bot und Aufnahmen (fixtures)
   tools/                 Werkzeuge: Bildschirmfotos, Aufnahmen, Balance-Simulation
 ```
@@ -32,10 +33,11 @@ godot/
 
 | Datei | Inhalt |
 |---|---|
-| `pen.gd` | Nachbau der Canvas-2D-Schnittstelle (Pfade, Kurven, Verläufe, Text) |
-| `tiles.gd` | Böden, Mauern, Türen und Schatten als Texturen, einmal erzeugt |
-| `map_view.gd` | Karte: statische Ebene (nur bei Änderungen neu), bewegte Ebene, Licht, Effekte |
-| `sprites.gd` | Kreaturen und Spielfigur |
+| `pixel_art.gd` | Pixel-Bögen laden, Monsterfarben tönen, ganzzahlig vergrößert zeichnen |
+| `pixel_box.gd` | Rahmen im Pixel-Stil für alle Flächen und Knöpfe (abgestufte Ecken, harter Schatten) |
+| `tiles.gd` | Bodenmaterial je Raum, Mauerfarben je Etage, fester Zufall je Kachel |
+| `map_view.gd` | Karte: statische Ebene (nur bei Änderungen neu), belebte Ebene, Nebel und Licht mit Dithering (Shader), Figuren, Effekte |
+| `sprites.gd` | Welche Figur zu welcher Monsterart gehört, große Porträts |
 | `animator.gd` | Gleiten, Kamera, Geschosse, aufsteigende Zahlen |
 | `game_view.gd` | Spielansicht, Eingabe, Kampfmodus, Log |
 | `game_here.gd`, `game_tabs.gd`, `game_combat.gd`, `game_dialogs.gd` | Seitenleiste, Reiter, Kampfsequenz, Tooltip, Versus, Talkshow, Hilfe |
@@ -44,9 +46,45 @@ godot/
 | `sound.gd` | Klänge im Spiel erzeugt, ohne Audiodateien |
 | `ui_theme.gd`, `kit.gd`, `click_panel.gd` | Designsystem (Farben, Knöpfe, Karten) und Bausteine |
 
-`Pen` bildet die Canvas-Befehle eines Browsers nach (Pfade, Kurven,
-Verläufe). Verläufe werden vormultipliziert gemischt. Kanten werden weich
-gezeichnet, weil der Kompatibilitäts-Renderer kein 2D-MSAA kennt.
+## Pixel-Grafik
+
+Alles auf der Karte ist Pixel-Grafik mit 16 × 16 Pixeln je Kachel. Die Karte
+vergrößert ganzzahlig (2× bis 5×, Mausrad oder + und −) und zeichnet ohne
+Filter, damit jeder Pixel scharf bleibt. Die Kamera rastet auf Kunstpixel ein.
+Nebel, Lichtkegel und Vignette werden von Shadern in Kunstpixeln gerastert und
+mit einem Bayer-Muster gedithert, statt weich zu verlaufen.
+
+Die Bilder liegen in `assets/pixel` als PNG-Bögen:
+
+| Bogen | Inhalt |
+|---|---|
+| `kreaturen.png` | 34 Kreaturen, Spielfigur, Haustier, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
+| `kacheln.png` | Böden (9 Materialien × 4 Varianten), Wände (3 Etagen × 4 Varianten, Krone und Vorderseite), Türen, Treppe |
+| `dinge.png` | Gegenstände am Boden, Fallen, Geschosse |
+| `einrichtung.png` | Automat, Bett, Toilette, Theke, Kisten, Fässer, Regale, Gerümpel, Eimer, Flecken |
+
+`index.json` hält fest, wo jedes Bild im Bogen liegt (Name → Bogen, x, y,
+Breite, Höhe).
+
+**Bearbeiten:** Die PNGs lassen sich in jedem Pixel-Editor ändern (Aseprite,
+LibreSprite, Piskel, GIMP). Die Lage der Bilder im Bogen muss dabei gleich
+bleiben. Stellen, die die Farbe des Monsters (bzw. der Seltenheit oder Box)
+annehmen sollen, werden mit fünf Magenta-Stufen gemalt: `#400040` Schatten,
+`#800080` dunkel, `#c000c0` Grundfarbe, `#ff00ff` hell, `#ff80ff` Glanz. Beim
+Zeichnen ersetzt `PixelArt` sie durch eine Farbrampe aus der Monsterfarbe
+(Schatten kühler, Licht wärmer). Alle anderen Farben bleiben, wie sie sind.
+
+**Neu erzeugen:** Die Bögen wurden mit `tools/make_pixel_art.gd` aus den
+Textvorlagen in `tools/pixel_defs.gd` und aus prozeduralen Mustern (Böden,
+Wände, Türen) erzeugt. Der Generator legt Umriss und Schattierung automatisch
+an. Er überschreibt vorhandene Bögen nur mit `--force`, damit Änderungen aus
+einem Pixel-Editor nicht verloren gehen. Neue Monsterarten brauchen einen
+Eintrag in `Sprites.BY_DEF`; `test_pixel_art` prüft, dass es zu jedem Monster,
+jeder Falle, jedem Reittier und jedem Möbelstück ein Bild gibt.
+
+**Schriften:** Fließtext in Montserrat, Überschriften, Knöpfe, Reiter und die
+Karte in Pixelify Sans. Pixelify ist bei Größen in Zehnerschritten ganz
+scharf (ein Schriftpixel = 1/10 der Größe).
 
 ## Werkzeuge
 
@@ -57,7 +95,8 @@ gezeichnet, weil der Kompatibilitäts-Renderer kein 2D-MSAA kennt.
 | `godot --headless --path godot -s res://tools/record_fixtures.gd` | Aufnahmen für die Replay-Tests neu erzeugen (Karten, Replays, Anzeige-Helfer), nach absichtlichen Änderungen an Inhalten oder Regeln |
 | `godot --headless --path godot -s res://tools/balance_sim.gd [-- anzahl]` | Ein Bot spielt Partien bis Etage 3 und gibt eine Tabelle aus (Stufe, Kills, Todesursache …) |
 | `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte) |
-| `xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- bild.png` | Alle Kreaturen als Bogen, zum Vergleich mit der Web-Version |
+| `xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- bild.png [vergrößerung]` | Alle Monster in ihrer echten Farbe, dazu Spielfigur, Reittiere, Gegenstände, Fallen |
+| `godot --headless --path godot -s res://tools/make_pixel_art.gd -- --force [--preview ordner]` | Pixel-Bögen aus den Vorlagen neu erzeugen (überschreibt Änderungen aus Pixel-Editoren) |
 
 ## Tests
 
@@ -69,6 +108,7 @@ gezeichnet, weil der Kompatibilitäts-Renderer kein 2D-MSAA kennt.
 | `test_engine`, `test_combat_zones`, `test_ai`, `test_skills` … | Spielregeln einzeln: Kampf, Gegner, Skills, Klassen, Magie, Fallen, Handwerk, Haustiere, Reittiere, Sponsoren, Talkshow, Achievements |
 | `test_ui_smoke` | Eine Partie komplett über die Spielansicht gespielt: keine Laufzeitfehler, Spielverlauf unverändert |
 | `test_sound` | Klänge hörbar und nicht übersteuert |
+| `test_pixel_art` | Zu allem, was gezeichnet wird, gibt es ein Bild; Tönen ersetzt alle Magenta-Stufen |
 
 ## Grundsätze
 
@@ -97,6 +137,7 @@ gezeichnet, weil der Kompatibilitäts-Renderer kein 2D-MSAA kennt.
 | 4 – Darstellung | Karte, Kreaturen, Kamera, Licht und Nebel, Theme, Log mit Schreibmaschinen-Effekt, Klänge, Versus-Bildschirm, Kampfbanner | erledigt |
 | 5 – Abschluss | Titel, Interview, Speichern und Laden, Export Web, Windows, Linux | erledigt |
 | 6 – Eigenständig | Alle Tests in GDScript, Aufnahmen und Testlauf ohne Node, Godot als einzige Quelle | erledigt |
+| 7 – Pixel-Stil | Pixel-Bögen mit Generator, Karte ganzzahlig und gedithert, Pixel-Rahmen und Pixel-Schrift in der Oberfläche | erledigt |
 
 ## Export
 
@@ -110,7 +151,7 @@ godot --headless --path godot --export-release Linux ../build/godot-linux/DerGro
 godot --headless --path godot --export-release Windows ../build/godot-windows/DerGrosseAbstieg.exe
 ```
 
-Geprüft: Die Linux-Version startet fehlerfrei. Die Web-Version läuft in
+Geprüft: Die Linux-Version startet fehlerfrei. Der Web-Export läuft in
 Chromium mit Titel, Interview, Karte, Kampf und Tastatur. Die Web-Vorlage kommt
 ohne Threads aus und läuft deshalb auf jedem einfachen Webserver (etwa
 `python3 -m http.server` im Ausgabeordner). Die Klänge werden dort

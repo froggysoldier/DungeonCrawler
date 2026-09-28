@@ -127,7 +127,8 @@ func _input(ev: InputEvent) -> void:
 # ================================================================ Bausteine
 
 static func title(parent: Node, t: String) -> Label:
-	var l := Kit.label(parent, t, 23, UiTheme.ACCENT, 800)
+	var l := Kit.label(parent, t, 30, UiTheme.ACCENT)
+	l.add_theme_font_override("font", UiFonts.pixel(700))
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	return l
 
@@ -138,8 +139,8 @@ static func speaker(parent: Node, t: String) -> void:
 	var p := PanelContainer.new()
 	p.theme_type_variation = "Speaker"
 	h.add_child(p)
-	var l := Kit.label(p, t.to_upper(), 12, UiTheme.ACCENT_2, 700)
-	l.add_theme_font_override("font", UiFonts.get_font(700, false, 1))
+	var l := Kit.label(p, t.to_upper(), 16, UiTheme.ACCENT_2)
+	l.add_theme_font_override("font", UiFonts.pixel(700, 1))
 	Kit.spacer(parent, 4)
 
 
@@ -243,7 +244,7 @@ func confirm(t: String, text: String, yes: String, no: String = "Abbrechen") -> 
 func toast(t: String, text: String, kind: String) -> void:
 	var p := PanelContainer.new()
 	p.theme_type_variation = "Toast"
-	var sb: StyleBoxFlat = UiTheme.get_theme().get_stylebox("panel", "Toast").duplicate()
+	var sb: PixelBox = UiTheme.get_theme().get_stylebox("panel", "Toast").duplicate()
 	sb.border_color = UiTheme.LINE_2
 	var edge := {"achievement": UiTheme.ACHV, "skill": UiTheme.INFO, "warnung": UiTheme.DANGER}
 	var accent: Color = edge.get(kind, UiTheme.ACCENT)

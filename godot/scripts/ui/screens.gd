@@ -29,35 +29,47 @@ static func card_screen(root: Control, width: float = 760.0) -> VBoxContainer:
 	return v
 
 
-## Hintergrund mit zwei weichen Farbflecken (wie im CSS des Body).
+## Hintergrund in Pixel-Grafik: dunkler Kellerboden, gestuftes Leuchten und
+## eine Reihe Kreaturen am unteren Rand.
 class Backdrop:
 	extends Control
+
+	const PARADE := ["ratte", "kobold", "schleim", "geist", "spinne", "zombie", "fledermaus", "troll", "pilz", "skelett", "kroete", "hexe", "alien", "hund", "motte"]
+	const TINTS := ["#b08a6a", "#6fbf4a", "#4ad8b0", "#b8c8ff", "#8a5aa8", "#7a8a5a", "#7a6a8a", "#5a8a4a", "#c8a0a0", "#e8e0c8", "#6aa04a", "#9a6ad0", "#9aa0b0", "#8a7a5a", "#c8b890"]
+
+	func _init() -> void:
+		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
 	func _draw() -> void:
 		var w := size.x
 		var h := size.y
 		draw_rect(Rect2(0, 0, w, h), UiTheme.BG)
-		var pen := Pen.new(self)
-		var g := pen.radial_gradient(w / 2, -0.1 * h, 0, w / 2, -0.1 * h, 900)
-		g.add(0, "rgba(244,194,79,0.06)")
-		g.add(0.6, "rgba(244,194,79,0)")
-		g.add(1, "rgba(244,194,79,0)")
-		pen.fill_style = g
-		pen.fill_rect(0, 0, w, h)
-		var g2 := pen.radial_gradient(w, h * 1.1, 0, w, h * 1.1, 700)
-		g2.add(0, "rgba(255,111,174,0.04)")
-		g2.add(0.6, "rgba(255,111,174,0)")
-		g2.add(1, "rgba(255,111,174,0)")
-		pen.fill_style = g2
-		pen.fill_rect(0, 0, w, h)
+		# Kellerboden, stark abgedunkelt
+		var k := 4
+		var t := 16 * k
+		for y in int(ceilf(h / t)):
+			for x in int(ceilf(w / t)):
+				PixelArt.draw(self, "boden/pflaster%d" % (int(Tiles.hash(x, y) * 4)), Vector2(x * t, y * t), k, null, false, Color(1, 1, 1, 0.13))
+		# Gestuftes Leuchten oben (Gold) und unten rechts (Rosa)
+		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w / 2 - 16 * 28, -16 * 28 - h * 0.1), 28, null, false, Color(UiTheme.ACCENT, 0.12))
+		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w - 16 * 22, h - 16 * 16), 22, null, false, Color(UiTheme.ACCENT_2, 0.07))
+		# Kreaturen am unteren Rand, als dunkle Parade
+		var sc := 5
+		var step := 16 * sc + 24
+		var n := int(w / step) + 1
+		for i in n:
+			var kind: String = PARADE[i % PARADE.size()]
+			var foot := Vector2(i * step + step / 2.0, h - 8)
+			PixelArt.draw_foot(self, "kreatur/" + kind, foot, sc, TINTS[i % TINTS.size()], i % 2 == 1, Color(0.35, 0.33, 0.4, 0.55))
 
 
-static func logo(parent: Node, text: String, size: int = 56) -> Label:
-	var l := Kit.label(parent, text, size, UiTheme.ACCENT, 800)
+static func logo(parent: Node, text: String, size: int = 60) -> Label:
+	var l := Kit.label(parent, text, size, UiTheme.ACCENT)
+	l.add_theme_font_override("font", UiFonts.pixel(700))
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.add_theme_color_override("font_shadow_color", Color(1, 111 / 255.0, 174 / 255.0, 0.55))
-	l.add_theme_constant_override("shadow_offset_x", 0)
-	l.add_theme_constant_override("shadow_offset_y", 3)
+	l.add_theme_color_override("font_shadow_color", Color("#b0306e"))
+	l.add_theme_constant_override("shadow_offset_x", 4)
+	l.add_theme_constant_override("shadow_offset_y", 4)
 	return l
 
 
@@ -70,7 +82,7 @@ static func quote(parent: Node, bb: String, then_show: Array) -> Typing:
 	var bar := ColorRect.new()
 	bar.color = UiTheme.ACCENT
 	bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.draw.connect(func(): p.draw_rect(Rect2(0, 0, 3, p.size.y), UiTheme.ACCENT))
+	p.draw.connect(func(): p.draw_rect(Rect2(0, 0, 4, p.size.y), UiTheme.ACCENT))
 	var rt := Kit.text(p, "", 16, UiTheme.ACCENT, 6)
 	rt.add_theme_font_override("normal_font", UiFonts.get_font(400, true))
 	for c in then_show:
@@ -100,8 +112,8 @@ static func hall_of_fame(parent: Node, meta: Dictionary) -> void:
 		return
 	var g := Kit.grid(parent, 9, 12, 6)
 	for h in ["#", "Crawler", "Vorher", "Level", "Etage", "Kills", "Erfolge", "Ausgang", "Ende"]:
-		var l := Kit.label(g, h.to_upper(), 11, "muted", 600)
-		l.add_theme_font_override("font", UiFonts.get_font(600, false, 1))
+		var l := Kit.label(g, h.to_upper(), 16, "muted")
+		l.add_theme_font_override("font", UiFonts.pixel(700, 1))
 	var rows := hof.duplicate()
 	rows.reverse()
 	for h in rows.slice(0, 12):
@@ -302,7 +314,7 @@ static func end_screen(root: Control, s: Dictionary, meta: Dictionary, on_new: C
 		text = "%s Ursache: %s. Der Geist von %s wandert jetzt durch Etage %d – mit der alten Ausrüstung. Vielleicht triffst du ihn in der nächsten Staffel." % [quip, J.nn(s, "deathCause", "unbekannt"), p.name, s.floor]
 	var b: Dictionary = s.counters
 	var v := card_screen(root)
-	logo(v, headline, 36)
+	logo(v, headline, 40)
 	var rest := VBoxContainer.new()
 	rest.add_theme_constant_override("separation", 10)
 	quote(v, Kit.esc(text), [])

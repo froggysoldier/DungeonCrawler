@@ -1,7 +1,9 @@
 class_name UiTheme
 extends RefCounted
-## Das Designsystem als Godot-Theme: Farben, Schrift,
-## Knöpfe, Karten, Balken. Varianten werden über theme_type_variation gewählt.
+## Das Designsystem als Godot-Theme im Pixel-Stil: Farben, Schriften,
+## Knöpfe, Karten, Balken. Flächen sind PixelBox-Rahmen (abgestufte Ecken,
+## harte Schatten), Knöpfe und Überschriften nutzen die Pixel-Schrift,
+## Fließtext bleibt Montserrat. Varianten über theme_type_variation.
 
 const BG := Color("#0b0c10")
 const PANEL := Color("#13151b")
@@ -25,24 +27,68 @@ const HEX := {
 }
 
 static var _theme: Theme
+static var _colors := {}
 
 
-static func box(bg: Color, border: Color = Color(0, 0, 0, 0), radius: int = 8, border_w: int = 1, pad: Vector4 = Vector4(10, 6, 10, 6)) -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
+## Farbe aus einer Angabe wie in CSS: Color, "#rgb", "#rrggbb", "rgba(r, g, b, a)".
+static func css(v: Variant) -> Color:
+	if v is Color:
+		return v
+	var key: String = v
+	var c = _colors.get(key)
+	if c != null:
+		return c
+	var out := Color.BLACK
+	var t := key.strip_edges()
+	if t.begins_with("#"):
+		var h := t.substr(1)
+		if h.length() == 3:
+			h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2]
+		out = Color.html("#" + h)
+	elif t.begins_with("rgb"):
+		var inner := t.substr(t.find("(") + 1, t.rfind(")") - t.find("(") - 1)
+		var parts := inner.split(",")
+		out = Color(float(parts[0]) / 255.0, float(parts[1]) / 255.0, float(parts[2]) / 255.0, float(parts[3]) if parts.size() > 3 else 1.0)
+	elif t == "transparent":
+		out = Color(0, 0, 0, 0)
+	elif t == "white":
+		out = Color.WHITE
+	_colors[key] = out
+	return out
+
+
+## Größe der Pixel-Schrift zu einer früheren Montserrat-Größe.
+static func pixel_size(size: int) -> int:
+	return 16 if size <= 13 else (18 if size <= 15 else 20)
+
+
+## Pixel-Rahmen. radius wählt die Eckenstufe, border_w zählt in Kunstpixeln (2 px).
+static func box(bg: Color, border: Color = Color(0, 0, 0, 0), radius: int = 8, border_w: int = 1, pad: Vector4 = Vector4(10, 6, 10, 6)) -> PixelBox:
+	var sb := PixelBox.new()
 	sb.bg_color = bg
 	sb.border_color = border
 	if border.a > 0:
-		sb.set_border_width_all(border_w)
+		sb.set_border_width_all(border_w * sb.unit)
 	sb.set_corner_radius_all(radius)
 	sb.content_margin_left = pad.x
 	sb.content_margin_top = pad.y
 	sb.content_margin_right = pad.z
 	sb.content_margin_bottom = pad.w
-	sb.anti_aliasing = true
 	return sb
 
 
-static func _button(t: Theme, type: String, normal: StyleBoxFlat, hover: StyleBoxFlat, pressed: StyleBoxFlat, disabled: StyleBoxFlat, font_color: Color, hover_color: Color = Color(0, 0, 0, 0), size: int = 14, weight: int = 500) -> void:
+## Knopf-Rahmen: wie box, dazu Innenrand und ein Kunstpixel harter Schatten.
+static func bbox(bg: Color, border: Color, radius: int = 8, pad: Vector4 = Vector4(10, 6, 10, 6), shadow: bool = true) -> PixelBox:
+	var sb := box(bg, border, radius, 1, pad)
+	sb.bevel = 0.1
+	if shadow:
+		sb.shadow_color = Color(0, 0, 0, 0.5)
+		sb.shadow_size = 1
+		sb.shadow_offset = Vector2(0, 2)
+	return sb
+
+
+static func _button(t: Theme, type: String, normal: StyleBox, hover: StyleBox, pressed: StyleBox, disabled: StyleBox, font_color: Color, hover_color: Color = Color(0, 0, 0, 0), size: int = 14, weight: int = 500, pixel: bool = true) -> void:
 	if type != "Button":
 		t.set_type_variation(type, "Button")
 	t.set_stylebox("normal", type, normal)
@@ -50,18 +96,18 @@ static func _button(t: Theme, type: String, normal: StyleBoxFlat, hover: StyleBo
 	t.set_stylebox("pressed", type, pressed)
 	t.set_stylebox("hover_pressed", type, pressed)
 	t.set_stylebox("disabled", type, disabled)
-	t.set_stylebox("focus", type, box(Color(0, 0, 0, 0), ACCENT, normal.corner_radius_top_left, 2))
+	t.set_stylebox("focus", type, box(Color(0, 0, 0, 0), ACCENT, 8, 1))
 	t.set_color("font_color", type, font_color)
 	t.set_color("font_hover_color", type, hover_color if hover_color.a > 0 else font_color)
 	t.set_color("font_pressed_color", type, hover_color if hover_color.a > 0 else font_color)
 	t.set_color("font_hover_pressed_color", type, hover_color if hover_color.a > 0 else font_color)
 	t.set_color("font_focus_color", type, font_color)
 	t.set_color("font_disabled_color", type, Color(MUTED, 0.6) if font_color.v < 0.2 else Color(font_color, 0.38))
-	t.set_font_size("font_size", type, size)
-	t.set_font("font", type, UiFonts.get_font(weight))
+	t.set_font_size("font_size", type, pixel_size(size) if pixel else size)
+	t.set_font("font", type, UiFonts.pixel(weight) if pixel else UiFonts.get_font(weight))
 
 
-static func _panel(t: Theme, type: String, sb: StyleBoxFlat) -> void:
+static func _panel(t: Theme, type: String, sb: StyleBox) -> void:
 	t.set_type_variation(type, "PanelContainer")
 	t.set_stylebox("panel", type, sb)
 
@@ -87,20 +133,16 @@ static func get_theme() -> Theme:
 
 	# Knöpfe
 	var pad := Vector4(10, 6, 10, 6)
-	var n := box(Color("#1f222c"), LINE_2, 8, 1, pad)
-	n.shadow_color = Color(0, 0, 0, 0.35)
-	n.shadow_size = 1
-	n.shadow_offset = Vector2(0, 1)
-	var h := box(Color("#262a35"), Color(ACCENT, 0.6), 8, 1, pad)
-	var p := box(Color("#181b22"), Color(ACCENT, 0.6), 8, 1, Vector4(pad.x, pad.y + 1, pad.z, pad.w - 1))
+	var n := bbox(Color("#1f222c"), LINE_2, 8, pad)
+	var h := bbox(Color("#262a35"), Color(ACCENT, 0.6), 8, pad)
+	var p := bbox(Color("#181b22"), Color(ACCENT, 0.6), 8, Vector4(pad.x, pad.y + 2, pad.z, pad.w - 2), false)
 	var d := box(Color("#1f222c", 0.6), Color(LINE_2, 0.6), 8, 1, pad)
 	_button(t, "Button", n, h, p, d, TEXT)
-	var pn := box(Color("#f0b53a"), Color("#f7c65a"), 8, 1, pad)
-	pn.shadow_color = Color(ACCENT, 0.25)
-	pn.shadow_size = 6
-	pn.shadow_offset = Vector2(0, 3)
-	var ph := box(Color("#f7c24a"), Color("#ffe08c"), 8, 1, pad)
-	var pp := box(Color("#e0a42a"), Color("#f7c65a"), 8, 1, Vector4(pad.x, pad.y + 1, pad.z, pad.w - 1))
+	var pn := bbox(Color("#f0b53a"), Color("#8a5a14"), 8, pad)
+	pn.shadow_color = Color("#6a4210", 0.9)
+	var ph := bbox(Color("#f7c24a"), Color("#a06a18"), 8, pad)
+	ph.shadow_color = Color("#6a4210", 0.9)
+	var pp := bbox(Color("#e0a42a"), Color("#8a5a14"), 8, Vector4(pad.x, pad.y + 2, pad.z, pad.w - 2), false)
 	# Deaktiviert grau (nicht halb durchsichtiges Gold)
 	var pd := box(Color("#1a1d25"), LINE, 8, 1, pad)
 	_button(t, "PrimaryButton", pn, ph, pp, pd, Color("#1c1405"), Color("#1c1405"), 14, 700)
@@ -119,9 +161,7 @@ static func get_theme() -> Theme:
 	var tn := box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 7, 1, tab_pad)
 	_button(t, "TabButton", tn, box(Color(1, 1, 1, 0.04), Color(0, 0, 0, 0), 7, 1, tab_pad), tn, tn, MUTED, TEXT, 13, 600)
 	var ta := box(Color("#222530"), LINE_2, 7, 1, tab_pad)
-	ta.border_width_bottom = 2
-	ta.border_color = LINE_2
-	ta.border_width_bottom = 1
+	ta.bevel = 0.08
 	_button(t, "TabActive", ta, ta, ta, ta, ACCENT, ACCENT, 13, 600)
 	# Link
 	var ln := box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 0, Vector4(0, 2, 0, 2))
@@ -132,10 +172,10 @@ static func get_theme() -> Theme:
 	_button(t, "SpellSel", box(Color("#1c2a4a"), Color("#6fa8ff"), 7, 1, pad), box(Color("#1c2a4a"), Color("#8fbcff"), 7, 1, pad), box(Color("#1c2a4a"), Color("#6fa8ff"), 7, 1, pad), box(Color("#1c2a4a", 0.6), Color("#6fa8ff", 0.5), 7, 1, pad), Color("#9ec0ff"))
 	# Antworten im Interview
 	var ap := Vector4(16, 12, 16, 12)
-	_button(t, "AnswerButton", box(Color("#1c1f27"), LINE_2, 10, 1, ap), box(Color("#2a2718"), Color(ACCENT, 0.55), 10, 1, Vector4(20, 12, 12, 12)), box(Color("#181b22"), Color(ACCENT, 0.55), 10, 1, ap), box(Color("#1c1f27", 0.6), LINE_2, 10, 1, ap), TEXT, Color(0, 0, 0, 0), 15, 500)
+	_button(t, "AnswerButton", bbox(Color("#1c1f27"), LINE_2, 10, ap), bbox(Color("#2a2718"), Color(ACCENT, 0.55), 10, Vector4(20, 12, 12, 12)), bbox(Color("#181b22"), Color(ACCENT, 0.55), 10, ap, false), box(Color("#1c1f27", 0.6), LINE_2, 10, 1, ap), TEXT, Color(0, 0, 0, 0), 15, 500, false)
 	# Wahl (Rasse, Klasse)
 	var cp := Vector4(12, 10, 12, 10)
-	_button(t, "ChoiceButton", box(Color("#1c1f27"), LINE_2, 10, 1, cp), box(Color("#23262f"), Color(ACCENT, 0.6), 10, 1, cp), box(Color("#181b22"), Color(ACCENT, 0.6), 10, 1, cp), box(Color("#1c1f27", 0.5), LINE_2, 10, 1, cp), TEXT)
+	_button(t, "ChoiceButton", bbox(Color("#1c1f27"), LINE_2, 10, cp), bbox(Color("#23262f"), Color(ACCENT, 0.6), 10, cp), bbox(Color("#181b22"), Color(ACCENT, 0.6), 10, cp, false), box(Color("#1c1f27", 0.5), LINE_2, 10, 1, cp), TEXT)
 	_button(t, "ChoiceSel", box(Color("#2b2616"), ACCENT, 10, 1, cp), box(Color("#342d18"), ACCENT, 10, 1, cp), box(Color("#2b2616"), ACCENT, 10, 1, cp), box(Color("#2b2616", 0.5), ACCENT, 10, 1, cp), TEXT)
 	# Zoom
 	var zp := Vector4(0, 0, 0, 0)
@@ -148,18 +188,20 @@ static func get_theme() -> Theme:
 	_panel(t, "Item", box(Color("#1a1d25"), LINE, 10, 1, Vector4(11, 9, 11, 9)))
 	_panel(t, "Locked", box(Color(1, 1, 1, 0.015), LINE_2, 10, 1, Vector4(14, 14, 14, 14)))
 	var md := box(Color("#171a21"), Color(ACCENT, 0.35), 16, 1, Vector4(26, 24, 26, 24))
-	md.shadow_color = Color(0, 0, 0, 0.65)
-	md.shadow_size = 30
-	md.shadow_offset = Vector2(0, 12)
+	md.border_color = Color("#8a6a24")
+	md.shadow_color = Color(0, 0, 0, 0.6)
+	md.shadow_size = 4
+	md.shadow_offset = Vector2(0, 6)
+	md.bevel = 0.05
 	_panel(t, "Modal", md)
 	var vm := md.duplicate()
 	vm.bg_color = Color("#161218")
-	vm.border_color = Color(1, 110 / 255.0, 90 / 255.0, 0.45)
+	vm.border_color = Color("#9a3a30")
 	_panel(t, "VersusModal", vm)
 	var tp := box(Color(14 / 255.0, 16 / 255.0, 22 / 255.0, 0.95), LINE_2, 10, 1, Vector4(12, 9, 12, 9))
-	tp.shadow_color = Color(0, 0, 0, 0.55)
-	tp.shadow_size = 16
-	tp.shadow_offset = Vector2(0, 8)
+	tp.shadow_color = Color(0, 0, 0, 0.5)
+	tp.shadow_size = 4
+	tp.shadow_offset = Vector2(0, 4)
 	_panel(t, "Tip", tp)
 	_panel(t, "Pill", box(Color(1, 1, 1, 0.035), LINE, 99, 1, Vector4(11, 4, 11, 4)))
 	_panel(t, "PillWarn", box(Color(1, 93 / 255.0, 93 / 255.0, 0.22), DANGER, 99, 1, Vector4(11, 4, 11, 4)))
@@ -170,16 +212,16 @@ static func get_theme() -> Theme:
 	_panel(t, "Bottom", box(Color("#111318"), Color(0, 0, 0, 0), 0, 0, Vector4(0, 0, 0, 0)))
 	_panel(t, "ActionBar", box(Color(0, 0, 0, 0.15), Color(0, 0, 0, 0), 0, 0, Vector4(10, 8, 10, 8)))
 	var cb := box(Color(40 / 255.0, 14 / 255.0, 12 / 255.0, 0.9), Color(0, 0, 0, 0), 0, 0, Vector4(10, 10, 10, 10))
-	cb.border_width_top = 1
 	cb.border_color = Color(1, 93 / 255.0, 93 / 255.0, 0.45)
+	cb.border_width_top = 2
 	_panel(t, "CombatBar", cb)
 	_panel(t, "Target", box(Color("#1a1719"), Color("#3a2f33"), 10, 1, Vector4(9, 7, 9, 7)))
 	_panel(t, "TargetSel", box(Color("#24161a"), Color("#ff8a6a"), 10, 1, Vector4(9, 7, 9, 7)))
 	_panel(t, "Quote", box(Color(ACCENT, 0.07), Color(0, 0, 0, 0), 10, 0, Vector4(16, 12, 16, 12)))
 	var toast := box(Color(20 / 255.0, 22 / 255.0, 29 / 255.0, 0.95), LINE_2, 10, 1, Vector4(14, 10, 14, 10))
-	toast.border_width_left = 4
 	toast.shadow_color = Color(0, 0, 0, 0.5)
-	toast.shadow_size = 14
+	toast.shadow_size = 4
+	toast.shadow_offset = Vector2(0, 4)
 	_panel(t, "Toast", toast)
 	_panel(t, "MiniWrap", box(Color(10 / 255.0, 12 / 255.0, 17 / 255.0, 0.82), Color(1, 1, 1, 0.1), 10, 1, Vector4(6, 6, 6, 6)))
 	_panel(t, "Tabs", box(Color(0, 0, 0, 0.18), Color(0, 0, 0, 0), 0, 0, Vector4(8, 7, 8, 7)))

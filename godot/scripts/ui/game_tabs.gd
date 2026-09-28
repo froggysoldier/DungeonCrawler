@@ -447,7 +447,7 @@ static func skills_tab(gv: GameView, root: VBoxContainer) -> void:
 	var cat_names: Dictionary = Db.t("skills", "SKILL_CATEGORY_NAMES")
 	for cat in cat_order:
 		Kit.spacer(root, 4)
-		Kit.label(root, String(cat_names[cat]).to_upper(), 12, "muted").add_theme_font_override("font", UiFonts.get_font(400, false, 1))
+		Kit.label(root, String(cat_names[cat]).to_upper(), 16, "muted").add_theme_font_override("font", UiFonts.pixel(500, 1))
 		for st in by_cat[cat]:
 			var def: Dictionary = Db.skill(st.id)
 			var need := Rules.skill_xp_needed(st.level)

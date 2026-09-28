@@ -41,8 +41,8 @@ static var _pixel_base: FontFile
 
 ## Pixelify Sans (SIL Open Font License) für Titel, Knöpfe und die Karte.
 ## Scharf bei Größen in Zehnerschritten: ein Schriftpixel ist 1/10 der Größe.
-static func pixel(weight: int = 400) -> Font:
-	var key := -weight
+static func pixel(weight: int = 400, spacing: int = 0) -> Font:
+	var key := -weight - spacing * 10000
 	var f = _cache.get(key)
 	if f != null:
 		return f
@@ -50,6 +50,11 @@ static func pixel(weight: int = 400) -> Font:
 		_pixel_base = _load("res://assets/fonts/PixelifySans.ttf")
 	var v := FontVariation.new()
 	v.base_font = _pixel_base
-	v.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): clampi(weight, 400, 700)}
+	var ts := TextServerManager.get_primary_interface()
+	v.variation_opentype = {ts.name_to_tag("wght"): clampi(weight, 400, 700)}
+	# Ohne Ligaturen: „fl“ sähe in Pixelify sonst wie „A“ aus
+	v.opentype_features = {ts.name_to_tag("liga"): 0, ts.name_to_tag("clig"): 0, ts.name_to_tag("dlig"): 0}
+	if spacing != 0:
+		v.spacing_glyph = spacing
 	_cache[key] = v
 	return v

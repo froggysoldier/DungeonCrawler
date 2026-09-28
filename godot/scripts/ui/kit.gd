@@ -107,7 +107,7 @@ static func text(parent: Node, bb: String, size: int = 14, color: Variant = null
 		for k in ["normal_font_size", "bold_font_size", "italics_font_size", "bold_italics_font_size"]:
 			rt.add_theme_font_size_override(k, size)
 	if color != null:
-		rt.add_theme_color_override("default_color", Pen.css(UiTheme.HEX.get(color, color)) if color is String else color)
+		rt.add_theme_color_override("default_color", UiTheme.css(UiTheme.HEX.get(color, color)) if color is String else color)
 	rt.text = bb
 	return _add(parent, rt)
 
@@ -122,7 +122,7 @@ static func label(parent: Node, t: String, size: int = 14, color: Variant = null
 	if weight != 400:
 		l.add_theme_font_override("font", UiFonts.get_font(weight))
 	if color != null:
-		l.add_theme_color_override("font_color", Pen.css(UiTheme.HEX.get(color, color)) if color is String else color)
+		l.add_theme_color_override("font_color", UiTheme.css(UiTheme.HEX.get(color, color)) if color is String else color)
 	return _add(parent, l)
 
 
@@ -137,8 +137,8 @@ static func section(parent: Node, title: String, extra_bb: String = "") -> HBoxC
 	wrap.add_child(h)
 	var l := Label.new()
 	l.text = title.to_upper()
-	l.add_theme_font_size_override("font_size", 12)
-	l.add_theme_font_override("font", UiFonts.get_font(700, false, 2))
+	l.add_theme_font_size_override("font_size", 16)
+	l.add_theme_font_override("font", UiFonts.pixel(700, 1))
 	l.add_theme_color_override("font_color", UiTheme.ACCENT)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.add_child(l)
@@ -149,22 +149,21 @@ static func section(parent: Node, title: String, extra_bb: String = "") -> HBoxC
 	var line := Rule.new()
 	line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	line.custom_minimum_size = Vector2(10, 1)
+	line.custom_minimum_size = Vector2(10, 2)
 	h.add_child(line)
 	spacer(wrap, 4)
 	return h
 
 
-## Feine Linie, die nach rechts ausläuft.
+## Gepunktete Pixellinie, die nach rechts in Stufen ausläuft.
 class Rule:
 	extends Control
 
 	func _draw() -> void:
-		var steps := 24
-		var w := size.x / steps
-		for i in steps:
-			var a := 1.0 - float(i) / steps
-			draw_rect(Rect2(i * w, 0, w + 0.5, 1), Color(UiTheme.LINE_2, a))
+		var n := int(size.x / 6)
+		for i in n:
+			var a := 1.0 - floorf(float(i) / n * 4) / 4
+			draw_rect(Rect2(i * 6, 0, 4, 2), Color(UiTheme.LINE_2, a))
 
 
 ## Normaler Knopf.
@@ -194,8 +193,8 @@ static func kbutton(parent: Node, t: String, key: String, cb: Callable, variant:
 	cp.add_child(h)
 	var l := Label.new()
 	l.text = t
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_font_override("font", UiFonts.get_font(500))
+	l.add_theme_font_size_override("font_size", UiTheme.pixel_size(size))
+	l.add_theme_font_override("font", UiFonts.pixel(500))
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(l)
@@ -232,13 +231,13 @@ static func keycap(key: String) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var sb := UiTheme.box(Color("#0e1015"), Color("#3a3f4d"), 4, 1, Vector4(4, 0, 4, 0))
-	sb.border_width_bottom = 2
+	sb.border_width_bottom = 4
 	p.add_theme_stylebox_override("panel", sb)
 	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var l := Label.new()
 	l.text = key
-	l.add_theme_font_size_override("font_size", 10)
-	l.add_theme_font_override("font", UiFonts.get_font(700))
+	l.add_theme_font_size_override("font_size", 14)
+	l.add_theme_font_override("font", UiFonts.pixel(700))
 	l.add_theme_color_override("font_color", Color("#b9bdc8"))
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.custom_minimum_size = Vector2(9, 0)
@@ -272,37 +271,35 @@ class Bar:
 			queue_redraw()
 
 	func _draw() -> void:
-		var pen := Pen.new(self)
-		var w := size.x
-		var h := size.y
-		pen.fill_style = "#0d0f14"
-		pen.begin_path()
-		pen.round_rect(0, 0, w, h, 6)
-		pen.fill()
-		var fw := w * clampf(frac, 0.0, 1.0)
-		if fw > 0.5:
+		# Pixel-Balken: dunkler Rahmen, Füllung mit heller Oberkante und dunkler Unterkante
+		var u := 2.0
+		var w := floorf(size.x / u) * u
+		var h := floorf(size.y / u) * u
+		draw_rect(Rect2(u, 0, w - 2 * u, h), Color("#07080b"))
+		draw_rect(Rect2(0, u, w, h - 2 * u), Color("#07080b"))
+		draw_rect(Rect2(u, u, w - 2 * u, h - 2 * u), Color("#161922"))
+		var fw := floorf((w - 2 * u) * clampf(frac, 0.0, 1.0) / u) * u
+		if fw > 0:
 			var a := 1.0
 			if pulse:
 				a = 0.75 + 0.25 * cos(Time.get_ticks_msec() / 1000.0 * TAU)
-			var g := pen.linear_gradient(0, 0, maxf(fw, 1.0), 0)
-			g.add(0, Color(c0, a))
-			g.add(1, Color(c1, a))
-			pen.fill_style = g
-			pen.begin_path()
-			pen.round_rect(0, 0, fw, h, minf(6, fw / 2))
-			pen.fill()
-			var hl := pen.linear_gradient(0, 0, 0, h / 2)
-			hl.add(0, "rgba(255,255,255,0.22)")
-			hl.add(1, "rgba(255,255,255,0)")
-			pen.fill_style = hl
-			pen.begin_path()
-			pen.round_rect(0, 0, fw, h / 2, [minf(6, fw / 2), minf(6, fw / 2), 0, 0])
-			pen.fill()
-		var f := UiFonts.get_font(700)
-		var fs := 12
-		var y := (h + f.get_ascent(fs) - f.get_descent(fs)) / 2.0
-		draw_string(f, Vector2(10, y + 1), label, HORIZONTAL_ALIGNMENT_LEFT, w - 12, fs, Color(0, 0, 0, 0.9))
-		draw_string(f, Vector2(9, y), label, HORIZONTAL_ALIGNMENT_LEFT, w - 12, fs, UiTheme.TEXT)
+			# Farbe in vier Stufen von c0 nach c1
+			var steps := 4
+			for i in steps:
+				var x0 := floorf(fw * i / steps / u) * u
+				var x1 := floorf(fw * (i + 1) / steps / u) * u
+				if x1 > x0:
+					draw_rect(Rect2(u + x0, u, x1 - x0, h - 2 * u), Color(c0.lerp(c1, float(i) / (steps - 1)), a))
+			draw_rect(Rect2(u, u, fw, u), Color(1, 1, 1, 0.22 * a))
+			if h >= 6 * u:
+				draw_rect(Rect2(u, h - 2 * u, fw, u), Color(0, 0, 0, 0.22 * a))
+		if label == "":
+			return
+		var f := UiFonts.pixel(700)
+		var fs := 16
+		var y := roundf((h + f.get_ascent(fs) - f.get_descent(fs)) / 2.0)
+		draw_string(f, Vector2(10, y + 2), label, HORIZONTAL_ALIGNMENT_LEFT, w - 12, fs, Color(0, 0, 0, 0.9))
+		draw_string(f, Vector2(8, y), label, HORIZONTAL_ALIGNMENT_LEFT, w - 12, fs, UiTheme.TEXT)
 
 
 static func bar(parent: Node, frac: float, t: String, c0: String, c1: String, height: float = 20, pulse: bool = false) -> Bar:

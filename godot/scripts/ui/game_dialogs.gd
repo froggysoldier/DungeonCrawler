@@ -129,7 +129,7 @@ static func _pop(c: Control, delay: float) -> void:
 
 # ================================================================ Versus
 
-## Porträt einer Figur für den Versus-Bildschirm (Pixel-Figur, 12× vergrößert).
+## Porträt einer Figur für den Versus-Bildschirm (Pixel-Figur, 10× vergrößert).
 class Portrait:
 	extends Control
 	var draw_fn: Callable
@@ -163,31 +163,31 @@ static func maybe_versus(gv: GameView) -> void:
 		var row := Kit.hbox(root, 10)
 		var left := Kit.vbox(row, 2)
 		var hero := Portrait.new()
-		hero.custom_minimum_size = Vector2(220, 220)
+		hero.custom_minimum_size = Vector2(220, 240)
 		hero.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		hero.draw_fn = func(ci: CanvasItem): Sprites.draw_hero(ci, Vector2(110, 200), 12)
+		hero.draw_fn = func(ci: CanvasItem): Sprites.draw_hero(ci, Vector2(110, 226), 10)
 		left.add_child(hero)
-		_center_label(left, p.name, 22, UiTheme.ACCENT, 800)
+		_center_label(left, p.name, 30, UiTheme.ACCENT, 700, true)
 		_center_label(left, "%s · Level %d" % [who if who != "" else "Crawler", p.level], 13, UiTheme.MUTED)
 		_center_label(left, "HP %d / %d" % [maxi(0, p.hp), Player.max_hp(s)], 13, UiTheme.MUTED)
-		var vs := Kit.label(row, "VS", 64, Color.WHITE, 900)
-		vs.add_theme_font_override("font", UiFonts.get_font(900, true))
-		vs.add_theme_color_override("font_outline_color", Color(1, 90 / 255.0, 60 / 255.0, 0.9))
-		vs.add_theme_constant_override("outline_size", 10)
+		var vs := Kit.label(row, "VS", 80, Color.WHITE)
+		vs.add_theme_font_override("font", UiFonts.pixel(700))
+		vs.add_theme_color_override("font_outline_color", Color("#c8321e"))
+		vs.add_theme_constant_override("outline_size", 12)
 		vs.add_theme_color_override("font_shadow_color", Color("#e9aa2c"))
 		vs.add_theme_constant_override("shadow_offset_x", 4)
 		vs.add_theme_constant_override("shadow_offset_y", 4)
 		vs.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		var right := Kit.vbox(row, 2)
 		var bp := Portrait.new()
-		bp.custom_minimum_size = Vector2(220, 220)
+		bp.custom_minimum_size = Vector2(220, 240)
 		bp.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		var kind := Sprites.sprite_for(boss.defId)
 		var col = boss.color
 		var unk: bool = info.insight >= 3
-		bp.draw_fn = func(ci: CanvasItem): Sprites.draw_portrait(ci, kind, col, Vector2(110, 200), 12, {"crown": true, "flip": true, "unknown": unk})
+		bp.draw_fn = func(ci: CanvasItem): Sprites.draw_portrait(ci, kind, col, Vector2(110, 226), 10, {"crown": true, "flip": true, "unknown": unk})
 		right.add_child(bp)
-		_center_label(right, info.name, 22, Color("#ff7a6a"), 800)
+		_center_label(right, info.name, 30, Color("#ff7a6a"), 700, true)
 		_center_label(right, "%s · %s" % [rank, info.level], 13, UiTheme.MUTED)
 		_center_label(right, info.challenge.name, 13, Color(info.challenge.color))
 		# Beide Seiten blenden nacheinander ein, dann springt das VS herein
@@ -219,8 +219,10 @@ static func maybe_versus(gv: GameView) -> void:
 	gv.modals().custom(build, 820, "VersusModal")
 
 
-static func _center_label(parent: Node, text: String, size: int, color: Color, weight: int = 400) -> void:
-	var l := Kit.label(parent, text, size, color, weight)
+static func _center_label(parent: Node, text: String, size: int, color: Color, weight: int = 400, pixel: bool = false) -> void:
+	var l := Kit.label(parent, text, size, color, 400 if pixel else weight)
+	if pixel:
+		l.add_theme_font_override("font", UiFonts.pixel(weight))
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	l.custom_minimum_size = Vector2(240, 0)

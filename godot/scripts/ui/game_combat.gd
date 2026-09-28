@@ -128,8 +128,8 @@ static func _col(parent: Node, title: String, ratio: float, hint: String = "") -
 	v.size_flags_stretch_ratio = ratio
 	parent.add_child(v)
 	var h := Kit.hbox(v, 6)
-	var l := Kit.label(h, title.to_upper(), 12, Color("#ff9b85"), 700)
-	l.add_theme_font_override("font", UiFonts.get_font(700, false, 1))
+	var l := Kit.label(h, title.to_upper(), 16, Color("#ff9b85"))
+	l.add_theme_font_override("font", UiFonts.pixel(700, 1))
 	if hint != "":
 		Kit.label(h, hint, 12, "muted")
 	return v

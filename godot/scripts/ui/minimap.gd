@@ -42,10 +42,11 @@ func _draw() -> void:
 	by1 = mini(mh - 1, by1 + pad)
 	var bw := bx1 - bx0 + 1
 	var bh := by1 - by0 + 1
-	var cell := minf(minf(w / bw, h / bh), 8.0)
-	var ox := (w - cell * bw) / 2 - bx0 * cell
-	var oy := (h - cell * bh) / 2 - by0 * cell
-	var cs := ceilf(cell)
+	# Ganze Pixel je Feld, damit die Karte scharf bleibt
+	var cell := maxf(1.0, floorf(minf(minf(w / bw, h / bh), 8.0)))
+	var ox := floorf((w - cell * bw) / 2) - bx0 * cell
+	var oy := floorf((h - cell * bh) / 2) - by0 * cell
+	var cs := cell
 	for y in range(by0, by1 + 1):
 		for x in range(bx0, bx1 + 1):
 			var i := y * mw + x
@@ -80,8 +81,11 @@ func _draw() -> void:
 	if si >= 0 and explored[si]:
 		var sx := ox + (si % mw) * cell + cell / 2
 		var sy := oy + (si / mw) * cell + cell / 2
-		draw_arc(Vector2(sx, sy), maxf(3, cell * 1.6), 0, TAU, 32, Color("#ffcc33"), 1.5, true)
+		var r := maxf(3, floorf(cell * 1.6))
+		draw_rect(Rect2(floorf(sx - r), floorf(sy - r), r * 2, r * 2), Color("#ffcc33"), false, 2.0)
 	var px: float = ox + s.player.pos.x * cell + cell / 2
 	var py: float = oy + s.player.pos.y * cell + cell / 2
-	draw_circle(Vector2(px, py), maxf(4, cell * 2.4), Color(1, 214 / 255.0, 90 / 255.0, 0.3), true, -1.0, true)
-	draw_circle(Vector2(px, py), maxf(2, cell * 1.1), Color("#fff4cc"), true, -1.0, true)
+	var g := maxf(4, floorf(cell * 2.4))
+	draw_rect(Rect2(floorf(px - g), floorf(py - g), g * 2, g * 2), Color(1, 214 / 255.0, 90 / 255.0, 0.3))
+	var d := maxf(2, floorf(cell * 1.1))
+	draw_rect(Rect2(floorf(px - d), floorf(py - d), d * 2, d * 2), Color("#fff4cc"))

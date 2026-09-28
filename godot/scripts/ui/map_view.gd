@@ -682,12 +682,11 @@ func _digits(ci: CanvasItem, x: float, y: float, text: String, c: Color) -> void
 					ci.draw_rect(Rect2(x + (n * 4 + gx) * px, y + gy * px, px, px), c)
 
 
-## Stufenmarke unten links: Farbe zeigt die Herausforderung.
+## Stufenmarke unten links: dunkles Kästchen, Ziffern in der Farbe der Herausforderung.
 func _level_pill(ci: CanvasItem, sx: float, sy: float, text: String, color: Variant) -> void:
 	var w := text.length() * 4 + 1
-	_rect(ci, sx, sy, -1, 10, w + 2, 7, Color(0.02, 0.02, 0.05, 0.9))
-	_rect(ci, sx, sy, 0, 11, w, 5, _col(_hex_or(color, "#a39a8c")))
-	_digits(ci, sx + px, sy + 11 * px, text, Color("#12100c"))
+	_rect(ci, sx, sy, -1, 10, w + 2, 7, Color(0.02, 0.02, 0.05, 0.92))
+	_digits(ci, sx + px, sy + 11 * px, text, _col(_hex_or(color, "#a39a8c")))
 
 
 ## Kleines Schild unter einer Figur, z. B. „am Boden“.
