@@ -20,6 +20,39 @@ class Checker:
 		if actual != expected:
 			failures.append("%s: %s – erwartet %s, bekommen %s" % [current, msg, str(expected), str(actual)])
 
+	func _cmp(cond: bool, msg: String, detail: String) -> void:
+		checks += 1
+		if not cond:
+			failures.append("%s: %s – %s" % [current, msg, detail])
+
+	func has(list: Variant, item: Variant, msg: String = "") -> void:
+		_cmp(list != null and list.has(item), msg, "%s fehlt in %s" % [str(item), str(list).left(200)])
+
+	func lacks(list: Variant, item: Variant, msg: String = "") -> void:
+		_cmp(list == null or not list.has(item), msg, "%s sollte nicht enthalten sein" % str(item))
+
+	func gt(a: Variant, b: Variant, msg: String = "") -> void:
+		_cmp(a != null and a > b, msg, "%s ist nicht größer als %s" % [str(a), str(b)])
+
+	func ge(a: Variant, b: Variant, msg: String = "") -> void:
+		_cmp(a != null and a >= b, msg, "%s ist kleiner als %s" % [str(a), str(b)])
+
+	func lt(a: Variant, b: Variant, msg: String = "") -> void:
+		_cmp(a != null and a < b, msg, "%s ist nicht kleiner als %s" % [str(a), str(b)])
+
+	func le(a: Variant, b: Variant, msg: String = "") -> void:
+		_cmp(a != null and a <= b, msg, "%s ist größer als %s" % [str(a), str(b)])
+
+	func matches(text: Variant, pattern: String, msg: String = "") -> void:
+		var re := RegEx.create_from_string(pattern)
+		_cmp(text != null and re.search(str(text)) != null, msg, "„%s“ passt nicht zu /%s/" % [str(text), pattern])
+
+	func is_null(v: Variant, msg: String = "") -> void:
+		_cmp(v == null, msg, "erwartet null, bekommen %s" % str(v).left(200))
+
+	func not_null(v: Variant, msg: String = "") -> void:
+		_cmp(v != null, msg, "Wert fehlt")
+
 
 func _initialize() -> void:
 	# Erst nach dem ersten Bild ist der Baum bereit (für Oberflächen-Tests)
@@ -37,7 +70,13 @@ func _initialize() -> void:
 	if not filter.is_empty():
 		files = files.filter(func(f): return f.contains(filter[0]))
 	for file in files:
-		var inst = load("res://tests/%s" % file).new()
+		var scr = load("res://tests/%s" % file)
+		if scr == null or not scr.can_instantiate():
+			t.checks += 1
+			t.failures.append("%s: Skript lässt sich nicht laden" % file)
+			print("  FEHLER  %s lässt sich nicht laden" % file)
+			continue
+		var inst = scr.new()
 		if inst.has_method("setup"):
 			inst.setup(data)
 		for m in inst.get_method_list():
