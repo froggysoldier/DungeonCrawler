@@ -129,22 +129,16 @@ static func _pop(c: Control, delay: float) -> void:
 
 # ================================================================ Versus
 
-## Porträt einer Figur für den Versus-Bildschirm.
+## Porträt einer Figur für den Versus-Bildschirm (Pixel-Figur, 12× vergrößert).
 class Portrait:
 	extends Control
 	var draw_fn: Callable
 
+	func _init() -> void:
+		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+
 	func _draw() -> void:
-		var pen := Pen.new(self)
-		# Schlagschatten
-		var g := pen.radial_gradient(110, 200, 0, 110, 200, 80)
-		g.add(0, "rgba(0,0,0,0.45)")
-		g.add(1, "rgba(0,0,0,0)")
-		pen.fill_style = g
-		pen.begin_path()
-		pen.ellipse(110, 200, 80, 18, 0, 0, TAU)
-		pen.fill()
-		draw_fn.call(pen)
+		draw_fn.call(self)
 
 
 ## Versus-Bildschirm beim Betreten einer Boss-Kammer: Crawler gegen Boss.
@@ -171,7 +165,7 @@ static func maybe_versus(gv: GameView) -> void:
 		var hero := Portrait.new()
 		hero.custom_minimum_size = Vector2(220, 220)
 		hero.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		hero.draw_fn = func(pen: Pen): Sprites.draw_hero(pen, 110, 120, 190)
+		hero.draw_fn = func(ci: CanvasItem): Sprites.draw_hero(ci, Vector2(110, 200), 12)
 		left.add_child(hero)
 		_center_label(left, p.name, 22, UiTheme.ACCENT, 800)
 		_center_label(left, "%s · Level %d" % [who if who != "" else "Crawler", p.level], 13, UiTheme.MUTED)
@@ -191,7 +185,7 @@ static func maybe_versus(gv: GameView) -> void:
 		var kind := Sprites.sprite_for(boss.defId)
 		var col = boss.color
 		var unk: bool = info.insight >= 3
-		bp.draw_fn = func(pen: Pen): Sprites.draw_sprite(pen, kind, col, 110, 120, 200, {"crown": true, "flip": true, "unknown": unk})
+		bp.draw_fn = func(ci: CanvasItem): Sprites.draw_portrait(ci, kind, col, Vector2(110, 200), 12, {"crown": true, "flip": true, "unknown": unk})
 		right.add_child(bp)
 		_center_label(right, info.name, 22, Color("#ff7a6a"), 800)
 		_center_label(right, "%s · %s" % [rank, info.level], 13, UiTheme.MUTED)

@@ -34,3 +34,22 @@ static func get_font(weight: int = 400, is_italic: bool = false, spacing: int = 
 		v.spacing_glyph = spacing
 	_cache[key] = v
 	return v
+
+
+static var _pixel_base: FontFile
+
+
+## Pixelify Sans (SIL Open Font License) für Titel, Knöpfe und die Karte.
+## Scharf bei Größen in Zehnerschritten: ein Schriftpixel ist 1/10 der Größe.
+static func pixel(weight: int = 400) -> Font:
+	var key := -weight
+	var f = _cache.get(key)
+	if f != null:
+		return f
+	if _pixel_base == null:
+		_pixel_base = _load("res://assets/fonts/PixelifySans.ttf")
+	var v := FontVariation.new()
+	v.base_font = _pixel_base
+	v.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): clampi(weight, 400, 700)}
+	_cache[key] = v
+	return v

@@ -1,29 +1,46 @@
 extends SceneTree
-## Entwicklerwerkzeug: alle Kreaturen, Gegenstände und Fallen als Bogen.
-##   xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- ziel.png
-
-const KINDS := ["ratte", "kakerlake", "kobold", "schleim", "hase", "geist", "alien", "sack", "wurm", "zombie", "gnom", "spinne", "fledermaus", "kroete", "irrlicht", "tentakel", "maschine", "drohne", "hund", "troll", "skelett", "mensch", "elementar", "kroko", "fisch", "hexe", "pilz", "motte", "vogel", "crawler", "haustier"]
-const COLORS := ["#8a7a6a", "#6a4a2a", "#5fa04a", "#6ad04a", "#c8a878", "#b8c8ff", "#9aa0b0", "#3a3a3a", "#8a6a4a", "#7a8a5a"]
+## Entwicklerwerkzeug: alle Monster in ihrer echten Farbe (so, wie sie im
+## Spiel getönt werden), dazu Spielfigur, Reittiere, Gegenstände und Fallen.
+##   xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- ziel.png [vergrößerung]
 
 
 class Sheet:
 	extends Control
+	var scale_px := 4
 
 	func _draw() -> void:
-		var c := Pen.new(self)
 		draw_rect(Rect2(Vector2.ZERO, size), Color("#1a1d25"))
-		for i in KINDS.size():
-			var x := 60.0 + (i % 10) * 110
-			var y := 60.0 + (i / 10) * 120
-			Sprites.draw_sprite(c, KINDS[i], COLORS[i % COLORS.size()], x, y, 90, {"time": 0.0, "crown": i == 0, "unknown": i == 1})
-		Sprites.draw_hero(c, 60 + 1 * 110, 60 + 3 * 120, 90)
+		var font := UiFonts.get_font(500)
+		var cell := 16 * scale_px + 28
+		var cols := int(size.x / cell)
+		var entries: Array = []
+		for m in Db.t("monsters", "MONSTERS"):
+			entries.append([m.id, "kreatur/" + Sprites.sprite_for(m.id), m.color])
+		for m in Db.t("monsters", "HOOD_BOSSES"):
+			entries.append([m.id, "kreatur/" + Sprites.sprite_for(m.id), m.color])
+		entries.append(["held", "kreatur/held", null])
+		entries.append(["haustier", "kreatur/haustier", "#e0a0c8"])
+		for n in PixelArt.names("reittier/"):
+			entries.append([n.get_file(), n, null])
+		for n in PixelArt.names("ding/"):
+			entries.append([n.get_file(), n, "#5aa0ff"])
+		for n in PixelArt.names("falle/"):
+			entries.append([n.get_file(), n, "#ff5a4a"])
+		for i in entries.size():
+			var e: Array = entries[i]
+			var at := Vector2(14 + (i % cols) * cell, 10 + (i / cols) * (cell + 8))
+			PixelArt.draw(self, e[1], at, scale_px, e[2])
+			draw_string(font, at + Vector2(0, 16 * scale_px + 14), String(e[0]).left(14), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("#a7a9b4"))
 
 
 func _initialize() -> void:
-	var out := OS.get_cmdline_user_args()[0]
+	var args := OS.get_cmdline_user_args()
+	var out := args[0]
 	var sh := Sheet.new()
+	if args.size() > 1:
+		sh.scale_px = int(args[1])
 	sh.size = Vector2(1600, 900)
-	sh.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	sh.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	get_root().add_child(sh)
 	for i in 4:
 		await process_frame
