@@ -40,6 +40,9 @@ class Backdrop:
 	func _init() -> void:
 		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 
+	func _process(_d: float) -> void:
+		queue_redraw()
+
 	func _draw() -> void:
 		var w := size.x
 		var h := size.y
@@ -53,14 +56,25 @@ class Backdrop:
 		# Gestuftes Leuchten oben (Gold) und unten rechts (Rosa)
 		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w / 2 - 16 * 28, -16 * 28 - h * 0.1), 28, null, false, Color(UiTheme.ACCENT, 0.12))
 		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w - 16 * 22, h - 16 * 16), 22, null, false, Color(UiTheme.ACCENT_2, 0.07))
-		# Kreaturen am unteren Rand, als dunkle Parade
+		# Kreaturen am unteren Rand: eine dunkle Parade, die langsam nach links zieht
 		var sc := 5
 		var step := 16 * sc + 24
-		var n := int(w / step) + 1
-		for i in n:
+		var ms := Time.get_ticks_msec()
+		var shift := fmod(ms * 0.03, float(step * PARADE.size()))
+		var n := int(w / step) + 2
+		var first := int(shift / step)
+		for j in n:
+			var i := first + j
 			var kind: String = PARADE[i % PARADE.size()]
-			var foot := Vector2(i * step + step / 2.0, h - 8)
-			PixelArt.draw_foot(self, "kreatur/" + kind, foot, sc, TINTS[i % TINTS.size()], i % 2 == 1, Color(0.35, 0.33, 0.4, 0.55))
+			var name := "kreatur/" + kind
+			# Flatternde Wesen im Wechsel mit ihrem zweiten Bild, alle wippen im Schritt
+			var alt := name + "_2"
+			if PixelArt.has(alt) and (ms / 180 + i) % 2 == 1:
+				name = alt
+			var bob := sc if (ms / 260 + i) % 2 == 1 else 0
+			var x := roundf((i * step - shift + step / 2.0) / sc) * sc
+			var foot := Vector2(x, h - 8 - bob)
+			PixelArt.draw_foot(self, name, foot, sc, TINTS[i % TINTS.size()], true, Color(0.35, 0.33, 0.4, 0.55))
 
 
 static func logo(parent: Node, text: String, size: int = 60) -> Label:

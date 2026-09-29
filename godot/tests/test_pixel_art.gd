@@ -42,6 +42,24 @@ func test_fallen_reittiere_einrichtung(t) -> void:
 	t.eq(_missing(names), [], "Fallen, Reittiere, Möbel, Gegenstände")
 
 
+func test_haustiere_und_zweite_bilder(t) -> void:
+	var names: Array = []
+	for species in Db.t("pets", "PET_SPECIES"):
+		var look := Sprites.pet_sprite(species)
+		t.ok(look[0] != "kreatur/haustier", "%s hat ein eigenes Bild" % species)
+		names.append(look[0])
+	t.eq(_missing(names), [], "Haustier-Bilder")
+	var pairs := 0
+	for n in PixelArt.names("kreatur/"):
+		if String(n).ends_with("_2"):
+			pairs += 1
+			var base := String(n).trim_suffix("_2")
+			t.ok(PixelArt.has(base), "%s hat ein erstes Bild" % n)
+			t.eq(PixelArt.size_of(n), PixelArt.size_of(base), "%s gleich groß" % n)
+	t.ge(pairs, 9, "zweite Bilder")
+	t.eq(_missing(["moebel/fackel", "moebel/fackel_2"]), [], "Fackel")
+
+
 func test_kacheln_vollstaendig(t) -> void:
 	var names: Array = ["treppe"]
 	for mat in Tiles.MATERIALS:

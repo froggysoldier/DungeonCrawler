@@ -2,11 +2,23 @@ class_name Animator
 extends RefCounted
 ## Weiche Bewegung und Effekte: Figuren gleiten
 ## von Feld zu Feld, die Kamera folgt sanft, Geschosse fliegen sichtbar,
-## Schadenszahlen steigen auf. Die Spiellogik bleibt rundenbasiert.
+## Schadenszahlen steigen auf. Angreifer machen einen Ausfallschritt, Getroffene
+## blitzen auf, Besiegte zerfallen in Pixel, schwere Treffer lassen das Bild
+## beben. Die Spiellogik bleibt rundenbasiert.
 
 const STEP_MS := 125.0
+const LUNGE_MS := 200.0
+const FLASH_MS := 110.0
+const BURST_MS := 650.0
+const SHAKE_MS := 180.0
+const SPARKLE_MS := 1200.0
 
 var _tweens: Dictionary = {}
+var _lunges: Dictionary = {}
+var _flashes: Dictionary = {}
+var _bursts: Array = []
+var _shake: Dictionary = {}
+var _sparkles: Array = []
 var _shots: Array = []
 var _floaters: Array = []
 var _cam: Variant = null
@@ -52,20 +64,51 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 	var bp = before.get("p")
 	if bp != null and maxf(absf(bp.x - s.player.pos.x), absf(bp.y - s.player.pos.y)) > 3:
 		_cam = null
+	# Wer steht wo (nach der Aktion, sonst davor)?
+	var at_key := {}
+	for key in before:
+		at_key["%d,%d" % [before[key].x, before[key].y]] = key
+	for key in current:
+		at_key["%d,%d" % [current[key].x, current[key].y]] = key
 	var delay := 0.0
 	var per_tile := {}
+	# Ankunft von Geschossen je Feld: Treffer und Zahlen erst, wenn es ankommt
+	var arrival := {}
 	for f in fx:
-		if f.kind == "shot":
-			var a := Vector2(f.from.x, f.from.y)
-			var b := Vector2(f.to.x, f.to.y)
-			var dur := maxf(120.0, a.distance_to(b) * 45)
-			_shots.append({"from": a, "to": b, "start": now + delay, "dur": dur, "style": f.style})
-			delay += 60
-		else:
-			var key := "%d,%d" % [f.at.x, f.at.y]
-			var n: int = per_tile.get(key, 0)
-			per_tile[key] = n + 1
-			_floaters.append({"at": Vector2(f.at.x, f.at.y), "text": f.text, "color": f.color, "start": now + delay + n * 260, "dur": 900.0})
+		match f.kind:
+			"shot":
+				var a := Vector2(f.from.x, f.from.y)
+				var b := Vector2(f.to.x, f.to.y)
+				var dur := maxf(120.0, a.distance_to(b) * 45)
+				_shots.append({"from": a, "to": b, "start": now + delay, "dur": dur, "style": f.style})
+				arrival["%d,%d" % [f.to.x, f.to.y]] = now + delay + dur
+				delay += 60
+			"strike":
+				var key = at_key.get("%d,%d" % [f.from.x, f.from.y])
+				var d := Vector2(f.to.x - f.from.x, f.to.y - f.from.y)
+				if key != null and d != Vector2.ZERO:
+					_lunges[key] = {"dir": d.normalized(), "start": now + delay, "dur": LUNGE_MS}
+					arrival["%d,%d" % [f.to.x, f.to.y]] = now + delay + LUNGE_MS * 0.5
+			"hit":
+				var tile := "%d,%d" % [f.at.x, f.at.y]
+				var t0: float = maxf(now + delay, arrival.get(tile, 0.0))
+				var key = at_key.get(tile)
+				if key != null:
+					_flashes[key] = {"start": t0, "dur": FLASH_MS}
+				if f.get("strong", false):
+					_shake = {"start": t0, "dur": SHAKE_MS, "amp": 2 if key == "p" else 1}
+			"levelup":
+				_sparkles.append({"start": now + delay, "dur": SPARKLE_MS})
+			"death":
+				var tile := "%d,%d" % [f.at.x, f.at.y]
+				var t0: float = maxf(now + delay, arrival.get(tile, 0.0)) + 60
+				_bursts.append({"at": Vector2(f.at.x, f.at.y), "defId": f.defId, "color": f.get("color"), "rank": f.get("rank", "normal"), "start": t0, "dur": BURST_MS})
+			_:
+				var tile := "%d,%d" % [f.at.x, f.at.y]
+				var n: int = per_tile.get(tile, 0)
+				per_tile[tile] = n + 1
+				var t0: float = maxf(now + delay, arrival.get(tile, 0.0))
+				_floaters.append({"at": Vector2(f.at.x, f.at.y), "text": f.text, "color": f.color, "start": t0 + n * 260, "dur": 900.0})
 
 
 func draw_pos(key: String, fallback: Vector2, now: float = -1.0) -> Vector2:
@@ -81,6 +124,82 @@ func draw_pos(key: String, fallback: Vector2, now: float = -1.0) -> Vector2:
 	return (t.from as Vector2).lerp(t.to, _ease(k))
 
 
+## Ausfallschritt einer Figur in Kacheln (0 außerhalb eines Angriffs).
+func lunge(key: String, now: float = -1.0) -> Vector2:
+	var l = _lunges.get(key)
+	if l == null:
+		return Vector2.ZERO
+	if now < 0:
+		now = now_ms()
+	var k: float = (now - l.start) / l.dur
+	if k >= 1:
+		_lunges.erase(key)
+		return Vector2.ZERO
+	if k < 0:
+		return Vector2.ZERO
+	return (l.dir as Vector2) * 0.3 * sin(k * PI)
+
+
+## Blitzt die Figur gerade auf (getroffen)?
+func flashing(key: String, now: float = -1.0) -> bool:
+	var f = _flashes.get(key)
+	if f == null:
+		return false
+	if now < 0:
+		now = now_ms()
+	if now >= f.start + f.dur:
+		_flashes.erase(key)
+		return false
+	return now >= f.start
+
+
+## Zerfallende Monster: at, defId, color, rank und Fortschritt k (0 bis 1).
+func bursts(now: float = -1.0) -> Array:
+	if now < 0:
+		now = now_ms()
+	_bursts = _bursts.filter(func(b): return now < b.start + b.dur)
+	var out: Array = []
+	for b in _bursts:
+		if now >= b.start:
+			var e: Dictionary = b.duplicate()
+			e.k = (now - b.start) / b.dur
+			out.append(e)
+	return out
+
+
+## Funken beim Stufenaufstieg: Fortschritte k (0 bis 1) der laufenden Funkenregen.
+func sparkles(now: float = -1.0) -> Array:
+	if now < 0:
+		now = now_ms()
+	_sparkles = _sparkles.filter(func(sp): return now < sp.start + sp.dur)
+	var out: Array = []
+	for sp in _sparkles:
+		if now >= sp.start:
+			out.append((now - sp.start) / sp.dur)
+	return out
+
+
+## Beben des Bildes in Kunstpixeln.
+func shake(now: float = -1.0) -> Vector2:
+	if _shake.is_empty():
+		return Vector2.ZERO
+	if now < 0:
+		now = now_ms()
+	var k: float = (now - _shake.start) / _shake.dur
+	if k >= 1:
+		_shake = {}
+		return Vector2.ZERO
+	if k < 0:
+		return Vector2.ZERO
+	var amp: float = _shake.amp * (1 - k)
+	return Vector2(roundf(sin(now / 18.0) * amp), roundf(cos(now / 23.0) * amp * 0.6))
+
+
+## Gleitet diese Figur gerade von Feld zu Feld?
+func moving(key: String) -> bool:
+	return _tweens.has(key)
+
+
 ## Läuft gerade noch eine Bewegung des Spielers?
 func player_moving(now: float = -1.0) -> float:
 	var t = _tweens.get("p")
@@ -94,7 +213,7 @@ func player_moving(now: float = -1.0) -> float:
 func busy(now: float = -1.0) -> bool:
 	if now < 0:
 		now = now_ms()
-	if not _tweens.is_empty():
+	if not _tweens.is_empty() or not _lunges.is_empty():
 		return true
 	for sh in _shots:
 		if now < sh.start + sh.dur:
@@ -109,6 +228,11 @@ func reset() -> void:
 	_tweens.clear()
 	_shots.clear()
 	_floaters.clear()
+	_lunges.clear()
+	_flashes.clear()
+	_bursts.clear()
+	_sparkles.clear()
+	_shake = {}
 	_cam = null
 
 
@@ -147,4 +271,4 @@ func frame(s: Dictionary, now: float = -1.0) -> Dictionary:
 			continue
 		var k: float = (now - f.start) / f.dur
 		floaters.append({"x": f.at.x, "y": f.at.y - 0.2 - k * 0.9, "text": f.text, "color": f.color, "alpha": 1.0 if k < 0.7 else 1 - (k - 0.7) / 0.3})
-	return {"cam": _cam, "projectiles": projectiles, "floaters": floaters, "time": now, "now": now}
+	return {"cam": _cam, "projectiles": projectiles, "floaters": floaters, "bursts": bursts(now), "sparkles": sparkles(now), "shake": shake(now), "time": now, "now": now}

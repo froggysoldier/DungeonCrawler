@@ -104,6 +104,8 @@ static func _attack_player(s: Dictionary, m: Dictionary, ranged: bool) -> void:
 	var verb := "schießt auf dich" if ranged else "greift an"
 	if ranged:
 		Fx.shot(s, m.pos, p.pos, _shot_style(s, m))
+	else:
+		Fx.strike(s, m.pos, p.pos)
 	var covered := J.some(p.buffs, func(x): return x.name == "Deckung")
 	if covered:
 		Skills.train_skill(s, "block", Skills.learn_factor(s, m.level))
@@ -143,6 +145,7 @@ static func _attack_player(s: Dictionary, m: Dictionary, ranged: bool) -> void:
 		Observer.train_defense(s, source, "abhaertung")
 	p.hp -= dmg
 	Fx.float_text(s, p.pos, "-%d" % dmg, Fx.COLORS.gegenSpieler)
+	Fx.hit(s, p.pos, dmg >= Player.max_hp(s, b) * 0.15)
 	s.counters.damageTaken += dmg
 	s.counters.hitTakenStreak += 1
 	Log.add(s, "%s %s und trifft dich für %d Schaden." % [Identify.name_of_cap(s, m), verb, dmg], "gefahr")

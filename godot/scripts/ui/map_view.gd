@@ -83,6 +83,9 @@ uniform vec2 grid = vec2(0.0);
 uniform vec2 light_pos = vec2(0.0);
 uniform float radius = 100.0;
 uniform vec2 view_size = vec2(100.0);
+// Fackeln: xy Bildschirmposition, z Radius
+uniform vec3 torches[8];
+uniform int torch_count = 0;
 varying vec2 local_pos;
 float bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
 float bayer4(vec2 a) { return bayer2(0.5 * a) * 0.25 + bayer2(a); }
@@ -93,6 +96,13 @@ void fragment() {
 	float d = distance(center, light_pos) / max(radius, 1.0);
 	float a = mix(0.0, 0.16, clamp((d - 0.4) / 0.3, 0.0, 1.0));
 	a = mix(a, 0.45, clamp((d - 0.7) / 0.35, 0.0, 1.0));
+	for (int i = 0; i < 8; i++) {
+		if (i >= torch_count) {
+			break;
+		}
+		float dt = distance(center, torches[i].xy) / max(torches[i].z, 1.0);
+		a = min(a, mix(0.0, 0.45, clamp((dt - 0.35) / 0.65, 0.0, 1.0)));
+	}
 	float r0 = min(view_size.x, view_size.y) * 0.35;
 	float r1 = max(view_size.x, view_size.y) * 0.75;
 	float v = clamp((length(center - view_size * 0.5) - r0) / (r1 - r0), 0.0, 1.0) * 0.5;
@@ -109,6 +119,8 @@ uniform float cell = 3.0;
 uniform vec2 grid = vec2(0.0);
 uniform vec2 light_pos = vec2(0.0);
 uniform float radius = 100.0;
+uniform vec3 torches[8];
+uniform int torch_count = 0;
 varying vec2 local_pos;
 float bayer2(vec2 a) { a = floor(a); return fract(a.x / 2.0 + a.y * a.y * 0.75); }
 float bayer4(vec2 a) { return bayer2(0.5 * a) * 0.25 + bayer2(a); }
@@ -119,7 +131,16 @@ void fragment() {
 	float d = distance(center, light_pos) / max(radius * 0.75, 1.0);
 	float a = clamp(1.0 - d, 0.0, 1.0);
 	float q = clamp(floor(a * 4.0 + bayer4(c)) / 4.0, 0.0, 1.0) * 0.18;
-	COLOR = vec4(vec3(0.43, 0.27, 0.09) * q, 1.0);
+	vec3 col = vec3(0.43, 0.27, 0.09) * q;
+	for (int i = 0; i < 8; i++) {
+		if (i >= torch_count) {
+			break;
+		}
+		float dt = distance(center, torches[i].xy) / max(torches[i].z, 1.0);
+		float ta = clamp(1.0 - dt, 0.0, 1.0);
+		col += vec3(0.55, 0.3, 0.08) * clamp(floor(ta * 4.0 + bayer4(c)) / 4.0, 0.0, 1.0) * 0.2;
+	}
+	COLOR = vec4(col, 1.0);
 }
 """
 
@@ -242,7 +263,38 @@ func _sy(y: float) -> float:
 
 func _at(key: String, p: Dictionary) -> Vector2:
 	var v := Vector2(p.x, p.y)
-	return anim.draw_pos(key, v, frame_anim.get("now", -1.0)) if anim else v
+	if anim == null:
+		return v
+	var now: float = frame_anim.get("now", -1.0)
+	return anim.draw_pos(key, v, now) + anim.lunge(key, now)
+
+
+## Kreaturen mit zweitem Bild: flatternd oder schwebend (immer) und laufend (nur in Bewegung).
+const FLAPPING := ["kreatur/fledermaus", "kreatur/motte", "kreatur/vogel", "kreatur/drohne"]
+const WALKERS := ["kreatur/held", "kreatur/mensch"]
+
+
+## Welches Bild gerade dran ist: erstes oder zweites (Name mit „_2“).
+func _frame(name: String, key: String, moving: bool, idle: bool = true) -> String:
+	var alt := name + "_2"
+	if not idle or not PixelArt.has(alt):
+		return name
+	var time: float = frame_anim.get("time", 0.0)
+	if name in WALKERS:
+		return alt if moving and fmod(time / 130.0, 2.0) >= 1.0 else name
+	# Jede Figur mit eigenem Takt, damit nicht alle gleichzeitig schlagen
+	var phase := float(absi(key.hash()) % 97) * 11.0
+	var period := 170.0 if name in FLAPPING else 420.0
+	return alt if fmod((time + phase) / period, 2.0) >= 1.0 else name
+
+
+## Eine Figur zeichnen: zweites Bild, weißes Aufblitzen bei Treffern.
+func _figure(ci: CanvasItem, key: String, name: String, x: float, y: float, tint: Variant, flip: bool, mod: Color = Color.WHITE, moving: bool = false, idle: bool = true) -> void:
+	var n := _frame(name, key, moving, idle)
+	if anim and anim.flashing(key, frame_anim.get("now", -1.0)):
+		PixelArt.draw_texture(ci, PixelArt.silhouette(n), Vector2(x, y), px, flip, Color(1, 1, 1, mod.a))
+		return
+	_spr(ci, n, x, y, tint, flip, mod)
 
 
 static func _cond_turns(m: Dictionary, id: String) -> float:
@@ -295,6 +347,8 @@ func redraw() -> void:
 	ox = cam.x + 0.5 - cols / 2.0
 	oy = cam.y + 0.5 - rows / 2.0
 	_cam_px = Vector2(roundf(ox * tile_px / px) * px, roundf(oy * tile_px / px) * px)
+	# Beben bei schweren Treffern, in ganzen Kunstpixeln
+	_cam_px += (frame_anim.get("shake", Vector2.ZERO) as Vector2) * px
 	var vkey := "%d|%d|%d|%d" % [s.turn, s.floor, s.player.pos.x, s.player.pos.y]
 	if vkey != _vis_key:
 		_vis_key = vkey
@@ -334,6 +388,19 @@ func _known(i: int, memory: bool) -> bool:
 func _wall(x: int, y: int) -> bool:
 	var m: Dictionary = s.map
 	return x < 0 or y < 0 or x >= m.width or y >= m.height or m.tiles[y * m.width + x] == "wall"
+
+
+## Hängt an dieser Wand eine Fackel? Nur an Vorderseiten über Boden in
+## gewöhnlichen Räumen, Boss-Kammern, Arenen und Gilden, nicht zu dicht.
+func _torch_at(x: int, y: int) -> bool:
+	var m: Dictionary = s.map
+	if (x + y) % 2 != 0 or Tiles.hash(x, y, 11) > 0.2 or not MapGen.in_bounds(m, x, y + 1):
+		return false
+	var below: int = (y + 1) * int(m.width) + x
+	if m.tiles[below] != "floor":
+		return false
+	var ri: int = m.roomAt[below]
+	return ri >= 0 and m.rooms[ri].kind in ["normal", "boss", "arena", "guild"]
 
 
 static func door_name(open: bool, horizontal: bool, boss: bool) -> String:
@@ -450,6 +517,11 @@ func _draw_static(ci: CanvasItem) -> void:
 			var sx := x * T
 			var sy := y * T
 			_spr(ci, "wand/%d_%s%d" % [fl, "front" if face else "oben", v], sx, sy)
+			if face and _torch_at(x, y):
+				if vis.has(i) or vis.has(i + mw):
+					_animated.append(["torch", x, y])
+				else:
+					_spr(ci, "moebel/fackel", sx, sy)
 			var cap_h := 4 if face else TILE
 			if not _wall(x, y - 1):
 				_rect(ci, sx, sy, 0, 0, TILE, 1, lip)
@@ -497,6 +569,10 @@ func _draw_live() -> void:
 			"lairdoor":
 				_glow(ci, sx + T / 2, sy + T / 2, "#ff3c28", 0.45 + 0.3 * sin(time / 400.0))
 				_spr(ci, door_name(a[3], a[4], true), sx, sy)
+			"torch":
+				var ph: float = Tiles.hash(a[1], a[2], 12) * 1000.0
+				_glow(ci, sx + T / 2, sy + 5 * px, "#ff9a3c", 0.38 + 0.12 * sin((time + ph) / 90.0) + 0.06 * sin((time + ph) / 37.0))
+				_spr(ci, "moebel/fackel_2" if fmod((time + ph) / 160.0, 2.0) >= 1.0 else "moebel/fackel", sx, sy)
 
 	# --- Bekannte Fallen
 	for tr in J.arr(s, "traps"):
@@ -619,12 +695,25 @@ func _update_light_shaders() -> void:
 	var flick := 1 + sin(time / 90.0) * 0.012 + sin(time / 37.0) * 0.008
 	_light_center = Vector2(_sx(ppos.x) + T / 2, _sy(ppos.y) + T / 2)
 	_light_radius = Player.lichtradius(s) * T * flick
+	# Sichtbare Fackeln, die nächsten acht zum Spieler
+	var torches: Array = []
+	for a in _animated:
+		if a[0] == "torch":
+			var ph: float = Tiles.hash(a[1], a[2], 12) * 1000.0
+			var r := T * 2.6 * (1 + 0.04 * sin((time + ph) / 90.0))
+			torches.append(Vector3(_sx(a[1]) + T / 2, _sy(a[2]) + T * 0.4, r))
+	torches.sort_custom(func(u, w): return u.distance_squared_to(Vector3(_light_center.x, _light_center.y, u.z)) < w.distance_squared_to(Vector3(_light_center.x, _light_center.y, w.z)))
+	var packed := PackedVector3Array()
+	for i in 8:
+		packed.append(torches[i] if i < torches.size() else Vector3.ZERO)
 	for r in [_dark, _warm]:
 		var mat: ShaderMaterial = r.material
 		mat.set_shader_parameter("cell", float(px))
 		mat.set_shader_parameter("grid", _cam_px)
 		mat.set_shader_parameter("light_pos", _light_center)
 		mat.set_shader_parameter("radius", _light_radius * (1.05 if r == _dark else 1.0))
+		mat.set_shader_parameter("torches", packed)
+		mat.set_shader_parameter("torch_count", mini(8, torches.size()))
 	(_dark.material as ShaderMaterial).set_shader_parameter("view_size", size)
 
 
@@ -740,7 +829,7 @@ func _draw_dynamic_body() -> void:
 		var sy := _sy(p.y)
 		var party: bool = cr.get("party", false)
 		_ground(ci, sx, sy, _col("#7fe0a0" if party else "#7cc4ff", 0.7))
-		_spr(ci, "kreatur/mensch", sx, sy - px, "#4f9a6a" if party else "#4a7fb0")
+		_figure(ci, cr.uid, "kreatur/mensch", sx, sy - px, "#4f9a6a" if party else "#4a7fb0", p.x > _at("p", s.player.pos).x, Color.WHITE, anim != null and anim.moving(cr.uid))
 		if cr.hp < cr.maxHp:
 			_hp_bar(ci, sx, sy, sprite_top("kreatur/mensch") - 1, float(cr.hp) / cr.maxHp, "#6ee07a")
 
@@ -769,7 +858,7 @@ func _draw_dynamic_body() -> void:
 		var mod := Color(1, 1, 1, 0.75 if mo.rank == "geist" else 1.0)
 		if asleep:
 			mod = Color(0.8, 0.8, 0.9, mod.a)
-		_spr(ci, name, sx, sy - px + bob, mo.color, p.x > ppos.x, mod)
+		_figure(ci, mo.uid, name, sx, sy - px + bob, mo.color, p.x > ppos.x, mod, false, not asleep)
 		var top := sprite_top(name) - 1
 		if boss:
 			_spr(ci, "aufsatz/krone", sx + 4 * px, sy + (top - 5) * px + bob)
@@ -804,6 +893,11 @@ func _draw_dynamic_body() -> void:
 			if label != null:
 				_tag(ci, sx + T / 2, sy + T + px, label[0], label[1])
 
+	# --- Besiegte zerfallen in Pixel
+	for b in frame_anim.get("bursts", []):
+		if vis.has(MapGen.idx(m, int(b.at.x), int(b.at.y))):
+			_draw_burst(ci, b)
+
 	# --- Haustier
 	var pet = s.player.get("pet")
 	if pet != null and pet.alive:
@@ -811,12 +905,56 @@ func _draw_dynamic_body() -> void:
 		var sx := _sx(p.x)
 		var sy := _sy(p.y)
 		_ground(ci, sx, sy, _col("#ffb3e6", 0.7))
-		_spr(ci, "kreatur/haustier", sx, sy - px, "#e0a0c8", p.x > ppos.x)
+		var look := Sprites.pet_sprite(String(pet.get("species", "")))
+		_figure(ci, "pet", look[0], sx, sy - px, look[1], p.x > ppos.x, Color.WHITE, anim != null and anim.moving("pet"))
 		if pet.hp < pet.maxHp:
-			_hp_bar(ci, sx, sy, sprite_top("kreatur/haustier") - 1, float(pet.hp) / pet.maxHp, "#ff8ad8")
+			_hp_bar(ci, sx, sy, sprite_top(look[0]) - 1, float(pet.hp) / pet.maxHp, "#ff8ad8")
 
 	# --- Spieler
 	_draw_player(ci, _sx(ppos.x), _sy(ppos.y), time)
+	for k in frame_anim.get("sparkles", []):
+		_draw_sparkles(ci, _sx(ppos.x), _sy(ppos.y), k)
+
+
+## Ein besiegtes Monster: erst weiß, dann fliegen seine Pixel auseinander und fallen.
+func _draw_burst(ci: CanvasItem, b: Dictionary) -> void:
+	var name := "kreatur/" + Sprites.sprite_for(String(b.defId), b.rank == "geist")
+	var sx := _sx(b.at.x)
+	var sy := _sy(b.at.y) - px
+	var k: float = b.k
+	if k < 0.1:
+		PixelArt.draw_texture(ci, PixelArt.silhouette(name), Vector2(sx, sy), px)
+		return
+	var t := (k - 0.1) / 0.9
+	var alpha := 1.0 - t * t
+	var pix := PixelArt.pixels(name, b.color)
+	for i in pix.size():
+		var q: Vector2i = pix[i][0]
+		var c: Color = pix[i][1]
+		var h := Tiles.hash(q.x, q.y, 77)
+		var dx := (q.x - 7.5) * (0.5 + h) * t * 1.4
+		var dy := (q.y - 9.0) * (0.3 + h * 0.5) * t + 10.0 * t * t
+		ci.draw_rect(Rect2(sx + roundf(q.x + dx) * px, sy + roundf(q.y + dy) * px, px, px), Color(c, c.a * alpha))
+
+
+## Stufenaufstieg: goldene Funken steigen in Säulen um die Spielfigur auf.
+func _draw_sparkles(ci: CanvasItem, sx: float, sy: float, k: float) -> void:
+	var gold := [Color("#fee761"), Color("#feae34"), Color("#ffffff")]
+	var alpha := 1.0 if k < 0.7 else 1.0 - (k - 0.7) / 0.3
+	if k < 0.15:
+		_spr(ci, "aufsatz/ring_gross", sx - 2 * px, sy + 9 * px, null, false, Color(1, 0.9, 0.4, 1.0 - k / 0.15))
+	for i in 18:
+		var h := Tiles.hash(i, 3, 91)
+		var x := -3 + int(h * 22)
+		var start := Tiles.hash(i, 5, 92) * 0.4
+		var t := clampf((k - start) / 0.6, 0.0, 1.0)
+		if t <= 0.0 or t >= 1.0:
+			continue
+		var y := 14 - int(t * (18 + h * 8))
+		var c: Color = gold[i % 3]
+		ci.draw_rect(Rect2(sx + x * px, sy + y * px, px, px), Color(c, alpha))
+		if i % 3 == 0:
+			ci.draw_rect(Rect2(sx + x * px, sy + (y + 1) * px, px, px), Color(c, alpha * 0.4))
 
 
 func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
@@ -839,7 +977,8 @@ func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
 	if riding and not vehicle:
 		_spr(ci, mount_name, sx, sy, null, flip)
 	var lift := (5 if riding and not vehicle else (3 if riding else 1)) * px
-	_spr(ci, "kreatur/held", sx, sy - lift + bob, null, flip)
+	var walking: bool = anim != null and anim.player_moving(frame_anim.get("now", -1.0)) > 0
+	_figure(ci, "p", "kreatur/held", sx, sy - lift + (0.0 if walking else bob), null, flip, Color.WHITE, walking)
 	if riding and vehicle:
 		_spr(ci, mount_name, sx, sy, null, flip)
 	# Zustände des Crawlers als farbige Ringe

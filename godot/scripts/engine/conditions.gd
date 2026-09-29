@@ -110,6 +110,7 @@ static func turn(s: Dictionary, m: Dictionary, kill: Callable) -> bool:
 			s.counters.damageDealt += dmg
 			if Sight.player_sees(s, m.pos):
 				Fx.float_text(s, m.pos, str(dmg), CONDITIONS[id].color)
+				Fx.hit(s, m.pos)
 				Log.add(s, "%s %s: %d Schaden." % [Identify.name_of_cap(s, m), CONDITIONS[id].state, dmg], "kampf")
 			if m.hp <= 0:
 				kill.call(m, part)

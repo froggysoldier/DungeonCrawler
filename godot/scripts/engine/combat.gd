@@ -162,6 +162,8 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 	var name := technique_name(t)
 	if thrown != null:
 		Fx.shot(s, p.pos, target.pos, "bombe" if thrown.get("explosion") else "stein")
+	else:
+		Fx.strike(s, p.pos, target.pos)
 	if not is_hit:
 		Fx.float_text(s, target.pos, "daneben", Fx.COLORS.info)
 		s.counters.missStreak += 1
@@ -218,6 +220,7 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 	target.hp -= final
 	target.aware = true
 	Fx.float_text(s, target.pos, ("%d!" % final) if crit else str(final), Fx.COLORS.krit if crit else Fx.COLORS.schaden)
+	Fx.hit(s, target.pos, crit)
 	target.hitBy = J.uniq(J.arr(target, "hitBy") + [t.part])
 	target.zonesHit = J.uniq(J.arr(target, "zonesHit") + [zone])
 	s.counters.damageDealt += final
@@ -369,7 +372,9 @@ static func counter_strike(s: Dictionary, m: Dictionary) -> void:
 	var dmg := maxi(1, J.rnd((3 + st.str / 2.0) * (1 + 0.1 * lvl) * (0.8 + R.next(s) * 0.4) - m.ruestung))
 	m.hp -= dmg
 	s.counters.damageDealt += dmg
+	Fx.strike(s, s.player.pos, m.pos)
 	Fx.float_text(s, m.pos, str(dmg), Fx.COLORS.schaden)
+	Fx.hit(s, m.pos)
 	Log.add(s, "Du weichst aus und konterst sofort: %d Schaden an %s." % [dmg, Identify.name_of(s, m)], "kampf")
 	var t := {"part": "faust", "move": "normal"}
 	if m.hp > 0:
@@ -428,6 +433,7 @@ static func _explode(s: Dictionary, m: Dictionary) -> void:
 static func kill_monster(s: Dictionary, m: Dictionary, t: Variant, by_pet: Variant = false, facets: Variant = null) -> void:
 	if not J.has_same(s.monsters, m):
 		return
+	Fx.death(s, m)
 	s.monsters = J.without(s.monsters, m)
 	s.counters.kills += 1
 	s.counters.killsByDef[m.defId] = int(J.num(s.counters.killsByDef, m.defId)) + 1

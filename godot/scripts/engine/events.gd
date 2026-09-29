@@ -7,6 +7,7 @@ static func emit(s: Dictionary, e: Dictionary) -> void:
 	Stats.on_event(s, e)
 	if e.type == "levelUp":
 		Fx.sound(s, {"kind": "levelup"})
+		Fx.level_up(s, s.player.pos)
 	if e.type == "boxOpened":
 		var box = e.item.get("box")
 		Fx.sound(s, Items.compact({"kind": "box", "tier": box.tier if box != null else null}))

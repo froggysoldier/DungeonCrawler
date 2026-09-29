@@ -82,6 +82,16 @@ einem Pixel-Editor nicht verloren gehen. Neue Monsterarten brauchen einen
 Eintrag in `Sprites.BY_DEF`; `test_pixel_art` prüft, dass es zu jedem Monster,
 jeder Falle, jedem Reittier und jedem Möbelstück ein Bild gibt.
 
+**Bewegung:** Fledermäuse, Motten, Tauben und Drohnen flattern, Irrlichter
+flackern, Geister wabern, Schleime quellen, jeweils mit einem zweiten Bild
+(Name mit `_2`). Spielfigur und Menschen haben ein Laufbild. Die Engine meldet
+Angriffe (`Fx.strike`), Treffer (`Fx.hit`), Tode (`Fx.death`) und
+Stufenaufstiege (`Fx.level_up`); der Animator zeigt daraus Ausfallschritt,
+weißes Aufblitzen, Pixelzerfall, Beben bei schweren Treffern und goldene
+Funken. Wandfackeln in gewöhnlichen Räumen, Boss-Kammern, Arenen und Gilden
+flackern und hellen die Dunkelheit um sich auf. Haustiere erscheinen als ihre
+Art (Katze, Hund, Kellerraptor, Minidrache …).
+
 **Schriften:** Fließtext in Montserrat, Überschriften, Knöpfe, Reiter und die
 Karte in Pixelify Sans. Pixelify ist bei Größen in Zehnerschritten ganz
 scharf (ein Schriftpixel = 1/10 der Größe).
@@ -94,7 +104,7 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | `UI_SMOKE_ALL=1 ./test.sh ui_smoke` | Alle aufgezeichneten Partien (bis Etage 3) durch die Oberfläche spielen, dauert einige Minuten |
 | `godot --headless --path godot -s res://tools/record_fixtures.gd` | Aufnahmen für die Replay-Tests neu erzeugen (Karten, Replays, Anzeige-Helfer), nach absichtlichen Änderungen an Inhalten oder Regeln |
 | `godot --headless --path godot -s res://tools/balance_sim.gd [-- anzahl]` | Ein Bot spielt Partien bis Etage 3 und gibt eine Tabelle aus (Stufe, Kills, Todesursache …) |
-| `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte) |
+| `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte), `fx` (Angriff in sechs Bildern), `fackeln` |
 | `xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- bild.png [vergrößerung]` | Alle Monster in ihrer echten Farbe, dazu Spielfigur, Reittiere, Gegenstände, Fallen |
 | `godot --headless --path godot -s res://tools/make_pixel_art.gd -- --force [--preview ordner]` | Pixel-Bögen aus den Vorlagen neu erzeugen (überschreibt Änderungen aus Pixel-Editoren) |
 
@@ -108,7 +118,8 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | `test_engine`, `test_combat_zones`, `test_ai`, `test_skills` … | Spielregeln einzeln: Kampf, Gegner, Skills, Klassen, Magie, Fallen, Handwerk, Haustiere, Reittiere, Sponsoren, Talkshow, Achievements |
 | `test_ui_smoke` | Eine Partie komplett über die Spielansicht gespielt: keine Laufzeitfehler, Spielverlauf unverändert |
 | `test_sound` | Klänge hörbar und nicht übersteuert |
-| `test_pixel_art` | Zu allem, was gezeichnet wird, gibt es ein Bild; Tönen ersetzt alle Magenta-Stufen |
+| `test_pixel_art` | Zu allem, was gezeichnet wird, gibt es ein Bild; Tönen ersetzt alle Magenta-Stufen; Haustier-Arten und zweite Bilder |
+| `test_effects` | Engine meldet Angriff, Treffer, Tod und Aufstieg; Animator macht daraus Ausfallschritt, Aufblitzen, Zerfall, Beben, Funken |
 
 ## Grundsätze
 

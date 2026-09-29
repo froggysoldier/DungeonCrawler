@@ -3,63 +3,63 @@
   "h": 9,
   "sheet": "kreaturen",
   "w": 7,
-  "x": 16,
+  "x": 208,
   "y": 32
  },
  "aufsatz/krone": {
   "h": 6,
   "sheet": "kreaturen",
   "w": 9,
-  "x": 240,
-  "y": 16
+  "x": 176,
+  "y": 32
  },
  "aufsatz/leuchten": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
   "x": 32,
-  "y": 48
+  "y": 64
  },
  "aufsatz/leuchten_klein": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
-  "x": 176,
-  "y": 32
+  "x": 112,
+  "y": 48
  },
  "aufsatz/ring": {
   "h": 7,
   "sheet": "kreaturen",
   "w": 16,
-  "x": 160,
-  "y": 32
+  "x": 96,
+  "y": 48
  },
  "aufsatz/ring_gross": {
   "h": 9,
   "sheet": "kreaturen",
   "w": 20,
   "x": 0,
-  "y": 48
+  "y": 64
  },
  "aufsatz/schatten": {
   "h": 5,
   "sheet": "kreaturen",
   "w": 14,
-  "x": 128,
-  "y": 32
+  "x": 64,
+  "y": 48
  },
  "aufsatz/schatten_klein": {
   "h": 3,
   "sheet": "kreaturen",
   "w": 10,
-  "x": 144,
-  "y": 32
+  "x": 80,
+  "y": 48
  },
  "aufsatz/schlaf": {
   "h": 8,
   "sheet": "kreaturen",
   "w": 7,
-  "x": 0,
+  "x": 192,
   "y": 32
  },
  "boden/arena0": {
@@ -430,63 +430,63 @@
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 176,
+  "x": 208,
   "y": 0
  },
  "fleck/fleck1": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 224,
-  "y": 0
+  "x": 0,
+  "y": 16
  },
  "fleck/fleck2": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 16,
+  "x": 48,
   "y": 16
  },
  "fleck/pfuetze0": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 144,
+  "x": 176,
   "y": 0
  },
  "fleck/pfuetze1": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 192,
+  "x": 224,
   "y": 0
  },
  "fleck/pfuetze2": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 240,
-  "y": 0
+  "x": 16,
+  "y": 16
  },
  "fleck/riss0": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 160,
+  "x": 192,
   "y": 0
  },
  "fleck/riss1": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 208,
+  "x": 240,
   "y": 0
  },
  "fleck/riss2": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 0,
+  "x": 32,
   "y": 16
  },
  "geschoss/blitz": {
@@ -538,12 +538,26 @@
   "x": 96,
   "y": 0
  },
+ "kreatur/drache": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 16,
+  "y": 32
+ },
  "kreatur/drohne": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
   "x": 16,
   "y": 16
+ },
+ "kreatur/drohne_2": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 80,
+  "y": 32
  },
  "kreatur/elementar": {
   "h": 16,
@@ -566,12 +580,26 @@
   "x": 192,
   "y": 0
  },
+ "kreatur/fledermaus_2": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 32,
+  "y": 32
+ },
  "kreatur/geist": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
   "x": 80,
   "y": 0
+ },
+ "kreatur/geist_2": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 112,
+  "y": 32
  },
  "kreatur/gnom": {
   "h": 16,
@@ -601,6 +629,13 @@
   "x": 224,
   "y": 16
  },
+ "kreatur/held_2": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 144,
+  "y": 32
+ },
  "kreatur/hexe": {
   "h": 16,
   "sheet": "kreaturen",
@@ -622,12 +657,26 @@
   "x": 224,
   "y": 0
  },
+ "kreatur/irrlicht_2": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 96,
+  "y": 32
+ },
  "kreatur/kakerlake": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
   "x": 16,
   "y": 0
+ },
+ "kreatur/katze": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 240,
+  "y": 16
  },
  "kreatur/kobold": {
   "h": 16,
@@ -664,6 +713,13 @@
   "x": 80,
   "y": 16
  },
+ "kreatur/mensch_2": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 160,
+  "y": 32
+ },
  "kreatur/motte": {
   "h": 16,
   "sheet": "kreaturen",
@@ -671,12 +727,26 @@
   "x": 176,
   "y": 16
  },
+ "kreatur/motte_2": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 48,
+  "y": 32
+ },
  "kreatur/pilz": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
   "x": 160,
   "y": 16
+ },
+ "kreatur/raptor": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 0,
+  "y": 32
  },
  "kreatur/ratte": {
   "h": 16,
@@ -698,6 +768,13 @@
   "w": 16,
   "x": 48,
   "y": 0
+ },
+ "kreatur/schleim_2": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 128,
+  "y": 32
  },
  "kreatur/skelett": {
   "h": 16,
@@ -734,6 +811,13 @@
   "x": 192,
   "y": 16
  },
+ "kreatur/vogel_2": {
+  "h": 16,
+  "sheet": "kreaturen",
+  "w": 16,
+  "x": 64,
+  "y": 32
+ },
  "kreatur/wurm": {
   "h": 16,
   "sheet": "kreaturen",
@@ -752,106 +836,120 @@
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 0,
+  "x": 32,
   "y": 0
  },
  "moebel/bett": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 16,
+  "x": 48,
   "y": 0
  },
  "moebel/eimer": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 128,
+  "x": 160,
+  "y": 0
+ },
+ "moebel/fackel": {
+  "h": 16,
+  "sheet": "einrichtung",
+  "w": 16,
+  "x": 0,
+  "y": 0
+ },
+ "moebel/fackel_2": {
+  "h": 16,
+  "sheet": "einrichtung",
+  "w": 16,
+  "x": 16,
   "y": 0
  },
  "moebel/fass": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 80,
+  "x": 112,
   "y": 0
  },
  "moebel/geruempel": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 112,
+  "x": 144,
   "y": 0
  },
  "moebel/kiste": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 64,
+  "x": 96,
   "y": 0
  },
  "moebel/regal": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 96,
+  "x": 128,
   "y": 0
  },
  "moebel/theke": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 48,
+  "x": 80,
   "y": 0
  },
  "moebel/toilette": {
   "h": 16,
   "sheet": "einrichtung",
   "w": 16,
-  "x": 32,
+  "x": 64,
   "y": 0
  },
  "reittier/bobbycar": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
-  "x": 64,
-  "y": 32
+  "x": 0,
+  "y": 48
  },
  "reittier/einkaufswagen": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
-  "x": 32,
+  "x": 224,
   "y": 32
  },
  "reittier/kampfeber": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
-  "x": 112,
-  "y": 32
+  "x": 48,
+  "y": 48
  },
  "reittier/kellerpony": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
-  "x": 80,
-  "y": 32
+  "x": 16,
+  "y": 48
  },
  "reittier/rasentraktor": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
-  "x": 48,
+  "x": 240,
   "y": 32
  },
  "reittier/sattelschnecke": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 16,
-  "x": 96,
-  "y": 32
+  "x": 32,
+  "y": 48
  },
  "treppe": {
   "h": 16,

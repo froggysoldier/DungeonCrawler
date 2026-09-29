@@ -95,6 +95,7 @@ static func _spell_hurt(s: Dictionary, m: Dictionary, dmg: float, label: String)
 	m.hp -= final
 	m.aware = true
 	Fx.float_text(s, m.pos, str(final), Fx.COLORS.mana)
+	Fx.hit(s, m.pos)
 	s.counters.damageDealt += final
 	Log.add(s, "%s trifft %s für %d Schaden." % [label, Identify.name_of(s, m), final], "kampf")
 	if m.hp <= 0:

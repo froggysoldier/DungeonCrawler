@@ -37,6 +37,20 @@ const BY_DEF := {
 }
 
 
+## Haustier-Art: Bild und Fellfarbe.
+const PETS := {
+	"Katze": ["katze", "#d08a4a"], "Hund": ["hund", "#a07850"], "Kellerraptor": ["raptor", "#6aa04a"],
+	"Minidrache": ["drache", "#c8503a"], "Wolpertinger": ["hase", "#c8a878"], "Fledermaus": ["fledermaus", "#7a6a8a"],
+	"Ratte": ["ratte", "#9a8a7a"], "Spinne": ["spinne", "#6a5a7a"],
+}
+
+
+## [Bildname, Farbe] für eine Haustier-Art; Unbekanntes wird ein allgemeines Haustier.
+static func pet_sprite(species: String) -> Array:
+	var e = PETS.get(species)
+	return ["kreatur/" + e[0], e[1]] if e != null else ["kreatur/haustier", "#e0a0c8"]
+
+
 static func sprite_for(def_id: String, rank_ghost: bool = false) -> String:
 	if rank_ghost:
 		return "geist"

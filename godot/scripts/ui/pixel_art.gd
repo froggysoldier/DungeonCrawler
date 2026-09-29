@@ -153,12 +153,54 @@ static func texture(name: String, tint: Variant = null) -> Texture2D:
 	return tex
 
 
+## Weiße Silhouette eines Bildes (Aufblitzen bei Treffern).
+static func silhouette(name: String) -> Texture2D:
+	var key := "%s|weiss" % name
+	if _tinted.has(key):
+		return _tinted[key]
+	var img := image(name)
+	if img == null:
+		return null
+	for y in img.get_height():
+		for x in img.get_width():
+			if img.get_pixel(x, y).a > 0.5:
+				img.set_pixel(x, y, Color.WHITE)
+	var tex := ImageTexture.create_from_image(img)
+	_tinted[key] = tex
+	return tex
+
+
+static var _pixel_lists := {}
+
+
+## Alle sichtbaren Pixel eines getönten Bildes als [Vector2i, Color] (zum Zerfallen).
+static func pixels(name: String, tint: Variant = null) -> Array:
+	var key := "%s|%s" % [name, str(tint)]
+	if _pixel_lists.has(key):
+		return _pixel_lists[key]
+	var out: Array = []
+	var tex := texture(name, tint)
+	if tex != null:
+		var img := tex.get_image()
+		for y in img.get_height():
+			for x in img.get_width():
+				var c := img.get_pixel(x, y)
+				if c.a > 0.5:
+					out.append([Vector2i(x, y), c])
+	_pixel_lists[key] = out
+	return out
+
+
 # ---------------------------------------------------------------- Zeichnen
 
 ## Zeichnet ein Bild mit linker oberer Ecke bei pos (Bildschirmpixel), skaliert
 ## um den ganzzahligen Faktor scale. flip spiegelt waagerecht.
 static func draw(ci: CanvasItem, name: String, pos: Vector2, scale: int, tint: Variant = null, flip: bool = false, modulate: Color = Color.WHITE) -> void:
-	var tex := texture(name, tint)
+	draw_texture(ci, texture(name, tint), pos, scale, flip, modulate)
+
+
+## Eine fertige Textur ganzzahlig vergrößert zeichnen (auch gespiegelt).
+static func draw_texture(ci: CanvasItem, tex: Texture2D, pos: Vector2, scale: int, flip: bool = false, modulate: Color = Color.WHITE) -> void:
 	if tex == null:
 		return
 	var sz := Vector2(tex.get_size()) * scale
@@ -183,3 +225,4 @@ static func reset() -> void:
 	_sheets = {}
 	_images = {}
 	_tinted = {}
+	_pixel_lists = {}

@@ -1,7 +1,9 @@
 extends SceneTree
 ## Entwicklerwerkzeug: startet das Spiel, spielt kurz und speichert Bildschirmfotos.
 ##   xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus [seed]
-## Modi: title, interview, game, dialog, walk, tabs, combat
+## Modi: title, interview, game, dialog, walk, tabs, combat, select, versus,
+## talkshow, safe, floor3, fx (Angriff mit Ausfallschritt, Aufblitzen, Zerfall),
+## fackeln (Raum mit Wandfackeln)
 
 var out := ""
 var main: Control
@@ -85,6 +87,41 @@ func _initialize() -> void:
 				await wait(2.0)
 				await shot("dialog")
 			var gv: GameView = main.view
+			if mode == "fackeln":
+				# In den ersten normalen Raum mit Fackel stellen
+				for r in s.map.rooms:
+					if r.kind != "normal":
+						continue
+					var found := false
+					for x in range(r.x, r.x + r.w):
+						if gv.map._torch_at(x, r.y - 1):
+							found = true
+					if found:
+						TH.teleport(s, {"x": r.x + r.w / 2, "y": r.y + r.h / 2})
+						s.monsters = s.monsters.filter(func(mo): return Fov.chebyshev(mo.pos, s.player.pos) > 8)
+						break
+				gv.refresh_side()
+				await wait(1.0)
+				await shot("fackeln")
+				quit()
+				return
+			if mode == "fx":
+				# Ein Gegner direkt daneben, der beim ersten Schlag fällt
+				gv.zoom_map(10)
+				s.monsters = []
+				var spot = TH.free_neighbor(s, s.player.pos)
+				var m := Monsters.spawn_monster(s, TH.monster_def("kellerratte"), 1, spot, 0)
+				m.hp = 1
+				m.ausweichen = -200
+				m.aware = true
+				s.monsters.append(m)
+				await wait(0.4)
+				gv.act(func(): return Game.attack(s, m.uid, {"part": "faust", "move": "normal"}))
+				for i in 6:
+					await shot("fx_%d" % i)
+					await wait(0.05)
+				quit()
+				return
 			if mode == "walk" or mode == "tabs" or mode == "combat":
 				# Ein paar Schritte in Richtung eines Gegners oder zufällig
 				for i in 40:

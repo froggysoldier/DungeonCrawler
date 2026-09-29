@@ -459,6 +459,7 @@ static func _tick_time(s: Dictionary, turns: int, before: int) -> void:
 		if turns == 1:
 			Log.add(s, "%s: −%d HP." % [b.name, dmg], "gefahr")
 			Fx.float_text(s, p.pos, "-%d" % dmg, Fx.COLORS.gegenSpieler)
+			Fx.hit(s, p.pos)
 		if p.hp <= 0:
 			Death.handle_lethal(s, Conditions.death_by_buff(b.name))
 			if s.status != "playing":

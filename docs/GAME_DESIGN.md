@@ -454,7 +454,7 @@ Details in [`GODOT_PORT.md`](GODOT_PORT.md).
 
 1. Balance von Etage 2–3 durch Testspielen (Klassen, Zustände, Achievements)
 2. Etage 4+ mit neuen Themen, Klassen-Spezialisierung (Etage 6/9/12)
-3. Animationen für die Pixel-Figuren (Laufen, Angriff)
+3. Eigene, größere Bilder für Bosse
 
 ## 7. Rechtliches
 *Dungeon Crawler Carl* ist geistiges Eigentum von Matt Dinniman. Das Spiel

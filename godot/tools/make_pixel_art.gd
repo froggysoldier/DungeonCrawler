@@ -18,9 +18,9 @@ const SHADE := {
 	"n": ["n", "K", "N"], "g": ["g", "N", "G"], "L": ["L", "e", "l"], "R": ["R", "r", "f"],
 }
 ## Zeichen ohne eigenen Umriss.
-const NO_OUTLINE := "kKzvqj"
+const NO_OUTLINE := "kKzvqjFO"
 ## Ersatzfarben für die Zeichen ohne Umriss.
-const ALIAS := {"z": "2", "v": "g", "q": "f", "j": "S"}
+const ALIAS := {"z": "2", "v": "g", "q": "f", "j": "S", "F": "Y", "O": "o"}
 
 var errors := PackedStringArray()
 ## Bilder größer als eine Zelle, werden am Ende des Bogens abgelegt.
