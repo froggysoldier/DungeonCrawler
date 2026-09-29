@@ -26,7 +26,7 @@ kämpft.
 | Tod | Alle vier Konzepte (siehe Abschnitt 6) |
 | Namen | Eigene Namen (Show, Guide, Bosse …), damit eine spätere Veröffentlichung möglich bleibt |
 | Etagen | Themen dürfen sich am Buch orientieren, aber keine Spoiler |
-| Oberfläche | Klickbare Karte in Pixel-Grafik (16 × 16 je Kachel), daneben Panels + Textlog; Gegenstände, Ausrüstungsplätze, Gegner und Haustier auch dort als Pixel-Bilder; die Spielfigur trägt ihre Ausrüstung sichtbar (Farbe = Seltenheit); jede Rasse hat eigenen Körperbau, Kopf und Anbauten |
+| Oberfläche | Klickbare Karte in Pixel-Grafik (einheitlich 32 × 32 je Kachel und Figur), daneben Panels + Textlog; Gegenstände, Ausrüstungsplätze, Gegner und Haustier auch dort als Pixel-Bilder; die Spielfigur trägt ihre Ausrüstung sichtbar (Farbe = Seltenheit); jede Rasse hat eigenen Körperbau, Kopf und Anbauten |
 | Erster Meilenstein | Etage 1 komplett spielbar |
 | Zweiter Meilenstein | Mehr Inhalte, Web-Link, Etage 2 (Publikum) und 3 (Rassen/Klassen) |
 

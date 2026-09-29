@@ -123,17 +123,18 @@ func test_gegenstaende_und_plaetze_haben_bilder(t) -> void:
 func test_bilder_in_der_oberflaeche(t) -> void:
 	# Im Fließtext: [img] findet die getönte, vergrößerte Textur
 	var bb := Kit.img("ding/slot_waffe", "#5aa0ff", 2)
-	t.matches(bb, "^\\[img=32x32\\]res://pixel_bb/.+\\[/img\\]$", "BBCode mit Größe")
+	t.matches(bb, "^\\[img=64x64\\]res://pixel_bb/.+\\[/img\\]$", "BBCode mit Größe")
 	var path := bb.get_slice("]", 1).get_slice("[", 0)
 	var tex: Texture2D = load(path)
 	t.not_null(tex, "Textur über den Pfad ladbar")
 	if tex != null:
-		t.eq(tex.get_size(), Vector2(32, 32), "vorab vergrößert")
+		t.eq(tex.get_size(), Vector2(64, 64), "vorab vergrößert")
 		t.gt(tex.get_image().get_used_rect().size.x, 0, "nicht leer")
 	t.eq(Kit.img("ding/gibt_es_nicht"), "", "unbekanntes Bild")
 	# Als Control: Größe ist das vergrößerte Bild oder das vorgegebene Feld
 	var ic := Kit.icon(null, "kreatur/ratte", "#b08a6a", 3)
-	t.eq(ic.custom_minimum_size, Vector2(48, 48), "Figur dreifach")
+	t.eq(ic.custom_minimum_size, Vector2(96, 96), "Figur dreifach")
+	t.ok(Kit.img("ding/trank", null, 0.5).begins_with("[img=16x16]"), "im Text auch verkleinert")
 	ic.free()
 	var slot := Kit.icon(null, "ding/slot_ring", null, 2, Vector2(40, 36), true)
 	t.eq(slot.custom_minimum_size, Vector2(40, 36), "festes Feld")
@@ -145,6 +146,17 @@ func _gear(slot: String, rarity: String) -> Dictionary:
 	return {"kind": "ausruestung", "slot": slot, "rarity": rarity}
 
 
+## Zeilen, in denen sich zwei gleich große Bilder unterscheiden.
+func _diff_rows(a: Image, b: Image) -> Array:
+	var rows: Array = []
+	for y in a.get_height():
+		for x in a.get_width():
+			if a.get_pixel(x, y) != b.get_pixel(x, y):
+				rows.append(y)
+				break
+	return rows
+
+
 func test_ausruestung_an_der_figur(t) -> void:
 	for body in ["normal", "klein", "gross", "breit"]:
 		for slot in Sprites.GEAR_BEHIND + Sprites.GEAR_BODY + Sprites.GEAR_TOP:
@@ -153,30 +165,47 @@ func test_ausruestung_an_der_figur(t) -> void:
 		t.has(GameTabs.EQUIP_ORDER, slot, "%s ist ein Ausrüstungsplatz" % slot)
 	var plain := Sprites.hero_name({})
 	t.ok(PixelArt.has(plain) and PixelArt.has(plain + "_2"), "schlichte Figur mit Laufbild")
-	t.eq(PixelArt.size_of(plain), Vector2i(20, 20), "20 x 20")
+	t.eq(PixelArt.size_of(plain), Vector2i(PixelArt.TILE, PixelArt.TILE), "so groß wie eine Kachel")
 	t.eq(Sprites.hero_name({"equipment": {"ring1": _gear("ring", "episch")}}), plain, "Ringe sieht man nicht")
+	var base := PixelArt.image(plain)
+	# Der Helm verändert nur den Kopf, die Stiefel nur die Füße
+	var helm := PixelArt.image(Sprites.hero_name({"equipment": {"kopf": _gear("kopf", "selten")}}))
+	var rows := _diff_rows(base, helm)
+	t.ok(not rows.is_empty() and rows.max() < 16, "Helm nur am Kopf")
+	var boots := PixelArt.image(Sprites.hero_name({"equipment": {"fuesse": _gear("fuesse", "selten")}}))
+	rows = _diff_rows(base, boots)
+	t.ok(not rows.is_empty() and rows.min() >= 24, "Stiefel nur an den Füßen")
+	# Die Waffe ragt über die Hand hinaus und hat oben einen Umriss
 	var eq := {"kopf": _gear("kopf", "selten"), "waffe": _gear("waffe", "episch"), "fuesse": _gear("fuesse", "gewoehnlich")}
 	var n := Sprites.hero_name({"equipment": eq})
 	t.ok(n != plain and PixelArt.has(n + "_2"), "zusammengesetzt, mit Laufbild")
 	t.eq(Sprites.hero_name({"equipment": eq}), n, "gleiche Ausrüstung, gleicher Name")
-	var img := PixelArt.image(n)
-	var base := PixelArt.image(plain)
-	t.ok(img.get_pixel(9, 4) != base.get_pixel(9, 4), "Helm über den Haaren")
-	t.eq(img.get_pixel(9, 8), base.get_pixel(9, 8), "Gesicht bleibt frei")
-	t.eq(img.get_pixel(15, 5), Sprites.OUTLINE, "Umriss um die Waffenspitze")
+	var armed := PixelArt.image(Sprites.hero_name({"equipment": {"waffe": _gear("waffe", "episch")}}))
+	var tip := Vector2i(-1, 99)
+	for y in armed.get_height():
+		for x in range(armed.get_width() / 2, armed.get_width()):
+			if armed.get_pixel(x, y) != base.get_pixel(x, y) and armed.get_pixel(x, y) != Sprites.OUTLINE and y < tip.y:
+				tip = Vector2i(x, y)
+	t.ok(tip.x >= 0, "Waffe sichtbar")
+	if tip.x >= 0:
+		t.eq(armed.get_pixel(tip.x, tip.y - 1), Sprites.OUTLINE, "Umriss um die Waffenspitze")
 	var eq2 := eq.duplicate(true)
 	eq2.kopf.rarity = "episch"
 	t.ok(Sprites.hero_name({"equipment": eq2}) != n, "andere Seltenheit, andere Figur")
 	t.not_null(PixelArt.texture(n), "tönbar wie jedes Bild")
 	t.not_null(PixelArt.silhouette(n), "Aufblitzen möglich")
-	var walk := PixelArt.image(plain + "_2")
-	t.ok(walk.get_pixel(8, 18) != base.get_pixel(8, 18), "Laufbild: Füße gehen auseinander")
-	t.eq(walk.get_pixel(9, 8), base.get_pixel(9, 8), "Laufbild: Kopf bleibt")
+	# Laufbild: nur die Füße bewegen sich
+	rows = _diff_rows(base, PixelArt.image(plain + "_2"))
+	t.ok(not rows.is_empty() and rows.min() >= Sprites.WALK_ROW - 1, "Laufbild: nur die Füße gehen auseinander")
 	# Der Zwergenbart liegt über der Weste
 	var dwarf := PixelArt.image(Sprites.hero_name({"race": "zwerg"}))
 	var vest := PixelArt.image(Sprites.hero_name({"race": "zwerg", "equipment": {"brust": _gear("brust", "episch")}}))
-	t.eq(vest.get_pixel(9, 13), dwarf.get_pixel(9, 13), "Bart über der Weste")
-	t.ok(vest.get_pixel(6, 15) != dwarf.get_pixel(6, 15), "Weste neben dem Bart")
+	var beard_same := true
+	for y in range(18, 24):
+		if vest.get_pixel(15, y) != dwarf.get_pixel(15, y):
+			beard_same = false
+	t.ok(beard_same, "Bart über der Weste")
+	t.ok(not _diff_rows(dwarf, vest).is_empty(), "Weste neben dem Bart")
 
 
 func test_truhe_beim_oeffnen(t) -> void:
@@ -184,9 +213,12 @@ func test_truhe_beim_oeffnen(t) -> void:
 	var shut := PixelArt.image("ding/truhe")
 	var open := PixelArt.image("ding/truhe_offen")
 	var same := true
-	for y in range(8, 12):
-		for x in 16:
-			if shut.get_pixel(x, y) != open.get_pixel(x, y):
+	for y in range(16, 24):
+		for x in PixelArt.TILE:
+			var a := shut.get_pixel(x, y)
+			var b := open.get_pixel(x, y)
+			# Durchsichtige Pixel zählen gleich, egal welche Farbe der Import darin ablegt
+			if (a.a > 0.5 or b.a > 0.5) and a != b:
 				same = false
 	t.ok(same, "Unterteil deckungsgleich, damit die Truhe beim Aufspringen nicht springt")
 	for tier in Db.world("BOX_TIERS"):
@@ -220,8 +252,14 @@ func test_rassen_an_der_figur(t) -> void:
 	t.gt(box.call("troll").size.y, box.call("mensch").size.y, "Trolle sind größer")
 	t.gt(box.call("zwerg").size.x, box.call("mensch").size.x, "Zwerge sind breiter")
 	t.lt(box.call("zwerg").size.y, box.call("mensch").size.y, "und kleiner")
-	t.ge(box.call("echsenmensch").end.x, 19, "Echsenschwanz ragt hinaus")
+	t.ge(box.call("echsenmensch").end.x, PixelArt.TILE - 2, "Echsenschwanz ragt hinaus")
 	t.le(box.call("kellerfee").position.x, 0, "Feenflügel ragen hinaus")
 	var elf := PixelArt.image(Sprites.hero_name({"race": "elf"}))
-	t.eq(elf.get_pixel(9, 8).to_html(false), Color(Sprites.RACE_LOOKS.elf.skin).to_html(false), "Haut in der Farbe der Rasse")
+	var skin := Color(Sprites.RACE_LOOKS.elf.skin).to_html(false)
+	var found := false
+	for y in elf.get_height():
+		for x in elf.get_width():
+			if elf.get_pixel(x, y).to_html(false) == skin:
+				found = true
+	t.ok(found, "Haut in der Farbe der Rasse")
 	t.eq(Sprites.hero_name({"race": "gibt_es_nicht"}), Sprites.hero_name({}), "Unbekannte Rasse: Mensch")

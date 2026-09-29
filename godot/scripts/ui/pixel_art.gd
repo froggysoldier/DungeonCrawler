@@ -5,9 +5,9 @@ extends RefCounted
 ##
 ## Tönbare Stellen sind in den Bögen mit fünf Magenta-Stufen markiert
 ## (TINT_KEYS). Beim Zeichnen werden sie durch eine Farbrampe aus der Farbe des
-## Monsters (oder der Seltenheit) ersetzt. Eine Kachel ist 16 Pixel groß.
+## Monsters (oder der Seltenheit) ersetzt. Eine Kachel ist 32 Pixel groß.
 
-const TILE := 16
+const TILE := 32
 const DIR := "res://assets/pixel"
 
 ## Palette der Vorlagen (Zeichen in den Definitionen von tools/make_pixel_art.gd).

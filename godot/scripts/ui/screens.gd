@@ -48,17 +48,17 @@ class Backdrop:
 		var h := size.y
 		draw_rect(Rect2(0, 0, w, h), UiTheme.BG)
 		# Kellerboden, stark abgedunkelt
-		var k := 4
-		var t := 16 * k
+		var k := 2
+		var t := PixelArt.TILE * k
 		for y in int(ceilf(h / t)):
 			for x in int(ceilf(w / t)):
 				PixelArt.draw(self, "boden/pflaster%d" % (int(Tiles.hash(x, y) * 4)), Vector2(x * t, y * t), k, null, false, Color(1, 1, 1, 0.13))
 		# Gestuftes Leuchten oben (Gold) und unten rechts (Rosa)
-		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w / 2 - 16 * 28, -16 * 28 - h * 0.1), 28, null, false, Color(UiTheme.ACCENT, 0.12))
-		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w - 16 * 22, h - 16 * 16), 22, null, false, Color(UiTheme.ACCENT_2, 0.07))
+		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w / 2 - 32 * 14, -32 * 14 - h * 0.1), 14, null, false, Color(UiTheme.ACCENT, 0.12))
+		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w - 32 * 11, h - 32 * 8), 11, null, false, Color(UiTheme.ACCENT_2, 0.07))
 		# Kreaturen am unteren Rand: eine dunkle Parade, die langsam nach links zieht
-		var sc := 5
-		var step := 16 * sc + 24
+		var sc := 3
+		var step := PixelArt.TILE * sc + 12
 		var ms := Time.get_ticks_msec()
 		var shift := fmod(ms * 0.03, float(step * PARADE.size()))
 		var n := int(w / step) + 2
@@ -71,7 +71,7 @@ class Backdrop:
 			var alt := name + "_2"
 			if PixelArt.has(alt) and (ms / 180 + i) % 2 == 1:
 				name = alt
-			var bob := sc if (ms / 260 + i) % 2 == 1 else 0
+			var bob := sc * 2 if (ms / 260 + i) % 2 == 1 else 0
 			var x := roundf((i * step - shift + step / 2.0) / sc) * sc
 			var foot := Vector2(x, h - 8 - bob)
 			PixelArt.draw_foot(self, name, foot, sc, TINTS[i % TINTS.size()], true, Color(0.35, 0.33, 0.4, 0.55))

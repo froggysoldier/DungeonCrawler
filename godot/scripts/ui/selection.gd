@@ -30,8 +30,8 @@ static func _race_detail(parent: Node, r: Dictionary, p: Dictionary = {}) -> voi
 	# So sieht die Figur mit dieser Rasse (und der jetzigen Ausrüstung) aus
 	var look := Sprites.hero_name({"race": r.id, "equipment": J.nn(p, "equipment", {})})
 	var st := Kit.Stage.new()
-	st.items = [{"name": look, "scale": 5, "foot": Vector2(52, 104)}]
-	st.custom_minimum_size = Vector2(104, 118)
+	st.items = [{"name": look, "scale": 3, "foot": Vector2(48, 98)}]
+	st.custom_minimum_size = Vector2(96, 110)
 	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top.add_child(st)
 	var tv := Kit.vbox(top, 4)
@@ -140,7 +140,7 @@ static func show_selection(gv: GameView) -> Modals.Job:
 			for ro in races:
 				var r: Dictionary = ro.race
 				var avail: bool = ro.available
-				var face := Kit.img(Sprites.hero_name({"race": r.id}), null, 2)
+				var face := Kit.img(Sprites.hero_name({"race": r.id}), null, 1)
 				var bb := "%s [b]%s[/b]\n%s" % [face, Kit.esc(r.name), Kit.small(Kit.esc(r.description))]
 				if not avail:
 					bb += "\n" + Kit.small(Kit.col("Gesperrt – Bedingung: " + Kit.esc(r.requirement.text if r.get("requirement") != null else ""), "danger"))

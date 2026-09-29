@@ -1,7 +1,7 @@
 class_name MapView
 extends Control
-## Die Karte in Pixel-Grafik. Eine Kachel ist 16 Kunstpixel groß und wird
-## ganzzahlig vergrößert (Zoom 2× bis 5×), die Kamera rastet auf Kunstpixel
+## Die Karte in Pixel-Grafik. Eine Kachel ist 32 Kunstpixel groß und wird
+## ganzzahlig vergrößert (Zoom 1× bis 3×), die Kamera rastet auf Kunstpixel
 ## ein. Ebenen von unten nach oben:
 ##   statisch   Böden, Schatten, Flecken, Einrichtung, Türen, Wände (nur bei Änderungen neu)
 ##   belebt     Treppe, Automaten, Boss-Türen, Fallen, Gegenstände
@@ -15,7 +15,7 @@ signal tile_clicked(tile: Vector2i, button: int)
 signal zoom_requested(delta: int)
 
 const TILE := PixelArt.TILE
-const ZOOM_STEPS := [32, 48, 64, 80]
+const ZOOM_STEPS := [32, 64, 96]
 
 var s: Dictionary
 var tiles: Tiles
@@ -25,9 +25,9 @@ var path: Variant = null
 var selected: Variant = null
 
 var zoom_index: int = 1
-var tile_px: float = 48.0
+var tile_px: float = 64.0
 ## Bildschirmpixel pro Kunstpixel.
-var px: int = 3
+var px: int = 2
 ## Kamera: linke obere Ecke in Kachelkoordinaten.
 var ox := 0.0
 var oy := 0.0
@@ -323,10 +323,10 @@ func _spr(ci: CanvasItem, name: String, x: float, y: float, tint: Variant = null
 	PixelArt.draw(ci, name, Vector2(x, y), px, tint, flip, mod)
 
 
-## Leuchten mittig bei (cx, cy); groß = 32 Kunstpixel, sonst 16.
+## Leuchten mittig bei (cx, cy); groß = zwei Kacheln, sonst eine.
 func _glow(ci: CanvasItem, cx: float, cy: float, color: Variant, alpha: float, big: bool = true) -> void:
 	var n := "aufsatz/leuchten" if big else "aufsatz/leuchten_klein"
-	var half := (16 if big else 8) * px
+	var half := (TILE if big else TILE / 2) * px
 	_spr(ci, n, cx - half, cy - half, null, false, _col(color, alpha))
 
 
@@ -348,7 +348,7 @@ func redraw() -> void:
 	oy = cam.y + 0.5 - rows / 2.0
 	_cam_px = Vector2(roundf(ox * tile_px / px) * px, roundf(oy * tile_px / px) * px)
 	# Beben bei schweren Treffern, in ganzen Kunstpixeln
-	_cam_px += (frame_anim.get("shake", Vector2.ZERO) as Vector2) * px
+	_cam_px += (frame_anim.get("shake", Vector2.ZERO) as Vector2) * 2 * px
 	var vkey := "%d|%d|%d|%d" % [s.turn, s.floor, s.player.pos.x, s.player.pos.y]
 	if vkey != _vis_key:
 		_vis_key = vkey
@@ -455,12 +455,12 @@ func _draw_static(ci: CanvasItem) -> void:
 			var we: bool = x == 0 or tl[i - 1] == "wall"
 			var ea: bool = x == mw - 1 or tl[i + 1] == "wall"
 			if n:
-				_rect(ci, sx, sy, 0, 0, TILE, 2, shade)
-				_rect(ci, sx, sy, 0, 2, TILE, 1, shade2)
+				_rect(ci, sx, sy, 0, 0, TILE, 4, shade)
+				_rect(ci, sx, sy, 0, 4, TILE, 2, shade2)
 			if we:
-				_rect(ci, sx, sy, 0, 0 if not n else 2, 1, TILE - (0 if not n else 2), shade2)
+				_rect(ci, sx, sy, 0, 0 if not n else 4, 2, TILE - (0 if not n else 4), shade2)
 			if ea:
-				_rect(ci, sx, sy, TILE - 1, 0 if not n else 2, 1, TILE - (0 if not n else 2), shade2)
+				_rect(ci, sx, sy, TILE - 2, 0 if not n else 4, 2, TILE - (0 if not n else 4), shade2)
 			var rkind = room.kind if room != null else null
 			if tile == "floor" and rkind != "safe" and rkind != "guild":
 				_draw_decal(ci, sx, sy, x, y, s.floor)
@@ -522,7 +522,7 @@ func _draw_static(ci: CanvasItem) -> void:
 					_animated.append(["torch", x, y])
 				else:
 					_spr(ci, "moebel/fackel", sx, sy)
-			var cap_h := 4 if face else TILE
+			var cap_h := 8 if face else TILE
 			if not _wall(x, y - 1):
 				_rect(ci, sx, sy, 0, 0, TILE, 1, lip)
 			if not _wall(x - 1, y):
@@ -571,7 +571,7 @@ func _draw_live() -> void:
 				_spr(ci, door_name(a[3], a[4], true), sx, sy)
 			"torch":
 				var ph: float = Tiles.hash(a[1], a[2], 12) * 1000.0
-				_glow(ci, sx + T / 2, sy + 5 * px, "#ff9a3c", 0.38 + 0.12 * sin((time + ph) / 90.0) + 0.06 * sin((time + ph) / 37.0))
+				_glow(ci, sx + T / 2, sy + 10 * px, "#ff9a3c", 0.38 + 0.12 * sin((time + ph) / 90.0) + 0.06 * sin((time + ph) / 37.0))
 				_spr(ci, "moebel/fackel_2" if fmod((time + ph) / 160.0, 2.0) >= 1.0 else "moebel/fackel", sx, sy)
 
 	# --- Bekannte Fallen
@@ -604,10 +604,10 @@ func _draw_furniture(ci: CanvasItem, kind: String, sx: float, sy: float, time: f
 			_spr(ci, "moebel/automat", sx, sy)
 		"haendler", "wirt":
 			# Figur hinter der Theke
-			var bob := px if fmod(time / 700.0, 2.0) < 1.0 else 0
-			_spr(ci, "kreatur/mensch", sx, sy - 5 * px + bob, "#8a4a3a" if kind == "wirt" else "#3a6a8a")
+			var bob := 2 * px if fmod(time / 700.0, 2.0) < 1.0 else 0
+			_spr(ci, "kreatur/mensch", sx, sy - 10 * px + bob, "#8a4a3a" if kind == "wirt" else "#3a6a8a")
 			_spr(ci, "moebel/theke", sx, sy)
-			_rect(ci, sx, sy, 4, 10, 8, 1, Color("#e7c46a") if kind == "wirt" else Color("#9fd0ff"))
+			_rect(ci, sx, sy, 8, 20, 16, 2, Color("#e7c46a") if kind == "wirt" else Color("#9fd0ff"))
 		_:
 			_spr(ci, "moebel/" + kind, sx, sy)
 
@@ -617,7 +617,7 @@ func _draw_item(ci: CanvasItem, it: Dictionary, sx: float, sy: float, is_visible
 	var T := tile_px
 	if is_visible and (it.rarity != "gewoehnlich" or it.kind == "box"):
 		_glow(ci, sx + T / 2, sy + T / 2, col, 0.5 + 0.25 * sin(time / 420.0 + sx), false)
-	_spr(ci, "aufsatz/schatten_klein", sx + 3 * px, sy + 11 * px)
+	_spr(ci, "aufsatz/schatten_klein", sx + 6 * px, sy + 22 * px)
 	var look := Sprites.item_sprite(it)
 	_spr(ci, look[0], sx, sy, look[1])
 
@@ -716,23 +716,24 @@ static func sprite_top(name: String) -> int:
 
 ## Schatten und Ring am Boden unter einer Figur.
 func _ground(ci: CanvasItem, sx: float, sy: float, ring: Variant, outer: Variant = null) -> void:
-	_spr(ci, "aufsatz/schatten", sx + px, sy + 11 * px)
+	_spr(ci, "aufsatz/schatten", sx + 2 * px, sy + 22 * px)
 	if ring != null:
-		_spr(ci, "aufsatz/ring", sx, sy + 10 * px, null, false, _col(ring))
+		_spr(ci, "aufsatz/ring", sx, sy + 20 * px, null, false, _col(ring))
 	if outer != null:
-		_spr(ci, "aufsatz/ring_gross", sx - 2 * px, sy + 9 * px, null, false, _col(outer))
+		_spr(ci, "aufsatz/ring_gross", sx - 4 * px, sy + 18 * px, null, false, _col(outer))
 
 
-## Lebensbalken über einer Figur: 12 Kunstpixel breit, mit dunklem Rand.
+## Lebensbalken über einer Figur: 26 Kunstpixel breit, mit dunklem Rand.
 func _hp_bar(ci: CanvasItem, sx: float, sy: float, top: int, frac: float, color: String) -> void:
 	var f := clampf(frac, 0, 1)
-	var y := maxi(-3, top - 4)
-	_rect(ci, sx, sy, 1, y, 14, 4, Color(0.02, 0.02, 0.05, 0.9))
-	var w := int(ceilf(12 * f))
+	var y := maxi(-6, top - 7)
+	_rect(ci, sx, sy, 2, y, 28, 6, Color(0.02, 0.02, 0.05, 0.9))
+	var w := int(ceilf(26 * f))
 	if w > 0:
 		var c := _col(color)
-		_rect(ci, sx, sy, 2, y + 1, w, 2, c)
-		_rect(ci, sx, sy, 2, y + 1, w, 1, c.lightened(0.3))
+		_rect(ci, sx, sy, 3, y + 1, w, 4, c)
+		_rect(ci, sx, sy, 3, y + 1, w, 1, c.lightened(0.35))
+		_rect(ci, sx, sy, 3, y + 4, w, 1, c.darkened(0.25))
 
 
 ## Winzige Ziffern (3 × 5) für Stufen.
@@ -746,26 +747,28 @@ const DIGITS := {
 }
 
 
+## Ziffern mit zwei Kunstpixeln je Punkt (auf der Karte gut lesbar).
 func _digits(ci: CanvasItem, x: float, y: float, text: String, c: Color) -> void:
+	var d := 2 * px
 	for n in text.length():
 		var g: Array = DIGITS.get(text[n], DIGITS["?"])
 		for gy in 5:
 			for gx in 3:
 				if g[gy][gx] == "#":
-					ci.draw_rect(Rect2(x + (n * 4 + gx) * px, y + gy * px, px, px), c)
+					ci.draw_rect(Rect2(x + (n * 4 + gx) * d, y + gy * d, d, d), c)
 
 
 ## Stufenmarke unten links: dunkles Kästchen, Ziffern in der Farbe der Herausforderung.
 func _level_pill(ci: CanvasItem, sx: float, sy: float, text: String, color: Variant) -> void:
-	var w := text.length() * 4 + 1
-	_rect(ci, sx, sy, -1, 10, w + 2, 7, Color(0.02, 0.02, 0.05, 0.92))
-	_digits(ci, sx + px, sy + 11 * px, text, _col(_hex_or(color, "#a39a8c")))
+	var w := text.length() * 8 + 2
+	_rect(ci, sx, sy, -2, 20, w + 4, 14, Color(0.02, 0.02, 0.05, 0.92))
+	_digits(ci, sx + 2 * px, sy + 22 * px, text, _col(_hex_or(color, "#a39a8c")))
 
 
 ## Kleines Schild unter einer Figur, z. B. „am Boden“.
 func _tag(ci: CanvasItem, cx: float, y: float, text: String, color: String) -> void:
 	var f := UiFonts.pixel(500)
-	var fs := 20 if px < 4 else 30
+	var fs := 20 if px < 2 else 30
 	var w := f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 12
 	var h := fs + 4
 	var r := Rect2(roundf(cx - w / 2), roundf(y), roundf(w), h)
@@ -799,10 +802,10 @@ func _draw_dynamic_body() -> void:
 			var sy := _sy(p.y)
 			var c := Color(1, 214 / 255.0, 90 / 255.0, maxf(0.3, 0.85 - n * 0.03))
 			if n == pl.size() - 1:
-				for q in [[5, 5, 6, 1], [5, 10, 6, 1], [5, 5, 1, 6], [10, 5, 1, 6]]:
+				for q in [[10, 10, 12, 2], [10, 20, 12, 2], [10, 10, 2, 12], [20, 10, 2, 12]]:
 					_rect(ci, sx, sy, q[0], q[1], q[2], q[3], c)
 			else:
-				_rect(ci, sx, sy, 7, 7, 2, 2, c)
+				_rect(ci, sx, sy, 14, 14, 4, 4, c)
 
 	# --- Andere Crawler (nur sichtbare)
 	for cr in J.arr(s, "crawlers"):
@@ -813,9 +816,9 @@ func _draw_dynamic_body() -> void:
 		var sy := _sy(p.y)
 		var party: bool = cr.get("party", false)
 		_ground(ci, sx, sy, _col("#7fe0a0" if party else "#7cc4ff", 0.7))
-		_figure(ci, cr.uid, "kreatur/mensch", sx, sy - px, "#4f9a6a" if party else "#4a7fb0", p.x > _at("p", s.player.pos).x, Color.WHITE, anim != null and anim.moving(cr.uid))
+		_figure(ci, cr.uid, "kreatur/mensch", sx, sy - 2 * px, "#4f9a6a" if party else "#4a7fb0", p.x > _at("p", s.player.pos).x, Color.WHITE, anim != null and anim.moving(cr.uid))
 		if cr.hp < cr.maxHp:
-			_hp_bar(ci, sx, sy, sprite_top("kreatur/mensch") - 1, float(cr.hp) / cr.maxHp, "#6ee07a")
+			_hp_bar(ci, sx, sy, sprite_top("kreatur/mensch") - 2, float(cr.hp) / cr.maxHp, "#6ee07a")
 
 	# --- Monster (nur sichtbare)
 	var ppos := _at("p", s.player.pos)
@@ -846,28 +849,29 @@ func _draw_dynamic_body() -> void:
 		var mod := Color(1, 1, 1, 0.75 if mo.rank == "geist" else 1.0)
 		if asleep:
 			mod = Color(0.8, 0.8, 0.9, mod.a)
-		_figure(ci, mo.uid, name, sx - gx * px, sy - (gy + 1) * px + bob, mo.color, p.x > ppos.x, mod, false, not asleep)
-		var top := sprite_top(name) - 1 - gy
+		_figure(ci, mo.uid, name, sx - gx * px, sy - (gy + 2) * px + bob, mo.color, p.x > ppos.x, mod, false, not asleep)
+		var top := sprite_top(name) - 2 - gy
+		var crown_h := PixelArt.size_of("aufsatz/krone").y
 		if boss and not name.begins_with("boss/"):
-			_spr(ci, "aufsatz/krone", sx + 4 * px, sy + (top - 5) * px + bob)
+			_spr(ci, "aufsatz/krone", sx + (TILE - PixelArt.size_of("aufsatz/krone").x) / 2 * px, sy + (top - crown_h) * px + bob)
 		if unknown:
-			_spr(ci, "aufsatz/frage", sx + 10 * px, sy + (top - 3) * px)
+			_spr(ci, "aufsatz/frage", sx + 20 * px, sy + (top - 6) * px)
 		# Brennende Gegner flackern
 		if _cond_turns(mo, "brennen") > 0:
 			var fl := 0.5 + 0.4 * sin(time / 70.0 + mo.pos.x)
-			_spr(ci, "aufsatz/ring_gross", sx - 2 * px, sy + 9 * px, null, false, Color(1, 0.55, 0.15, fl))
+			_spr(ci, "aufsatz/ring_gross", sx - 4 * px, sy + 18 * px, null, false, Color(1, 0.55, 0.15, fl))
 		if mo.hp < mo.maxHp and info.showHealthBar:
-			_hp_bar(ci, sx, sy, top - (6 if boss and not name.begins_with("boss/") else 0), float(mo.hp) / mo.maxHp, "#ff5a4a")
+			_hp_bar(ci, sx, sy, top - (crown_h + 1 if boss and not name.begins_with("boss/") else 0), float(mo.hp) / mo.maxHp, "#ff5a4a")
 		_level_pill(ci, sx, sy, J.s(mo.level) if info.insight <= 1 else "?", info.challenge.color)
 		# Zustände als kleine farbige Quadrate oben rechts
 		var conds := Conditions.condition_list(mo)
 		for n in conds.size():
-			var cx := 12 - n * 4
-			_rect(ci, sx, sy, cx, top, 4, 4, Color(0.02, 0.02, 0.05, 0.9))
-			_rect(ci, sx, sy, cx + 1, top + 1, 2, 2, _col(conds[n].color))
+			var cx := 24 - n * 8
+			_rect(ci, sx, sy, cx, top, 8, 8, Color(0.02, 0.02, 0.05, 0.9))
+			_rect(ci, sx, sy, cx + 2, top + 2, 4, 4, _col(conds[n].color))
 		if asleep:
-			var zb := px if fmod(time / 500.0, 2.0) < 1.0 else 0
-			_spr(ci, "aufsatz/schlaf", sx + 11 * px, sy + (top - 6) * px - zb)
+			var zb := 2 * px if fmod(time / 500.0, 2.0) < 1.0 else 0
+			_spr(ci, "aufsatz/schlaf", sx + 22 * px, sy + (top - 12) * px - zb)
 		else:
 			var label: Variant = null
 			if J.num(mo, "downed") > 0:
@@ -894,9 +898,9 @@ func _draw_dynamic_body() -> void:
 		var sy := _sy(p.y)
 		_ground(ci, sx, sy, _col("#ffb3e6", 0.7))
 		var look := Sprites.pet_sprite(String(pet.get("species", "")))
-		_figure(ci, "pet", look[0], sx, sy - px, look[1], p.x > ppos.x, Color.WHITE, anim != null and anim.moving("pet"))
+		_figure(ci, "pet", look[0], sx, sy - 2 * px, look[1], p.x > ppos.x, Color.WHITE, anim != null and anim.moving("pet"))
 		if pet.hp < pet.maxHp:
-			_hp_bar(ci, sx, sy, sprite_top(look[0]) - 1, float(pet.hp) / pet.maxHp, "#ff8ad8")
+			_hp_bar(ci, sx, sy, sprite_top(look[0]) - 2, float(pet.hp) / pet.maxHp, "#ff8ad8")
 
 	# --- Spieler
 	_draw_player(ci, _sx(ppos.x), _sy(ppos.y), time)
@@ -909,7 +913,7 @@ func _draw_burst(ci: CanvasItem, b: Dictionary) -> void:
 	var name := Sprites.sprite_name(String(b.defId), b.rank == "geist")
 	var sz := PixelArt.size_of(name)
 	var sx := _sx(b.at.x) - (sz.x - TILE) / 2 * px
-	var sy := _sy(b.at.y) - (sz.y - TILE + 1) * px
+	var sy := _sy(b.at.y) - (sz.y - TILE + 2) * px
 	var k: float = b.k
 	if k < 0.1:
 		PixelArt.draw_texture(ci, PixelArt.silhouette(name), Vector2(sx, sy), px)
@@ -922,7 +926,7 @@ func _draw_burst(ci: CanvasItem, b: Dictionary) -> void:
 		var c: Color = pix[i][1]
 		var h := Tiles.hash(q.x, q.y, 77)
 		var dx := (q.x - sz.x / 2.0 + 0.5) * (0.5 + h) * t * 1.4
-		var dy := (q.y - sz.y * 0.56) * (0.3 + h * 0.5) * t + 10.0 * t * t
+		var dy := (q.y - sz.y * 0.56) * (0.3 + h * 0.5) * t + 20.0 * t * t
 		ci.draw_rect(Rect2(sx + roundf(q.x + dx) * px, sy + roundf(q.y + dy) * px, px, px), Color(c, c.a * alpha))
 
 
@@ -931,19 +935,20 @@ func _draw_sparkles(ci: CanvasItem, sx: float, sy: float, k: float) -> void:
 	var gold := [Color("#fee761"), Color("#feae34"), Color("#ffffff")]
 	var alpha := 1.0 if k < 0.7 else 1.0 - (k - 0.7) / 0.3
 	if k < 0.15:
-		_spr(ci, "aufsatz/ring_gross", sx - 2 * px, sy + 9 * px, null, false, Color(1, 0.9, 0.4, 1.0 - k / 0.15))
+		_spr(ci, "aufsatz/ring_gross", sx - 4 * px, sy + 18 * px, null, false, Color(1, 0.9, 0.4, 1.0 - k / 0.15))
+	var d := 2 * px
 	for i in 18:
 		var h := Tiles.hash(i, 3, 91)
-		var x := -3 + int(h * 22)
+		var x := -6 + int(h * 44)
 		var start := Tiles.hash(i, 5, 92) * 0.4
 		var t := clampf((k - start) / 0.6, 0.0, 1.0)
 		if t <= 0.0 or t >= 1.0:
 			continue
-		var y := 14 - int(t * (18 + h * 8))
+		var y := 28 - int(t * (36 + h * 16))
 		var c: Color = gold[i % 3]
-		ci.draw_rect(Rect2(sx + x * px, sy + y * px, px, px), Color(c, alpha))
+		ci.draw_rect(Rect2(sx + x * px, sy + y * px, d, d), Color(c, alpha))
 		if i % 3 == 0:
-			ci.draw_rect(Rect2(sx + x * px, sy + (y + 1) * px, px, px), Color(c, alpha * 0.4))
+			ci.draw_rect(Rect2(sx + x * px, sy + y * px + d, d, d), Color(c, alpha * 0.4))
 
 
 func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
@@ -965,9 +970,9 @@ func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
 	var bob: float = 0.0 if fmod(time / 600.0, 2.0) < 1.0 else -px
 	if riding and not vehicle:
 		_spr(ci, mount_name, sx, sy, null, flip)
-	var lift := (5 if riding and not vehicle else (3 if riding else 1)) * px
+	var lift := (10 if riding and not vehicle else (6 if riding else 2)) * px
 	var walking: bool = anim != null and anim.player_moving(frame_anim.get("now", -1.0)) > 0
-	# Die Figur ist größer als eine Kachel: mittig, Füße wie bei 16er-Bildern
+	# Mittig auf der Kachel, Füße wie bei den anderen Figuren
 	var hero := Sprites.hero_name(p)
 	var hsz := PixelArt.size_of(hero)
 	var hx := (hsz.x - TILE) / 2
@@ -987,7 +992,7 @@ func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
 			rings.append(pair[1])
 	for n in rings.size():
 		var a := 0.6 + 0.35 * sin(time / 150.0 + n)
-		_spr(ci, "aufsatz/ring_gross", sx - 2 * px, sy + (9 - n * 2) * px, null, false, _col(rings[n], a))
+		_spr(ci, "aufsatz/ring_gross", sx - 4 * px, sy + (18 - n * 4) * px, null, false, _col(rings[n], a))
 
 
 # ================================================================ Oben
@@ -1004,7 +1009,7 @@ func _draw_top() -> void:
 	for pr in frame_anim.get("projectiles", []):
 		_draw_projectile(ci, pr)
 	var font := UiFonts.pixel(700)
-	var fs := 20 if px < 4 else 30
+	var fs := 20 if px < 2 else 30
 	for f in frame_anim.get("floaters", []):
 		var text: String = f.text
 		var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
@@ -1018,13 +1023,13 @@ func _draw_top() -> void:
 		var c := Color(1, 214 / 255.0, 90 / 255.0, 0.9)
 		ci.draw_rect(Rect2(hx, hy, T, T), Color(1, 214 / 255.0, 90 / 255.0, 0.08))
 		# Ecken als Pixelwinkel
-		for q in [[0, 0, 4, 1], [0, 0, 1, 4], [12, 0, 4, 1], [15, 0, 1, 4], [0, 15, 4, 1], [0, 12, 1, 4], [12, 15, 4, 1], [15, 12, 1, 4]]:
+		for q in [[0, 0, 8, 2], [0, 0, 2, 8], [24, 0, 8, 2], [30, 0, 2, 8], [0, 30, 8, 2], [0, 24, 2, 8], [24, 30, 8, 2], [30, 24, 2, 8]]:
 			_rect(ci, hx, hy, q[0], q[1], q[2], q[3], c)
 	if selected != null:
 		var qx := _sx(selected.x)
 		var qy := _sy(selected.y)
 		var c := Color(140 / 255.0, 200 / 255.0, 1, 0.95)
-		for q in [[-1, -1, 5, 1], [-1, -1, 1, 5], [12, -1, 5, 1], [16, -1, 1, 5], [-1, 16, 5, 1], [-1, 12, 1, 5], [12, 16, 5, 1], [16, 12, 1, 5]]:
+		for q in [[-2, -2, 10, 2], [-2, -2, 2, 10], [24, -2, 10, 2], [32, -2, 2, 10], [-2, 32, 10, 2], [-2, 24, 2, 10], [24, 32, 10, 2], [32, 24, 2, 10]]:
 			_rect(ci, qx, qy, q[0], q[1], q[2], q[3], c)
 
 
@@ -1039,14 +1044,14 @@ func _draw_projectile(ci: CanvasItem, pr: Dictionary) -> void:
 	for n in trail.size():
 		var tp: Vector2 = trail[n]
 		var a := (n + 1.0) / trail.size() * 0.5
-		ci.draw_rect(Rect2(_sx(tp.x) + T / 2 - px, _sy(tp.y) + T / 2 - px, px * 2, px * 2), Color(color, a))
+		ci.draw_rect(Rect2(_sx(tp.x) + T / 2 - 2 * px, _sy(tp.y) + T / 2 - 2 * px, px * 4, px * 4), Color(color, a))
 	if style == "pfeil":
-		# Pfeil als Pixellinie in Flugrichtung
+		# Pfeil als Pixellinie in Flugrichtung, zwei Pixel stark
 		var d := Vector2(cos(pr.angle), sin(pr.angle))
-		for i in range(-5, 6):
+		for i in range(-10, 11):
 			var q := Vector2(roundf(d.x * i), roundf(d.y * i))
-			var c := Color("#e8e8e8") if i >= 4 else (Color("#c05040") if i <= -4 else color)
-			ci.draw_rect(Rect2(cx + q.x * px, cy + q.y * px, px, px), c)
+			var c := Color("#e8e8e8") if i >= 7 else (Color("#c05040") if i <= -7 else color)
+			ci.draw_rect(Rect2(cx + q.x * px, cy + q.y * px, px * 2, px * 2), c)
 		return
 	var name := "geschoss/" + style
 	if not PixelArt.has(name):

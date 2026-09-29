@@ -104,20 +104,21 @@ static func sprite_for(def_id: String, rank_ghost: bool = false) -> String:
 static func draw_portrait(ci: CanvasItem, name: String, tint: Variant, foot: Vector2, scale: int, opts: Dictionary = {}) -> void:
 	var flip: bool = opts.get("flip", false)
 	var sz := PixelArt.size_of(name)
-	PixelArt.draw_foot(ci, "aufsatz/schatten", foot + Vector2(0, 3 * scale), scale)
+	PixelArt.draw_foot(ci, "aufsatz/schatten", foot + Vector2(0, 6 * scale), scale)
 	PixelArt.draw_foot(ci, name, foot, scale, tint, flip)
 	var img := PixelArt.image(name)
 	var top: int = img.get_used_rect().position.y if img else 0
 	var origin := foot - Vector2(sz.x * scale / 2.0, sz.y * scale)
 	if opts.get("crown", false) and not name.begins_with("boss/"):
-		PixelArt.draw(ci, "aufsatz/krone", origin + Vector2((sz.x / 2 - 4) * scale, (top - 6) * scale), scale)
+		var ks := PixelArt.size_of("aufsatz/krone")
+		PixelArt.draw(ci, "aufsatz/krone", origin + Vector2((sz.x - ks.x) / 2 * scale, (top - ks.y - 1) * scale), scale)
 	if opts.get("unknown", false):
-		PixelArt.draw(ci, "aufsatz/frage", origin + Vector2((sz.x - 5) * scale, (top - 3) * scale), scale)
+		PixelArt.draw(ci, "aufsatz/frage", origin + Vector2((sz.x - 10) * scale, (top - 6) * scale), scale)
 
 
 ## Die Spielfigur als Porträt (name aus hero_name, sonst ohne Ausrüstung).
 static func draw_hero(ci: CanvasItem, foot: Vector2, scale: int, flip: bool = false, name: String = "kreatur/held") -> void:
-	PixelArt.draw_foot(ci, "aufsatz/schatten", foot + Vector2(0, 3 * scale), scale)
+	PixelArt.draw_foot(ci, "aufsatz/schatten", foot + Vector2(0, 6 * scale), scale)
 	PixelArt.draw_foot(ci, name, foot, scale, null, flip)
 
 
@@ -130,8 +131,9 @@ const GEAR_BEHIND := ["ruecken"]
 const GEAR_BODY := ["beine", "fuesse", "brust", "guertel", "hals", "schultern", "arme", "haende"]
 const GEAR_TOP := ["gesicht", "kopf", "waffe"]
 const OUTLINE := Color("#181425")
-## Ab dieser Zeile machen die Füße im Laufbild einen Schritt nach außen.
-const WALK_ROW := 17
+## Ab dieser Zeile machen die Füße im Laufbild einen Schritt (WALK_STEP Pixel) nach außen.
+const WALK_ROW := 27
+const WALK_STEP := 2
 
 ## Hautfarbe und Körperbau je Rasse (normal, klein, gross, breit). Kopf, Haare
 ## und Anbauten jeder Rasse liegen als held/<id> in helden.png.
@@ -231,7 +233,7 @@ static func _walk_frame(img: Image) -> Image:
 				continue
 			var nx := x
 			if y >= WALK_ROW:
-				nx += -1 if x < w / 2 else 1
+				nx += -WALK_STEP if x < w / 2 else WALK_STEP
 			if nx >= 0 and nx < w:
 				out.set_pixel(nx, y, c)
 	return out

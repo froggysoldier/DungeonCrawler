@@ -155,6 +155,11 @@ func sprite(name: String, rows: Array, outline: bool = true) -> Image:
 				ch = "."
 			line.append(ch)
 		grid.append(line)
+	# Vorlagen sind im groben Raster gezeichnet (16, Bosse 24, Figuren 20):
+	# Scale2x glättet Schrägen, Größeres wird gleichmäßig auf 32 verkleinert
+	grid = _shrink(_scale2x(grid), T)
+	h = grid.size()
+	w = (grid[0] as Array).size()
 	var empty := func(x: int, y: int) -> bool:
 		return x < 0 or y < 0 or x >= w or y >= h or grid[y][x] == "."
 	var out: Array = []
@@ -201,19 +206,19 @@ func _build_all() -> void:
 	for n in Defs.OVERLAYS:
 		_add("kreaturen", "aufsatz/" + n, sprite(n, Defs.OVERLAYS[n]))
 	for n in Defs.BOSSES:
-		_add("bosse", "boss/" + n, _bottom(sprite(n, Defs.BOSSES[n]), 1))
+		_add("bosse", "boss/" + n, _bottom(sprite(n, Defs.BOSSES[n]), 2))
 	for n in Defs.MOUNTS:
 		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n]))
 	for n in Defs.HEROES:
 		_add("helden", "held/" + n, sprite(n, Defs.HEROES[n], false))
 	for n in Defs.GEAR:
 		_add("helden", "ausruestung/" + n, sprite(n, Defs.GEAR[n], false))
-	_add("kreaturen", "aufsatz/schatten", _shadow(14, 5))
-	_add("kreaturen", "aufsatz/schatten_klein", _shadow(10, 3))
-	_add("kreaturen", "aufsatz/ring", _ring(16, 7))
-	_add("kreaturen", "aufsatz/ring_gross", _ring(20, 9))
-	_add("kreaturen", "aufsatz/leuchten", _glow(32))
-	_add("kreaturen", "aufsatz/leuchten_klein", _glow(16))
+	_add("kreaturen", "aufsatz/schatten", _shadow(28, 10))
+	_add("kreaturen", "aufsatz/schatten_klein", _shadow(20, 6))
+	_add("kreaturen", "aufsatz/ring", _ring(32, 14))
+	_add("kreaturen", "aufsatz/ring_gross", _ring(40, 18))
+	_add("kreaturen", "aufsatz/leuchten", _glow(64))
+	_add("kreaturen", "aufsatz/leuchten_klein", _glow(32))
 	for n in Defs.ITEMS:
 		_add("dinge", "ding/" + n, sprite(n, Defs.ITEMS[n]))
 	for n in Defs.TRAPS:
@@ -238,6 +243,68 @@ func _build_all() -> void:
 			for open in [false, true]:
 				_add("kacheln", "tuer/%s_%s_%s" % ["boss" if boss else "holz", "quer" if hor else "laengs", "offen" if open else "zu"], _door(open, hor, boss))
 	_add("kacheln", "treppe", _stairs())
+
+
+## Scale2x (EPX) auf dem Zeichenraster: jede Zelle wird zu 2 × 2, Kanten
+## zwischen gleichen Nachbarn werden schräg geglättet.
+static func _scale2x(grid: Array) -> Array:
+	var h := grid.size()
+	var w := (grid[0] as Array).size()
+	var at := func(x: int, y: int) -> String:
+		return grid[y][x] if x >= 0 and y >= 0 and x < w and y < h else "."
+	var out: Array = []
+	for y in h * 2:
+		var line: Array = []
+		line.resize(w * 2)
+		out.append(line)
+	for y in h:
+		for x in w:
+			var p: String = grid[y][x]
+			var a: String = at.call(x, y - 1)
+			var b: String = at.call(x + 1, y)
+			var c: String = at.call(x - 1, y)
+			var d: String = at.call(x, y + 1)
+			out[2 * y][2 * x] = a if c == a and c != d and a != b else p
+			out[2 * y][2 * x + 1] = b if a == b and a != c and b != d else p
+			out[2 * y + 1][2 * x] = c if d == c and d != b and c != a else p
+			out[2 * y + 1][2 * x + 1] = d if b == d and b != a and d != c else p
+	return out
+
+
+## Spiegelgleich verteilte Zeilen/Spalten, die beim Verkleinern von n auf m wegfallen.
+static func _drop_set(n: int, m: int) -> Dictionary:
+	var k := n - m
+	var out := {}
+	if k <= 0:
+		return out
+	var step := float(n) / k
+	for i in k / 2:
+		var v := int(step / 2.0 + i * step)
+		out[v] = true
+		out[n - 1 - v] = true
+	if k % 2 == 1:
+		out[n / 2] = true
+	return out
+
+
+## Raster, das größer als size ist, gleichmäßig auf size verkleinern.
+static func _shrink(grid: Array, size: int) -> Array:
+	var h := grid.size()
+	var w := (grid[0] as Array).size()
+	if w <= size and h <= size:
+		return grid
+	var dx := _drop_set(w, mini(w, size))
+	var dy := _drop_set(h, mini(h, size))
+	var out: Array = []
+	for y in h:
+		if dy.has(y):
+			continue
+		var line: Array = []
+		for x in w:
+			if not dx.has(x):
+				line.append(grid[y][x])
+		out.append(line)
+	return out
 
 
 ## Bild nach unten schieben, bis unten nur noch `margin` leere Zeilen bleiben.
@@ -325,42 +392,50 @@ func _decal(kind: String, v: int) -> Image:
 	var img := Image.create(T, T, false, Image.FORMAT_RGBA8)
 	match kind:
 		"pfuetze":
-			var cx := _ri(5, 10)
-			var cy := _ri(5, 10)
-			var rx := _ri(3, 5)
-			var ry := _ri(2, 3)
+			var cx := _ri(10, 21)
+			var cy := _ri(10, 21)
+			var rx := _ri(6, 10)
+			var ry := _ri(4, 6)
 			for y in T:
 				for x in T:
 					var d := pow((x - cx) / float(rx), 2) + pow((y - cy) / float(ry), 2)
-					if d <= 1.0 + _r() * 0.15:
-						img.set_pixel(x, y, Color(0.12, 0.17, 0.24, 0.55))
-			img.set_pixel(cx - 1, cy - 1, Color(0.7, 0.8, 0.95, 0.35))
-			img.set_pixel(cx, cy - 1, Color(0.7, 0.8, 0.95, 0.25))
+					if d <= 1.0 + _r() * 0.12:
+						img.set_pixel(x, y, Color(0.12, 0.17, 0.24, 0.55 if d > 0.5 else 0.62))
+			# Spiegelung
+			for i in 3:
+				img.set_pixel(cx - 3 + i, cy - 2, Color(0.7, 0.8, 0.95, 0.35))
+			img.set_pixel(cx - 4, cy - 1, Color(0.7, 0.8, 0.95, 0.25))
 		"riss":
-			var x := _ri(2, 5)
-			var y := _ri(4, 11)
-			while x < 14:
+			var x := _ri(3, 9)
+			var y := _ri(8, 23)
+			while x < 28:
 				img.set_pixel(x, y, Color(0, 0, 0, 0.55))
 				x += 1
-				if _r() < 0.45:
-					y = clampi(y + (1 if _r() < 0.5 else -1), 1, 14)
+				if _r() < 0.35:
+					y = clampi(y + (1 if _r() < 0.5 else -1), 2, 29)
 					img.set_pixel(x, y, Color(0, 0, 0, 0.55))
-				if _r() < 0.15:
-					img.set_pixel(x, clampi(y + 1, 0, 15), Color(0, 0, 0, 0.3))
+				if _r() < 0.12:
+					# Seitenast
+					var bx := x
+					var by := y
+					for i in _ri(2, 4):
+						bx += 1
+						by += 1 if (v % 2 == 0) else -1
+						img.set_pixel(clampi(bx, 0, T - 1), clampi(by, 0, T - 1), Color(0, 0, 0, 0.35))
 		"fleck":
-			var cx := _ri(5, 10)
-			var cy := _ri(5, 10)
+			var cx := _ri(10, 21)
+			var cy := _ri(10, 21)
 			for y in T:
 				for x in T:
-					var d := pow((x - cx) / 4.0, 2) + pow((y - cy) / 2.6, 2)
+					var d := pow((x - cx) / 8.0, 2) + pow((y - cy) / 5.2, 2)
 					if d <= 1.0 and _r() < 0.9:
-						img.set_pixel(x, y, Color(0.05, 0.03, 0.02, 0.3))
+						img.set_pixel(x, y, Color(0.05, 0.03, 0.02, 0.3 if d > 0.4 else 0.38))
 	return img
 
 
 const PROJECTILES := {
-	"stein": ["#c8c0b0", 3], "schleim": ["#8ce04a", 3], "bombe": ["#3a3a44", 4],
-	"magie": ["#c080ff", 5], "feuer": ["#ff8a2a", 5], "blitz": ["#9fdcff", 5],
+	"stein": ["#c8c0b0", 6], "schleim": ["#8ce04a", 6], "bombe": ["#3a3a44", 8],
+	"magie": ["#c080ff", 10], "feuer": ["#ff8a2a", 10], "blitz": ["#9fdcff", 10],
 }
 
 
@@ -369,20 +444,28 @@ func _projectile(n: String) -> Image:
 	var s: int = PROJECTILES[n][1]
 	var img := Image.create(s + 2, s + 2, false, Image.FORMAT_RGBA8)
 	var c := (s + 2) / 2.0
+	var glow := n in ["magie", "feuer", "blitz"]
 	for y in s + 2:
 		for x in s + 2:
 			var d := Vector2(x + 0.5 - c, y + 0.5 - c).length()
-			if d <= s / 2.0 + 0.2:
-				var glow := n in ["magie", "feuer", "blitz"]
-				img.set_pixel(x, y, Color.WHITE if glow and d < s / 4.0 else col)
+			if d <= s / 2.0:
+				var cc := col
+				if glow and d < s / 4.0:
+					cc = Color.WHITE
+				elif d < s / 2.0 - 1.0 and x < c and y < c:
+					cc = col.lightened(0.25)
+				elif d >= s / 2.0 - 1.0 and (x >= c or y >= c):
+					cc = col.darkened(0.25)
+				img.set_pixel(x, y, cc)
 			elif d <= s / 2.0 + 1.0:
 				img.set_pixel(x, y, Color(PixelArt.PALETTE.k))
 	if n == "bombe":
 		img.set_pixel(s, 0, Color("#feae34"))
+		img.set_pixel(s - 1, 1, Color("#8a7c6a"))
 	return img
 
 
-# ================================================================ Böden
+# ================================================================ Böden (32 × 32)
 
 const FLOORS := {
 	"pflaster": {"base": "#5d5449", "gap": "#2b2520"},
@@ -397,6 +480,21 @@ const FLOORS := {
 }
 
 
+## Ein Stein, eine Platte oder ein Ziegel mit heller Ober- und Links-, dunkler
+## Unter- und Rechtskante und leicht gesprenkelter Fläche.
+func _block(img: Image, x0: int, y0: int, w: int, h: int, col: Color, speck: float = 0.06) -> void:
+	for yy in range(y0, y0 + h):
+		for xx in range(x0, x0 + w):
+			if xx < 0 or yy < 0 or xx >= T or yy >= T:
+				continue
+			var c := _jit(col, speck, _r())
+			if yy == y0 or xx == x0:
+				c = col.lightened(0.14)
+			elif yy == y0 + h - 1 or xx == x0 + w - 1:
+				c = col.darkened(0.18)
+			img.set_pixel(xx, yy, c)
+
+
 func _floor(mat: String, v: int) -> Image:
 	_rng = Rng.new(100 + v * 17 + mat.length() * 101)
 	var spec: Dictionary = FLOORS[mat]
@@ -406,130 +504,136 @@ func _floor(mat: String, v: int) -> Image:
 	img.fill(gap)
 	match mat:
 		"pflaster":
-			# Unregelmäßige Steine in versetzten Reihen
+			# Unregelmäßige Steine in versetzten Reihen, 1 Pixel Fuge
 			var y := 0
 			var row := 0
 			while y < T:
-				var hgt := 4 if y + 4 <= T else T - y
-				var x := -(row % 2) * 3
+				var hgt := _ri(7, 9) if y + 9 <= T else T - y
+				var x := -(row % 2) * _ri(4, 7)
 				while x < T:
-					var wd := _ri(4, 6)
-					var col := _jit(base, 0.12, _r())
-					for yy in range(y, y + hgt - 1):
-						for xx in range(maxi(0, x), mini(T, x + wd - 1)):
-							var c := col
-							if yy == y:
-								c = col.lightened(0.12)
-							elif yy == y + hgt - 2:
-								c = col.darkened(0.15)
-							img.set_pixel(xx, yy, c)
+					var wd := _ri(8, 13)
+					_block(img, x, y, wd - 1, hgt - 1, _jit(base, 0.12, _r()), 0.05)
 					x += wd
 				y += hgt
 				row += 1
 		"dielen":
 			for p in 4:
-				var y0 := p * 4
+				var y0 := p * 8
 				var col := _jit(base, 0.08, _r())
-				var cut := _ri(3, 12)
-				for yy in range(y0, y0 + 3):
+				var cut := _ri(6, 25)
+				for yy in range(y0, y0 + 7):
 					for xx in T:
 						var c := col
-						if _r() < 0.18:
-							c = col.darkened(0.12)
 						if yy == y0:
-							c = c.lightened(0.08)
-						img.set_pixel(xx, yy, c)
+							c = col.lightened(0.1)
+						elif yy == y0 + 6:
+							c = col.darkened(0.12)
+						img.set_pixel(xx, yy, _jit(c, 0.03, _r()))
+				# Maserung: lange, dunkle Striche
+				for g in 3:
+					var gy := y0 + _ri(1, 5)
+					var gx := _ri(0, T - 1)
+					for i in _ri(5, 11):
+						img.set_pixel((gx + i) % T, gy, col.darkened(0.16))
 				# Stoß und Nägel
-				for yy in range(y0, y0 + 3):
+				for yy in range(y0, y0 + 7):
 					img.set_pixel(cut, yy, gap)
-				img.set_pixel(cut + 1, y0 + 1, Color("#8f8a80"))
-				img.set_pixel((cut + 8) % T, y0 + 1, Color("#8f8a80"))
+				for nx in [(cut + 2) % T, (cut + 16) % T]:
+					img.set_pixel(nx, y0 + 2, Color("#9a958a"))
+					img.set_pixel(nx, y0 + 4, Color("#6a655c"))
 		"fliesen":
 			for ty in 2:
 				for tx in 2:
 					var col := base if (tx + ty) % 2 == 0 else base.darkened(0.08)
-					col = _jit(col, 0.03, _r())
-					for yy in range(ty * 8, ty * 8 + 7):
-						for xx in range(tx * 8, tx * 8 + 7):
-							img.set_pixel(xx, yy, col)
-					img.set_pixel(tx * 8, ty * 8, col.lightened(0.18))
-					img.set_pixel(tx * 8 + 1, ty * 8, col.lightened(0.1))
+					_block(img, tx * 16, ty * 16, 15, 15, _jit(col, 0.03, _r()), 0.02)
+					img.set_pixel(tx * 16 + 2, ty * 16 + 2, col.lightened(0.28))
+					img.set_pixel(tx * 16 + 3, ty * 16 + 2, col.lightened(0.18))
+					img.set_pixel(tx * 16 + 2, ty * 16 + 3, col.lightened(0.18))
 		"beton", "arena":
 			for yy in T:
 				for xx in T:
 					img.set_pixel(xx, yy, _jit(base, 0.05, _r()))
-			for i in 10:
+			for i in 26:
 				var c := base.darkened(0.18) if _r() < 0.6 else base.lightened(0.12)
-				img.set_pixel(_ri(0, 15), _ri(0, 15), c)
+				var qx := _ri(0, T - 1)
+				var qy := _ri(0, T - 1)
+				img.set_pixel(qx, qy, c)
+				if _r() < 0.3:
+					img.set_pixel(mini(qx + 1, T - 1), qy, c)
 			if mat == "beton":
 				# Fugen der Platten
 				for i in T:
 					img.set_pixel(i, 0, gap)
 					img.set_pixel(0, i, gap)
+					img.set_pixel(i, 1, base.lightened(0.08))
+					img.set_pixel(1, i, base.lightened(0.08))
 			else:
-				for i in 3:
-					var px := _ri(1, 14)
-					var py := _ri(1, 14)
-					img.set_pixel(px, py, Color("#b09a74"))
-					img.set_pixel(px + 1, py, Color("#6c5a3e"))
+				# Sand mit Kieseln
+				for i in 6:
+					var qx := _ri(2, 28)
+					var qy := _ri(2, 28)
+					img.set_pixel(qx, qy, Color("#b09a74"))
+					img.set_pixel(qx + 1, qy, Color("#9a8460"))
+					img.set_pixel(qx, qy + 1, Color("#6c5a3e"))
+					img.set_pixel(qx + 1, qy + 1, Color("#5a4a32"))
 		"ziegelboden":
 			for r in 4:
-				var y0 := r * 4
-				var off := 4 if r % 2 == 1 else 0
+				var y0 := r * 8
+				var off := 8 if r % 2 == 1 else 0
 				for b in 3:
-					var x0 := b * 8 - off
-					var col := _jit(base, 0.1, _r())
-					for yy in range(y0, y0 + 3):
-						for xx in range(maxi(0, x0), mini(T, x0 + 7)):
-							var c := col.lightened(0.1) if yy == y0 else (col.darkened(0.12) if yy == y0 + 2 else col)
-							img.set_pixel(xx, yy, c)
+					_block(img, b * 16 - off, y0, 15, 7, _jit(base, 0.1, _r()), 0.05)
 		"teppich":
 			for yy in T:
 				for xx in T:
-					img.set_pixel(xx, yy, _jit(base, 0.04, _r()))
+					var c := _jit(base, 0.04, _r())
+					# feine Webstruktur
+					if (xx + yy) % 4 == 0:
+						c = c.darkened(0.06)
+					img.set_pixel(xx, yy, c)
 			var trim := Color(spec.trim)
-			# Rautenmuster
-			for i in 4:
-				img.set_pixel(7 - i, 3 + i, trim.darkened(0.2))
-				img.set_pixel(8 + i, 3 + i, trim.darkened(0.2))
-				img.set_pixel(4 + i, 7 + i, trim.darkened(0.2))
-				img.set_pixel(11 - i, 7 + i, trim.darkened(0.2))
-			img.set_pixel(7, 7, trim)
-			img.set_pixel(8, 8, trim)
+			# Raute mit Füllung
+			for i in 9:
+				for q in [Vector2i(15 - i, 6 + i), Vector2i(16 + i, 6 + i), Vector2i(7 + i, 15 + i), Vector2i(24 - i, 15 + i)]:
+					img.set_pixelv(q, trim.darkened(0.2))
+			for i in 5:
+				for q in [Vector2i(15 - i, 11 + i), Vector2i(16 + i, 11 + i), Vector2i(11 + i, 16 + i), Vector2i(20 - i, 16 + i)]:
+					img.set_pixelv(q, trim.darkened(0.45))
+			for q in [Vector2i(15, 15), Vector2i(16, 15), Vector2i(15, 16), Vector2i(16, 16)]:
+				img.set_pixelv(q, trim)
 		"marmor":
 			for yy in T:
 				for xx in T:
 					img.set_pixel(xx, yy, _jit(base, 0.025, _r()))
 			var vein := Color(spec.vein)
-			var x := _ri(0, 6)
-			var y := _ri(0, 15)
-			for i in 14:
-				img.set_pixel(clampi(x, 0, 15), clampi(y, 0, 15), vein)
-				x += 1
-				y += _ri(-1, 1)
+			for n in 2:
+				var x := _ri(0, 12)
+				var y := _ri(0, T - 1)
+				for i in 30:
+					img.set_pixel(clampi(x, 0, T - 1), clampi(y, 0, T - 1), vein if n == 0 else vein.lightened(0.15))
+					x += 1
+					if _r() < 0.5:
+						y += _ri(-1, 1)
 			for i in T:
 				img.set_pixel(i, T - 1, gap)
 				img.set_pixel(T - 1, i, gap)
 		"blutstein":
 			for ty in 2:
 				for tx in 2:
-					var col := _jit(base, 0.1, _r())
-					for yy in range(ty * 8, ty * 8 + 7):
-						for xx in range(tx * 8, tx * 8 + 7):
-							img.set_pixel(xx, yy, col)
-					img.set_pixel(tx * 8, ty * 8, col.lightened(0.15))
+					_block(img, tx * 16, ty * 16, 15, 15, _jit(base, 0.1, _r()), 0.08)
 			if v % 2 == 0:
-				var x := _ri(2, 8)
-				var y := _ri(3, 12)
+				var x := _ri(4, 16)
+				var y := _ri(6, 24)
 				var vein := Color(spec.vein)
-				for i in 5:
+				for i in 11:
 					img.set_pixel(x + i, y, vein)
 					if i % 2 == 1:
-						y += 1
+						y += 1 if _r() < 0.7 else 0
+					if i % 3 == 0:
+						img.set_pixel(x + i, y + 1, vein.darkened(0.3))
 	return img
 
 
-# ================================================================ Wände, Türen, Treppe
+# ================================================================ Wände, Türen, Treppe (32 × 32)
 
 func _wall(fl: int, v: int, face: bool) -> Image:
 	_rng = Rng.new(300 + fl * 13 + v * 7 + (1 if face else 0))
@@ -538,50 +642,63 @@ func _wall(fl: int, v: int, face: bool) -> Image:
 	var stone := Color(th.capStone)
 	var img := Image.create(T, T, false, Image.FORMAT_RGBA8)
 	img.fill(cap)
-	# Mauerkrone von oben: große Platten
-	var seam := _ri(5, 10)
+	# Mauerkrone von oben: große Platten mit Fugen
+	var seam := _ri(10, 21)
+	var cut_l := _ri(12, 20)
+	var cut_r := _ri(8, 14)
 	for yy in T:
 		for xx in T:
-			var c := _jit(stone, 0.06, _r())
-			if xx == seam or (yy == 8 and xx < seam) or (yy == 5 and xx > seam):
+			var c := _jit(stone, 0.05, _r())
+			var on_seam := xx == seam or (yy == cut_l and xx < seam) or (yy == cut_r and xx > seam)
+			if on_seam:
 				c = cap
+			elif xx == seam + 1 or (yy == cut_l + 1 and xx < seam) or (yy == cut_r + 1 and xx > seam) or yy == 0 or xx == 0:
+				c = stone.lightened(0.1)
 			img.set_pixel(xx, yy, c)
 	if not face:
 		return img
-	var top := 5
+	var top := 10
 	var mortar := Color(th.mortar)
 	var fc := Color(th.face)
 	for yy in range(top, T):
 		for xx in T:
-			img.set_pixel(xx, yy, mortar)
+			img.set_pixel(xx, yy, _jit(mortar, 0.04, _r()))
 	# Kante der Krone
 	for xx in T:
-		img.set_pixel(xx, top - 1, Color(th.lip).darkened(0.1))
-	# Ziegel 8×3 im Verband
+		img.set_pixel(xx, top - 2, Color(th.lip))
+		img.set_pixel(xx, top - 1, Color(th.lip).darkened(0.25))
+	# Ziegel 16 × 6 im Verband, 1 Pixel Fuge
 	var r := 0
 	var y := top
-	while y < T:
-		var off := 4 if r % 2 == 1 else 0
+	while y < T - 2:
+		var off := 8 if r % 2 == 1 else 0
 		for b in 3:
-			var x0 := b * 8 - off
+			var x0 := b * 16 - off
 			var col := _jit(fc, 0.1, _r())
-			for yy in range(y, mini(T, y + 2)):
-				for xx in range(maxi(0, x0), mini(T, x0 + 7)):
-					var c := col.lightened(0.12) if yy == y else col
+			for yy in range(y, mini(T - 2, y + 5)):
+				for xx in range(maxi(0, x0), mini(T, x0 + 15)):
+					var c := _jit(col, 0.04, _r())
+					if yy == y:
+						c = col.lightened(0.14)
+					elif yy == y + 4:
+						c = col.darkened(0.14)
 					img.set_pixel(xx, yy, c)
-		y += 3
+		y += 6
 		r += 1
 	# Schatten unten, wo die Wand auf den Boden trifft
 	for xx in T:
-		img.set_pixel(xx, T - 1, mortar.darkened(0.3))
+		img.set_pixel(xx, T - 2, mortar.darkened(0.2))
+		img.set_pixel(xx, T - 1, mortar.darkened(0.35))
 	if th.has("moss"):
 		var moss := Color(th.moss)
-		for i in 5:
-			var mx := _ri(0, 15)
-			var my := _ri(top + 1, T - 2)
+		for i in 8:
+			var mx := _ri(0, T - 3)
+			var my := _ri(top + 2, T - 4)
 			img.set_pixel(mx, my, moss)
-			if mx < 15:
-				img.set_pixel(mx + 1, my, moss.darkened(0.2))
+			img.set_pixel(mx + 1, my, moss.darkened(0.2))
+			if _r() < 0.5:
+				img.set_pixel(mx, my + 1, moss.darkened(0.3))
+				img.set_pixel(mx + 2, my, moss.lightened(0.1))
 	return img
 
 
@@ -597,54 +714,72 @@ func _door(open: bool, horizontal: bool, boss: bool) -> Image:
 		# Tür in einer waagerechten Wand: Vorderansicht
 		img.fill(frame_d)
 		for yy in T:
-			img.set_pixel(0, yy, frame)
-			img.set_pixel(1, yy, frame)
-			img.set_pixel(14, yy, frame_d.darkened(0.2))
-			img.set_pixel(15, yy, frame_d.darkened(0.2))
+			for xx in [0, 1, 2, 3]:
+				img.set_pixel(xx, yy, frame if xx < 3 else frame_d)
+			for xx in [28, 29, 30, 31]:
+				img.set_pixel(xx, yy, frame_d.darkened(0.2))
 		for xx in T:
-			img.set_pixel(xx, 0, frame.lightened(0.1))
-			img.set_pixel(xx, 1, frame)
+			img.set_pixel(xx, 0, frame.lightened(0.15))
+			for yy in [1, 2, 3]:
+				img.set_pixel(xx, yy, frame)
 		if open:
-			for yy in range(2, T):
-				for xx in range(2, 14):
-					img.set_pixel(xx, yy, k if yy < 8 else Color("#1e1a24"))
-			for yy in range(2, T):
-				img.set_pixel(2, yy, wood)
-				img.set_pixel(3, yy, wood_d)
+			for yy in range(4, T):
+				for xx in range(4, 28):
+					img.set_pixel(xx, yy, k if yy < 16 else Color("#1e1a24"))
+			for yy in range(4, T):
+				for xx in [4, 5]:
+					img.set_pixel(xx, yy, wood)
+				for xx in [6, 7]:
+					img.set_pixel(xx, yy, wood_d)
 			return img
-		for yy in range(2, T):
-			for xx in range(2, 14):
-				var c := wood if (xx - 2) % 4 != 3 else wood_d
-				img.set_pixel(xx, yy, c)
-		for xx in range(2, 14):
-			img.set_pixel(xx, 5, band)
-			img.set_pixel(xx, 12, band)
-		img.set_pixel(11, 9, Color("#feae34"))
-		img.set_pixel(11, 10, Color("#be4a2f"))
+		for yy in range(4, T):
+			for xx in range(4, 28):
+				var col := wood if (xx - 4) % 8 != 7 else wood_d
+				if (xx - 4) % 8 == 0:
+					col = wood.lightened(0.1)
+				img.set_pixel(xx, yy, _jit(col, 0.03, _r()))
+		for yy in [10, 11, 24, 25]:
+			for xx in range(4, 28):
+				img.set_pixel(xx, yy, band if yy % 2 == 0 else band.darkened(0.3))
+		for q in [Vector2i(22, 18), Vector2i(23, 18), Vector2i(22, 19), Vector2i(23, 19)]:
+			img.set_pixelv(q, Color("#feae34"))
+		img.set_pixel(22, 20, Color("#be4a2f"))
+		img.set_pixel(23, 20, Color("#be4a2f"))
 		if boss:
-			for p in [Vector2i(4, 5), Vector2i(8, 5), Vector2i(12, 5), Vector2i(4, 12), Vector2i(8, 12), Vector2i(12, 12)]:
+			for p in [Vector2i(8, 10), Vector2i(16, 10), Vector2i(24, 10), Vector2i(8, 24), Vector2i(16, 24), Vector2i(24, 24)]:
 				img.set_pixelv(p, Color("#e43b44"))
+				img.set_pixel(p.x + 1, p.y, Color("#e43b44"))
+				img.set_pixel(p.x, p.y + 1, Color("#a22633"))
+				img.set_pixel(p.x + 1, p.y + 1, Color("#a22633"))
 		return img
 	# Tür in einer senkrechten Wand: von oben als schmale Platte
 	for xx in T:
-		for yy in [0, 1, 14, 15]:
-			img.set_pixel(xx, yy, frame if yy < 8 else frame_d)
+		for yy in [0, 1, 2, 3, 28, 29, 30, 31]:
+			img.set_pixel(xx, yy, frame if yy < 16 else frame_d)
 	if open:
-		for xx in range(3, 13):
-			img.set_pixel(xx, 2, k)
-			img.set_pixel(xx, 3, wood)
-			img.set_pixel(xx, 4, wood_d)
-			img.set_pixel(xx, 5, k)
+		for xx in range(6, 26):
+			for yy in [4, 5]:
+				img.set_pixel(xx, yy, k)
+			for yy in [6, 7]:
+				img.set_pixel(xx, yy, wood)
+			for yy in [8, 9]:
+				img.set_pixel(xx, yy, wood_d)
+			for yy in [10, 11]:
+				img.set_pixel(xx, yy, k)
 		return img
-	for yy in range(2, 14):
-		img.set_pixel(5, yy, k)
-		img.set_pixel(6, yy, wood.lightened(0.1))
-		img.set_pixel(7, yy, wood)
-		img.set_pixel(8, yy, wood)
-		img.set_pixel(9, yy, wood_d)
-		img.set_pixel(10, yy, k)
-	for yy in [4, 11]:
-		for xx in range(6, 10):
+	for yy in range(4, 28):
+		for xx in [10, 11]:
+			img.set_pixel(xx, yy, k)
+		img.set_pixel(12, yy, wood.lightened(0.15))
+		img.set_pixel(13, yy, wood.lightened(0.05))
+		for xx in [14, 15, 16, 17]:
+			img.set_pixel(xx, yy, wood)
+		img.set_pixel(18, yy, wood_d)
+		img.set_pixel(19, yy, wood_d)
+		for xx in [20, 21]:
+			img.set_pixel(xx, yy, k)
+	for yy in [8, 9, 22, 23]:
+		for xx in range(12, 20):
 			img.set_pixel(xx, yy, band)
 	return img
 
@@ -654,25 +789,29 @@ func _stairs() -> Image:
 	var k := Color(PixelArt.PALETTE.k)
 	img.fill(Color("#6e6254"))
 	for i in T:
-		img.set_pixel(i, 0, Color("#8a7c6a"))
-		img.set_pixel(0, i, Color("#8a7c6a"))
-		img.set_pixel(i, T - 1, Color("#3e3730"))
-		img.set_pixel(T - 1, i, Color("#3e3730"))
-	for yy in range(2, 15):
-		for xx in range(2, 14):
+		for j in 2:
+			img.set_pixel(i, j, Color("#8a7c6a"))
+			img.set_pixel(j, i, Color("#8a7c6a"))
+			img.set_pixel(i, T - 1 - j, Color("#3e3730"))
+			img.set_pixel(T - 1 - j, i, Color("#3e3730"))
+	for yy in range(4, 30):
+		for xx in range(4, 28):
 			img.set_pixel(xx, yy, k)
 	# Stufen, nach unten dunkler und schmaler
-	for s in 5:
-		var y := 2 + s * 3
-		var inset := s
-		var light := 0.78 - s * 0.14
+	for st in 5:
+		var y := 4 + st * 6
+		var inset := st * 2
+		var light := 0.78 - st * 0.14
 		var col := Color(light, light * 0.84, light * 0.62)
-		for xx in range(2 + inset, 14 - inset):
-			img.set_pixel(xx, y, col.lightened(0.25))
-			img.set_pixel(xx, y + 1, col)
+		for xx in range(4 + inset, 28 - inset):
+			img.set_pixel(xx, y, col.lightened(0.3))
+			img.set_pixel(xx, y + 1, col.lightened(0.1))
+			img.set_pixel(xx, y + 2, col)
+			img.set_pixel(xx, y + 3, col.darkened(0.25))
 	# Goldene Geländer
-	for yy in range(2, 15):
-		var inset := (yy - 2) / 3
-		img.set_pixel(1 + inset, yy, Color("#d9ae52"))
-		img.set_pixel(14 - inset, yy, Color("#d9ae52"))
+	for yy in range(4, 30):
+		var inset := (yy - 4) / 3
+		for d in 2:
+			img.set_pixel(2 + inset + d, yy, Color("#d9ae52") if d == 0 else Color("#a07c30"))
+			img.set_pixel(29 - inset - d, yy, Color("#d9ae52") if d == 0 else Color("#a07c30"))
 	return img

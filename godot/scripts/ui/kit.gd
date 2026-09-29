@@ -275,20 +275,20 @@ static func icon(parent: Node, name: String, tint: Variant = null, scale: int = 
 static var _bb_images := {}
 
 
-static func img(name: String, tint: Variant = null, scale: int = 1) -> String:
+static func img(name: String, tint: Variant = null, scale: float = 1.0) -> String:
 	var key := "roh" if tint == null else ((tint as Color).to_html() if tint is Color else String(tint).trim_prefix("#"))
-	var path := "res://pixel_bb/%s.tex" % ("%s|%s|%d" % [name, key, scale]).md5_text()
+	var path := "res://pixel_bb/%s.tex" % ("%s|%s|%s" % [name, key, scale]).md5_text()
 	if not _bb_images.has(path):
 		var src := PixelArt.texture(name, tint)
 		if src == null:
 			return ""
 		var im := src.get_image()
-		im.resize(im.get_width() * scale, im.get_height() * scale, Image.INTERPOLATE_NEAREST)
+		im.resize(maxi(1, roundi(im.get_width() * scale)), maxi(1, roundi(im.get_height() * scale)), Image.INTERPOLATE_NEAREST)
 		var tex := ImageTexture.create_from_image(im)
 		tex.take_over_path(path)
 		_bb_images[path] = tex
-	var sz := PixelArt.size_of(name) * scale
-	return "[img=%dx%d]%s[/img]" % [sz.x, sz.y, path]
+	var sz := Vector2(PixelArt.size_of(name)) * scale
+	return "[img=%dx%d]%s[/img]" % [roundi(sz.x), roundi(sz.y), path]
 
 
 ## Kleine Bühne für Pixel-Figuren: jedes Element {name, tint, scale} steht
@@ -310,7 +310,7 @@ class Stage:
 				continue
 			var foot: Vector2 = e.foot
 			if e.get("shadow", true):
-				PixelArt.draw_foot(self, "aufsatz/schatten", foot + Vector2(0, 3 * sc), sc)
+				PixelArt.draw_foot(self, "aufsatz/schatten", foot + Vector2(0, 6 * sc), sc)
 			PixelArt.draw_foot(self, e.name, foot, sc, e.get("tint"), e.get("flip", false), mod)
 
 

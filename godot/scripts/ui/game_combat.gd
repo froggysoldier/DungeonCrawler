@@ -319,7 +319,7 @@ static func _target_row(gv: GameView, list: Node, m: Dictionary) -> void:
 	cp.add_child(row)
 	# Die Figur, wie sie auf der Karte steht (eigene Boss-Figuren sind größer)
 	var look := Sprites.monster_sprite(m)
-	var fig := Kit.icon(row, look[0], look[1], 2 if PixelArt.size_of(look[0]).y > 16 else 3, Vector2(48, 48))
+	var fig := Kit.icon(row, look[0], look[1], 2, Vector2(64, 64))
 	if m.get("rank") == "geist":
 		fig.modulate.a = 0.75
 	var v := VBoxContainer.new()

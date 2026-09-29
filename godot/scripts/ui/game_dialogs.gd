@@ -30,7 +30,7 @@ static func tooltip_for(gv: GameView, t: Variant, detail: bool = false) -> Varia
 		var info := Identify.describe_monster(s, mon)
 		var color = "#b0a898" if info.insight >= 3 else mon.color
 		var look := Sprites.monster_sprite(mon)
-		var fig := Kit.img(look[0], look[1], 2 if PixelArt.size_of(look[0]).y <= 16 else 1)
+		var fig := Kit.img(look[0], look[1], 1)
 		parts.append("%s [b]%s[/b]%s" % [fig, Kit.col(Kit.esc(info.name), color), (" " + Kit.muted(Kit.esc(info.rank))) if info.rank != null else ""])
 		parts.append(Kit.muted("%s · %s" % [Kit.esc(info.level), Identify.INSIGHT_NAMES[info.insight]]))
 		parts.append("Herausforderung: [b]%s[/b] %s" % [Kit.col(Kit.esc(info.challenge.name), info.challenge.color), Kit.small(Kit.muted("(%s)" % Kit.esc(info.challenge.hint)))])
@@ -71,7 +71,7 @@ static func tooltip_for(gv: GameView, t: Variant, detail: bool = false) -> Varia
 		var lines: Array = []
 		for e in items:
 			var look := Sprites.item_sprite(e.item)
-			var line := Kit.img(look[0], look[1]) + " " + Kit.col(Kit.esc(Identify.item_name(s, e.item)), GameTabs.rarity_color(e.item.rarity))
+			var line := Kit.img(look[0], look[1], 0.5) + " " + Kit.col(Kit.esc(Identify.item_name(s, e.item)), GameTabs.rarity_color(e.item.rarity))
 			if detail:
 				var d := Identify.describe_item(s, e.item)
 				var extra: Array = []
@@ -146,7 +146,9 @@ static func _chest(root: VBoxContainer, tier: Variant) -> float:
 class Chest:
 	extends Control
 	const OPEN_AT := 0.8
+	## Strahlenraster und Kunstpixel der Truhe (32er-Bild, 128 Bildschirmpixel breit)
 	const PX := 8
+	const ART := 4
 	const R := 17
 	var tier := "bronze"
 	var color := Color.WHITE
@@ -182,11 +184,11 @@ class Chest:
 		_front.queue_redraw()
 
 	func _origin() -> Vector2:
-		return Vector2(floorf(size.x / 2.0 / PX) * PX - 8 * PX, size.y - 12 * PX)
+		return Vector2(floorf(size.x / 2.0 / PX) * PX - 16 * ART, size.y - 24 * ART)
 
 	## Mitte der Öffnung, auf dem Pixelraster.
 	func _mid() -> Vector2:
-		return _origin() + Vector2(8 * PX, 6 * PX)
+		return _origin() + Vector2(16 * ART, 12 * ART)
 
 	func _square(at: Vector2, c: Color) -> void:
 		draw_rect(Rect2(at, Vector2(PX, PX)), c)
@@ -239,11 +241,11 @@ class Chest:
 			# Immer stärkeres Wackeln
 			var amp := 1.0 + 2.0 * t / OPEN_AT
 			var dx := roundf(sin(t * 55.0) * amp) * 2.0
-			PixelArt.draw(_front, "ding/truhe", origin + Vector2(dx, 0), PX, color)
+			PixelArt.draw(_front, "ding/truhe", origin + Vector2(dx, 0), ART, color)
 			return
 		var k := t - OPEN_AT
 		var mid := _mid()
-		PixelArt.draw(_front, "ding/truhe_offen", origin, PX, color)
+		PixelArt.draw(_front, "ding/truhe_offen", origin, ART, color)
 		# Funken: ein Schwall nach oben, der zurückfällt, dann steigendes Glitzern
 		var spark := color.lightened(0.45)
 		if k < 1.4:
@@ -308,7 +310,7 @@ static func maybe_versus(gv: GameView) -> void:
 		hero.custom_minimum_size = Vector2(220, 240)
 		hero.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		var hero_look := Sprites.hero_name(p)
-		hero.draw_fn = func(ci: CanvasItem): Sprites.draw_hero(ci, Vector2(110, 226), 10, false, hero_look)
+		hero.draw_fn = func(ci: CanvasItem): Sprites.draw_hero(ci, Vector2(110, 226), 6, false, hero_look)
 		left.add_child(hero)
 		_center_label(left, p.name, 30, UiTheme.ACCENT, 700, true)
 		_center_label(left, "%s · Level %d" % [who if who != "" else "Crawler", p.level], 13, UiTheme.MUTED)
@@ -328,9 +330,7 @@ static func maybe_versus(gv: GameView) -> void:
 		var look := Sprites.sprite_name(boss.defId)
 		var col = boss.color
 		var unk: bool = info.insight >= 3
-		# Eigene Boss-Figuren sind größer: kleiner vergrößern, damit sie ins Bild passen
-		var sc := 10 if PixelArt.size_of(look).y <= 16 else 8
-		bp.draw_fn = func(ci: CanvasItem): Sprites.draw_portrait(ci, look, col, Vector2(110, 226), sc, {"crown": true, "flip": true, "unknown": unk})
+		bp.draw_fn = func(ci: CanvasItem): Sprites.draw_portrait(ci, look, col, Vector2(110, 226), 6, {"crown": true, "flip": true, "unknown": unk})
 		right.add_child(bp)
 		_center_label(right, info.name, 30, Color("#ff7a6a"), 700, true)
 		_center_label(right, "%s · %s" % [rank, info.level], 13, UiTheme.MUTED)

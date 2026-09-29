@@ -48,9 +48,11 @@ godot/
 
 ## Pixel-Grafik
 
-Alles auf der Karte ist Pixel-Grafik mit 16 × 16 Pixeln je Kachel. Die Karte
-vergrößert ganzzahlig (2× bis 5×, Mausrad oder + und −) und zeichnet ohne
-Filter, damit jeder Pixel scharf bleibt. Die Kamera rastet auf Kunstpixel ein.
+Alles ist Pixel-Grafik im einheitlichen Raster von 32 × 32 Pixeln: Kacheln,
+Monster, Bosse, Spielfiguren, Gegenstände, Einrichtung und Fallen. Die Karte
+vergrößert ganzzahlig (1×, 2× oder 3×, also 32, 64 oder 96 Bildschirmpixel je
+Kachel; Mausrad oder + und −) und zeichnet ohne Filter, damit jeder Pixel scharf
+bleibt. Die Kamera rastet auf Kunstpixel ein.
 Nebel, Lichtkegel und Vignette werden von Shadern in Kunstpixeln gerastert und
 mit einem Bayer-Muster gedithert, statt weich zu verlaufen.
 
@@ -59,8 +61,8 @@ Die Bilder liegen in `assets/pixel` als PNG-Bögen:
 | Bogen | Inhalt |
 |---|---|
 | `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur (alte Einzelfigur), Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
-| `helden.png` | Spielfigur je Rasse (`held/<id>`, 20 × 20, mit Kopfmaske `held/<id>_kopf`) und Ausrüstung je Körperbau (`ausruestung/<bau>/<platz>`) |
-| `bosse.png` | Eigene Figuren der 15 Bosse, 24 × 24 Pixel; sie stehen auf ihrer Kachel und ragen darüber hinaus |
+| `helden.png` | Spielfigur je Rasse (`held/<id>`, mit Kopfmaske `held/<id>_kopf`) und Ausrüstung je Körperbau (`ausruestung/<bau>/<platz>`) |
+| `bosse.png` | Eigene Figuren der 15 Bosse |
 | `kacheln.png` | Böden (9 Materialien × 4 Varianten), Wände (3 Etagen × 4 Varianten, Krone und Vorderseite), Türen, Treppe |
 | `dinge.png` | Gegenstände am Boden, Symbole der 15 Ausrüstungsplätze (`slot_…`), Fallen, Geschosse |
 | `einrichtung.png` | Automat, Bett, Toilette, Theke, Kisten, Fässer, Regale, Gerümpel, Eimer, Flecken |
@@ -86,6 +88,13 @@ Eintrag in `Sprites.BY_DEF`, neue Bosse eine eigene Figur (`boss/<id>`);
 jeder Falle, jedem Reittier, jedem Möbelstück, jedem Gegenstand und jedem
 Ausrüstungsplatz ein Bild gibt.
 
+**Raster:** Die Vorlagen in `tools/pixel_defs.gd` sind im groben Raster
+gezeichnet (16 × 16, Bosse 24 × 24, Spielfiguren und ihre Ausrüstung 20 × 20).
+Der Generator verdoppelt sie mit Scale2x, das Schrägen glättet statt Blöcke zu
+bilden, verkleinert Größeres spiegelgleich auf 32 × 32 und legt erst dann
+Schattierung und Umriss an. Böden, Wände, Türen, Treppe, Flecken, Schatten,
+Ringe und Geschosse entstehen direkt in 32 × 32.
+
 **Bewegung:** Fledermäuse, Motten, Tauben und Drohnen flattern, Irrlichter
 flackern, Geister wabern, Schleime quellen, jeweils mit einem zweiten Bild
 (Name mit `_2`). Spielfigur und Menschen haben ein Laufbild. Die Engine meldet
@@ -105,7 +114,7 @@ Ausrüstungsraster mit abgeblendeten leeren Plätzen, Zielkarten im Kampf),
 Crawler-Reiter zeigt Spielfigur und Haustier.
 
 **Spielfigur, Rassen und Ausrüstung:** Jede Rasse hat eine eigene Figur
-(`held/<id>`, 20 × 20, Füße in Zeile 18) mit einem von vier Körperbauten
+(`held/<id>`) mit einem von vier Körperbauten
 (normal; klein für Gnom, Halbling, Kobold, Fee; groß für Halbork, Troll, Oger,
 Minotaurus, Golem; breit für Zwerg und Wasserspeier), eigenem Kopf und
 Anbauten wie Schwänzen und Flügeln. `Sprites.RACE_LOOKS` nennt Hautfarbe und

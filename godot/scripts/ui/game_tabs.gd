@@ -31,7 +31,7 @@ static func item_card(gv: GameView, parent: Node, it: Dictionary, with_actions: 
 	var v := Kit.card(parent, "Item", 2)
 	var h := Kit.hbox(v, 10)
 	var look := Sprites.item_sprite(it)
-	Kit.icon(h, look[0], look[1], 2, Vector2(36, 36)).size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	Kit.icon(h, look[0], look[1], 1, Vector2(36, 36)).size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	item_body(gv, Kit.vbox(h, 2), it, with_actions, from)
 	return v
 
@@ -135,13 +135,13 @@ static func item_body(gv: GameView, v: Node, it: Dictionary, with_actions: bool,
 static func portrait(s: Dictionary) -> Control:
 	var st := Kit.Stage.new()
 	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	st.items = [{"name": Sprites.hero_name(s.player), "scale": 4, "foot": Vector2(42, 84)}]
-	st.custom_minimum_size = Vector2(84, 98)
+	st.items = [{"name": Sprites.hero_name(s.player), "scale": 3, "foot": Vector2(48, 96)}]
+	st.custom_minimum_size = Vector2(96, 108)
 	var pet = s.player.get("pet")
 	if pet != null:
 		var look := Sprites.pet_sprite(String(pet.get("species", "")))
-		st.items.append({"name": look[0], "tint": look[1], "scale": 3, "foot": Vector2(104, 84), "flip": true, "mod": Color.WHITE if pet.alive else Color(1, 1, 1, 0.4)})
-		st.custom_minimum_size.x = 130
+		st.items.append({"name": look[0], "tint": look[1], "scale": 2, "foot": Vector2(112, 96), "flip": true, "mod": Color.WHITE if pet.alive else Color(1, 1, 1, 0.4)})
+		st.custom_minimum_size.x = 146
 	return st
 
 
@@ -390,7 +390,7 @@ static func inventory_tab(gv: GameView, root: VBoxContainer) -> void:
 		var g := Kit.grid(root, 3, 8, 4)
 		for slot in EQUIP_ORDER:
 			var it = p.equipment.get(slot)
-			Kit.icon(g, Sprites.slot_sprite(slot), rarity_color(it.rarity) if it != null else null, 2, Vector2(32, 32), it == null)
+			Kit.icon(g, Sprites.slot_sprite(slot), rarity_color(it.rarity) if it != null else null, 1, Vector2(32, 32), it == null)
 			if it != null:
 				var d := Identify.describe_item(s, it)
 				var name_rt := Kit.text(g, "%s\n%s" % [Kit.col(Kit.esc(Identify.item_name(s, it)), rarity_color(it.rarity)), Kit.small(Kit.muted(equip_name(slot)))], 13, null, 0)
