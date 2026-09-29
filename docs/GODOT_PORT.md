@@ -3,11 +3,11 @@
 Das ganze Spiel läuft in Godot 4.7.2: Spiellogik, Karte, Figuren, Oberfläche,
 Dialoge, Klänge und Speichern. Es wird nur noch hier entwickelt.
 
-Die frühere Web-Version (TypeScript) ist eingefroren. Ihr letzter Stand liegt im
-Git-Verlauf bei Commit `8b139bb` („Port remaining Vitest suites …“). Bis dahin
-rechneten beide Versionen bitgenau gleich; die Replay-Aufnahmen in
-`tests/fixtures` stammen ursprünglich aus der Web-Version und werden jetzt in
-Godot selbst erzeugt (siehe unten).
+Die frühere Web-Version (TypeScript) ist entfernt. Ihr letzter Stand liegt im
+Git-Verlauf bei Commit `8b139bb` („Port remaining Vitest suites …“), etwa mit
+`git checkout 8b139bb -- src`. Bis dahin rechneten beide Versionen bitgenau
+gleich; die Replay-Aufnahmen in `tests/fixtures` stammen ursprünglich aus der
+Web-Version und werden jetzt in Godot selbst erzeugt (siehe unten).
 
 Starten: `godot/project.godot` im Godot-Editor 4.7.2 öffnen und F5 drücken.
 Die Hauptszene ist `scenes/main.tscn`.
@@ -20,8 +20,8 @@ godot/
   export_presets.cfg     Vorlagen für den Export: Web, Windows, Linux
   data/*.json            Inhalte (Monster, Gegenstände, Skills, Achievements …)
   scripts/core/          Zufall, Sichtfeld, Wegfindung, Datenzugriff, JS-Hilfen
-  scripts/engine/        Spiellogik (Port von src/engine), ohne Grafik
-  scripts/ui/            Oberfläche (Port von src/ui)
+  scripts/engine/        Spiellogik, ohne Grafik
+  scripts/ui/            Oberfläche
   scenes/main.*          Einstieg: Titel, Interview, Spiel, Endbildschirm
   assets/pixel/          Pixel-Bögen (PNG) und index.json mit der Lage jedes Bildes
   assets/fonts/          Montserrat und Pixelify Sans (beide SIL Open Font License)

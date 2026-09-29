@@ -2,7 +2,7 @@
 
 - Spiel „Der Große Abstieg“: Godot 4.7.2 (GDScript), Projekt in `godot/`. Es wird nur noch in Godot entwickelt. Aufbau, Werkzeuge und Export stehen in `docs/GODOT_PORT.md`.
 - Spiellogik in `godot/scripts/engine` (ohne Nodes), Oberfläche in `godot/scripts/ui`, Inhalte in `godot/data/*.json`. Bedingungen, die nicht in JSON passen (Achievements, Klassen, Rassen, Interview …), stehen in `godot/scripts/engine/data_checks.gd` und `rules.gd`.
-- Die alte Web-Version (TypeScript: `src/`, `tests/`, `scripts/`, `package.json`) ist eingefroren: nicht mehr ändern, nichts mehr daraus exportieren.
+- Die alte Web-Version (TypeScript) ist entfernt; ihr letzter Stand liegt im Git-Verlauf bei Commit `8b139bb`. Nicht wiederherstellen.
 - Sprache im Spiel: Deutsch.
 - **Keine Emojis** in Oberfläche, Spieltexten oder Logs. Nur klare Schrift, Text und Wörter.
 - Monster und Gegenstände werden über `godot/scripts/engine/identify.gd` angezeigt: Namen und Werte nie direkt ausgeben, sondern `name_of`/`describe_monster`/`item_name`/`describe_item` verwenden.

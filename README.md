@@ -20,8 +20,8 @@ Inhalte (Monster, Gegenstände, Skills, Achievements …) stehen in
 `godot/assets/pixel`. Aufbau, Werkzeuge und Export (Web, Windows, Linux) stehen
 in [`docs/GODOT_PORT.md`](docs/GODOT_PORT.md).
 
-Die frühere Web-Version (TypeScript in `src/`) ist eingefroren und wird nicht
-mehr weiterentwickelt.
+Die frühere Web-Version (TypeScript) ist entfernt; ihr letzter Stand liegt im
+Git-Verlauf bei Commit `8b139bb`.
 
 ## Steuerung
 

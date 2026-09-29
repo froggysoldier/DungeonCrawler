@@ -1,9 +1,8 @@
 class_name J
 extends RefCounted
 ## Hilfsfunktionen mit festgelegtem Verhalten (Rundung, stabile Sortierung,
-## Zahlenformat wie in JavaScript). Die Spiellogik stammt aus der früheren
-## TypeScript-Version; Spielstände und Replays hängen davon ab, dass diese
-## Hilfen genau so bleiben.
+## Zahlenformat wie in JavaScript, aus dem die Spiellogik ursprünglich stammt).
+## Spielstände und Replays hängen davon ab, dass diese Hilfen genau so bleiben.
 
 
 ## Math.round: rundet .5 immer nach oben (auch bei negativen Zahlen).

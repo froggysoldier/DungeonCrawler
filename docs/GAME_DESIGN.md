@@ -20,13 +20,13 @@ kämpft.
 
 | Frage | Entscheidung |
 |---|---|
-| Plattform | Browser-Spiel, TypeScript + Vite. Engine strikt getrennt von der UI. |
+| Plattform | Godot 4.7.2 (GDScript), Export für Windows, Linux und Web. Engine strikt getrennt von der UI. |
 | Zeitmodell | Rundenbasiert. 1 Zug = 3 Minuten Spielzeit. |
 | Sprache | Deutsch |
 | Tod | Alle vier Konzepte (siehe Abschnitt 6) |
 | Namen | Eigene Namen (Show, Guide, Bosse …), damit eine spätere Veröffentlichung möglich bleibt |
 | Etagen | Themen dürfen sich am Buch orientieren, aber keine Spoiler |
-| Oberfläche | Klickbare Karte, Spieler = leuchtender Punkt, daneben Panels + Textlog |
+| Oberfläche | Klickbare Karte in Pixel-Grafik (16 × 16 je Kachel), daneben Panels + Textlog |
 | Erster Meilenstein | Etage 1 komplett spielbar |
 | Zweiter Meilenstein | Mehr Inhalte, Web-Link, Etage 2 (Publikum) und 3 (Rassen/Klassen) |
 
@@ -439,18 +439,22 @@ neuer Skill. Schalter „Ton an/aus“ in der oberen Leiste.
 ## 5. Technik
 
 ```
-src/
-  engine/   Spiellogik, UI-unabhängig, deterministisch (Seed), JSON-Zustand
-  data/     Inhalte: Monster, Items, Skills, Achievements, Interview, Welttexte
-  ui/       Canvas-Karte, Panels, Dialoge
-tests/      Vitest: Engine-Tests + optionale Balance-Simulation (SIM=1)
+godot/
+  scripts/engine/  Spiellogik, UI-unabhängig, deterministisch (Seed), JSON-Zustand
+  data/            Inhalte: Monster, Items, Skills, Achievements, Interview, Welttexte
+  scripts/ui/      Pixel-Karte, Panels, Dialoge
+  assets/pixel/    Pixel-Bögen (PNG), in jedem Pixel-Editor bearbeitbar
+  tests/           Engine-, Replay- und Oberflächentests (./test.sh)
+  tools/           Balance-Simulation, Aufnahmen, Pixel-Generator, Bildschirmfotos
 ```
+
+Details in [`GODOT_PORT.md`](GODOT_PORT.md).
 
 ## 6. Nächste Schritte (Vorschlag)
 
 1. Balance von Etage 2–3 durch Testspielen (Klassen, Zustände, Achievements)
 2. Etage 4+ mit neuen Themen, Klassen-Spezialisierung (Etage 6/9/12)
-3. Grafik-Upgrade der Karte
+3. Animationen für die Pixel-Figuren (Laufen, Angriff)
 
 ## 7. Rechtliches
 *Dungeon Crawler Carl* ist geistiges Eigentum von Matt Dinniman. Das Spiel

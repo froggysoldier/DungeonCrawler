@@ -1,4 +1,4 @@
-# Einheitliche Zeilenenden (Godot und Web)
+# Einheitliche Zeilenenden
 * text=auto eol=lf
 *.png binary
 *.jpg binary
