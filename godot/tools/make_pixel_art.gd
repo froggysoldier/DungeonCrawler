@@ -204,10 +204,10 @@ func _build_all() -> void:
 		_add("bosse", "boss/" + n, _bottom(sprite(n, Defs.BOSSES[n]), 1))
 	for n in Defs.MOUNTS:
 		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n]))
+	for n in Defs.HEROES:
+		_add("helden", "held/" + n, sprite(n, Defs.HEROES[n], false))
 	for n in Defs.GEAR:
-		_add("kreaturen", "ausruestung/" + n, sprite(n, Defs.GEAR[n], false))
-	for n in Defs.RACES:
-		_add("kreaturen", "rasse/" + n, sprite(n, Defs.RACES[n], false))
+		_add("helden", "ausruestung/" + n, sprite(n, Defs.GEAR[n], false))
 	_add("kreaturen", "aufsatz/schatten", _shadow(14, 5))
 	_add("kreaturen", "aufsatz/schatten_klein", _shadow(10, 3))
 	_add("kreaturen", "aufsatz/ring", _ring(16, 7))

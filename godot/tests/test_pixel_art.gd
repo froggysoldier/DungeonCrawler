@@ -146,27 +146,37 @@ func _gear(slot: String, rarity: String) -> Dictionary:
 
 
 func test_ausruestung_an_der_figur(t) -> void:
-	for slot in Sprites.GEAR_BEHIND + Sprites.GEAR_FRONT:
-		t.ok(PixelArt.has("ausruestung/" + slot), "%s hat einen Aufsatz" % slot)
+	for body in ["normal", "klein", "gross", "breit"]:
+		for slot in Sprites.GEAR_BEHIND + Sprites.GEAR_BODY + Sprites.GEAR_TOP:
+			t.ok(PixelArt.has("ausruestung/%s/%s" % [body, slot]), "%s: %s" % [body, slot])
+	for slot in Sprites.GEAR_BEHIND + Sprites.GEAR_BODY + Sprites.GEAR_TOP:
 		t.has(GameTabs.EQUIP_ORDER, slot, "%s ist ein Ausrüstungsplatz" % slot)
-	t.eq(Sprites.hero_name({"equipment": {}}), "kreatur/held", "ohne Ausrüstung die schlichte Figur")
-	t.eq(Sprites.hero_name({"equipment": {"ring1": _gear("ring", "episch")}}), "kreatur/held", "Ringe sieht man nicht")
+	var plain := Sprites.hero_name({})
+	t.ok(PixelArt.has(plain) and PixelArt.has(plain + "_2"), "schlichte Figur mit Laufbild")
+	t.eq(PixelArt.size_of(plain), Vector2i(20, 20), "20 x 20")
+	t.eq(Sprites.hero_name({"equipment": {"ring1": _gear("ring", "episch")}}), plain, "Ringe sieht man nicht")
 	var eq := {"kopf": _gear("kopf", "selten"), "waffe": _gear("waffe", "episch"), "fuesse": _gear("fuesse", "gewoehnlich")}
 	var n := Sprites.hero_name({"equipment": eq})
-	t.ok(n != "kreatur/held" and PixelArt.has(n) and PixelArt.has(n + "_2"), "zusammengesetzt, mit Laufbild")
-	t.eq(PixelArt.size_of(n), PixelArt.size_of("kreatur/held"), "gleich groß wie die Figur")
+	t.ok(n != plain and PixelArt.has(n + "_2"), "zusammengesetzt, mit Laufbild")
 	t.eq(Sprites.hero_name({"equipment": eq}), n, "gleiche Ausrüstung, gleicher Name")
 	var img := PixelArt.image(n)
-	var base := PixelArt.image("kreatur/held")
-	t.ok(img.get_pixel(7, 1) != base.get_pixel(7, 1), "Helm über den Haaren")
-	t.eq(img.get_pixel(7, 4), base.get_pixel(7, 4), "Gesicht bleibt frei")
-	t.eq(img.get_pixel(13, 1), Sprites.OUTLINE, "Umriss um die Waffenspitze")
-	t.ok(PixelArt.image(n + "_2").get_pixel(3, 13) != img.get_pixel(3, 13), "Stiefel im Laufbild versetzt")
+	var base := PixelArt.image(plain)
+	t.ok(img.get_pixel(9, 4) != base.get_pixel(9, 4), "Helm über den Haaren")
+	t.eq(img.get_pixel(9, 8), base.get_pixel(9, 8), "Gesicht bleibt frei")
+	t.eq(img.get_pixel(15, 5), Sprites.OUTLINE, "Umriss um die Waffenspitze")
 	var eq2 := eq.duplicate(true)
 	eq2.kopf.rarity = "episch"
 	t.ok(Sprites.hero_name({"equipment": eq2}) != n, "andere Seltenheit, andere Figur")
 	t.not_null(PixelArt.texture(n), "tönbar wie jedes Bild")
 	t.not_null(PixelArt.silhouette(n), "Aufblitzen möglich")
+	var walk := PixelArt.image(plain + "_2")
+	t.ok(walk.get_pixel(8, 18) != base.get_pixel(8, 18), "Laufbild: Füße gehen auseinander")
+	t.eq(walk.get_pixel(9, 8), base.get_pixel(9, 8), "Laufbild: Kopf bleibt")
+	# Der Zwergenbart liegt über der Weste
+	var dwarf := PixelArt.image(Sprites.hero_name({"race": "zwerg"}))
+	var vest := PixelArt.image(Sprites.hero_name({"race": "zwerg", "equipment": {"brust": _gear("brust", "episch")}}))
+	t.eq(vest.get_pixel(9, 13), dwarf.get_pixel(9, 13), "Bart über der Weste")
+	t.ok(vest.get_pixel(6, 15) != dwarf.get_pixel(6, 15), "Weste neben dem Bart")
 
 
 func test_truhe_beim_oeffnen(t) -> void:
@@ -194,23 +204,24 @@ func test_truhe_beim_oeffnen(t) -> void:
 
 
 func test_rassen_an_der_figur(t) -> void:
-	t.eq(Sprites.hero_name({"race": "mensch"}), "kreatur/held", "Menschen bleiben, wie sie sind")
-	var base := PixelArt.image("kreatur/held")
+	var names := {}
 	for r in Db.t("races", "RACES"):
-		if r.id == "mensch":
-			continue
-		t.ok(Sprites.RACE_LOOKS.has(r.id), "%s hat Farben" % r.id)
-		t.ok(PixelArt.has("rasse/" + r.id) or PixelArt.has("rasse/%s_hinten" % r.id), "%s hat ein Merkmal" % r.id)
+		t.ok(Sprites.RACE_LOOKS.has(r.id), "%s hat Aussehen" % r.id)
+		t.ok(PixelArt.has("held/" + r.id) and PixelArt.has("held/%s_kopf" % r.id), "%s hat eine Figur" % r.id)
 		var n := Sprites.hero_name({"race": r.id})
-		t.ok(n != "kreatur/held" and PixelArt.has(n + "_2"), "%s zusammengesetzt, mit Laufbild" % r.id)
+		t.ok(PixelArt.has(n + "_2"), "%s mit Laufbild" % r.id)
+		names[n] = true
+	t.eq(names.size(), Db.t("races", "RACES").size(), "jede Rasse sieht anders aus")
+	for id in Sprites.RACE_LOOKS:
+		t.has(["normal", "klein", "gross", "breit"], Sprites.RACE_LOOKS[id].body, "%s: Körperbau" % id)
+	var box := func(id: String) -> Rect2i:
+		return PixelArt.image(Sprites.hero_name({"race": id})).get_used_rect()
+	t.lt(box.call("halbling").size.y, box.call("mensch").size.y, "Halblinge sind kleiner")
+	t.gt(box.call("troll").size.y, box.call("mensch").size.y, "Trolle sind größer")
+	t.gt(box.call("zwerg").size.x, box.call("mensch").size.x, "Zwerge sind breiter")
+	t.lt(box.call("zwerg").size.y, box.call("mensch").size.y, "und kleiner")
+	t.ge(box.call("echsenmensch").end.x, 19, "Echsenschwanz ragt hinaus")
+	t.le(box.call("kellerfee").position.x, 0, "Feenflügel ragen hinaus")
 	var elf := PixelArt.image(Sprites.hero_name({"race": "elf"}))
-	t.eq(elf.get_pixel(7, 4).to_html(false), Color(Sprites.RACE_LOOKS.elf.skin).to_html(false), "Haut in der Farbe der Rasse")
-	t.eq(elf.get_pixel(3, 2).a > 0.5, true, "spitze Ohren ragen hinaus")
-	var golem := PixelArt.image(Sprites.hero_name({"race": "golem"}))
-	t.ok(golem.get_pixel(7, 1) != base.get_pixel(7, 1), "kahler Kopf statt Haare")
-	t.eq(golem.get_pixel(5, 14), base.get_pixel(5, 14), "Schuhe bleiben, wie sie sind")
-	var eq := {"kopf": _gear("kopf", "selten")}
-	var both := Sprites.hero_name({"race": "minotaurus", "equipment": eq})
-	t.ok(both != Sprites.hero_name({"race": "minotaurus"}) and both != Sprites.hero_name({"equipment": eq}), "Rasse und Ausrüstung zusammen")
-	var feet := PixelArt.image(Sprites.hero_name({"race": "halbling"}) + "_2")
-	t.ok(feet.get_pixel(2, 14) != base.get_pixel(2, 14), "nackte Füße auch im Laufbild")
+	t.eq(elf.get_pixel(9, 8).to_html(false), Color(Sprites.RACE_LOOKS.elf.skin).to_html(false), "Haut in der Farbe der Rasse")
+	t.eq(Sprites.hero_name({"race": "gibt_es_nicht"}), Sprites.hero_name({}), "Unbekannte Rasse: Mensch")

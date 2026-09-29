@@ -30,8 +30,8 @@ static func _race_detail(parent: Node, r: Dictionary, p: Dictionary = {}) -> voi
 	# So sieht die Figur mit dieser Rasse (und der jetzigen Ausrüstung) aus
 	var look := Sprites.hero_name({"race": r.id, "equipment": J.nn(p, "equipment", {})})
 	var st := Kit.Stage.new()
-	st.items = [{"name": look, "scale": 5, "foot": Vector2(44, 84)}]
-	st.custom_minimum_size = Vector2(88, 100)
+	st.items = [{"name": look, "scale": 5, "foot": Vector2(52, 104)}]
+	st.custom_minimum_size = Vector2(104, 118)
 	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top.add_child(st)
 	var tv := Kit.vbox(top, 4)

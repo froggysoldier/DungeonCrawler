@@ -150,8 +150,10 @@ func _initialize() -> void:
 				quit()
 				return
 			if mode == "ausruestung":
-				# Freigeschaltet, mit angelegter Ausrüstung, Rucksack und Haustier
+				# Freigeschaltet, mit angelegter Ausrüstung, Rucksack und Haustier (RACE=id wählt die Rasse)
 				s.unlocks.append_array(["inventar", "stats", "minimap", "skills"])
+				if OS.get_environment("RACE") != "":
+					s.player.race = OS.get_environment("RACE")
 				var rar: Array = Db.t("items", "RARITY_ORDER")
 				for slot in ["kopf", "brust", "haende", "beine", "fuesse", "waffe", "hals", "ring"]:
 					var it := Items.generate_equipment(s, rar[(slot.length() + 1) % 5], [slot])

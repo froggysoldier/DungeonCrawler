@@ -58,7 +58,8 @@ Die Bilder liegen in `assets/pixel` als PNG-Bögen:
 
 | Bogen | Inhalt |
 |---|---|
-| `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur, Ausrüstungs-Aufsätze (`ausruestung/…`) und Rassenmerkmale (`rasse/…`) der Spielfigur, Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
+| `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur (alte Einzelfigur), Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
+| `helden.png` | Spielfigur je Rasse (`held/<id>`, 20 × 20, mit Kopfmaske `held/<id>_kopf`) und Ausrüstung je Körperbau (`ausruestung/<bau>/<platz>`) |
 | `bosse.png` | Eigene Figuren der 15 Bosse, 24 × 24 Pixel; sie stehen auf ihrer Kachel und ragen darüber hinaus |
 | `kacheln.png` | Böden (9 Materialien × 4 Varianten), Wände (3 Etagen × 4 Varianten, Krone und Vorderseite), Türen, Treppe |
 | `dinge.png` | Gegenstände am Boden, Symbole der 15 Ausrüstungsplätze (`slot_…`), Fallen, Geschosse |
@@ -103,21 +104,20 @@ Ausrüstungsraster mit abgeblendeten leeren Plätzen, Zielkarten im Kampf),
 `Kit.img` bettet es als `[img]` in BBCode ein (Tooltips auf der Karte). Der
 Crawler-Reiter zeigt Spielfigur und Haustier.
 
-**Ausrüstung an der Figur:** Für jeden sichtbaren Platz (Kopf, Gesicht, Hals,
-Schultern, Brust, Rücken, Arme, Hände, Gürtel, Beine, Füße, Waffe) gibt es einen
-Aufsatz im Raster der Spielfigur, ohne eigenen Umriss und in der
-Seltenheitsfarbe getönt. `Sprites.hero_name(player)` legt die Aufsätze der
-angelegten Teile über die Figur (der Rücken liegt dahinter), zieht einen Umriss
-um das Ganze und stellt das Ergebnis samt Laufbild mit `PixelArt.register`
-unter einem eigenen Namen bereit. Karte, Crawler-Reiter und Versus-Bildschirm
-zeichnen diese Figur.
-
-**Rassen an der Figur:** `Sprites.RACE_LOOKS` gibt jeder Rasse Haut- und
-Haarfarbe (ohne Haarfarbe kahl). Beim Zusammensetzen färbt `hero_name` Haut und
-Haare um und legt die Merkmale aus `rasse/<id>` davor (Ohren, Hörner, Bart,
-Pilzhut, leuchtende Augen …) und `rasse/<id>_hinten` dahinter (Schwänze,
-Flügel); `#` darin nimmt die Hautfarbe an. Die Rassenwahl zeigt jede Rasse als
-kleines Bild und in der Detailkarte die eigene Figur mit ihrer Ausrüstung.
+**Spielfigur, Rassen und Ausrüstung:** Jede Rasse hat eine eigene Figur
+(`held/<id>`, 20 × 20, Füße in Zeile 18) mit einem von vier Körperbauten
+(normal; klein für Gnom, Halbling, Kobold, Fee; groß für Halbork, Troll, Oger,
+Minotaurus, Golem; breit für Zwerg und Wasserspeier), eigenem Kopf und
+Anbauten wie Schwänzen und Flügeln. `Sprites.RACE_LOOKS` nennt Hautfarbe und
+Körperbau; `#` und die Stufen 1 – 5 in der Figur nehmen die Hautfarbe an. Die
+Ausrüstung gibt es je Körperbau (`ausruestung/<bau>/<platz>`), getönt in der
+Seltenheitsfarbe. `Sprites.hero_name(player)` setzt zusammen: Umhang, Figur,
+Körperausrüstung, darüber noch einmal der Kopf (`held/<id>_kopf`: Bärte, Haare
+und Kragen liegen über der Weste), dann Brille, Helm und Waffe; das Laufbild
+entsteht, indem die Füße einen Schritt nach außen machen. Das Ergebnis bekommt
+einen Umriss und wird mit `PixelArt.register` unter eigenem Namen abgelegt.
+Karte, Crawler-Reiter, Versus-Bildschirm und Rassenwahl zeigen diese Figur.
+Die Vorlagen stehen in `tools/pixel_defs.gd` (`HEROES`, `GEAR`).
 
 **Lootboxen öffnen:** Beim Öffnen wackelt eine Truhe in der Farbe der
 Box-Stufe, springt auf (`ding/truhe_offen`, mit dem Box-Klang), strahlt und

@@ -121,137 +121,134 @@ static func draw_hero(ci: CanvasItem, foot: Vector2, scale: int, flip: bool = fa
 	PixelArt.draw_foot(ci, name, foot, scale, null, flip)
 
 
-# ---------------------------------------------------------------- Ausrüstung an der Figur
+# ---------------------------------------------------------------- Spielfigur
 
-## Sichtbare Ausrüstungsplätze in Zeichenreihenfolge; GEAR_BEHIND liegt hinter der Figur.
+## Ausrüstung an der Figur in Zeichenreihenfolge: GEAR_BEHIND hinter der Figur,
+## GEAR_BODY über dem Körper (darüber liegt noch einmal der Kopf mit Bart,
+## Haaren und Kragen), GEAR_TOP ganz oben.
 const GEAR_BEHIND := ["ruecken"]
-const GEAR_FRONT := ["beine", "fuesse", "brust", "guertel", "hals", "schultern", "arme", "haende", "gesicht", "kopf", "waffe"]
+const GEAR_BODY := ["beine", "fuesse", "brust", "guertel", "hals", "schultern", "arme", "haende"]
+const GEAR_TOP := ["gesicht", "kopf", "waffe"]
 const OUTLINE := Color("#181425")
+## Ab dieser Zeile machen die Füße im Laufbild einen Schritt nach außen.
+const WALK_ROW := 17
 
-
-## Haut- und Haarfarbe je Rasse; ohne Haarfarbe ist der Kopf kahl (Hautfarbe).
-## Merkmale (Ohren, Hörner, Schwänze …) liegen als rasse/<id> in kreaturen.png.
+## Hautfarbe und Körperbau je Rasse (normal, klein, gross, breit). Kopf, Haare
+## und Anbauten jeder Rasse liegen als held/<id> in helden.png.
 const RACE_LOOKS := {
-	"halbork": {"skin": "#8fb45a", "hair": "#2a2622"},
-	"elf": {"skin": "#f2e0cc", "hair": "#e8dca0"},
-	"zwerg": {"skin": "#e0a47e", "hair": "#a8452a"},
-	"gnom": {"skin": "#f0c0a0", "hair": "#e8e8f0"},
-	"halbling": {"skin": "#e8b08a", "hair": "#7a4a22"},
-	"echsenmensch": {"skin": "#5c9a4a", "hair": null},
-	"hobgoblin": {"skin": "#c8783a", "hair": "#2a1e18"},
-	"katzenmensch": {"skin": "#e8b796", "hair": "#d8843a"},
-	"troll": {"skin": "#8a9e7a", "hair": "#4a5a3a"},
-	"minotaurus": {"skin": "#8a5a3a", "hair": "#3a2418"},
-	"golem": {"skin": "#b8804a", "hair": null},
-	"pilzling": {"skin": "#e8dcc0", "hair": null},
-	"vampir": {"skin": "#e6e2ee", "hair": "#1c1a2a"},
-	"kobold": {"skin": "#b8743a", "hair": null},
-	"salamander": {"skin": "#d8603a", "hair": "#f0a030"},
-	"rattling": {"skin": "#c8b4a8", "hair": "#8a7a6a"},
-	"kelleroger": {"skin": "#b09468", "hair": "#4a3a2a"},
-	"schattenwesen": {"skin": "#4a4264", "hair": "#18142a"},
-	"wasserspeier": {"skin": "#8e8e96", "hair": null},
-	"kellerfee": {"skin": "#f8d8e8", "hair": "#f0a0e0"},
-	"ghulblut": {"skin": "#9aaa8a", "hair": "#3a3a30"},
-	"blechmensch": {"skin": "#a8b0b8", "hair": null},
-	"drachenblut": {"skin": "#e0a070", "hair": "#b03020"},
+	"mensch": {"skin": "#e8b796", "body": "normal"},
+	"elf": {"skin": "#f4e2d0", "body": "normal"},
+	"halbork": {"skin": "#8fb45a", "body": "gross"},
+	"zwerg": {"skin": "#e0a47e", "body": "breit"},
+	"gnom": {"skin": "#f0c0a0", "body": "klein"},
+	"halbling": {"skin": "#e8b08a", "body": "klein"},
+	"kobold": {"skin": "#c07838", "body": "klein"},
+	"kellerfee": {"skin": "#f8d4e4", "body": "klein"},
+	"echsenmensch": {"skin": "#5c9a4a", "body": "normal"},
+	"salamander": {"skin": "#d8603a", "body": "normal"},
+	"hobgoblin": {"skin": "#c8783a", "body": "normal"},
+	"katzenmensch": {"skin": "#d8843a", "body": "normal"},
+	"troll": {"skin": "#7f9a78", "body": "gross"},
+	"minotaurus": {"skin": "#8a5a3a", "body": "gross"},
+	"golem": {"skin": "#b8804a", "body": "gross"},
+	"kelleroger": {"skin": "#b8966a", "body": "gross"},
+	"pilzling": {"skin": "#ece0c8", "body": "normal"},
+	"vampir": {"skin": "#e8e4f0", "body": "normal"},
+	"rattling": {"skin": "#9a8a80", "body": "normal"},
+	"schattenwesen": {"skin": "#4a4264", "body": "normal"},
+	"wasserspeier": {"skin": "#8e8e96", "body": "breit"},
+	"ghulblut": {"skin": "#98a888", "body": "normal"},
+	"blechmensch": {"skin": "#a8b0b8", "body": "normal"},
+	"drachenblut": {"skin": "#d89060", "body": "normal"},
 }
 
 
-## Bildname der Spielfigur mit Rasse und angelegter Ausrüstung. Die schlichte
-## Figur für Menschen ohne sichtbare Ausrüstung; sonst wird sie einmal
-## zusammengesetzt (auch das Laufbild „_2“) und unter einem Namen aus Rasse,
-## Plätzen und Farben abgelegt.
+## Bildname der Spielfigur mit Rasse und angelegter Ausrüstung. Sie wird einmal
+## zusammengesetzt (samt Laufbild „_2“) und unter einem Namen aus Rasse, Plätzen
+## und Farben abgelegt.
 static func hero_name(p: Dictionary) -> String:
 	var eq: Dictionary = J.nn(p, "equipment", {})
-	var race := String(p.get("race")) if p.get("race") != null else ""
+	var race := String(p.get("race")) if p.get("race") != null else "mensch"
 	if not RACE_LOOKS.has(race):
-		race = ""
-	var parts: Array = []
-	if race != "":
-		parts.append("rasse=" + race)
-	for slot in GEAR_BEHIND + GEAR_FRONT:
-		if eq.get(slot) != null and PixelArt.has("ausruestung/" + slot):
+		race = "mensch"
+	var body: String = RACE_LOOKS[race].body
+	var parts: Array = [race]
+	for slot in GEAR_BEHIND + GEAR_BODY + GEAR_TOP:
+		if eq.get(slot) != null and PixelArt.has("ausruestung/%s/%s" % [body, slot]):
 			parts.append("%s=%s" % [slot, item_color(eq[slot])])
-	if parts.is_empty():
-		return "kreatur/held"
 	var name := "kreatur/held@" + ",".join(parts)
 	if not PixelArt.has(name):
-		PixelArt.register(name, _compose_hero(eq, race, ""))
-		PixelArt.register(name + "_2", _compose_hero(eq, race, "_2"))
+		var img := _compose_hero(eq, race)
+		PixelArt.register(name, _outlined(img))
+		PixelArt.register(name + "_2", _outlined(_walk_frame(img)))
 	return name
 
 
-static func _compose_hero(eq: Dictionary, race: String, frame: String) -> Image:
-	var base := PixelArt.image("kreatur/held" + frame)
-	var skin: Variant = null
-	if race != "":
-		skin = RACE_LOOKS[race].skin
-		_recolor(base, RACE_LOOKS[race])
-	var img := Image.create(base.get_width(), base.get_height(), false, Image.FORMAT_RGBA8)
-	var extra := {}
-	if race != "":
-		_overlay(img, "rasse/%s_hinten" % race, frame, skin, extra)
+## Figur ohne Umriss: Umhang, Rasse, Körperausrüstung, Kopf, Helm/Brille/Waffe.
+static func _compose_hero(eq: Dictionary, race: String) -> Image:
+	var body: String = RACE_LOOKS[race].body
+	var full := PixelArt.texture("held/" + race, RACE_LOOKS[race].skin).get_image()
+	var img := Image.create(full.get_width(), full.get_height(), false, Image.FORMAT_RGBA8)
 	for slot in GEAR_BEHIND:
-		if eq.get(slot) != null:
-			_overlay(img, "ausruestung/" + slot, frame, item_color(eq[slot]), extra)
-	for y in base.get_height():
-		for x in base.get_width():
-			var c := base.get_pixel(x, y)
-			if c.a > 0.5:
-				img.set_pixel(x, y, c)
-				extra.erase(Vector2i(x, y))
-	if race != "":
-		_overlay(img, "rasse/" + race, frame, skin, extra)
-	for slot in GEAR_FRONT:
-		if eq.get(slot) != null:
-			_overlay(img, "ausruestung/" + slot, frame, item_color(eq[slot]), extra)
-	# Umriss dort, wo Merkmale oder Ausrüstung über die Figur hinausragen
+		_gear(img, eq, body, slot)
+	_copy(img, full, full)
+	for slot in GEAR_BODY:
+		_gear(img, eq, body, slot)
+	# Der Kopf (Bart, Haare, Kragen) liegt über Weste und Schultern
+	var head := PixelArt.image("held/%s_kopf" % race)
+	if head != null:
+		_copy(img, full, head)
+	for slot in GEAR_TOP:
+		_gear(img, eq, body, slot)
+	return img
+
+
+## Pixel aus src übernehmen, wo mask sichtbar ist.
+static func _copy(img: Image, src: Image, mask: Image) -> void:
+	for y in mini(img.get_height(), mask.get_height()):
+		for x in mini(img.get_width(), mask.get_width()):
+			if mask.get_pixel(x, y).a > 0.5:
+				img.set_pixel(x, y, src.get_pixel(x, y))
+
+
+static func _gear(img: Image, eq: Dictionary, body: String, slot: String) -> void:
+	var it = eq.get(slot)
+	var n := "ausruestung/%s/%s" % [body, slot]
+	if it == null or not PixelArt.has(n):
+		return
+	var src := PixelArt.texture(n, item_color(it)).get_image()
+	_copy(img, src, src)
+
+
+## Laufbild: die Füße machen einen Schritt nach außen.
+static func _walk_frame(img: Image) -> Image:
+	var w := img.get_width()
+	var out := Image.create(w, img.get_height(), false, Image.FORMAT_RGBA8)
+	for y in img.get_height():
+		for x in w:
+			var c := img.get_pixel(x, y)
+			if c.a < 0.5:
+				continue
+			var nx := x
+			if y >= WALK_ROW:
+				nx += -1 if x < w / 2 else 1
+			if nx >= 0 and nx < w:
+				out.set_pixel(nx, y, c)
+	return out
+
+
+## Dunkler Umriss um die ganze Figur (4er-Nachbarschaft).
+static func _outlined(img: Image) -> Image:
+	var out := img.duplicate() as Image
 	var w := img.get_width()
 	var h := img.get_height()
-	var edge: Array = []
 	for y in h:
 		for x in w:
 			if img.get_pixel(x, y).a > 0.5:
 				continue
 			for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
-				if extra.has(Vector2i(x, y) + d):
-					edge.append(Vector2i(x, y))
+				var q: Vector2i = Vector2i(x, y) + d
+				if q.x >= 0 and q.y >= 0 and q.x < w and q.y < h and img.get_pixelv(q).a > 0.5:
+					out.set_pixel(x, y, OUTLINE)
 					break
-	for q in edge:
-		img.set_pixelv(q, OUTLINE)
-	return img
-
-
-## Haut (überall) und Haare (nur oben am Kopf) der Figur in die Farben der Rasse.
-static func _recolor(img: Image, look: Dictionary) -> void:
-	var pal: Dictionary = PixelArt.PALETTE
-	var sr := PixelArt.ramp(Color(look.skin))
-	var hr := PixelArt.ramp(Color(look.hair)) if look.hair != null else [sr[1], sr[1], sr[2], sr[3], sr[4]]
-	var skin := {Color(pal.s).to_html(false): sr[2], Color(pal.S).to_html(false): sr[1]}
-	var hair := {Color(pal.d).to_html(false): hr[2], Color(pal.D).to_html(false): hr[0], Color(pal.U).to_html(false): hr[3]}
-	for y in img.get_height():
-		for x in img.get_width():
-			var c := img.get_pixel(x, y)
-			if c.a < 0.5:
-				continue
-			var key := c.to_html(false)
-			if skin.has(key):
-				img.set_pixel(x, y, skin[key])
-			elif y <= 3 and hair.has(key):
-				img.set_pixel(x, y, hair[key])
-
-
-## Ein Aufsatz über das Bild (Laufbild „_2“, wenn es eines gibt); merkt sich die Pixel.
-static func _overlay(img: Image, n: String, frame: String, tint: Variant, marks: Dictionary) -> void:
-	if not PixelArt.has(n):
-		return
-	if PixelArt.has(n + frame):
-		n += frame
-	var src := PixelArt.texture(n, tint).get_image()
-	for y in mini(src.get_height(), img.get_height()):
-		for x in mini(src.get_width(), img.get_width()):
-			var c := src.get_pixel(x, y)
-			if c.a > 0.5:
-				img.set_pixel(x, y, c)
-				marks[Vector2i(x, y)] = true
+	return out

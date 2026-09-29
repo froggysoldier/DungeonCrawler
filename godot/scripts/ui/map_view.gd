@@ -967,7 +967,12 @@ func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
 		_spr(ci, mount_name, sx, sy, null, flip)
 	var lift := (5 if riding and not vehicle else (3 if riding else 1)) * px
 	var walking: bool = anim != null and anim.player_moving(frame_anim.get("now", -1.0)) > 0
-	_figure(ci, "p", Sprites.hero_name(p), sx, sy - lift + (0.0 if walking else bob), null, flip, Color.WHITE, walking)
+	# Die Figur ist größer als eine Kachel: mittig, Füße wie bei 16er-Bildern
+	var hero := Sprites.hero_name(p)
+	var hsz := PixelArt.size_of(hero)
+	var hx := (hsz.x - TILE) / 2
+	var hy := hsz.y - TILE
+	_figure(ci, "p", hero, sx - hx * px, sy - hy * px - lift + (0.0 if walking else bob), null, flip, Color.WHITE, walking)
 	if riding and vehicle:
 		_spr(ci, mount_name, sx, sy, null, flip)
 	# Zustände des Crawlers als farbige Ringe

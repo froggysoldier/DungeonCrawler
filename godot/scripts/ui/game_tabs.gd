@@ -135,13 +135,13 @@ static func item_body(gv: GameView, v: Node, it: Dictionary, with_actions: bool,
 static func portrait(s: Dictionary) -> Control:
 	var st := Kit.Stage.new()
 	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	st.items = [{"name": Sprites.hero_name(s.player), "scale": 4, "foot": Vector2(36, 66)}]
-	st.custom_minimum_size = Vector2(72, 80)
+	st.items = [{"name": Sprites.hero_name(s.player), "scale": 4, "foot": Vector2(42, 84)}]
+	st.custom_minimum_size = Vector2(84, 98)
 	var pet = s.player.get("pet")
 	if pet != null:
 		var look := Sprites.pet_sprite(String(pet.get("species", "")))
-		st.items.append({"name": look[0], "tint": look[1], "scale": 3, "foot": Vector2(92, 66), "flip": true, "mod": Color.WHITE if pet.alive else Color(1, 1, 1, 0.4)})
-		st.custom_minimum_size.x = 118
+		st.items.append({"name": look[0], "tint": look[1], "scale": 3, "foot": Vector2(104, 84), "flip": true, "mod": Color.WHITE if pet.alive else Color(1, 1, 1, 0.4)})
+		st.custom_minimum_size.x = 130
 	return st
 
 
