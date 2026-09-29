@@ -1649,6 +1649,14 @@
    "flavor": "Hat noch nie etwas weggeworfen. Wird auch dich nicht wegwerfen. Sie wird dich *behalten*.",
    "loot": [
     "handtasche_der_sammlerin"
+   ],
+   "specials": [
+    "ansturm",
+    "wurfhagel"
+   ],
+   "phaseLines": [
+    "%s kreischt: „Meine Sammlung! Du fasst nichts an!“ Sie wird schneller.",
+    "%s wirft alles, was sie hat. Sie will dich nicht mehr fangen, sie will dich loswerden."
    ]
   },
   {
@@ -1679,6 +1687,14 @@
    ],
    "abilities": [
     "furchterregend"
+   ],
+   "specials": [
+    "stampfen",
+    "ansturm"
+   ],
+   "phaseLines": [
+    "%s wischt sich die Stirn. „Jetzt wird hier aufgeräumt.“",
+    "%s wirft den Besen weg und greift zum Schraubenschlüssel. Die Hausordnung gilt nicht mehr."
    ]
   },
   {
@@ -1708,6 +1724,14 @@
    "flavor": "Ein Rattenkönig im wörtlichsten Sinne. Die sieben Köpfe sind sich selten einig.",
    "loot": [
     "kronkorkenkrone"
+   ],
+   "specials": [
+    "schockwelle",
+    "giftwolke"
+   ],
+   "phaseLines": [
+    "%s pfeift. Aus allen Ritzen antwortet es.",
+    "%s richtet sich auf, die Krone rutscht ihm über ein Auge. Jetzt geht es ums Reich."
    ]
   },
   {
@@ -1738,6 +1762,14 @@
    "flavor": "Stufe 1: Sahne. Stufe 2: Eischnee. Stufe 3: dich.",
    "loot": [
     "ruehrbesen"
+   ],
+   "specials": [
+    "ansturm",
+    "stampfen"
+   ],
+   "phaseLines": [
+    "%s schaltet auf Stufe zwei. Die Klingen singen.",
+    "%s läuft auf Turbo. Rauch steigt aus dem Motor."
    ]
   },
   {
@@ -1769,6 +1801,15 @@
    ],
    "abilities": [
     "brennend"
+   ],
+   "specials": [
+    "flammenteppich",
+    "schockwelle",
+    "stampfen"
+   ],
+   "phaseLines": [
+    "%s faucht. Die Luft um sie flimmert vor Hitze.",
+    "%s glüht weiß. Der Kessel in ihr brodelt über."
    ]
   },
   {
@@ -1800,6 +1841,14 @@
    "flavor": "Hat sein Leben lang Schädlinge vergiftet. Hält dich für einen. Hat vielleicht recht.",
    "loot": [
     "gasmaske"
+   ],
+   "specials": [
+    "giftwolke",
+    "wurfhagel"
+   ],
+   "phaseLines": [
+    "%s schraubt einen größeren Kanister an. „Ungeziefer bleibt Ungeziefer.“",
+    "%s reißt die Maske herunter. Er atmet sein eigenes Gift und lacht."
    ]
   },
   {
@@ -1831,6 +1880,14 @@
    "flavor": "Hat jeden Wollpullover dieser Stadt gefressen. Du trägst Baumwolle? Egal.",
    "loot": [
     "mottenfluegel_umhang"
+   ],
+   "specials": [
+    "staubwolke",
+    "wurfhagel"
+   ],
+   "phaseLines": [
+    "%s schlägt wild mit den Flügeln. Der Staub wird dichter.",
+    "%s ruft ihre ganze Brut. Das Licht flackert."
    ]
   },
   {
@@ -1859,6 +1916,14 @@
    "flavor": "Wirft Flaschen. Sammelt sie wieder ein. Wirft sie wieder. Kreislaufwirtschaft.",
    "loot": [
     "pfandkrone"
+   ],
+   "specials": [
+    "wurfhagel",
+    "ansturm"
+   ],
+   "phaseLines": [
+    "%s zückt sein Buch. „Du schuldest mir noch was.“",
+    "%s wirft mit allem, was er gepfändet hat. Auch mit dem Tresor."
    ]
   },
   {
@@ -1891,6 +1956,14 @@
    "flavor": "Wurde nie gewartet. Hat es sich gemerkt.",
    "loot": [
     "thermostat_amulett"
+   ],
+   "specials": [
+    "flammenteppich",
+    "stampfen"
+   ],
+   "phaseLines": [
+    "%s zischt. Die Rohre an ihrem Rücken glühen rot.",
+    "%s überhitzt. Dampf schießt aus allen Ventilen."
    ]
   },
   {
@@ -1922,6 +1995,15 @@
    "loot": [
     "generalschluessel",
     "verwalter_stempel"
+   ],
+   "specials": [
+    "wurfhagel",
+    "schockwelle",
+    "ansturm"
+   ],
+   "phaseLines": [
+    "%s blättert in der Akte. „Mietrückstand. Das wird teuer.“",
+    "%s zerreißt den Mietvertrag. „Fristlos!“"
    ]
   },
   {
@@ -1953,6 +2035,15 @@
    "flavor": "Herrscherin über alles, was durch die Rohre kommt. Also über sehr viel Ekliges.",
    "loot": [
     "gullydeckel_schild"
+   ],
+   "specials": [
+    "giftwolke",
+    "schockwelle",
+    "schrei"
+   ],
+   "phaseLines": [
+    "%s taucht ab und wieder auf. Das Wasser um sie schäumt grün.",
+    "%s kreischt. Das ganze Becken bebt."
    ]
   },
   {
@@ -1983,6 +2074,15 @@
    "flavor": "Führt eine Armee aus Abfall. Die Armee ist loyal. Und klebrig.",
    "loot": [
     "offiziersmuetze"
+   ],
+   "specials": [
+    "stampfen",
+    "ansturm",
+    "wurfhagel"
+   ],
+   "phaseLines": [
+    "%s bellt Befehle. „Formation halten!“",
+    "%s wirft den Helm weg. „Keine Gefangenen!“"
    ]
   },
   {
@@ -2013,6 +2113,15 @@
    "flavor": "Hat alles. Verkauft alles. Klaut den Rest.",
    "loot": [
     "bauchtasche"
+   ],
+   "specials": [
+    "stampfen",
+    "ansturm",
+    "schrei"
+   ],
+   "phaseLines": [
+    "%s knackt mit den Fingerknöcheln. „Jetzt wird verhandelt.“",
+    "%s schmeißt die Ladentheke um. Das Geschäft ist geschlossen."
    ]
   },
   {
@@ -2043,6 +2152,14 @@
    "flavor": "Singt Seeleute in den Tod. Mangels Seeleuten: dich.",
    "loot": [
     "muschelhorn"
+   ],
+   "specials": [
+    "schockwelle",
+    "staubwolke"
+   ],
+   "phaseLines": [
+    "%s singt lauter. Das Lied zieht an dir.",
+    "%s verstummt. Das ist schlimmer als das Singen."
    ]
   },
   {
@@ -2077,11 +2194,103 @@
    "loot": [
     "kaiserzepter",
     "duschvorhang_mantel"
+   ],
+   "specials": [
+    "schockwelle",
+    "giftwolke",
+    "ansturm",
+    "schrei"
+   ],
+   "phaseLines": [
+    "%s hebt das Zepter. Das Quieken wird zum Chor.",
+    "%s wirft den Mantel ab. Darunter nur Zähne und Wut."
    ]
   }
  ],
  "GHOST_DEF": {
   "glyph": "@",
   "color": "#b0f0ff"
+ },
+ "BOSS_SPECIALS": {
+  "stampfen": {
+   "name": "Stampfen",
+   "form": "kreis",
+   "radius": 1,
+   "mult": 1.6,
+   "warn": "hebt beide Füße und holt aus. Der Boden rundherum zittert – weg da!",
+   "hit": "stampft auf. Die Druckwelle wirft dich um:",
+   "miss": "stampft auf, dass der Putz rieselt."
+  },
+  "schockwelle": {
+   "name": "Schockwelle",
+   "form": "ring",
+   "radius": 2,
+   "mult": 1.3,
+   "warn": "zieht die Luft ein. Zwei Schritte entfernt hebt sich ein Ring aus Staub – rein oder raus, aber nicht auf den Ring!",
+   "hit": "lässt eine Welle los. Sie trifft dich mit voller Wucht:",
+   "miss": "lässt eine Welle los, die an dir vorbeirollt."
+  },
+  "ansturm": {
+   "name": "Ansturm",
+   "form": "linie",
+   "length": 6,
+   "mult": 1.5,
+   "warn": "senkt den Kopf und scharrt. Gleich geht es im vollen Lauf geradeaus auf dich zu – aus der Bahn!",
+   "hit": "rammt dich im vollen Lauf:",
+   "miss": "donnert an dir vorbei und kommt schlitternd zum Stehen."
+  },
+  "wurfhagel": {
+   "name": "Trümmerhagel",
+   "form": "hagel",
+   "count": 5,
+   "mult": 1.3,
+   "warn": "reißt Trümmer aus der Wand und wirft sie hoch. Schatten fallen auf den Boden um dich herum.",
+   "hit": "lässt Trümmer auf dich regnen:",
+   "miss": "lässt Trümmer regnen. Keiner trifft."
+  },
+  "flammenteppich": {
+   "name": "Flammenteppich",
+   "form": "flaeche",
+   "radius": 1,
+   "mult": 1.1,
+   "cond": "brennen",
+   "condTurns": 3,
+   "warn": "spuckt einen Schwall Öl auf den Boden um dich. Gleich brennt es dort!",
+   "hit": "zündet das Öl an. Die Flammen schlagen über dir zusammen:",
+   "miss": "zündet das Öl an. Es brennt dort, wo du eben noch standest."
+  },
+  "giftwolke": {
+   "name": "Giftwolke",
+   "form": "flaeche",
+   "radius": 1,
+   "mult": 0.8,
+   "cond": "gift",
+   "condTurns": 4,
+   "warn": "bläht sich auf. Gleich platzt eine grüne Wolke über dir!",
+   "hit": "stößt eine Giftwolke aus. Du atmest sie ein:",
+   "miss": "stößt eine Giftwolke aus, die ins Leere zieht."
+  },
+  "staubwolke": {
+   "name": "Staubwolke",
+   "form": "flaeche",
+   "radius": 1,
+   "mult": 0.6,
+   "cond": "blind",
+   "condTurns": 3,
+   "warn": "schlägt mit den Flügeln. Eine dichte Staubwolke sammelt sich über dir!",
+   "hit": "lässt die Wolke fallen. Staub in den Augen:",
+   "miss": "lässt die Wolke fallen, aber du bist schon weg."
+  },
+  "schrei": {
+   "name": "Markerschütternder Schrei",
+   "form": "kreis",
+   "radius": 2,
+   "mult": 0.5,
+   "cond": "furcht",
+   "condTurns": 3,
+   "warn": "reißt das Maul auf und holt tief Luft. Gleich wird es laut – Abstand halten!",
+   "hit": "brüllt dich aus nächster Nähe an:",
+   "miss": "brüllt, doch du bist weit genug weg."
+  }
  }
 }

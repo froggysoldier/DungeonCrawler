@@ -49,6 +49,9 @@ func _go_to(s: Dictionary, target: Dictionary) -> bool:
 		var r: int = s.map.roomAt[y * w + x]
 		if r >= 0 and lairs.has(r) and r != target_room:
 			return false
+		# Möbel und verschlossene Türen umgehen (hineinlaufen kostet keinen Zug)
+		if not (x == target.x and y == target.y) and (MapGen.furniture_at(s.map, J.pos(x, y)) != null or Dungeon.lock_at(s, J.pos(x, y)) != null):
+			return false
 		return not J.some(s.monsters, func(m): return m.pos.x == x and m.pos.y == y)
 	var path = Pathfinding.find_path(s.map, s.player.pos, target, passable, 8000, true)
 	if path == null or path.is_empty():
@@ -63,8 +66,8 @@ func _fight(s: Dictionary) -> bool:
 	J.sort(near, func(a, b): return a.hp - b.hp)
 	var adj: Dictionary = near[0]
 	for t in [{"part": "tritt", "move": "stampfen"}, {"part": "tritt", "move": "normal"}, {"part": "faust", "move": "normal"}]:
-		if Combat.technique_blocker(s, adj, t) == null:
-			Game.attack(s, adj.uid, t)
+		# Scheitert der Angriff (etwa ohne Ausdauer), lieber warten als stehen bleiben
+		if Combat.technique_blocker(s, adj, t) == null and Game.attack(s, adj.uid, t).ok:
 			return true
 	Game.wait(s)
 	return true
@@ -102,14 +105,14 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 			var pot = J.find(p.inventory, func(i):
 				var e = i.get("effekt")
 				return i.kind == "verbrauch" and e != null and (e.get("heal") or e.get("healPct")))
-			if pot != null:
-				Game.use_item(s, pot.uid)
+			if pot != null and Game.use_item(s, pot.uid).ok:
 				continue
 			var safe = _nearest_room(s, "safe")
 			if safe != null and not Combat.is_in_safe_room(s, p.pos):
 				if _fight(s):
 					continue
-				_go_to(s, _center(safe))
+				if not _go_to(s, _center(safe)):
+					Game.wait(s)
 				continue
 			if safe != null:
 				for b in p.boxes.duplicate():

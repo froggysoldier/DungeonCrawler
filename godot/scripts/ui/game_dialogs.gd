@@ -101,6 +101,8 @@ static func tooltip_for(gv: GameView, t: Variant, detail: bool = false) -> Varia
 		parts.append("[b]%s[/b]\n%s" % [Kit.col(FURNITURE_TEXT.get(fu.kind, fu.kind), "#9fd0ff"), Kit.small(Kit.muted("Hineinlaufen zum Benutzen"))])
 	if m.tiles[i] == "stairs":
 		parts.append("[b]%s[/b]" % Kit.col("Treppenhaus nach unten", "#ffcc33"))
+	if J.some(BossFight.danger_tiles(s), func(q): return q.x == tp.x and q.y == tp.y):
+		parts.append("[b]%s[/b]\n%s" % [Kit.col("Gefahrenzone", "#ff5a3a"), Kit.small(Kit.muted("Hier schlägt im nächsten Zug ein Spezialangriff ein. Weg da!"))])
 	if TERRAIN_TEXT.has(m.tiles[i]):
 		var tt: Array = TERRAIN_TEXT[m.tiles[i]]
 		parts.append("[b]%s[/b]\n%s" % [Kit.col(tt[0], tt[1]), Kit.small(Kit.muted(tt[2]))])

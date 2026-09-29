@@ -604,6 +604,21 @@ func _draw_live() -> void:
 			kind = "baerenfalle"
 		_spr(ci, "falle/" + kind, _sx(tr.pos.x), _sy(tr.pos.y), "#6ee07a" if own else "#ff5a4a")
 
+	# --- Angekündigte Spezialangriffe der Bosse: rot pulsierende Felder
+	var danger := BossFight.danger_tiles(s)
+	if not danger.is_empty():
+		var pulse := 0.28 + 0.14 * sin(time / 110.0)
+		for q in danger:
+			if not vis.has(MapGen.idx(m, q.x, q.y)):
+				continue
+			var qx := _sx(q.x)
+			var qy := _sy(q.y)
+			_rect(ci, qx, qy, 0, 0, TILE, TILE, Color(1.0, 0.2, 0.1, pulse))
+			_rect(ci, qx, qy, 0, 0, TILE, 2, Color(1.0, 0.8, 0.3, pulse + 0.45))
+			_rect(ci, qx, qy, 0, TILE - 2, TILE, 2, Color(1.0, 0.8, 0.3, pulse + 0.45))
+			_rect(ci, qx, qy, 0, 0, 2, TILE, Color(1.0, 0.8, 0.3, pulse + 0.45))
+			_rect(ci, qx, qy, TILE - 2, 0, 2, TILE, Color(1.0, 0.8, 0.3, pulse + 0.45))
+
 	# --- Gegenstände
 	for e in s.items:
 		var i := MapGen.idx(m, e.pos.x, e.pos.y)

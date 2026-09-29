@@ -449,6 +449,25 @@ Jede Etage bekommt Gelände und Sonderräume (`scripts/engine/dungeon.gd`):
 Ummauerte Kammern entstehen nur, wenn danach noch alle anderen Räume und
 Treppen erreichbar sind; Auftragsziele liegen nie darin.
 
+### 3.26 Bosskämpfe: Phasen und Spezialangriffe
+Bosse kämpfen in drei Phasen (`scripts/engine/boss_fight.gd`):
+
+- **Phasenwechsel** bei 66 % und 33 % Lebenspunkten: eigener Satz je Boss,
+  Rufer holen sofort Verstärkung, die Pause zwischen Spezialangriffen wird
+  kürzer (5, 4, 3 Züge). Unter 30 % gerät der Boss zusätzlich in Raserei.
+- **Spezialangriffe werden angekündigt:** Der Boss holt aus, die betroffenen
+  Felder leuchten rot und pulsieren (Tooltip: Gefahrenzone). Im nächsten Zug
+  schlägt der Angriff ein. Wer dann nicht mehr auf einem roten Feld steht,
+  weicht aus (gezählt als `bossDodges`); Rüstung zählt nur halb.
+- **Formen:** Stampfen (rund um den Boss), Schockwelle (Ring in zwei Feldern
+  Abstand), Ansturm (gerade Bahn, der Boss rennt mit), Trümmerhagel (Feld
+  des Crawlers und zufällige daneben), Flammenteppich, Giftwolke,
+  Staubwolke (Fläche um den Crawler, mit Brand, Gift oder Blindheit),
+  Markerschütternder Schrei (Furcht im Umkreis).
+- Welche Angriffe ein Boss kann und seine Phasensätze stehen in
+  `data/monsters.json` (`BOSS_SPECIALS`, `HOOD_BOSSES[].specials`,
+  `phaseLines`).
+
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
 1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben

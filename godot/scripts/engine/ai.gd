@@ -301,6 +301,8 @@ static func _monster_turn(s: Dictionary, m: Dictionary) -> void:
 			Skills.train_skill(s, "sneak", Skills.learn_factor(s, m.level))
 		return
 	Abilities.start_of_turn(s, m)
+	if BossFight.turn(s, m):
+		return
 	var p: Dictionary = s.player
 	if Conditions.has_condition(m, "brennen") and m.rank == "normal" and J.some(Observer.target_facets(s, m), func(f): return f == "z:tier" or f == "z:ratte" or f == "z:insekt") and R.chance(s, 0.5):
 		var before = m.pos

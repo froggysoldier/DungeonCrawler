@@ -93,6 +93,22 @@ func _initialize() -> void:
 				await wait(2.0)
 				await shot("dialog")
 			var gv: GameView = main.view
+			if mode == "bossangriff":
+				# Vor einen Boss stellen, der gerade einen Spezialangriff ankündigt
+				var boss = J.find(s.monsters, func(mo): return mo.rank == "nachbarschaftsboss")
+				var room: Dictionary = s.map.rooms[boss.homeRoom]
+				TH.teleport(s, {"x": boss.pos.x - 2, "y": boss.pos.y})
+				s.monsters = s.monsters.filter(func(mo): return mo == boss or Fov.chebyshev(mo.pos, s.player.pos) > 8)
+				boss.aware = true
+				var sp := BossFight.special_def(OS.get_environment("SPECIAL") if OS.get_environment("SPECIAL") != "" else "schockwelle")
+				boss.telegraph = {"id": "schockwelle", "tiles": BossFight.target_tiles(s, boss, sp)}
+				Game.after_move(s)
+				gv.zoom_map(10)
+				gv.refresh_side()
+				await wait(1.2)
+				await shot("bossangriff")
+				quit()
+				return
 			if mode == "gelaende":
 				# Neben ein besonderes Feld stellen (FEATURE=schatz, schrein, markt, nest, wasser, schlamm)
 				var want := OS.get_environment("FEATURE")
