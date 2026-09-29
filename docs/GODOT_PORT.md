@@ -92,7 +92,9 @@ Ausrüstungsplatz ein Bild gibt.
 gezeichnet (16 × 16, Bosse 24 × 24, Spielfiguren und ihre Ausrüstung 20 × 20).
 Der Generator verdoppelt sie mit Scale2x, das Schrägen glättet statt Blöcke zu
 bilden, verkleinert Größeres spiegelgleich auf 32 × 32 und legt erst dann
-Schattierung und Umriss an. Böden, Wände, Türen, Treppe, Flecken, Schatten,
+Schattierung und Umriss an. Die Schattierung hat an der Schattenseite eine
+gerasterte Reihe Halbschatten; bei Lebewesen bekommen kleine, fast quadratische
+Augenflecken (schwarz, rot, gelb, cyan) einen weißen Glanzpunkt. Böden, Wände, Türen, Treppe, Flecken, Schatten,
 Ringe und Geschosse entstehen direkt in 32 × 32.
 
 **Bewegung:** Fledermäuse, Motten, Tauben und Drohnen flattern, Irrlichter

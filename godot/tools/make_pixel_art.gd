@@ -138,7 +138,7 @@ func _valid(ch: String) -> bool:
 
 
 ## Baut ein Bild aus Zeichenzeilen: Schattierung, dann Umriss.
-func sprite(name: String, rows: Array, outline: bool = true) -> Image:
+func sprite(name: String, rows: Array, outline: bool = true, eyes: bool = false) -> Image:
 	var h := rows.size()
 	var w := String(rows[0]).length()
 	var grid: Array = []
@@ -173,10 +173,15 @@ func sprite(name: String, rows: Array, outline: bool = true) -> Image:
 					ch = fam[1]
 				elif empty.call(x, y - 1) or empty.call(x - 1, y):
 					ch = fam[2]
+				elif (empty.call(x, y + 2) or empty.call(x + 2, y)) and (x + y) % 2 == 0 and y + 1 < h and grid[y + 1][x] == grid[y][x]:
+					# Halbschatten: gerastert eine Reihe innerhalb der Schattenkante
+					ch = fam[1]
 				else:
 					ch = fam[0]
 			line.append(ch)
 		out.append(line)
+	if eyes:
+		_glints(grid, out)
 	# Umriss um alles außer den Zeichen ohne Umriss
 	for y in (h if outline else 0):
 		for x in w:
@@ -202,15 +207,15 @@ func sprite(name: String, rows: Array, outline: bool = true) -> Image:
 
 func _build_all() -> void:
 	for n in Defs.CREATURES:
-		_add("kreaturen", "kreatur/" + n, sprite(n, Defs.CREATURES[n]))
+		_add("kreaturen", "kreatur/" + n, sprite(n, Defs.CREATURES[n], true, true))
 	for n in Defs.OVERLAYS:
 		_add("kreaturen", "aufsatz/" + n, sprite(n, Defs.OVERLAYS[n]))
 	for n in Defs.BOSSES:
-		_add("bosse", "boss/" + n, _bottom(sprite(n, Defs.BOSSES[n]), 2))
+		_add("bosse", "boss/" + n, _bottom(sprite(n, Defs.BOSSES[n], true, true), 2))
 	for n in Defs.MOUNTS:
-		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n]))
+		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n], true, true))
 	for n in Defs.HEROES:
-		_add("helden", "held/" + n, sprite(n, Defs.HEROES[n], false))
+		_add("helden", "held/" + n, sprite(n, Defs.HEROES[n], false, true))
 	for n in Defs.GEAR:
 		_add("helden", "ausruestung/" + n, sprite(n, Defs.GEAR[n], false))
 	_add("kreaturen", "aufsatz/schatten", _shadow(28, 10))
@@ -243,6 +248,57 @@ func _build_all() -> void:
 			for open in [false, true]:
 				_add("kacheln", "tuer/%s_%s_%s" % ["boss" if boss else "holz", "quer" if hor else "laengs", "offen" if open else "zu"], _door(open, hor, boss))
 	_add("kacheln", "treppe", _stairs())
+
+
+## Zeichen, deren kleine, fast quadratische Flecken als Augen gelten.
+const EYES := "kRYc"
+
+
+## Augenglanz: kleine Flecken (2 bis 4 Pixel, fast quadratisch) aus einem
+## Augenzeichen, rundum von anderer Farbe umgeben, bekommen oben links einen
+## weißen Punkt.
+static func _glints(grid: Array, out: Array) -> void:
+	var h := grid.size()
+	var w := (grid[0] as Array).size()
+	var seen := {}
+	for y in h:
+		for x in w:
+			var ch: String = grid[y][x]
+			if not EYES.contains(ch) or seen.has(Vector2i(x, y)):
+				continue
+			var comp: Array = []
+			var stack: Array = [Vector2i(x, y)]
+			seen[Vector2i(x, y)] = true
+			while not stack.is_empty():
+				var p: Vector2i = stack.pop_back()
+				comp.append(p)
+				for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var q: Vector2i = p + d
+					if q.x >= 0 and q.y >= 0 and q.x < w and q.y < h and not seen.has(q) and grid[q.y][q.x] == ch:
+						seen[q] = true
+						stack.append(q)
+			var lo := Vector2i(w, h)
+			var hi := Vector2i(-1, -1)
+			for p in comp:
+				lo = Vector2i(mini(lo.x, p.x), mini(lo.y, p.y))
+				hi = Vector2i(maxi(hi.x, p.x), maxi(hi.y, p.y))
+			var bw := hi.x - lo.x + 1
+			var bh := hi.y - lo.y + 1
+			if bw < 2 or bh < 2 or bw > 4 or bh > 4 or absi(bw - bh) > 1 or comp.size() < bw * bh - 2:
+				continue
+			var inside := true
+			for p in comp:
+				for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+					var q: Vector2i = p + d
+					if q.x < 0 or q.y < 0 or q.x >= w or q.y >= h or grid[q.y][q.x] == ".":
+						inside = false
+			if not inside:
+				continue
+			var tl: Vector2i = comp[0]
+			for p in comp:
+				if p.y < tl.y or (p.y == tl.y and p.x < tl.x):
+					tl = p
+			out[tl.y][tl.x] = "w"
 
 
 ## Scale2x (EPX) auf dem Zeichenraster: jede Zelle wird zu 2 × 2, Kanten
