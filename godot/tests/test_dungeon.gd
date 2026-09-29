@@ -273,3 +273,20 @@ func test_wanderhaendler(t) -> void:
 		t.lt(s.player.gold, 5000, "bezahlt")
 		return
 	t.ok(false, "kein Händler gefunden")
+
+
+func test_haendlertypen(t) -> void:
+	var s := TH.make(41, {"beruf": 1})
+	var seen := {}
+	for i in 40:
+		var room := {"id": 900 + i, "feature": "markt", "kind": "normal"}
+		var shop := Shop.ensure_shop(s, room)
+		seen[shop.type] = true
+		t.gt(shop.offers.size(), 0, "%s: Angebote" % shop.type)
+		t.ok(String(shop.title) != "", "Titel")
+		if shop.type == "apotheke":
+			t.ok(J.every(shop.offers, func(o): return o.item.kind == "verbrauch" or o.item.kind == "buch"), "Apotheke nur Tränke und Bücher")
+		if shop.type == "waffen":
+			t.ok(J.some(shop.offers, func(o): return o.item.get("slot") == "waffe"), "Waffenhändler hat Waffen")
+	for id in ["waffen", "apotheke", "schrott", "kurio"]:
+		t.ok(seen.has(id), "%s kommt vor" % id)

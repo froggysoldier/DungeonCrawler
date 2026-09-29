@@ -1,6 +1,6 @@
 class_name Shop
 extends RefCounted
-## Läden in Safe Rooms.
+## Läden in Safe Rooms und Wanderhändler mit eigenem Sortiment.
 
 const KEEPERS := [
 	"Pimbo, ein Gnom mit Monokel", "Frau Krätzig, eine Echsendame mit Lesebrille", "Oskar, ein sehr kleiner Oger",
@@ -18,6 +18,8 @@ static func _base_price(it: Dictionary) -> int:
 static func ensure_shop(s: Dictionary, room: Dictionary) -> Dictionary:
 	if room.get("shop") != null:
 		return room.shop
+	if room.get("feature") == "markt":
+		return _ensure_wander(s, room)
 	var offers := [
 		Items.create_item(s, "kleiner_heiltrank", 2),
 		Items.create_item(s, "heiltrank"),
@@ -41,6 +43,30 @@ static func ensure_shop(s: Dictionary, room: Dictionary) -> Dictionary:
 	room.shop = {
 		"keeper": R.pick(s, KEEPERS),
 		"offers": offers.map(func(item): return {"item": item, "price": _base_price(item)}),
+		"mood": 100,
+	}
+	return room.shop
+
+
+## Wanderhändler: Waffen, Apotheke, Schrott oder Kuriositäten (data/world.json, WANDER_SHOPS).
+static func _ensure_wander(s: Dictionary, room: Dictionary) -> Dictionary:
+	var def: Dictionary = R.pick(s, Db.world("WANDER_SHOPS"))
+	var offers := []
+	for entry in R.shuffle(s, def.items.duplicate()).slice(0, int(def.pick)):
+		offers.append(Items.create_item(s, entry[0], int(entry[1])))
+	var eq: Dictionary = def.equipment
+	for i in eq.rarities.size():
+		var slot = [eq.slots[i]] if i < eq.slots.size() else null
+		offers.append(Items.generate_equipment(s, eq.rarities[i], slot))
+	if R.chance(s, float(def.tomeChance)):
+		offers.append(Magic.random_tome(s, "selten" if s.floor >= 2 else "ungewoehnlich"))
+	room.shop = {
+		"keeper": R.pick(s, def.keepers),
+		"type": def.id,
+		"title": def.title,
+		"greeting": def.greeting,
+		# Wanderhändler sind etwas teurer: Sie tragen alles selbst
+		"offers": offers.map(func(item): return {"item": item, "price": J.rnd(_base_price(item) * 1.15)}),
 		"mood": 100,
 	}
 	return room.shop

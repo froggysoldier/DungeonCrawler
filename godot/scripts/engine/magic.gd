@@ -209,6 +209,70 @@ static func cast_spell(s: Dictionary, id: String, opts: Dictionary = {}) -> Dict
 		"entgiften":
 			if not Abilities.cure(s):
 				Log.add(s, "Da war gar kein Gift. Die Minze war trotzdem nett.", "info")
+		"frostnadel":
+			Fx.shot(s, p.pos, target.pos, "magie")
+			if _spell_hurt(s, target, 5 + st.int * 0.6 + level, "Die Frostnadel"):
+				kills += 1
+			else:
+				target.slowed = maxi(int(J.num(target, "slowed")), 4)
+				Log.add(s, "%s wird langsam vor Kälte." % Identify.name_of_cap(s, target), "kampf")
+		"blitzkette":
+			var hit := [target]
+			var cur: Dictionary = target
+			for k in 2:
+				var nxt = null
+				for m in s.monsters:
+					if not hit.has(m) and J.cheb(m.pos, cur.pos) <= 2 and not Combat.is_in_safe_room(s, m.pos):
+						nxt = m
+						break
+				if nxt == null:
+					break
+				hit.append(nxt)
+				cur = nxt
+			var dmg: float = 8 + st.int * 0.7 + level * 1.5
+			var from: Dictionary = p.pos
+			for i in hit.size():
+				Fx.shot(s, from, hit[i].pos, "blitz")
+				from = hit[i].pos
+				if _spell_hurt(s, hit[i], dmg * [1.0, 0.7, 0.5][i], "Der Kettenblitz"):
+					kills += 1
+		"donnerschlag":
+			var around: Array = s.monsters.filter(func(m): return J.cheb(m.pos, p.pos) <= 1 and not Combat.is_in_safe_room(s, m.pos))
+			Fx.hit(s, p.pos, true)
+			Log.add(s, "Ein Donnerschlag rollt durch den Raum.", "kampf")
+			for m in around:
+				if _spell_hurt(s, m, 4 + st.int * 0.5 + level, "Der Donnerschlag"):
+					kills += 1
+				else:
+					m.stunned = maxi(int(J.num(m, "stunned")), 1)
+		"blenden":
+			Fx.shot(s, p.pos, target.pos, "magie")
+			if Conditions.inflict(s, target, "blind", 3 + floori(level / 3.0), 1):
+				Log.add(s, "%s ist geblendet." % Identify.name_of_cap(s, target), "kampf")
+			else:
+				Log.add(s, "%s kneift die Augen zu. Das Licht verpufft." % Identify.name_of_cap(s, target), "kampf")
+			target.aware = true
+		"schreck":
+			var scared := 0
+			for m in s.monsters:
+				if J.cheb(m.pos, p.pos) <= 3 and not BossFight.is_boss(m) and Conditions.inflict(s, m, "furcht", 3 + floori(level / 3.0), 1):
+					scared += 1
+			Log.add(s, "Du wächst zu einer Schreckgestalt. %s" % (("%d Gegner ergreifen die Flucht." % scared) if scared > 0 else "Niemand lässt sich beeindrucken."), "kampf")
+		"regeneration":
+			_buff(p, "Regeneration", {"name": "Regeneration", "turns": 40, "bonuses": {"hpRegen": 1 + floori(level / 5.0)}})
+			Log.add(s, "Deine Wunden beginnen zu kribbeln und sich zu schließen.", "info")
+		"steinhaut":
+			_buff(p, "Steinhaut", {"name": "Steinhaut", "turns": 40, "bonuses": {"ruestung": 3 + floori(level / 4.0)}})
+			Log.add(s, "Deine Haut wird grau und hart wie Beton.", "info")
+		"saeurespritzer":
+			Fx.shot(s, p.pos, target.pos, "schleim")
+			var armor_before: int = target.ruestung
+			if _spell_hurt(s, target, 4 + st.int * 0.5 + level, "Der Säurespritzer"):
+				kills += 1
+			else:
+				target.ruestung = maxi(0, armor_before - 2)
+				if armor_before > 0:
+					Log.add(s, "Die Säure frisst sich in die Panzerung von %s." % Identify.name_of(s, target), "kampf")
 	p.mp = J.num(p, "mp") - cost
 	var cds: Dictionary = p.spellCooldowns.duplicate() if p.get("spellCooldowns") != null else {}
 	cds[id] = def.cooldown

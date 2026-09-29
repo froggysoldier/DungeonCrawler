@@ -1047,6 +1047,102 @@
    ],
    "text": "Steigere einen Grundwert auf {n}.",
    "category": "fortschritt"
+  },
+  {
+   "id": "kisten",
+   "stat": "kisten",
+   "stages": [
+    10,
+    30,
+    75
+   ],
+   "text": "Zerschlage {n} Kisten oder Fässer.",
+   "category": "erkundung"
+  },
+  {
+   "id": "geheimtueren",
+   "stat": "geheimtueren",
+   "stages": [
+    1,
+    3,
+    6
+   ],
+   "text": "Entdecke {n} Geheimtüren.",
+   "category": "erkundung"
+  },
+  {
+   "id": "schloesser",
+   "stat": "schloesser",
+   "stages": [
+    1,
+    3,
+    6
+   ],
+   "text": "Knacke {n} Schlösser.",
+   "category": "technik"
+  },
+  {
+   "id": "schatzkammern",
+   "stat": "schatzkammern",
+   "stages": [
+    1,
+    3
+   ],
+   "text": "Betritt {n} Schatzkammern.",
+   "category": "erkundung"
+  },
+  {
+   "id": "nester",
+   "stat": "nester",
+   "stages": [
+    1,
+    3,
+    5
+   ],
+   "text": "Räume {n} Monsternester aus.",
+   "category": "kampf"
+  },
+  {
+   "id": "gebete",
+   "stat": "gebete",
+   "stages": [
+    1,
+    5,
+    10
+   ],
+   "text": "Bete {n}-mal an einem Schrein.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "hinterhalte",
+   "stat": "hinterhalte",
+   "stages": [
+    1,
+    3
+   ],
+   "text": "Gerate in {n} Hinterhalte und lebe weiter.",
+   "category": "ueberleben"
+  },
+  {
+   "id": "boss_ausweichen",
+   "stat": "boss.ausgewichen",
+   "stages": [
+    1,
+    5,
+    15
+   ],
+   "text": "Weiche {n} angekündigten Boss-Angriffen aus.",
+   "category": "kampf"
+  },
+  {
+   "id": "ketten",
+   "stat": "ketten",
+   "stages": [
+    1,
+    3
+   ],
+   "text": "Schließe {n} Auftragsketten ab.",
+   "category": "sozial"
   }
  ]
 }

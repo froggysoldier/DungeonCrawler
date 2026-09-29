@@ -510,10 +510,11 @@ static func on_enter_room(s: Dictionary, room: Dictionary, first: bool) -> void:
 		Events.emit(s, {"type": "ambush"})
 	elif first and room.get("feature") == "schatz":
 		Log.add(s, "Die Schatzkammer! Hier lohnt es sich, jede Ecke abzusuchen.", "loot")
+		Events.emit(s, {"type": "treasureFound", "room": room.id})
 	elif room.get("feature") == "markt":
 		var shop := Shop.ensure_shop(s, room)
 		if first:
-			Log.add(s, "%s: „Nur hereinspaziert. Ich bin nicht lange hier, also entscheide dich schnell.“" % String(shop.keeper).split(",")[0], "dialog")
+			Log.add(s, "%s (%s): %s" % [String(shop.keeper).split(",")[0], shop.get("title", "Wanderhändler"), shop.get("greeting", "„Nur hereinspaziert.“")], "dialog")
 
 
 ## Nest ausgeräumt? Dann liegt dort etwas.
@@ -532,7 +533,7 @@ static func on_kill(s: Dictionary, mo: Dictionary) -> void:
 	s.items.append({"pos": J.pcopy(at), "item": Items.create_gold(s, R.int_(s, 15, 35) * s.floor)})
 	s.items.append({"pos": J.pcopy(at), "item": Items.roll_ground_item(s)})
 	Log.add(s, "Das Nest ist leer. Zwischen Knochen und Lumpen glänzt etwas.", "loot")
-	Events.emit(s, {"type": "nestCleared"})
+	Events.emit(s, {"type": "nestCleared", "room": nest})
 
 
 ## Beten am Schrein: meist ein Segen, manchmal Stille, selten ein Fluch.

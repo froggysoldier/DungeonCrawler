@@ -259,6 +259,212 @@
      "count": 10
     }
    ]
+  },
+  {
+   "id": "arkanum",
+   "name": "Orbitalakademie Arkanum",
+   "box": "schmuck",
+   "minFollower": 150,
+   "description": "Eine Zauberschule auf einem Mond aus Glas. Fördert jeden, der Mana verbrennt.",
+   "likes": {
+    "spell": 2,
+    "kill|t:zauber": 6,
+    "spell|blitzkette": 3,
+    "spell|feuerball": 3
+   },
+   "dislike": {
+    "signal": "crafted",
+    "text": "Basteln mit den Händen? Die Akademie rümpft die Nase."
+   },
+   "offer": "„Ihre Zauber sind … ungeschliffen. Aber roh ist gut. Die Orbitalakademie Arkanum möchte Sie fördern.“",
+   "wishes": [
+    {
+     "text": "Wirke 8 Zauber.",
+     "signals": [
+      "spell"
+     ],
+     "count": 8
+    },
+    {
+     "text": "Erledige 4 Gegner mit Zaubern.",
+     "signals": [
+      "kill|t:zauber"
+     ],
+     "count": 4
+    },
+    {
+     "text": "Wirke 12 Zauber.",
+     "signals": [
+      "spell"
+     ],
+     "count": 12
+    }
+   ]
+  },
+  {
+   "id": "tiefgrabe",
+   "name": "Tiefgrabe & Söhne, Bergungen",
+   "box": "abenteurer",
+   "minFollower": 120,
+   "description": "Ein Familienunternehmen, das seit sieben Generationen Ruinen ausräumt. Liebt Kisten, Schlösser und Geheimnisse.",
+   "likes": {
+    "crate": 2,
+    "secret": 12,
+    "lockpick": 8,
+    "treasure": 15,
+    "nest": 10
+   },
+   "dislike": {
+    "signal": "trap|self",
+    "text": "Eine Falle übersehen? Bei Tiefgrabe wären Sie schon gefeuert."
+   },
+   "offer": "„Sie haben ein Auge für versteckte Dinge. Tiefgrabe und Söhne bezahlen dafür. Unsere Söhne sind übrigens alle Töchter.“",
+   "wishes": [
+    {
+     "text": "Zerschlage 6 Kisten oder Fässer.",
+     "signals": [
+      "crate"
+     ],
+     "count": 6
+    },
+    {
+     "text": "Knacke ein Schloss, finde eine Geheimtür oder öffne eine Schatzkammer.",
+     "signals": [
+      "lockpick",
+      "secret",
+      "treasure"
+     ],
+     "count": 1
+    },
+    {
+     "text": "Räume ein Monsternest aus.",
+     "signals": [
+      "nest"
+     ],
+     "count": 1
+    }
+   ]
+  },
+  {
+   "id": "ballsaal_zirr",
+   "name": "Ballsaal Zirr",
+   "box": "schuh",
+   "minFollower": 200,
+   "description": "Das berühmteste Tanzhaus der dritten Spiralarmregion. Findet Ausweichen schöner als Zuschlagen.",
+   "likes": {
+    "dodge": 2,
+    "boss|dodge": 12
+   },
+   "dislike": {
+    "signal": "trap|self",
+    "text": "Stolpern ist das Gegenteil von Tanzen."
+   },
+   "offer": "„Sie bewegen sich wie ein junger Gott. Oder wie jemand, der nicht sterben will. Der Ballsaal Zirr liebt beides.“",
+   "wishes": [
+    {
+     "text": "Weiche 10 Angriffen aus.",
+     "signals": [
+      "dodge"
+     ],
+     "count": 10
+    },
+    {
+     "text": "Weiche 2 angekündigten Boss-Angriffen aus.",
+     "signals": [
+      "boss|dodge"
+     ],
+     "count": 2
+    },
+    {
+     "text": "Weiche 15 Angriffen aus.",
+     "signals": [
+      "dodge"
+     ],
+     "count": 15
+    }
+   ]
+  },
+  {
+   "id": "siebter_mond",
+   "name": "Kirche des Siebten Mondes",
+   "box": "ueberlebens",
+   "minFollower": 100,
+   "description": "Eine freundliche Sekte mit Spendenkonto. Mag Gebete, gute Taten und gerettete Seelen.",
+   "likes": {
+    "prayed": 10,
+    "quest|retten": 15,
+    "quest": 5
+   },
+   "dislike": {
+    "signal": "haggle|ok",
+    "text": "Feilschen mit Bedürftigen. Der Siebte Mond ist enttäuscht."
+   },
+   "offer": "„Wir haben Sie beten sehen. Und helfen. Die Kirche des Siebten Mondes segnet Sie. Gegen eine kleine Gebühr, die wir übernehmen.“",
+   "wishes": [
+    {
+     "text": "Bete an einem Schrein.",
+     "signals": [
+      "prayed"
+     ],
+     "count": 1
+    },
+    {
+     "text": "Erledige 2 Aufträge.",
+     "signals": [
+      "quest"
+     ],
+     "count": 2
+    },
+    {
+     "text": "Rette eine Person.",
+     "signals": [
+      "quest|retten"
+     ],
+     "count": 1
+    }
+   ]
+  },
+  {
+   "id": "sternfracht",
+   "name": "Sternfracht Logistik",
+   "box": "abenteurer",
+   "minFollower": 150,
+   "description": "Ein Lieferdienst, der zwischen Sonnensystemen pendelt. Pünktlichkeit ist alles. Aufträge sind alles.",
+   "likes": {
+    "quest|liefern": 12,
+    "quest|finden": 10,
+    "chain": 25,
+    "quest": 4
+   },
+   "dislike": {
+    "signal": "quest|fail",
+    "text": "Ein gescheiterter Auftrag. Bei Sternfracht gibt es keine gescheiterten Aufträge. Nur gekündigte Mitarbeiter."
+   },
+   "offer": "„Zuverlässig. Schnell. Leicht verzweifelt. Sie sind genau unser Typ. Sternfracht Logistik unterstützt Sie ab sofort.“",
+   "wishes": [
+    {
+     "text": "Liefere etwas ab oder bring etwas Verlorenes zurück.",
+     "signals": [
+      "quest|liefern",
+      "quest|finden"
+     ],
+     "count": 1
+    },
+    {
+     "text": "Erledige 3 Aufträge.",
+     "signals": [
+      "quest"
+     ],
+     "count": 3
+    },
+    {
+     "text": "Schließe eine Auftragskette ab.",
+     "signals": [
+      "chain"
+     ],
+     "count": 1
+    }
+   ]
   }
  ]
 }

@@ -33,3 +33,29 @@ func test_sponsor_ablauf(t) -> void:
 	for i in 10:
 		Events.emit(s, {"type": "trapTriggered", "kind": "pfeilplatte", "onPlayer": true})
 	t.eq(vornex.status, "dropped", "Gunst verspielt")
+
+
+func test_neue_sponsoren_reagieren(t) -> void:
+	var s := TH.make(3301, {"beruf": 1})
+	s.unlocks.append("zuschauer")
+	s.viewers.follower = 500
+	for i in 40:
+		Events.emit(s, {"type": "crateSmashed"})
+		Events.emit(s, {"type": "spellCast", "spell": "geschoss", "kills": 0})
+		Events.emit(s, {"type": "dodged", "source": "x", "facets": []})
+	var st := func(id: String) -> Dictionary: return J.find(Sponsors.states(s), func(x): return x.id == id)
+	t.ok(st.call("tiefgrabe").interest > 0 or st.call("tiefgrabe").status != "none", "Tiefgrabe mag Kisten")
+	t.ok(st.call("arkanum").interest > 0 or st.call("arkanum").status != "none", "Arkanum mag Zauber")
+	t.ok(st.call("ballsaal_zirr").interest > 0 or st.call("ballsaal_zirr").status != "none", "Zirr mag Ausweichen")
+	t.has(Sponsors.signals_of({"type": "questDone", "kind": "retten"}), "quest|retten")
+	t.has(Sponsors.signals_of({"type": "bossDodged"}), "boss|dodge")
+	# Jeder Wunsch nennt nur Signale, die das Spiel auch sendet
+	var known := {}
+	for e in [{"type": "spellCast", "spell": "x"}, {"type": "dodged"}, {"type": "bossDodged"}, {"type": "crateSmashed"}, {"type": "secretFound"}, {"type": "lockPicked"}, {"type": "treasureFound"}, {"type": "nestCleared"}, {"type": "prayed"}, {"type": "questDone", "kind": "retten"}, {"type": "questDone", "kind": "liefern"}, {"type": "questDone", "kind": "finden"}, {"type": "questFailed"}, {"type": "chainDone"}]:
+		for sig in Sponsors.signals_of(e):
+			known[sig] = true
+	for id in ["arkanum", "tiefgrabe", "ballsaal_zirr", "siebter_mond", "sternfracht"]:
+		var def: Dictionary = Db.sponsor(id)
+		for w in def.wishes:
+			for sig in w.signals:
+				t.ok(known.has(sig) or String(sig).begins_with("kill|"), "%s: %s" % [id, sig])

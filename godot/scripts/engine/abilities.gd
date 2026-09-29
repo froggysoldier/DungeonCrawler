@@ -86,7 +86,9 @@ static func on_monster_hit(s: Dictionary, m: Dictionary) -> void:
 ## Fähigkeiten, die zu Beginn eines Monsterzugs greifen.
 static func start_of_turn(s: Dictionary, m: Dictionary) -> void:
 	if has(m, "regeneriert") and m.hp < m.maxHp:
-		m.hp = mini(m.maxHp, m.hp + maxi(1, J.rnd(m.maxHp * 0.04)))
+		# Bosse haben viel mehr Lebenspunkte: dort heilt nur ein kleinerer Anteil
+		var rate := 0.015 if m.rank == "nachbarschaftsboss" or m.rank == "boroughboss" else 0.04
+		m.hp = mini(m.maxHp, m.hp + maxi(1, J.rnd(m.maxHp * rate)))
 	if has(m, "rufer") and m.aware and J.num(m, "summoned") < 2 and R.chance(s, 0.12):
 		_summon(s, m)
 
@@ -100,7 +102,8 @@ static func _summon(s: Dictionary, m: Dictionary) -> void:
 	if free.is_empty():
 		return
 	var pos: Dictionary = R.pick(s, free)
-	var level := maxi(1, m.level - 3)
+	# Diener von Bossen sind deutlich schwächer als ihr Herr
+	var level := maxi(1, m.level - (5 if m.rank == "nachbarschaftsboss" or m.rank == "boroughboss" else 3))
 	var def_id: String = m.defId
 	var is_rat := def_id.contains("ratte") or def_id == "rattenschamane" or def_id == "rattenkaiser" or def_id == "rattenmensch"
 	var rat_def = Monsters.def_by_id("knochenratte" if s.floor >= 2 else "kellerratte")

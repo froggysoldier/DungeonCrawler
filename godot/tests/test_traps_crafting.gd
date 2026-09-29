@@ -141,3 +141,40 @@ func test_eigene_fallen(t) -> void:
 	t.ok(rat.hp < rat_hp or not J.has_same(s.monsters, rat), "Monster getroffen")
 	t.is_null(Traps.trap_at(s, spot), "ausgelöst")
 	Game.wait(s)
+
+
+func test_rezepte_vollstaendig(t) -> void:
+	for r in Db.t("crafting", "RECIPES"):
+		for ing in r.ingredients:
+			for id in ing.ids:
+				t.ok(Items.base_exists(id), "%s: Zutat %s" % [r.id, id])
+		if r.has("result"):
+			t.ok(Items.base_exists(r.result.id), "%s: Ergebnis" % r.id)
+		else:
+			t.ok(r.get("upgradeWeapon", false) or r.has("upgradeArmor"), "%s: Verbesserung" % r.id)
+
+
+func test_traenke_mischen(t) -> void:
+	var s := TH.make(7301, {"beruf": 1})
+	TH.tutorial(s)
+	s.player.inventory = [Items.create_item(s, "kleiner_heiltrank", 2)]
+	t.ok(Crafting.craft(s, "heiltrank_mischen").ok, "gemischt")
+	t.ok(J.some(s.player.inventory, func(i): return i.baseId == "heiltrank"), "Heiltrank")
+	t.ok(not J.some(s.player.inventory, func(i): return i.baseId == "kleiner_heiltrank"), "Zutaten verbraucht")
+
+
+func test_kleidung_polstern(t) -> void:
+	var s := TH.make(7302, {"beruf": 1})
+	TH.tutorial(s)
+	s.player.equipment.brust = null
+	s.player.inventory = [Items.create_item(s, "lappen", 6), Items.create_item(s, "klebeband", 3)]
+	t.ok(not Crafting.craft(s, "polsterung").ok, "ohne Oberteil nicht")
+	var shirt := Items.create_item(s, "tshirt")
+	s.player.equipment.brust = shirt
+	var before: float = J.num(Player.total_bonuses(s), "ruestung")
+	t.ok(Crafting.craft(s, "polsterung").ok, "gepolstert")
+	t.eq(J.num(Player.total_bonuses(s), "ruestung"), before + 1, "+1 Rüstung")
+	t.ok(String(shirt.name).contains("gepolstert"), "Name")
+	t.ok(Crafting.craft(s, "polsterung").ok, "zweimal")
+	t.ok(not Crafting.craft(s, "polsterung").ok, "nicht dreimal")
+	t.eq(J.num(Player.total_bonuses(s), "ruestung"), before + 2, "+2 Rüstung")

@@ -1703,7 +1703,7 @@
    "glyph": "K",
    "color": "#c0a060",
    "level": 8,
-   "hp": 75,
+   "hp": 70,
    "dmg": [
     5,
     8
@@ -1781,7 +1781,7 @@
    "hp": 160,
    "dmg": [
     6,
-    11
+    10
    ],
    "treffer": 75,
    "ruestung": 3,
@@ -1932,9 +1932,9 @@
    "glyph": "F",
    "color": "#ff6030",
    "level": 8,
-   "hp": 85,
+   "hp": 70,
    "dmg": [
-    5,
+    4,
     8
    ],
    "treffer": 70,
@@ -1949,7 +1949,6 @@
    ],
    "abilities": [
     "gepanzert",
-    "regeneriert",
     "brennend"
    ],
    "intro": "Ein Heizkessel aus den 60ern hat Beine bekommen. Und Zähne. Und schlechte Laune. Es wird sehr warm.",
@@ -1971,11 +1970,11 @@
    "name": "Der Hausverwalter",
    "glyph": "V",
    "color": "#ffb030",
-   "level": 12,
-   "hp": 200,
+   "level": 11,
+   "hp": 180,
    "dmg": [
-    7,
-    12
+    6,
+    11
    ],
    "treffer": 75,
    "ruestung": 4,
@@ -2012,7 +2011,7 @@
    "glyph": "Q",
    "color": "#40c0a0",
    "level": 12,
-   "hp": 150,
+   "hp": 140,
    "dmg": [
     6,
     10
@@ -2052,13 +2051,13 @@
    "glyph": "K",
    "color": "#a08040",
    "level": 12,
-   "hp": 170,
+   "hp": 135,
    "dmg": [
     6,
-    11
+    10
    ],
    "treffer": 70,
-   "ruestung": 4,
+   "ruestung": 3,
    "ausweichen": 0,
    "size": "riesig",
    "xp": 350,
@@ -2130,10 +2129,10 @@
    "glyph": "N",
    "color": "#60e0ff",
    "level": 12,
-   "hp": 140,
+   "hp": 160,
    "dmg": [
-    6,
-    10
+    7,
+    11
    ],
    "treffer": 80,
    "ruestung": 1,
@@ -2167,11 +2166,11 @@
    "name": "Der Rattenkaiser",
    "glyph": "R",
    "color": "#ffd700",
-   "level": 15,
-   "hp": 320,
+   "level": 13,
+   "hp": 220,
    "dmg": [
-    8,
-    14
+    7,
+    13
    ],
    "treffer": 75,
    "ruestung": 4,
@@ -2284,11 +2283,11 @@
   "schrei": {
    "name": "Markerschütternder Schrei",
    "form": "kreis",
-   "radius": 2,
+   "radius": 1,
    "mult": 0.5,
    "cond": "furcht",
    "condTurns": 3,
-   "warn": "reißt das Maul auf und holt tief Luft. Gleich wird es laut – Abstand halten!",
+   "warn": "reißt das Maul auf und holt tief Luft. Gleich wird es laut – weg von ihm!",
    "hit": "brüllt dich aus nächster Nähe an:",
    "miss": "brüllt, doch du bist weit genug weg."
   }

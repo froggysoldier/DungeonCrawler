@@ -58,6 +58,30 @@ static func signals_of(e: Dictionary) -> Array:
 			return ["sleep"]
 		"eat":
 			return ["eat"]
+		"spellCast":
+			return ["spell", "spell|%s" % e.spell]
+		"dodged":
+			return ["dodge"]
+		"bossDodged":
+			return ["dodge", "boss|dodge"]
+		"crateSmashed":
+			return ["crate"]
+		"secretFound":
+			return ["secret"]
+		"lockPicked":
+			return ["lockpick"]
+		"treasureFound":
+			return ["treasure"]
+		"nestCleared":
+			return ["nest"]
+		"prayed":
+			return ["prayed"]
+		"questDone":
+			return ["quest", "quest|%s" % e.kind]
+		"questFailed":
+			return ["quest|fail"]
+		"chainDone":
+			return ["chain"]
 	return []
 
 

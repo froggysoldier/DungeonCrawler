@@ -2,7 +2,12 @@
  "HUNT_TEXTS": [
   "„{was} haben meinen Freund erwischt. Ich schaffe das nicht allein. Erledige {n} von ihnen – für ihn.“",
   "„Die {was} hier lassen mich nicht schlafen. Wenn du {n} erledigst, gebe ich dir, was ich habe.“",
-  "„Ich wette mit jemandem, dass du {n} {was} schaffst. Hilf mir, die Wette zu gewinnen.“"
+  "„Ich wette mit jemandem, dass du {n} {was} schaffst. Hilf mir, die Wette zu gewinnen.“",
+  "„Ich zähle mit. {n} {was}, und du bekommst meinen Anteil. Ich brauche ihn eh nicht mehr, wenn die mich kriegen.“",
+  "„Die {was} haben mein Lager geplündert. Mach {n} davon fertig, dann sind wir quitt.“",
+  "„Ich habe einen Plan: Du erledigst {n} {was}, ich sehe zu und applaudiere. Guter Plan, oder?“",
+  "„Seit die {was} hier herumlaufen, traut sich keiner mehr aufs Klo. {n} Stück, und die Welt ist ein bisschen besser.“",
+  "„Man sagt, wer {n} {was} erledigt, bekommt vom System eine Medaille. Ich weiß nicht, ob das stimmt. Ich zahle trotzdem.“"
  ],
  "FETCH_ITEMS": [
   {
@@ -28,6 +33,38 @@
   {
    "name": "Autoschlüssel mit Glücksbringer",
    "text": "„Es gibt kein Auto mehr. Ich weiß. Aber der Glücksbringer daran … bitte. Er liegt im {viertel}.“"
+  },
+  {
+   "name": "Zahnprothese",
+   "text": "„Meine Zähne! Die dritten! Sie liegen irgendwo im {viertel}. Ich kann seit Stunden nicht richtig reden.“"
+  },
+  {
+   "name": "Brille mit Tesafilm",
+   "text": "„Ohne Brille sehe ich die Monster erst, wenn sie mich beißen. Sie ist im {viertel} runtergefallen.“"
+  },
+  {
+   "name": "Vereinswimpel",
+   "text": "„Der Wimpel vom Kegelverein. Wir waren zwölf. Jetzt bin ich allein. Er liegt im {viertel}. Hol ihn mir, bitte.“"
+  },
+  {
+   "name": "Rezeptbuch der Familie",
+   "text": "„Dreihundert Jahre Familienrezepte. Und ich habe sie im {viertel} fallen lassen. Meine Ahnen drehen sich im Grab. Also, falls es noch Gräber gibt.“"
+  },
+  {
+   "name": "Lieblingstasse",
+   "text": "„Es ist nur eine Tasse. Mit einem Hund drauf. Sie liegt im {viertel}. Ich weiß, es ist albern. Bring sie mir trotzdem.“"
+  },
+  {
+   "name": "Hörgerät",
+   "text": "„WAS? ACH SO. MEIN HÖRGERÄT. IM {viertel}. DANKE, DASS DU FRAGST.“"
+  },
+  {
+   "name": "Glücksmünze",
+   "text": "„Meine Glücksmünze liegt im {viertel}. Seitdem habe ich nur noch Pech. Das ist kein Zufall.“"
+  },
+  {
+   "name": "Notizbuch voller Pläne",
+   "text": "„Ich hatte einen Plan, wie wir hier rauskommen. Alles aufgeschrieben. Das Heft liegt im {viertel}. Der Plan war gut. Glaube ich.“"
   }
  ],
  "DELIVER_WANTS": [
@@ -78,21 +115,239 @@
    "label": "Wurfgeschosse",
    "n": 6,
    "text": "„Ich kann nicht nah ran. Bring mir sechs Dinge zum Werfen, dann komme ich klar.“"
+  },
+  {
+   "ids": [
+    "verband",
+    "pflaster"
+   ],
+   "label": "Verbände",
+   "n": 2,
+   "text": "„Mein Bein sieht nicht gut aus. Zwei Verbände oder Pflaster, dann humple ich wenigstens sauber.“"
+  },
+  {
+   "ids": [
+    "kleiner_manatrank",
+    "manatrank",
+    "manatoast"
+   ],
+   "label": "Manatränke",
+   "n": 2,
+   "text": "„Ich übe Zauber. Es läuft schlecht. Mit zwei Manatränken läuft es vielleicht weniger schlecht.“"
+  },
+  {
+   "ids": [
+    "energydrink",
+    "ausdauertrank",
+    "traubenzucker"
+   ],
+   "label": "Wachmacher",
+   "n": 2,
+   "text": "„Ich habe seit drei Tagen nicht geschlafen, und ich will auch nicht damit anfangen. Zwei Wachmacher, bitte.“"
+  },
+  {
+   "ids": [
+    "naegel",
+    "klebeband"
+   ],
+   "label": "Nägel oder Klebeband",
+   "n": 3,
+   "text": "„Ich baue eine Barrikade. Nägel oder Klebeband, drei Stück. Mehr brauche ich nicht zum Überleben. Hoffe ich.“"
+  },
+  {
+   "ids": [
+    "dosenbier",
+    "hochprozentiges"
+   ],
+   "label": "etwas Starkes",
+   "n": 2,
+   "text": "„Nüchtern halte ich das hier nicht mehr aus. Zwei Flaschen von irgendwas. Frag nicht.“"
   }
  ],
  "RESCUE_TEXTS": [
   "„Mein Bruder {person} ist im {viertel} eingeschlossen. Monster überall. Bitte hol ihn da raus.“",
   "„{person} aus meinem Haus ist allein im {viertel} zurückgeblieben. Sie ist verletzt. Ich traue mich nicht zurück.“",
-  "„Wir haben {person} im {viertel} verloren. Vielleicht lebt er noch. Vielleicht.“"
+  "„Wir haben {person} im {viertel} verloren. Vielleicht lebt er noch. Vielleicht.“",
+  "„{person} wollte nur kurz nachsehen, was im {viertel} so knurrt. Das war vor sechs Stunden.“",
+  "„Meine Nachbarin {person} steckt im {viertel} fest. Sie hat mir immer die Post aufgehoben. Ich schulde ihr was.“",
+  "„{person} und ich haben uns im {viertel} gestritten. Dann ist er weggerannt. Ich will mich entschuldigen. Solange es noch geht.“"
  ],
  "BOSS_TEXTS": [
   "„Solange der Boss im {viertel} lebt, hören die Monster nicht auf zu kommen. Mach ihn fertig, und ich mache dir einen Freundschaftspreis.“",
-  "„Der Boss im {viertel} hat meinen Lieferanten gefressen. Rache ist ein Geschäft. Ich zahle.“"
+  "„Der Boss im {viertel} hat meinen Lieferanten gefressen. Rache ist ein Geschäft. Ich zahle.“",
+  "„Der Boss im {viertel} sitzt auf meinem Lieblingsplatz. Ich will ihn zurück. Den Platz, nicht den Boss.“",
+  "„Mach den Boss im {viertel} fertig. Ich habe dafür gespart. Also, so gut man hier sparen kann.“",
+  "„Wer den Boss im {viertel} erledigt, bekommt bei mir Kredit. Und Respekt. Vor allem Kredit.“"
  ],
  "QUEST_THANKS": [
   "„Danke. Wirklich. Du bist ein guter Mensch. Oder was auch immer du inzwischen bist.“",
   "„Ich wusste, dass auf dich Verlass ist. Hier, nimm das.“",
-  "„Das vergesse ich dir nie. Und ich vergesse selten etwas.“"
+  "„Das vergesse ich dir nie. Und ich vergesse selten etwas.“",
+  "„Du hast es wirklich getan. Ich hätte nicht darauf gewettet. Hier, bevor ich es mir anders überlege.“",
+  "„Danke. Ich schreibe deinen Namen auf die Liste der guten Leute. Die Liste ist sehr kurz.“",
+  "„Perfekt. Wenn wir hier je rauskommen, lade ich dich zum Essen ein. Etwas ohne Tentakel.“",
+  "„Du bist verlässlicher als das System. Das ist kein großes Lob, aber es ist ehrlich gemeint.“"
  ],
- "MAX_ACTIVE_QUESTS": 5
+ "MAX_ACTIVE_QUESTS": 5,
+ "NEST_TEXTS": [
+  "„Im {viertel} haben sich Viecher ein Nest gebaut. Jede Nacht werden es mehr. Räum es aus, bevor es zu spät ist.“",
+  "„Ich habe ein Nest gesehen, im {viertel}. Es hat mich angesehen. Nester sollten einen nicht ansehen. Mach es leer.“",
+  "„Da ist ein Nest im {viertel}. Was drin wohnt, klaut mir mein Essen. Kümmere dich darum, und ich teile.“"
+ ],
+ "SCHATZ_TEXTS": [
+  "„Im {viertel} gibt es eine Kammer mit Vorhängeschloss. Irgendwer hat da Sachen gehortet. Mach sie auf und erzähl mir, was drin ist.“",
+  "„Ich weiß von einer verschlossenen Schatzkammer im {viertel}. Den Schlüssel habe ich nicht. Du vielleicht bald.“"
+ ],
+ "QUEST_CHAINS": [
+  {
+   "id": "letzte_probe",
+   "name": "Die letzte Probe",
+   "steps": [
+    {
+     "kind": "finden",
+     "item": "Glücks-Plektrum",
+     "text": "„Ich war Gitarrist. Bin ich noch. Mein Glücks-Plektrum liegt im {viertel}. Ohne das spiele ich nicht.“"
+    },
+    {
+     "kind": "liefern",
+     "want": {
+      "ids": [
+       "flasche",
+       "bierkrug",
+       "dosenbier"
+      ],
+      "label": "Flaschen für die Band",
+      "n": 2
+     },
+     "text": "„Die Band braucht Flaschen. Zum Trinken und zum Werfen. Zwei Stück, dann proben wir.“"
+    },
+    {
+     "kind": "jagd",
+     "count": 5,
+     "text": "„Die {was} stören jede Probe. Erledige {n}, dann spielen wir dir ein Ständchen. Das letzte Konzert der Welt.“"
+    }
+   ]
+  },
+  {
+   "id": "kellerwache",
+   "name": "Die Kellerwache",
+   "steps": [
+    {
+     "kind": "jagd",
+     "count": 4,
+     "text": "„Ich war mal Wachmann. Jetzt bin ich der Wachmann von gar nichts. Hilf mir, das Viertel sauber zu halten: {n} {was}.“"
+    },
+    {
+     "kind": "nest",
+     "text": "„Die kamen alle aus einem Nest im {viertel}. Wenn wir das ausräumen, ist hier Ruhe. Ich komme mit. Also in Gedanken.“"
+    },
+    {
+     "kind": "boss",
+     "text": "„Jetzt der Große. Der Boss im {viertel}. Danach kann ich meinen Dienst quittieren.“"
+    }
+   ]
+  },
+  {
+   "id": "kater_moritz",
+   "name": "Wo ist Kater Moritz?",
+   "steps": [
+    {
+     "kind": "finden",
+     "item": "Katzenhalsband mit Glöckchen",
+     "text": "„Mein Kater ist weg. Ich habe sein Halsband klingeln hören, im {viertel}. Bring es mir, dann weiß ich, dass er lebt.“"
+    },
+    {
+     "kind": "retten",
+     "text": "„Das Halsband ist abgerissen. {person} hat ihn zuletzt gesehen, im {viertel}. Frag nach – falls {person} noch fragen kann.“"
+    },
+    {
+     "kind": "liefern",
+     "want": {
+      "ids": [
+       "leckerli",
+       "dosenbrot",
+       "mettbroetchen"
+      ],
+      "label": "Katzenfutter",
+      "n": 2
+     },
+     "text": "„{person} sagt, Moritz frisst jetzt bei den Monstern. Mit Futter locke ich ihn zurück. Zwei Portionen, bitte.“"
+    }
+   ]
+  },
+  {
+   "id": "der_tresor",
+   "name": "Der Tresor",
+   "steps": [
+    {
+     "kind": "finden",
+     "item": "Zettel mit Zahlenkombination",
+     "text": "„Ich war Buchhalter. Ich habe mir die Kombination aufgeschrieben und den Zettel im {viertel} verloren. Typisch.“"
+    },
+    {
+     "kind": "schatz",
+     "text": "„Die Kombination passt zu einer Schatzkammer im {viertel}. Ein Vorhängeschloss ist auch dran. Mach sie auf. Wir teilen.“"
+    },
+    {
+     "kind": "jagd",
+     "count": 5,
+     "text": "„Jetzt wissen alle von dem Schatz. Und die {was} wollen ihn auch. {n} davon müssen weg.“"
+    }
+   ]
+  },
+  {
+   "id": "kraeuterfrau",
+   "name": "Die Kräuterfrau",
+   "steps": [
+    {
+     "kind": "liefern",
+     "want": {
+      "ids": [
+       "lappen"
+      ],
+      "label": "Lappen",
+      "n": 3
+     },
+     "text": "„Ich mache Salben. Aus Pilzen, Moos und Dingen, die du nicht wissen willst. Zuerst brauche ich drei Lappen.“"
+    },
+    {
+     "kind": "liefern",
+     "want": {
+      "ids": [
+       "gegengift",
+       "rattengift"
+      ],
+      "label": "Gift oder Gegengift",
+      "n": 1
+     },
+     "text": "„Für die nächste Mischung brauche ich Gift. Oder Gegengift. Der Unterschied ist kleiner, als man denkt.“"
+    },
+    {
+     "kind": "nest",
+     "text": "„Die beste Zutat wächst in einem Nest im {viertel}. Leider wohnt dort jemand. Räum es aus, dann mache ich dir etwas Schönes.“"
+    }
+   ]
+  },
+  {
+   "id": "onkel_bert",
+   "name": "Rache für Onkel Bert",
+   "steps": [
+    {
+     "kind": "jagd",
+     "count": 3,
+     "text": "„{was} haben Onkel Bert erwischt. Er war ein schrecklicher Mensch, aber er war mein schrecklicher Mensch. {n} von denen, für den Anfang.“"
+    },
+    {
+     "kind": "jagd",
+     "count": 6,
+     "text": "„Das waren nicht alle. Ich habe gezählt. Noch {n} {was}.“"
+    },
+    {
+     "kind": "boss",
+     "text": "„Und jetzt der, der sie geschickt hat. Der Boss im {viertel}. Für Onkel Bert. Und für seinen Rasenmäher.“"
+    }
+   ]
+  }
+ ],
+ "CHAIN_CHANCE": 0.35
 }

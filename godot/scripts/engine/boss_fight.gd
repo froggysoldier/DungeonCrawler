@@ -95,9 +95,8 @@ static func _check_phase(s: Dictionary, m: Dictionary) -> void:
 		line = line % Identify.name_of_cap(s, m)
 	Log.add(s, line, "gefahr")
 	Fx.float_text(s, m.pos, "Phase %d" % (want + 1), "#ff7a4a")
-	# Rufer holen in jeder neuen Phase sofort Verstärkung
-	if Abilities.has(m, "rufer"):
-		m.summoned = 0
+	# Rufer holen in jeder neuen Phase sofort einen Diener (zählt zu ihren Rufen)
+	if Abilities.has(m, "rufer") and J.num(m, "summoned") < 3:
 		Abilities._summon(s, m)
 	Events.emit(s, {"type": "bossPhase", "phase": want + 1, "source": m.name})
 
@@ -122,10 +121,11 @@ static func target_tiles(s: Dictionary, m: Dictionary, sp: Dictionary) -> Array:
 					if maxi(absi(dx), absi(dy)) == r:
 						out.append(J.pos(m.pos.x + dx, m.pos.y + dy))
 		"flaeche":
-			# Rund um den Crawler
-			for dy in range(-r, r + 1):
-				for dx in range(-r, r + 1):
-					out.append(J.pos(p.x + dx, p.y + dy))
+			# Kreuz um den Crawler: ein Schritt schräg heraus rettet
+			out.append(J.pcopy(p))
+			for d in MapGen.DIRS4:
+				for k in range(1, r + 1):
+					out.append(J.pos(p.x + d[0] * k, p.y + d[1] * k))
 		"hagel":
 			# Das Feld des Crawlers und ein paar zufällige daneben
 			out.append(J.pcopy(p))

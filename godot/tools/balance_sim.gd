@@ -101,7 +101,7 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 			if Classes.use_ability(s, {"part": "tritt", "move": "normal"}).ok:
 				continue
 		# Heilen
-		if p.hp < Player.max_hp(s) * 0.35:
+		if p.hp < Player.max_hp(s) * 0.45:
 			var pot = J.find(p.inventory, func(i):
 				var e = i.get("effekt")
 				return i.kind == "verbrauch" and e != null and (e.get("heal") or e.get("healPct")))
@@ -127,6 +127,10 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 			continue
 		if J.some(s.items, func(e): return e.pos.x == p.pos.x and e.pos.y == p.pos.y and e.item.kind != "wurf"):
 			Game.pickup(s)
+			# Neue Ausrüstung sofort anlegen, wenn der Platz frei ist
+			for it in p.inventory.duplicate():
+				if it.kind == "ausruestung" and p.equipment.get(it.get("slot", "")) == null:
+					Game.equip(s, it.uid)
 		if phase == "guild":
 			if s.unlocks.has("inventar"):
 				phase = "clear"
@@ -139,7 +143,7 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 			# Normale Mobs in der Nähe jagen, bis Level 4, dann Bosse
 			var targets: Array = s.monsters.filter(func(m):
 				var rank_ok: bool = (m.rank == "normal" or m.rank == "elite") if p.level < 5 else m.rank == "nachbarschaftsboss"
-				return rank_ok and m.level <= p.level + 3)
+				return rank_ok and m.level <= p.level + (1 if m.rank != "nachbarschaftsboss" else 4))
 			J.sort(targets, func(a, b): return J.cheb(a.pos, p.pos) - J.cheb(b.pos, p.pos))
 			if targets.is_empty() or s.turn - s.floorStartTurn > 1700:
 				phase = "stairs"

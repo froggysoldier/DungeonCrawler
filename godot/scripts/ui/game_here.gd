@@ -178,7 +178,7 @@ static func _safe_room(gv: GameView, v: VBoxContainer, room: Dictionary) -> void
 
 static func _shop(gv: GameView, v: VBoxContainer, room: Dictionary, shop: Dictionary) -> void:
 	var s := gv.s
-	_subhead(v, "Laden" if room.kind == "safe" else "Wanderhändler")
+	_subhead(v, "Laden" if room.kind == "safe" else String(shop.get("title", "Wanderhändler")))
 	Kit.text(v, Kit.esc(shop.keeper) + (" – wirkt verstimmt" if shop.mood < 70 else ""), 12, "muted")
 	var offers: Array = shop.offers
 	for i in offers.size():

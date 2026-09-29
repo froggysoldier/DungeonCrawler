@@ -95,6 +95,90 @@
    "rarity": "ungewoehnlich",
    "description": "Neutralisiert Gift in deinem Körper.",
    "flavor": "Schmeckt nach Minze. Magische Minze."
+  },
+  {
+   "id": "frostnadel",
+   "name": "Frostnadel",
+   "cost": 3,
+   "cooldown": 4,
+   "target": "gegner",
+   "range": 6,
+   "rarity": "ungewoehnlich",
+   "description": "Eine Nadel aus Eis: Schaden und das Ziel wird für 4 Züge langsamer.",
+   "flavor": "Kalt, spitz und gemein. Wie der Hausmeister im Winter."
+  },
+  {
+   "id": "blitzkette",
+   "name": "Kettenblitz",
+   "cost": 6,
+   "cooldown": 10,
+   "target": "gegner",
+   "range": 6,
+   "rarity": "selten",
+   "description": "Ein Blitz trifft das Ziel und springt auf bis zu zwei weitere Gegner in der Nähe über (volle, 70 %, 50 % Schaden).",
+   "flavor": "Die Elektrik hier unten war nie auf Norm. Jetzt bist du die Elektrik."
+  },
+  {
+   "id": "donnerschlag",
+   "name": "Donnerschlag",
+   "cost": 5,
+   "cooldown": 12,
+   "target": "selbst",
+   "rarity": "selten",
+   "description": "Ein Knall um dich herum: Schaden an allen angrenzenden Gegnern, die einen Zug lang benommen sind.",
+   "flavor": "Du klatschst in die Hände. Die Wände zittern. Die Nachbarn beschweren sich nicht mehr."
+  },
+  {
+   "id": "blenden",
+   "name": "Grelles Licht",
+   "cost": 2,
+   "cooldown": 6,
+   "target": "gegner",
+   "range": 5,
+   "rarity": "gewoehnlich",
+   "description": "Ein Lichtblitz direkt ins Gesicht: Das Ziel ist einige Züge lang geblendet.",
+   "flavor": "Wie ein Fotograf auf einer Hochzeit. Nur mit Absicht."
+  },
+  {
+   "id": "schreck",
+   "name": "Schreckgestalt",
+   "cost": 3,
+   "cooldown": 15,
+   "target": "selbst",
+   "rarity": "ungewoehnlich",
+   "description": "Du wirst für einen Moment riesig und furchtbar: Gegner im Umkreis von 3 Feldern fliehen (Bosse nicht).",
+   "flavor": "Innen bist du immer noch du. Außen bist du ein Albtraum mit Bademantel."
+  },
+  {
+   "id": "regeneration",
+   "name": "Regeneration",
+   "cost": 3,
+   "cooldown": 25,
+   "target": "selbst",
+   "rarity": "ungewoehnlich",
+   "description": "Deine Wunden schließen sich von selbst: +1 HP-Regeneration (+1 alle 5 Stufen) für 40 Züge.",
+   "flavor": "Es kribbelt. Es juckt. Es heilt. Nicht kratzen."
+  },
+  {
+   "id": "steinhaut",
+   "name": "Steinhaut",
+   "cost": 4,
+   "cooldown": 30,
+   "target": "selbst",
+   "rarity": "selten",
+   "description": "Deine Haut wird grau und hart: +3 Rüstung (+1 alle 4 Stufen) für 40 Züge.",
+   "flavor": "Du fühlst dich wie eine Gartenmauer. Das ist diesmal ein Kompliment."
+  },
+  {
+   "id": "saeurespritzer",
+   "name": "Säurespritzer",
+   "cost": 4,
+   "cooldown": 6,
+   "target": "gegner",
+   "range": 5,
+   "rarity": "ungewoehnlich",
+   "description": "Ätzende Säure: Schaden und das Ziel verliert dauerhaft 2 Rüstung.",
+   "flavor": "Riecht nach Rohrreiniger. Wirkt auch so."
   }
  ],
  "SPELL_MAX_LEVEL": 15

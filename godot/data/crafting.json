@@ -200,6 +200,277 @@
      "label": "Panzertape"
     }
    ]
+  },
+  {
+   "id": "heiltrank_mischen",
+   "name": "Heiltränke zusammenkippen",
+   "workbench": false,
+   "description": "Zwei kleine Heiltränke in eine Flasche. Wird ein normaler Heiltrank. Frag nicht, wie das mit dem Volumen funktioniert.",
+   "ingredients": [
+    {
+     "ids": [
+      "kleiner_heiltrank"
+     ],
+     "n": 2,
+     "label": "Kleine Heiltränke"
+    }
+   ],
+   "result": {
+    "id": "heiltrank",
+    "n": 1
+   }
+  },
+  {
+   "id": "grosser_heiltrank",
+   "name": "Großer Heiltrank",
+   "workbench": true,
+   "description": "Zwei Heiltränke, eingekocht mit Traubenzucker. Heilt richtig viel.",
+   "ingredients": [
+    {
+     "ids": [
+      "heiltrank"
+     ],
+     "n": 2,
+     "label": "Heiltränke"
+    },
+    {
+     "ids": [
+      "traubenzucker"
+     ],
+     "n": 1,
+     "label": "Traubenzucker"
+    }
+   ],
+   "result": {
+    "id": "grosser_heiltrank",
+    "n": 1
+   }
+  },
+  {
+   "id": "manatoast",
+   "name": "Manatoast",
+   "workbench": false,
+   "description": "Dosenbrot, getränkt in Manatrank. Ergibt zwei Scheiben. Schmeckt blau.",
+   "ingredients": [
+    {
+     "ids": [
+      "dosenbrot"
+     ],
+     "n": 1,
+     "label": "Dosenbrot"
+    },
+    {
+     "ids": [
+      "kleiner_manatrank"
+     ],
+     "n": 1,
+     "label": "Kleiner Manatrank"
+    }
+   ],
+   "result": {
+    "id": "manatoast",
+    "n": 2
+   }
+  },
+  {
+   "id": "ausdauermix",
+   "name": "Ausdauertrank mixen",
+   "workbench": false,
+   "description": "Energydrink plus Traubenzucker, kräftig geschüttelt. Das Herz dankt es dir nicht, die Beine schon.",
+   "ingredients": [
+    {
+     "ids": [
+      "energydrink"
+     ],
+     "n": 1,
+     "label": "Energydrink"
+    },
+    {
+     "ids": [
+      "traubenzucker"
+     ],
+     "n": 1,
+     "label": "Traubenzucker"
+    }
+   ],
+   "result": {
+    "id": "ausdauertrank",
+    "n": 1
+   }
+  },
+  {
+   "id": "wurfsterne",
+   "name": "Wurfsterne feilen",
+   "workbench": true,
+   "description": "Schraubenmuttern flach klopfen, Kanten schärfen, Klebeband als Griff. Zwei Wurfsterne.",
+   "ingredients": [
+    {
+     "ids": [
+      "schraubenmutter"
+     ],
+     "n": 3,
+     "label": "Schraubenmuttern"
+    },
+    {
+     "ids": [
+      "klebeband"
+     ],
+     "n": 1,
+     "label": "Panzertape"
+    }
+   ],
+   "result": {
+    "id": "wurfstern",
+    "n": 2
+   }
+  },
+  {
+   "id": "staubbombe",
+   "name": "Staubbombe",
+   "workbench": false,
+   "description": "Kreide zerbröseln, in einen Lappen knoten. Blendet beim Aufprall alles in einem Feld Umkreis.",
+   "ingredients": [
+    {
+     "ids": [
+      "kreide"
+     ],
+     "n": 1,
+     "label": "Tafelkreide"
+    },
+    {
+     "ids": [
+      "lappen"
+     ],
+     "n": 1,
+     "label": "Lappen"
+    }
+   ],
+   "result": {
+    "id": "staubbeutel",
+    "n": 1
+   }
+  },
+  {
+   "id": "fallenteile",
+   "name": "Fallenteile basteln",
+   "workbench": true,
+   "description": "Federn aus Kugelschreibern, Muttern, Nägel, viel Klebeband: ein Satz Fallenteile.",
+   "ingredients": [
+    {
+     "ids": [
+      "schraubenmutter"
+     ],
+     "n": 2,
+     "label": "Schraubenmuttern"
+    },
+    {
+     "ids": [
+      "naegel"
+     ],
+     "n": 1,
+     "label": "Nägel"
+    },
+    {
+     "ids": [
+      "klebeband"
+     ],
+     "n": 1,
+     "label": "Panzertape"
+    }
+   ],
+   "result": {
+    "id": "fallenteile",
+    "n": 1
+   }
+  },
+  {
+   "id": "schwarzpulver",
+   "name": "Schwarzpulver anrühren",
+   "workbench": true,
+   "explosive": true,
+   "description": "Kreidestaub, Hochprozentiges und eine Menge Mut. Ergibt eine Portion Schwarzpulver. Nicht in der Nähe von Fackeln rühren.",
+   "ingredients": [
+    {
+     "ids": [
+      "kreide"
+     ],
+     "n": 2,
+     "label": "Tafelkreide"
+    },
+    {
+     "ids": [
+      "hochprozentiges"
+     ],
+     "n": 1,
+     "label": "Hochprozentiges"
+    }
+   ],
+   "result": {
+    "id": "schwarzpulver",
+    "n": 1
+   }
+  },
+  {
+   "id": "polsterung",
+   "name": "Kleidung polstern",
+   "workbench": false,
+   "description": "Lappen und Panzertape unter das Oberteil stopfen: +1 Rüstung am Brustteil. Bis zu zweimal.",
+   "upgradeArmor": {
+    "slot": "brust",
+    "bonuses": {
+     "ruestung": 1
+    },
+    "max": 2,
+    "suffix": "gepolstert",
+    "text": "Du stopfst Lappen unter %s und klebst alles fest. Sieht furchtbar aus, hält aber was aus."
+   },
+   "ingredients": [
+    {
+     "ids": [
+      "lappen"
+     ],
+     "n": 2,
+     "label": "Lappen"
+    },
+    {
+     "ids": [
+      "klebeband"
+     ],
+     "n": 1,
+     "label": "Panzertape"
+    }
+   ]
+  },
+  {
+   "id": "stahlkappen",
+   "name": "Stahlkappen",
+   "workbench": true,
+   "description": "Schraubenmuttern und Blech vorne in die Schuhe: +1 Rüstung und festere Tritte. Bis zu zweimal.",
+   "upgradeArmor": {
+    "slot": "fuesse",
+    "bonuses": {
+     "ruestung": 1
+    },
+    "max": 2,
+    "suffix": "mit Stahlkappen",
+    "text": "Du klopfst Blech und Muttern vorne in %s. Jeder Schritt klingt jetzt nach Baustelle."
+   },
+   "ingredients": [
+    {
+     "ids": [
+      "schraubenmutter"
+     ],
+     "n": 2,
+     "label": "Schraubenmuttern"
+    },
+    {
+     "ids": [
+      "klebeband"
+     ],
+     "n": 1,
+     "label": "Panzertape"
+    }
+   ]
   }
  ]
 }

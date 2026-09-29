@@ -318,6 +318,11 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
 - Heilen, Magisches Geschoss (Mana frei wählbar 3–6), Fackel, Irrlichtrüstung
   (Schild), Pfützensprung (Teleport), Feuerball, Schutzhülle, Schattenmantel,
   Entgiften.
+- Dazu 17 Zauber insgesamt: Frostnadel (verlangsamt), Kettenblitz (springt auf
+  bis zu zwei weitere Gegner über), Donnerschlag (Schaden ringsum, benommen),
+  Grelles Licht (blendet), Schreckgestalt (Furcht im Umkreis, nicht bei
+  Bossen), Regeneration, Steinhaut (+Rüstung) und Säurespritzer (zersetzt
+  dauerhaft 2 Rüstung).
 
 ### 3.15 Tränke und Blase
 - **Trank-Abklingzeit:** nach jedem Trank 20 Züge Pause.
@@ -339,7 +344,11 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
 - **Entschärfen:** direkt daneben, Chance mit Geschick und Fallenkunde.
   Erfolg bringt Fallenteile, Misserfolg löst die Falle manchmal aus.
 - **Handwerk** (eigener Tab): Verband, Brandflasche, Nagelbombe, Stachelfalle,
-  Schlingfalle, Sprengfalle, Waffe benageln (+2 Schaden, bis zu dreimal).
+  Schlingfalle, Sprengfalle, Waffe benageln (+2 Schaden, bis zu dreimal),
+  Heiltränke zusammenkippen, Großer Heiltrank, Manatoast, Ausdauertrank,
+  Wurfsterne, Staubbombe, Fallenteile, Schwarzpulver sowie **Kleidung
+  polstern** und **Stahlkappen** (+1 Rüstung am Brust- bzw. Fußteil, je bis
+  zu zweimal).
   Aufwendige Rezepte brauchen eine Werkbank (Werkstätten, Schmieden, Safe
   Rooms oder Klappwerkbank im Rucksack).
 - **Sprengsätze** treffen alles im Umkreis von einem Feld, auch dich.
@@ -373,10 +382,12 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
   Fan-Box.
 
 ### 3.20 Sponsoren
-- Sechs erfundene Sponsoren (Kristallhaus Vornex, Brennstoffwerke Pyrrax,
+- Elf erfundene Sponsoren (Kristallhaus Vornex, Brennstoffwerke Pyrrax,
   Gräfin Oolu vom Nebelmond, Konsortium Grimmzahn, Die Schleimbrüder GmbH,
-  Galaktische Mode AG) mit eigenem Geschmack: Stil, Explosionen, Haustiere,
-  Mut, schmutzige Tricks, absurde Mode.
+  Galaktische Mode AG, Orbitalakademie Arkanum, Tiefgrabe & Söhne, Ballsaal
+  Zirr, Kirche des Siebten Mondes, Sternfracht Logistik) mit eigenem
+  Geschmack: Stil, Explosionen, Haustiere, Mut, schmutzige Tricks, absurde
+  Mode, Zauberei, Schatzsuche, Ausweichen, Gebete und gute Taten, Aufträge.
 - Passende Aktionen wecken Interesse (mehr Hype = schneller). Ab 100 Interesse
   und genug Followern kommt ein Angebot; bis zu drei Sponsoren gleichzeitig.
 - Aktive Sponsoren haben Wünsche; jeder erfüllte Wunsch bringt eine
@@ -387,10 +398,21 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
 - Andere Crawler (manchmal beim ersten Gespräch) und jeder Laden bieten
   Aufträge an: **Jagd** (Gegner einer Art), **Finden** (verlorenes Andenken
   in einem anderen Viertel), **Liefern** (Tränke, Essen, Lappen …),
-  **Retten** (eingeschlossener Crawler, von Monstern bewacht) und **Boss**.
+  **Retten** (eingeschlossener Crawler, von Monstern bewacht), **Boss**,
+  **Nest ausräumen** und **Schatzkammer öffnen**.
+- **Auftragsketten:** Manche Crawler erzählen eine kleine Geschichte in drei
+  Teilen (sechs Ketten, etwa „Die letzte Probe“ oder „Der Tresor“). Jeder
+  Teil zahlt mehr, der letzte immer mit Box und einem seltenen Gegenstand.
 - Belohnung: Gold, XP, oft eine Lootbox; Ladenbesitzer geben danach 15 %
   Freundschaftsrabatt. Aufträge scheitern, wenn der Auftraggeber stirbt oder
   die Etage verlassen wird. Bis zu fünf offene Aufträge.
+
+- **Wanderhändler** (Sonderraum) haben ein eigenes Sortiment: Waffenhändler,
+  Wanderapotheke (mit Zauberbüchern), Schrotthändler (Handwerksmaterial,
+  Klappwerkbank) oder Kuriositätenhändler (Tattoos, Talismane, Eier). Sie
+  sind etwas teurer als die Läden in den Safe Rooms.
+- Neue Achievement-Familien: Kisten, Geheimtüren, Schlösser, Schatzkammern,
+  Nester, Gebete, Hinterhalte, Boss-Angriffen ausweichen, Auftragsketten.
 
 ### 3.22 Reittiere und Fahrzeuge
 - Motorisierter Einkaufswagen, Aufsitzrasenmäher, Raketen-Bobbycar (Fahrzeuge,
@@ -462,8 +484,15 @@ Bosse kämpfen in drei Phasen (`scripts/engine/boss_fight.gd`):
 - **Formen:** Stampfen (rund um den Boss), Schockwelle (Ring in zwei Feldern
   Abstand), Ansturm (gerade Bahn, der Boss rennt mit), Trümmerhagel (Feld
   des Crawlers und zufällige daneben), Flammenteppich, Giftwolke,
-  Staubwolke (Fläche um den Crawler, mit Brand, Gift oder Blindheit),
-  Markerschütternder Schrei (Furcht im Umkreis).
+  Staubwolke (Kreuz um den Crawler, mit Brand, Gift oder Blindheit),
+  Markerschütternder Schrei (Furcht direkt um den Boss). Jeder Angriff lässt
+  sich mit einem passenden Schritt verlassen.
+- **Balance (Duell-Simulation, typische Ausrüstung, zwei Heiltränke):**
+  Nachbarschaftsbosse auf Etage 1 gewinnt ein Crawler der Stufe 5 zu 45 bis
+  100 %, auf Etage 3 mit Stufe 11 zu 35 bis 90 %. Die Endbosse der Etagen
+  (Kesselkönigin, Hausverwalter, Rattenkaiser) sind allein kaum zu schaffen
+  und brauchen Zauber, Haustier oder Party. Boss-Regeneration 1,5 % pro Zug,
+  Diener fünf Stufen unter dem Boss, höchstens drei Rufe.
 - Welche Angriffe ein Boss kann und seine Phasensätze stehen in
   `data/monsters.json` (`BOSS_SPECIALS`, `HOOD_BOSSES[].specials`,
   `phaseLines`).

@@ -2,7 +2,7 @@ class_name Quests
 extends RefCounted
 ## Aufträge.
 
-const REWARD_BASE := {"jagd": 25, "finden": 30, "liefern": 20, "retten": 45, "boss": 80}
+const REWARD_BASE := {"jagd": 25, "finden": 30, "liefern": 20, "retten": 45, "boss": 80, "nest": 40, "schatz": 35}
 
 
 static func quests(s: Dictionary) -> Array:
@@ -61,16 +61,51 @@ static func _hunt_facets(s: Dictionary) -> Array:
 	return tags
 
 
-## Erzeugt ein Auftragsangebot für einen Crawler oder einen Laden.
+## Erzeugt ein Auftragsangebot für einen Crawler oder einen Laden. Crawler
+## beginnen manchmal eine Auftragskette (mehrere Teile, steigende Belohnung).
 static func offer_quest(s: Dictionary, giver: Dictionary) -> Variant:
-	var kinds := ["jagd", "boss", "liefern"] if giver.kind == "laden" else ["jagd", "finden", "liefern", "retten", "finden"]
-	var boss_hoods: Array = s.map.hoods.filter(func(h): return h.bossAlive)
-	var kind: String = R.pick(s, kinds.filter(func(k): return k != "boss" or not boss_hoods.is_empty()))
+	if giver.kind == "crawler" and R.chance(s, float(Db.t("quests", "CHAIN_CHANCE"))):
+		var chains: Array = Db.t("quests", "QUEST_CHAINS").filter(func(c): return not J.arr(s, "chainsDone").has(c.id) and _feasible(s, c.steps[0].kind))
+		if not chains.is_empty():
+			var chain: Dictionary = R.pick(s, chains)
+			var q = _make(s, giver, chain.steps[0].kind, {"id": chain.id, "name": chain.name, "step": 0, "total": chain.steps.size()})
+			if q != null:
+				return q
+	var kinds := ["jagd", "boss", "liefern", "nest"] if giver.kind == "laden" else ["jagd", "finden", "liefern", "retten", "finden", "nest", "schatz"]
+	var kind: String = R.pick(s, kinds.filter(func(k): return _feasible(s, k)))
+	return _make(s, giver, kind, null)
+
+
+## Lässt sich eine Auftragsart auf dieser Etage gerade stellen?
+static func _feasible(s: Dictionary, kind: String) -> bool:
+	match kind:
+		"boss":
+			return J.some(s.map.hoods, func(h): return h.bossAlive)
+		"nest":
+			return _nest_room(s) != null
+		"schatz":
+			return _treasure_room(s) != null
+	return true
+
+
+static func _nest_room(s: Dictionary) -> Variant:
+	return J.find(s.map.rooms, func(r): return r.get("feature") == "nest" and J.some(J.arr(r, "furniture"), func(f): return f.kind == "nest"))
+
+
+static func _treasure_room(s: Dictionary) -> Variant:
+	return J.find(s.map.rooms, func(r): return r.get("feature") == "schatz" and not r.get("visited"))
+
+
+static func _hood_name(s: Dictionary, hood: int) -> String:
+	var h = s.map.hoods[hood] if hood >= 0 and hood < s.map.hoods.size() else null
+	return h.name if h != null else "Nachbarviertel"
+
+
+## Baut einen Auftrag. chain (oder null): {id, name, step, total, person?}.
+static func _make(s: Dictionary, giver: Dictionary, kind: String, chain: Variant) -> Variant:
+	var step = Db.t("quests", "QUEST_CHAINS").filter(func(c): return c.id == chain.id)[0].steps[chain.step] if chain != null else {}
 	var room = _far_room(s)
-	var hood_name := "Nachbarviertel"
-	if room != null:
-		var hood = s.map.hoods[room.hood] if room.hood >= 0 and room.hood < s.map.hoods.size() else null
-		hood_name = hood.name if hood != null else "Nachbarviertel"
+	var hood_name := _hood_name(s, room.hood) if room != null else "Nachbarviertel"
 	var q := {
 		"id": _uid(s, "q"), "kind": kind, "floor": s.floor, "giver": giver, "title": "", "text": "", "status": "angebot", "count": 1, "progress": 0, "reward": _reward(s, kind),
 	}
@@ -81,37 +116,61 @@ static func offer_quest(s: Dictionary, giver: Dictionary) -> Variant:
 				return null
 			var tag: String = R.pick(s, tags)
 			q.facet = "z:%s" % tag
-			q.count = R.int_(s, 3, 6)
+			q.count = int(step.count) if step.has("count") else R.int_(s, 3, 6)
 			var label: String = Db.t("facets", "TARGET_FACETS")[tag].label
 			q.title = "Jagd: %d %s" % [q.count, label]
-			q.text = J.replace1(J.replace1(R.pick(s, Db.t("quests", "HUNT_TEXTS")), "{n}", str(q.count)), "{was}", label)
+			q.text = (step.text if step.has("text") else R.pick(s, Db.t("quests", "HUNT_TEXTS"))).replace("{n}", str(q.count)).replace("{was}", label)
 		"finden":
 			if room == null:
 				return null
-			var f: Dictionary = R.pick(s, Db.t("quests", "FETCH_ITEMS"))
+			var f: Dictionary = {"name": step.item, "text": step.text} if step.has("item") else R.pick(s, Db.t("quests", "FETCH_ITEMS"))
 			q.hood = room.hood
 			q.title = "Finden: %s" % f.name
 			q.text = J.replace1(f.text, "{viertel}", hood_name)
 			q.itemIds = [f.name]
 		"liefern":
-			var w: Dictionary = R.pick(s, Db.t("quests", "DELIVER_WANTS"))
+			var w: Dictionary = step.want if step.has("want") else R.pick(s, Db.t("quests", "DELIVER_WANTS"))
 			q.itemIds = w.ids.duplicate()
 			q.count = w.n
 			q.title = "Liefern: %sx %s" % [J.s(w.n), w.label]
-			q.text = w.text
+			q.text = step.text if step.has("text") else w.text
 		"retten":
 			if room == null:
 				return null
 			q.hood = room.hood
 			var person := Crawlers.make_crawler(s, J.pos(0, 0), "verzweifelt")
 			q.title = "Retten: %s" % person.name
-			q.text = J.replace1(J.replace1(R.pick(s, Db.t("quests", "RESCUE_TEXTS")), "{person}", person.name), "{viertel}", hood_name)
+			q.text = (step.text if step.has("text") else R.pick(s, Db.t("quests", "RESCUE_TEXTS"))).replace("{person}", person.name).replace("{viertel}", hood_name)
 			q.itemIds = [person.name]
+			if chain != null:
+				chain.person = person.name
 		"boss":
-			var h: Dictionary = R.pick(s, boss_hoods)
+			var alive: Array = s.map.hoods.filter(func(h): return h.bossAlive)
+			if alive.is_empty():
+				return null
+			var h: Dictionary = R.pick(s, alive)
 			q.hood = h.id
 			q.title = "Boss: %s" % h.name
-			q.text = J.replace1(R.pick(s, Db.t("quests", "BOSS_TEXTS")), "{viertel}", h.name)
+			q.text = J.replace1(step.text if step.has("text") else R.pick(s, Db.t("quests", "BOSS_TEXTS")), "{viertel}", h.name)
+		"nest", "schatz":
+			var target = _nest_room(s) if kind == "nest" else _treasure_room(s)
+			if target == null:
+				return null
+			q.hood = target.hood
+			q.roomId = target.id
+			var name := _hood_name(s, target.hood)
+			q.title = ("Nest ausräumen: %s" if kind == "nest" else "Schatzkammer öffnen: %s") % name
+			q.text = J.replace1(step.text if step.has("text") else R.pick(s, Db.t("quests", "NEST_TEXTS" if kind == "nest" else "SCHATZ_TEXTS")), "{viertel}", name)
+	if chain != null:
+		q.chain = chain
+		q.title = "%s (%d/%d): %s" % [chain.name, chain.step + 1, chain.total, q.title]
+		if chain.get("person") != null:
+			q.text = q.text.replace("{person}", chain.person)
+		# Spätere Teile einer Kette zahlen mehr
+		q.reward.gold = J.rnd(q.reward.gold * (1 + 0.4 * chain.step))
+		q.reward.xp = J.rnd(q.reward.xp * (1 + 0.4 * chain.step))
+		if chain.step == chain.total - 1:
+			q.reward.box = true
 	quests(s).append(q)
 	return q
 
@@ -189,6 +248,10 @@ static func hint(s: Dictionary, q: Dictionary) -> String:
 			return "Such im %s und sprich die Person an." % hood
 		"boss":
 			return "Besiege den Boss im %s." % hood
+		"nest":
+			return "Räum das Monsternest im %s aus." % hood
+		"schatz":
+			return "Finde die Schatzkammer im %s und öffne sie (Schlüssel oder Schloss knacken)." % hood
 	return ""
 
 
@@ -243,6 +306,34 @@ static func _complete(s: Dictionary, q: Dictionary, thanks: String = "") -> void
 		if giver != null:
 			giver.trust = mini(100, giver.trust + 40)
 	Events.emit(s, {"type": "questDone", "kind": q.kind, "done": quests(s).filter(func(x): return x.status == "erledigt").size()})
+	_continue_chain(s, q)
+
+
+## Nach einem Kettenteil: nächsten Teil anbieten oder die Kette abschließen.
+static func _continue_chain(s: Dictionary, q: Dictionary) -> void:
+	var chain = q.get("chain")
+	if chain == null:
+		return
+	if chain.step + 1 >= chain.total:
+		if s.get("chainsDone") == null:
+			s.chainsDone = []
+		s.chainsDone.append(chain.id)
+		var prize := Items.generate_equipment(s, "selten" if s.floor < 3 else "episch")
+		Inventory.give_item(s, prize)
+		Log.add(s, "%s: „Das war alles. Ohne dich hätte ich das nie geschafft. Hier, das gehört jetzt dir.“ Du erhältst %s." % [q.giver.name, Identify.item_name(s, prize)], "loot")
+		Events.emit(s, {"type": "chainDone", "chain": chain.id})
+		return
+	if q.giver.kind == "crawler" and not J.some(Crawlers.crawlers(s), func(c): return c.uid == q.giver.ref and c.alive):
+		return
+	var next_chain: Dictionary = chain.duplicate()
+	next_chain.step += 1
+	var kind: String = Db.t("quests", "QUEST_CHAINS").filter(func(c): return c.id == chain.id)[0].steps[next_chain.step].kind
+	if not _feasible(s, kind):
+		Log.add(s, "%s wollte noch etwas von dir, aber das hat sich erledigt." % q.giver.name, "dialog")
+		return
+	var nq = _make(s, q.giver, kind, next_chain)
+	if nq != null:
+		Log.add(s, "%s hat noch etwas für dich (Teil %d von %d): %s" % [q.giver.name, next_chain.step + 1, next_chain.total, nq.text], "dialog")
 
 
 static func _fail(s: Dictionary, q: Dictionary, why: String) -> void:
@@ -280,7 +371,15 @@ static func turn_in(s: Dictionary, id: String) -> Dictionary:
 
 
 static func on_event(s: Dictionary, e: Dictionary) -> void:
-	if e.type != "kill" or J.arr(s, "quests").is_empty():
+	if J.arr(s, "quests").is_empty():
+		return
+	if e.type == "nestCleared" or e.type == "treasureFound":
+		var want := "nest" if e.type == "nestCleared" else "schatz"
+		for q in active_quests(s):
+			if q.kind == want and int(J.nn(q, "roomId", -1)) == int(e.room):
+				_complete(s, q, "%s hört davon und ist beeindruckt. Die Belohnung kommt per Transportlicht." % q.giver.name)
+		return
+	if e.type != "kill":
 		return
 	for q in active_quests(s):
 		if q.kind == "jagd" and q.get("facet") and Observer.target_facets(s, e.monster).has(q.facet):

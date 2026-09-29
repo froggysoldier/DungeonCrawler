@@ -56,6 +56,11 @@ static func technique_name(t: Dictionary) -> String:
 	return ("%s (%s)" % [base, ZONES[z].name]) if z and z != "koerper" else base
 
 
+## „Dein Tritt“, aber „Deine Faust“ und „Deine Waffe“.
+static func your(t: Dictionary) -> String:
+	return "Deine" if t.part == "faust" or t.part == "waffe" else "Dein"
+
+
 static func is_in_safe_room(s: Dictionary, p: Dictionary) -> bool:
 	var r = MapGen.room_of(s.map, p)
 	return r != null and r.kind == "safe"
@@ -167,7 +172,7 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 	if not is_hit:
 		Fx.float_text(s, target.pos, "daneben", Fx.COLORS.info)
 		s.counters.missStreak += 1
-		Log.add(s, "Dein %s verfehlt %s." % [name, Identify.name_of(s, target)], "kampf")
+		Log.add(s, "%s %s verfehlt %s." % [your(t), name, Identify.name_of(s, target)], "kampf")
 		target.aware = true
 		if thrown != null and thrown.get("special") == "bumerang":
 			_return_thrown(s, thrown)
@@ -225,7 +230,7 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 	target.zonesHit = J.uniq(J.arr(target, "zonesHit") + [zone])
 	s.counters.damageDealt += final
 	var crit_txt := " KRITISCH!" if crit else ""
-	Log.add(s, "%sDein %s trifft %s für %d Schaden.%s" % ["Überraschungsangriff! " if ambush else "", name, Identify.name_of(s, target), final, crit_txt], "kampf")
+	Log.add(s, "%s%s %s trifft %s für %d Schaden.%s" % ["Überraschungsangriff! " if ambush else "", your(t), name, Identify.name_of(s, target), final, crit_txt], "kampf")
 
 	# Kopfstoß tut auch dir weh – außer du bist geübt darin.
 	if t.part == "kopf" and R.chance(s, maxf(0, 0.5 - Player.skill_level(s, "kopfnuss") * 0.1)):

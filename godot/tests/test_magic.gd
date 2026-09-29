@@ -100,3 +100,58 @@ func test_blase_fuellt_sich(t) -> void:
 	for i in 60:
 		Game.wait(s)
 	t.gt(s.player.blase, before + 8, "gefüllt")
+
+
+## Neue Zauber: jeder lässt sich wirken und tut, was er soll.
+func _caster(id: String) -> Array:
+	var s := TH.make(1510, {"beruf": 1})
+	var m := TH.foe(s, "ghul", 2)
+	m.hp = 500
+	m.maxHp = 500
+	m.ruestung = 4
+	Magic.learn_spell(s, id, true)
+	s.player.stats.int = 12
+	s.player.mp = 40
+	return [s, m]
+
+
+func test_neue_zauber(t) -> void:
+	for id in ["frostnadel", "blitzkette", "saeurespritzer", "blenden"]:
+		var sm := _caster(id)
+		var s: Dictionary = sm[0]
+		var m: Dictionary = sm[1]
+		t.ok(Game.cast(s, id, {"targetUid": m.uid}).ok, "%s gewirkt" % id)
+	var fr := _caster("frostnadel")
+	Game.cast(fr[0], "frostnadel", {"targetUid": fr[1].uid})
+	t.lt(fr[1].hp, 500, "Frostnadel trifft")
+	t.gt(int(J.num(fr[1], "slowed")), 0, "verlangsamt")
+	var sa := _caster("saeurespritzer")
+	Game.cast(sa[0], "saeurespritzer", {"targetUid": sa[1].uid})
+	t.eq(sa[1].ruestung, 2, "Rüstung zersetzt")
+	var bk := _caster("blitzkette")
+	var s2: Dictionary = bk[0]
+	var second := Monsters.spawn_monster(s2, Db.monster("ghul"), 2, {"x": bk[1].pos.x + 1, "y": bk[1].pos.y}, 0)
+	if MapGen.is_walkable(s2.map, second.pos.x, second.pos.y):
+		second.hp = 500
+		s2.monsters.append(second)
+		Game.cast(s2, "blitzkette", {"targetUid": bk[1].uid})
+		t.lt(second.hp, 500, "Blitz springt über")
+
+
+func test_selbstzauber(t) -> void:
+	var sm := _caster("donnerschlag")
+	var s: Dictionary = sm[0]
+	var m: Dictionary = sm[1]
+	m.pos = TH.free_neighbor(s, s.player.pos)
+	t.ok(Game.cast(s, "donnerschlag").ok, "Donnerschlag")
+	t.lt(m.hp, 500, "Schaden ringsum")
+	for id in ["regeneration", "steinhaut", "schreck"]:
+		var s3: Dictionary = _caster(id)[0]
+		var armor: float = J.num(Player.total_bonuses(s3), "ruestung")
+		t.ok(Game.cast(s3, id).ok, "%s gewirkt" % id)
+		if id == "steinhaut":
+			t.gt(J.num(Player.total_bonuses(s3), "ruestung"), armor, "mehr Rüstung")
+		if id == "regeneration":
+			t.gt(J.num(Player.total_bonuses(s3), "hpRegen"), 0, "Regeneration")
+	for sp in Db.t("spells", "SPELLS"):
+		t.ok(Magic.TOME_VALUE.has(sp.rarity), "%s: Seltenheit" % sp.id)

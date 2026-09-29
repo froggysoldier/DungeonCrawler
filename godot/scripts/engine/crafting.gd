@@ -53,6 +53,13 @@ static func recipe_status(s: Dictionary, r: Dictionary) -> Dictionary:
 			missing.append("eine ausgerüstete Waffe")
 		elif J.num(w, "upgrades") >= MAX_WEAPON_UPGRADES:
 			missing.append("eine Waffe, die noch nicht voller Nägel steckt")
+	var up = r.get("upgradeArmor")
+	if up != null:
+		var it = s.player.equipment.get(up.slot)
+		if it == null:
+			missing.append("ein angelegtes Teil am Platz %s" % Db.t("items", "SLOT_NAMES").get(up.slot, up.slot))
+		elif J.num(it, "armorUpgrades") >= up.max:
+			missing.append("ein Teil, das noch nicht fertig verstärkt ist")
 	return {"recipe": r, "missing": missing}
 
 
@@ -79,6 +86,16 @@ static func craft(s: Dictionary, recipe_id: String) -> Dictionary:
 		Log.add(s, "Du hämmerst Nägel in %s und wickelst Panzertape drumherum. Waffenschaden jetzt %s." % [Identify.item_name(s, w), J.s(w.waffenSchaden)], "loot")
 		Events.emit(s, {"type": "crafted", "recipe": r.id})
 		return {"ok": true, "item": w}
+	var up = r.get("upgradeArmor")
+	if up != null:
+		var it: Dictionary = s.player.equipment[up.slot]
+		it.armorUpgrades = int(J.num(it, "armorUpgrades")) + 1
+		it.bonuses = Bonuses.add(J.nn(it, "bonuses", {}).duplicate(true), up.bonuses)
+		if it.armorUpgrades == 1:
+			it.name = "%s (%s)" % [it.name, up.suffix]
+		Log.add(s, up.text % Identify.item_name(s, it), "loot")
+		Events.emit(s, {"type": "crafted", "recipe": r.id})
+		return {"ok": true, "item": it}
 	var res: Dictionary = r.result
 	var n: int = res.n
 	if r.get("explosive") and Player.skill_level(s, "handwerk") >= 3 and R.chance(s, 0.1 + Player.skill_level(s, "handwerk") * 0.02):

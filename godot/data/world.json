@@ -622,5 +622,211 @@
    5,
    "Die Decke bröckelt. Das ist kein Scherz. Die Systemstimme scherzt nie. Na gut, oft. Aber jetzt nicht."
   ]
+ ],
+ "WANDER_SHOPS": [
+  {
+   "id": "waffen",
+   "title": "Waffenhändler",
+   "keepers": [
+    "Grott, ein einäugiger Troll mit Lederschürze",
+    "Sabel, eine Halblingsfrau mit sehr vielen Messern"
+   ],
+   "greeting": "„Alles scharf, alles geprüft. Geprüft an wem, willst du nicht wissen.“",
+   "items": [
+    [
+     "wurfstern",
+     3
+    ],
+    [
+     "dartpfeil",
+     6
+    ],
+    [
+     "bowlingkugel",
+     1
+    ],
+    [
+     "nagelbombe",
+     2
+    ],
+    [
+     "brandflasche",
+     2
+    ]
+   ],
+   "pick": 3,
+   "equipment": {
+    "rarities": [
+     "ungewoehnlich",
+     "selten",
+     "selten"
+    ],
+    "slots": [
+     "waffe",
+     "waffe",
+     "haende"
+    ]
+   },
+   "tomeChance": 0
+  },
+  {
+   "id": "apotheke",
+   "title": "Wanderapotheke",
+   "keepers": [
+    "Frau Doktor Mandelkern, eine Pilzfrau im Kittel",
+    "Quirin, ein Kobold mit Kräuterkorb"
+   ],
+   "greeting": "„Tränke, Salben, Pflaster. Nebenwirkungen gibt es gratis dazu.“",
+   "items": [
+    [
+     "kleiner_heiltrank",
+     3
+    ],
+    [
+     "heiltrank",
+     2
+    ],
+    [
+     "grosser_heiltrank",
+     1
+    ],
+    [
+     "gegengift",
+     2
+    ],
+    [
+     "verband",
+     3
+    ],
+    [
+     "kleiner_manatrank",
+     2
+    ],
+    [
+     "ausdauertrank",
+     1
+    ],
+    [
+     "traubenzucker",
+     2
+    ]
+   ],
+   "pick": 6,
+   "equipment": {
+    "rarities": [],
+    "slots": []
+   },
+   "tomeChance": 0.6
+  },
+  {
+   "id": "schrott",
+   "title": "Schrotthändler",
+   "keepers": [
+    "Blech-Bruno, ein Golem aus Ersatzteilen",
+    "Mutter Rost, eine Gnomin mit Schweißerbrille"
+   ],
+   "greeting": "„Was du wegwirfst, verkaufe ich. Was ich verkaufe, wirfst du auf Monster. Kreislaufwirtschaft.“",
+   "items": [
+    [
+     "naegel",
+     4
+    ],
+    [
+     "klebeband",
+     3
+    ],
+    [
+     "schwarzpulver",
+     2
+    ],
+    [
+     "fallenteile",
+     2
+    ],
+    [
+     "lappen",
+     4
+    ],
+    [
+     "klappwerkbank",
+     1
+    ],
+    [
+     "hochprozentiges",
+     2
+    ],
+    [
+     "benzinkanister",
+     2
+    ],
+    [
+     "schraubenmutter",
+     5
+    ]
+   ],
+   "pick": 6,
+   "equipment": {
+    "rarities": [
+     "gewoehnlich"
+    ],
+    "slots": []
+   },
+   "tomeChance": 0
+  },
+  {
+   "id": "kurio",
+   "title": "Kuriositätenhändler",
+   "keepers": [
+    "Der Fremde mit dem Koffer",
+    "Madame Nimmermehr, eine Krähe mit Hut"
+   ],
+   "greeting": "„Seltene Dinge für seltene Leute. Du bist selten, oder? Du lebst ja noch.“",
+   "items": [
+    [
+     "tattoo_kobold",
+     1
+    ],
+    [
+     "tattoo_ratte",
+     1
+    ],
+    [
+     "talisman_flug",
+     1
+    ],
+    [
+     "talisman_insekt",
+     1
+    ],
+    [
+     "ei_raptor",
+     1
+    ],
+    [
+     "rubbellos",
+     3
+    ],
+    [
+     "superkeks",
+     1
+    ],
+    [
+     "pfeife_pony",
+     1
+    ],
+    [
+     "zuendschluessel_bobbycar",
+     1
+    ]
+   ],
+   "pick": 4,
+   "equipment": {
+    "rarities": [
+     "selten"
+    ],
+    "slots": []
+   },
+   "tomeChance": 0.8
+  }
  ]
 }

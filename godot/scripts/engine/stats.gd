@@ -287,6 +287,24 @@ static func on_event(s: Dictionary, e: Dictionary) -> void:
 			track(s, "fallen.aufgestellt")
 		"crafted":
 			track(s, "hergestellt.%s" % e.recipe)
+		"crateSmashed":
+			track(s, "kisten")
+		"secretFound":
+			track(s, "geheimtueren")
+		"lockPicked":
+			track(s, "schloesser")
+		"treasureFound":
+			track(s, "schatzkammern")
+		"nestCleared":
+			track(s, "nester")
+		"prayed":
+			track(s, "gebete")
+		"ambush":
+			track(s, "hinterhalte")
+		"bossDodged":
+			track(s, "boss.ausgewichen")
+		"chainDone":
+			track(s, "ketten")
 		"spellCast":
 			track(s, "zauber.gewirkt")
 			track(s, "zauber.%s" % e.spell)
