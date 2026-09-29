@@ -100,24 +100,163 @@ static func tooltip_for(gv: GameView, t: Variant, detail: bool = false) -> Varia
 
 # ================================================================ Boxen
 
-static func reveal_items(gv: GameView, title: String, items: Array) -> Modals.Job:
+## Enthüllte Gegenstände. Mit tier (Box-Stufe) springt vorher eine Truhe auf.
+static func reveal_items(gv: GameView, title: String, items: Array, tier: Variant = null) -> Modals.Job:
 	return gv.modals().html(title, func(root: VBoxContainer):
+		var delay := _chest(root, tier)
 		var list := Kit.vbox(root, 8)
 		for n in items.size():
 			var v := GameTabs.item_card(gv, list, items[n], false)
-			_pop(v.get_parent(), n * 0.25), "Super!")
+			_pop(v.get_parent(), delay + n * 0.25), "Super!")
 
 
-## Mehrere Boxen auf einmal: Inhalt nach Box gruppiert.
+## Mehrere Boxen auf einmal: Inhalt nach Box gruppiert, die Truhe in der besten Stufe.
 static func reveal_boxes(gv: GameView, list: Array) -> Modals.Job:
+	var tiers: Array = Db.world("BOX_TIERS")
+	var best = null
+	for b in list:
+		if b.get("tier") != null and (best == null or tiers.find(b.tier) > tiers.find(best)):
+			best = b.tier
 	return gv.modals().html("%d Lootboxen geöffnet" % list.size(), func(root: VBoxContainer):
+		var delay := _chest(root, best)
 		for bi in list.size():
 			var b: Dictionary = list[bi]
 			Kit.section(root, b.name)
 			var box := Kit.vbox(root, 8)
 			for n in b.items.size():
 				var v := GameTabs.item_card(gv, box, b.items[n], false)
-				_pop(v.get_parent(), minf(2.0, bi * 0.15 + n * 0.08)), "Super!")
+				_pop(v.get_parent(), delay + minf(2.0, bi * 0.15 + n * 0.08)), "Super!")
+
+
+## Truhe über den Gegenständen; gibt zurück, wie lange die Karten warten.
+static func _chest(root: VBoxContainer, tier: Variant) -> float:
+	if tier == null:
+		return 0.0
+	var c := Chest.new()
+	c.tier = String(tier)
+	c.color = Color(String(Db.world("BOX_TIER_COLORS").get(c.tier, "#c8a060")))
+	c.sound = SoundBox.instance
+	root.add_child(c)
+	return Chest.OPEN_AT + 0.2
+
+
+## Die Truhe wackelt, springt auf, strahlt in der Farbe der Box-Stufe und
+## sprüht Funken. Alles in Kunstpixeln (PX Bildschirmpixel). Strahlen und
+## Leuchten zeichnet die Truhe selbst (additiv), Truhe und Funken ein Kind davor.
+class Chest:
+	extends Control
+	const OPEN_AT := 0.8
+	const PX := 8
+	const R := 17
+	var tier := "bronze"
+	var color := Color.WHITE
+	var sound: SoundBox = null
+	var _t0 := 0.0
+	var _played := false
+	var _front := Control.new()
+
+	func _init() -> void:
+		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		custom_minimum_size = Vector2(0, 196)
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var mat := CanvasItemMaterial.new()
+		mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		material = mat
+		_front.set_anchors_preset(Control.PRESET_FULL_RECT)
+		_front.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_front.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		_front.draw.connect(_draw_front)
+		add_child(_front)
+		_t0 = Time.get_ticks_msec() / 1000.0
+
+	func elapsed() -> float:
+		return Time.get_ticks_msec() / 1000.0 - _t0
+
+	func _process(_d: float) -> void:
+		# Der Klang knarzt zuerst und macht nach 0,3 s „Plopp“
+		if not _played and elapsed() >= OPEN_AT - 0.3:
+			_played = true
+			if sound != null:
+				sound.play_box(tier)
+		queue_redraw()
+		_front.queue_redraw()
+
+	func _origin() -> Vector2:
+		return Vector2(floorf(size.x / 2.0 / PX) * PX - 8 * PX, size.y - 12 * PX)
+
+	## Mitte der Öffnung, auf dem Pixelraster.
+	func _mid() -> Vector2:
+		return _origin() + Vector2(8 * PX, 6 * PX)
+
+	func _square(at: Vector2, c: Color) -> void:
+		draw_rect(Rect2(at, Vector2(PX, PX)), c)
+
+	func _draw() -> void:
+		var k := elapsed() - OPEN_AT
+		if k < 0.0:
+			return
+		var intro := minf(1.0, k / 0.25)
+		var glow := color.lightened(0.35)
+		var mid := _mid()
+		# Acht Strahlen in festen Richtungen (sauber im Pixelraster): gerade lang
+		# und zwei Pixel breit, schräge kürzer; sie pulsieren
+		var rays: Array = []
+		for i in 8:
+			var q := i * TAU / 8.0
+			var pulse := 0.85 + 0.15 * sin(k * 5.0 + i * 1.7)
+			rays.append([Vector2(cos(q), sin(q)), (R if i % 2 == 0 else R * 0.8) * PX * pulse])
+		for gy in range(-R, R + 1):
+			for gx in range(-R, R + 1):
+				var v := (Vector2(gx, gy) + Vector2(0.5, 0.5)) * PX
+				var d := v.length()
+				if d > R * PX:
+					continue
+				# Helle Scheibe um die Öffnung
+				var a := 0.85 * clampf(1.0 - d / (4.5 * PX), 0.0, 1.0)
+				for ray in rays:
+					var dir: Vector2 = ray[0]
+					var reach: float = ray[1]
+					var along := v.dot(dir)
+					if along <= 0.0 or along >= reach:
+						continue
+					var perp := absf(v.x * dir.y - v.y * dir.x)
+					if perp < PX * 0.7:
+						a = maxf(a, 0.95 * pow(1.0 - along / reach, 0.6))
+				a = ceilf(a * intro * 4.0) / 4.0
+				if a > 0.0:
+					_square(mid + Vector2(gx, gy) * PX, Color(glow, a))
+		# Heller Ring beim Aufspringen
+		if k < 0.3:
+			var rad := 3.0 * PX + k * 360.0
+			for i in 28:
+				var q := i * TAU / 28.0
+				_square((mid + Vector2(cos(q), sin(q)) * rad / PX).floor() * PX, Color(1, 1, 1, 1.0 - k / 0.3))
+
+	func _draw_front() -> void:
+		var t := elapsed()
+		var origin := _origin()
+		if t < OPEN_AT:
+			# Immer stärkeres Wackeln
+			var amp := 1.0 + 2.0 * t / OPEN_AT
+			var dx := roundf(sin(t * 55.0) * amp) * 2.0
+			PixelArt.draw(_front, "ding/truhe", origin + Vector2(dx, 0), PX, color)
+			return
+		var k := t - OPEN_AT
+		var mid := _mid()
+		PixelArt.draw(_front, "ding/truhe_offen", origin, PX, color)
+		# Funken: ein Schwall nach oben, der zurückfällt, dann steigendes Glitzern
+		var spark := color.lightened(0.45)
+		if k < 1.4:
+			for i in 16:
+				var a := -PI / 2 + (float((i * 37) % 16) / 15.0 - 0.5) * 2.2
+				var speed := 150.0 + float((i * 53) % 7) * 22.0
+				var p := mid + Vector2(cos(a), sin(a)) * speed * k + Vector2(0, 170.0 * k * k)
+				var c := Color(Color.WHITE if i % 3 == 0 else spark, 1.0 - k / 1.4)
+				_front.draw_rect(Rect2((p / (PX / 2)).floor() * (PX / 2), Vector2(PX / 2, PX / 2) * (2 if i % 4 == 0 else 1)), c)
+		for i in 6:
+			var ph := fmod(k * 0.6 + i / 6.0, 1.0)
+			var p := mid + Vector2(float((i * 41) % 11 - 5) * PX, -ph * 90.0 - 12.0)
+			_front.draw_rect(Rect2((p / (PX / 2)).floor() * (PX / 2), Vector2(PX / 2, PX / 2)), Color(spark, sin(ph * PI) * 0.9 * minf(1.0, k / 0.25)))
 
 
 ## Aufploppen wie die CSS-Animation „pop“.

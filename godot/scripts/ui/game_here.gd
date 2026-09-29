@@ -196,7 +196,7 @@ static func _open_box(gv: GameView, uid: String) -> void:
 		got.items = res.get("contents")
 		return res)
 	if got.items != null and box != null:
-		GameDialogs.reveal_items(gv, box.name, got.items)
+		GameDialogs.reveal_items(gv, box.name, got.items, box.box.tier)
 
 
 static func _open_all(gv: GameView) -> void:
@@ -210,6 +210,6 @@ static func _open_all(gv: GameView) -> void:
 			return res)
 		if not ok or got.items == null:
 			break
-		opened.append({"name": box.name, "items": got.items})
+		opened.append({"name": box.name, "items": got.items, "tier": box.box.tier})
 	if not opened.is_empty():
 		GameDialogs.reveal_boxes(gv, opened)

@@ -112,6 +112,11 @@ um das Ganze und stellt das Ergebnis samt Laufbild mit `PixelArt.register`
 unter einem eigenen Namen bereit. Karte, Crawler-Reiter und Versus-Bildschirm
 zeichnen diese Figur.
 
+**Lootboxen öffnen:** Beim Öffnen wackelt eine Truhe in der Farbe der
+Box-Stufe, springt auf (`ding/truhe_offen`, mit dem Box-Klang), strahlt und
+sprüht Funken; danach erscheinen die Gegenstände (`GameDialogs.Chest`). Beim
+Öffnen mehrerer Boxen zeigt die Truhe die beste Stufe.
+
 **Schriften:** Fließtext in Montserrat, Überschriften, Knöpfe, Reiter und die
 Karte in Pixelify Sans. Pixelify ist bei Größen in Zehnerschritten ganz
 scharf (ein Schriftpixel = 1/10 der Größe).
@@ -124,7 +129,7 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | `UI_SMOKE_ALL=1 ./test.sh ui_smoke` | Alle aufgezeichneten Partien (bis Etage 3) durch die Oberfläche spielen, dauert einige Minuten |
 | `godot --headless --path godot -s res://tools/record_fixtures.gd` | Aufnahmen für die Replay-Tests neu erzeugen (Karten, Replays, Anzeige-Helfer), nach absichtlichen Änderungen an Inhalten oder Regeln |
 | `godot --headless --path godot -s res://tools/balance_sim.gd [-- anzahl]` | Ein Bot spielt Partien bis Etage 3 und gibt eine Tabelle aus (Stufe, Kills, Todesursache …) |
-| `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `combat`, `ausruestung` (Inventar, Crawler-Reiter und Tooltip mit Ausrüstung und Haustier), `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte), `fx` (Angriff in sechs Bildern, mit `BOSS=id` gegen einen Boss), `fackeln` |
+| `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `combat`, `ausruestung` (Inventar, Crawler-Reiter und Tooltip mit Ausrüstung und Haustier), `truhe` (Box öffnen in vier Bildern, Stufe mit `TIER=…`), `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte), `fx` (Angriff in sechs Bildern, mit `BOSS=id` gegen einen Boss), `fackeln` |
 | `xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- bild.png [vergrößerung]` | Alle Monster in ihrer echten Farbe, dazu Spielfigur, Reittiere, Gegenstände, Fallen |
 | `godot --headless --path godot -s res://tools/make_pixel_art.gd -- --force [--preview ordner]` | Pixel-Bögen aus den Vorlagen neu erzeugen (überschreibt Änderungen aus Pixel-Editoren) |
 

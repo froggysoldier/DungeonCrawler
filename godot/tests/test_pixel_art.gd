@@ -167,3 +167,27 @@ func test_ausruestung_an_der_figur(t) -> void:
 	t.ok(Sprites.hero_name({"equipment": eq2}) != n, "andere Seltenheit, andere Figur")
 	t.not_null(PixelArt.texture(n), "tönbar wie jedes Bild")
 	t.not_null(PixelArt.silhouette(n), "Aufblitzen möglich")
+
+
+func test_truhe_beim_oeffnen(t) -> void:
+	t.eq(PixelArt.size_of("ding/truhe_offen"), PixelArt.size_of("ding/truhe"), "offene Truhe gleich groß")
+	var shut := PixelArt.image("ding/truhe")
+	var open := PixelArt.image("ding/truhe_offen")
+	var same := true
+	for y in range(8, 12):
+		for x in 16:
+			if shut.get_pixel(x, y) != open.get_pixel(x, y):
+				same = false
+	t.ok(same, "Unterteil deckungsgleich, damit die Truhe beim Aufspringen nicht springt")
+	for tier in Db.world("BOX_TIERS"):
+		t.ok(Db.world("BOX_TIER_COLORS").has(tier), "%s hat eine Farbe" % tier)
+		t.ok(SoundBox.TIER_RANK.has(tier), "%s hat einen Klang" % tier)
+	var root := VBoxContainer.new()
+	t.eq(GameDialogs._chest(root, null), 0.0, "ohne Box keine Truhe")
+	t.eq(root.get_child_count(), 0, "nichts eingefügt")
+	var delay := GameDialogs._chest(root, "gold")
+	t.gt(delay, GameDialogs.Chest.OPEN_AT, "Gegenstände erst nach dem Aufspringen")
+	var c = root.get_child(0)
+	t.ok(c is GameDialogs.Chest, "Truhe eingefügt")
+	t.eq(c.color, Color(Db.world("BOX_TIER_COLORS")["gold"]), "Farbe der Box-Stufe")
+	root.free()

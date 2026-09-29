@@ -102,6 +102,11 @@ func play_sfx(list: Array) -> void:
 		"skill": _play("skill")
 
 
+## Eine Box springt auf (Klang der Box-Stufe).
+func play_box(tier: String) -> void:
+	_play("box:" + tier)
+
+
 func play_combat_start() -> void:
 	_play("kampf")
 

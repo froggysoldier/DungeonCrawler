@@ -1,7 +1,7 @@
 extends SceneTree
 ## Entwicklerwerkzeug: startet das Spiel, spielt kurz und speichert Bildschirmfotos.
 ##   xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus [seed]
-## Modi: title, interview, game, dialog, walk, tabs, combat, ausruestung, select, versus,
+## Modi: title, interview, game, dialog, walk, tabs, combat, ausruestung, truhe, select, versus,
 ## talkshow, safe, floor3, fx (Angriff mit Ausfallschritt, Aufblitzen, Zerfall),
 ## fackeln (Raum mit Wandfackeln)
 
@@ -133,6 +133,20 @@ func _initialize() -> void:
 				for i in 6:
 					await shot("fx_%d" % i)
 					await wait(0.05)
+				quit()
+				return
+			if mode == "truhe":
+				# Eine Box der Stufe TIER (Standard gold) öffnen, Bilder während der Szene
+				var tier := OS.get_environment("TIER") if OS.get_environment("TIER") != "" else "gold"
+				var items: Array = []
+				for r in ["selten", "episch"]:
+					items.append(Items.generate_equipment(s, r))
+				GameDialogs.reveal_items(gv, "Goldene Abenteurer-Box", items, tier)
+				var last := 0.0
+				for at in [0.3, 0.55, 0.95, 1.4]:
+					await wait(at - last)
+					last = at
+					await shot("truhe_%d" % int(at * 100))
 				quit()
 				return
 			if mode == "ausruestung":

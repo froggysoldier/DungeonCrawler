@@ -514,14 +514,14 @@
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 80,
+  "x": 96,
   "y": 0
  },
  "ding/buch": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 112,
+  "x": 128,
   "y": 0
  },
  "ding/edelstein": {
@@ -549,126 +549,126 @@
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 128,
+  "x": 144,
   "y": 0
  },
  "ding/slot_arme": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 240,
-  "y": 0
+  "x": 0,
+  "y": 16
  },
  "ding/slot_beine": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 48,
+  "x": 64,
   "y": 16
  },
  "ding/slot_brust": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 208,
+  "x": 224,
   "y": 0
  },
  "ding/slot_fuesse": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 64,
+  "x": 80,
   "y": 16
  },
  "ding/slot_fussring": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 80,
+  "x": 96,
   "y": 16
  },
  "ding/slot_gesicht": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 160,
+  "x": 176,
   "y": 0
  },
  "ding/slot_guertel": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 32,
+  "x": 48,
   "y": 16
  },
  "ding/slot_haende": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 0,
+  "x": 16,
   "y": 16
  },
  "ding/slot_hals": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 176,
+  "x": 192,
   "y": 0
  },
  "ding/slot_kopf": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 144,
+  "x": 160,
   "y": 0
  },
  "ding/slot_ring": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 16,
+  "x": 32,
   "y": 16
  },
  "ding/slot_ruecken": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 224,
+  "x": 240,
   "y": 0
  },
  "ding/slot_schultern": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 192,
+  "x": 208,
   "y": 0
  },
  "ding/slot_unterwaesche": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 96,
+  "x": 112,
   "y": 16
  },
  "ding/slot_waffe": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 112,
+  "x": 128,
   "y": 16
  },
  "ding/stein": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 64,
+  "x": 80,
   "y": 0
  },
  "ding/trank": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
-  "x": 96,
+  "x": 112,
   "y": 0
  },
  "ding/truhe": {
@@ -678,53 +678,60 @@
   "x": 48,
   "y": 0
  },
+ "ding/truhe_offen": {
+  "h": 16,
+  "sheet": "dinge",
+  "w": 16,
+  "x": 64,
+  "y": 0
+ },
  "falle/baerenfalle": {
-  "h": 16,
-  "sheet": "dinge",
-  "w": 16,
-  "x": 192,
-  "y": 16
- },
- "falle/fallgrube": {
-  "h": 16,
-  "sheet": "dinge",
-  "w": 16,
-  "x": 144,
-  "y": 16
- },
- "falle/giftgas": {
-  "h": 16,
-  "sheet": "dinge",
-  "w": 16,
-  "x": 160,
-  "y": 16
- },
- "falle/pfeilplatte": {
-  "h": 16,
-  "sheet": "dinge",
-  "w": 16,
-  "x": 128,
-  "y": 16
- },
- "falle/sprengfalle": {
-  "h": 16,
-  "sheet": "dinge",
-  "w": 16,
-  "x": 224,
-  "y": 16
- },
- "falle/stachelfalle": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
   "x": 208,
   "y": 16
  },
- "falle/stolperdraht": {
+ "falle/fallgrube": {
+  "h": 16,
+  "sheet": "dinge",
+  "w": 16,
+  "x": 160,
+  "y": 16
+ },
+ "falle/giftgas": {
   "h": 16,
   "sheet": "dinge",
   "w": 16,
   "x": 176,
+  "y": 16
+ },
+ "falle/pfeilplatte": {
+  "h": 16,
+  "sheet": "dinge",
+  "w": 16,
+  "x": 144,
+  "y": 16
+ },
+ "falle/sprengfalle": {
+  "h": 16,
+  "sheet": "dinge",
+  "w": 16,
+  "x": 240,
+  "y": 16
+ },
+ "falle/stachelfalle": {
+  "h": 16,
+  "sheet": "dinge",
+  "w": 16,
+  "x": 224,
+  "y": 16
+ },
+ "falle/stolperdraht": {
+  "h": 16,
+  "sheet": "dinge",
+  "w": 16,
+  "x": 192,
   "y": 16
  },
  "fleck/fleck0": {
@@ -794,43 +801,43 @@
   "h": 7,
   "sheet": "dinge",
   "w": 7,
-  "x": 64,
+  "x": 80,
   "y": 32
  },
  "geschoss/bombe": {
   "h": 6,
   "sheet": "dinge",
   "w": 6,
-  "x": 16,
+  "x": 32,
   "y": 32
  },
  "geschoss/feuer": {
   "h": 7,
   "sheet": "dinge",
   "w": 7,
-  "x": 48,
+  "x": 64,
   "y": 32
  },
  "geschoss/magie": {
   "h": 7,
   "sheet": "dinge",
   "w": 7,
-  "x": 32,
+  "x": 48,
   "y": 32
  },
  "geschoss/schleim": {
   "h": 5,
   "sheet": "dinge",
   "w": 5,
-  "x": 0,
+  "x": 16,
   "y": 32
  },
  "geschoss/stein": {
   "h": 5,
   "sheet": "dinge",
   "w": 5,
-  "x": 240,
-  "y": 16
+  "x": 0,
+  "y": 32
  },
  "kreatur/alien": {
   "h": 16,
