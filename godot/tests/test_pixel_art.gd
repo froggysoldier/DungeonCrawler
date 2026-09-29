@@ -191,3 +191,26 @@ func test_truhe_beim_oeffnen(t) -> void:
 	t.ok(c is GameDialogs.Chest, "Truhe eingefügt")
 	t.eq(c.color, Color(Db.world("BOX_TIER_COLORS")["gold"]), "Farbe der Box-Stufe")
 	root.free()
+
+
+func test_rassen_an_der_figur(t) -> void:
+	t.eq(Sprites.hero_name({"race": "mensch"}), "kreatur/held", "Menschen bleiben, wie sie sind")
+	var base := PixelArt.image("kreatur/held")
+	for r in Db.t("races", "RACES"):
+		if r.id == "mensch":
+			continue
+		t.ok(Sprites.RACE_LOOKS.has(r.id), "%s hat Farben" % r.id)
+		t.ok(PixelArt.has("rasse/" + r.id) or PixelArt.has("rasse/%s_hinten" % r.id), "%s hat ein Merkmal" % r.id)
+		var n := Sprites.hero_name({"race": r.id})
+		t.ok(n != "kreatur/held" and PixelArt.has(n + "_2"), "%s zusammengesetzt, mit Laufbild" % r.id)
+	var elf := PixelArt.image(Sprites.hero_name({"race": "elf"}))
+	t.eq(elf.get_pixel(7, 4).to_html(false), Color(Sprites.RACE_LOOKS.elf.skin).to_html(false), "Haut in der Farbe der Rasse")
+	t.eq(elf.get_pixel(3, 2).a > 0.5, true, "spitze Ohren ragen hinaus")
+	var golem := PixelArt.image(Sprites.hero_name({"race": "golem"}))
+	t.ok(golem.get_pixel(7, 1) != base.get_pixel(7, 1), "kahler Kopf statt Haare")
+	t.eq(golem.get_pixel(5, 14), base.get_pixel(5, 14), "Schuhe bleiben, wie sie sind")
+	var eq := {"kopf": _gear("kopf", "selten")}
+	var both := Sprites.hero_name({"race": "minotaurus", "equipment": eq})
+	t.ok(both != Sprites.hero_name({"race": "minotaurus"}) and both != Sprites.hero_name({"equipment": eq}), "Rasse und Ausrüstung zusammen")
+	var feet := PixelArt.image(Sprites.hero_name({"race": "halbling"}) + "_2")
+	t.ok(feet.get_pixel(2, 14) != base.get_pixel(2, 14), "nackte Füße auch im Laufbild")

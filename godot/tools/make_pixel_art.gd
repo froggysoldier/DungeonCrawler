@@ -206,6 +206,8 @@ func _build_all() -> void:
 		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n]))
 	for n in Defs.GEAR:
 		_add("kreaturen", "ausruestung/" + n, sprite(n, Defs.GEAR[n], false))
+	for n in Defs.RACES:
+		_add("kreaturen", "rasse/" + n, sprite(n, Defs.RACES[n], false))
 	_add("kreaturen", "aufsatz/schatten", _shadow(14, 5))
 	_add("kreaturen", "aufsatz/schatten_klein", _shadow(10, 3))
 	_add("kreaturen", "aufsatz/ring", _ring(16, 7))

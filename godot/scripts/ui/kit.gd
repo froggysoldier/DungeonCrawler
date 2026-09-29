@@ -277,7 +277,7 @@ static var _bb_images := {}
 
 static func img(name: String, tint: Variant = null, scale: int = 1) -> String:
 	var key := "roh" if tint == null else ((tint as Color).to_html() if tint is Color else String(tint).trim_prefix("#"))
-	var path := "res://pixel_bb/%s_%s_%d.tex" % [name.replace("/", "_"), key, scale]
+	var path := "res://pixel_bb/%s.tex" % ("%s|%s|%d" % [name, key, scale]).md5_text()
 	if not _bb_images.has(path):
 		var src := PixelArt.texture(name, tint)
 		if src == null:

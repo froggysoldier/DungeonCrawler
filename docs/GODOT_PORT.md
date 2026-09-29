@@ -58,7 +58,7 @@ Die Bilder liegen in `assets/pixel` als PNG-Bögen:
 
 | Bogen | Inhalt |
 |---|---|
-| `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur, Ausrüstungs-Aufsätze der Spielfigur (`ausruestung/…`), Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
+| `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur, Ausrüstungs-Aufsätze (`ausruestung/…`) und Rassenmerkmale (`rasse/…`) der Spielfigur, Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
 | `bosse.png` | Eigene Figuren der 15 Bosse, 24 × 24 Pixel; sie stehen auf ihrer Kachel und ragen darüber hinaus |
 | `kacheln.png` | Böden (9 Materialien × 4 Varianten), Wände (3 Etagen × 4 Varianten, Krone und Vorderseite), Türen, Treppe |
 | `dinge.png` | Gegenstände am Boden, Symbole der 15 Ausrüstungsplätze (`slot_…`), Fallen, Geschosse |
@@ -111,6 +111,13 @@ angelegten Teile über die Figur (der Rücken liegt dahinter), zieht einen Umris
 um das Ganze und stellt das Ergebnis samt Laufbild mit `PixelArt.register`
 unter einem eigenen Namen bereit. Karte, Crawler-Reiter und Versus-Bildschirm
 zeichnen diese Figur.
+
+**Rassen an der Figur:** `Sprites.RACE_LOOKS` gibt jeder Rasse Haut- und
+Haarfarbe (ohne Haarfarbe kahl). Beim Zusammensetzen färbt `hero_name` Haut und
+Haare um und legt die Merkmale aus `rasse/<id>` davor (Ohren, Hörner, Bart,
+Pilzhut, leuchtende Augen …) und `rasse/<id>_hinten` dahinter (Schwänze,
+Flügel); `#` darin nimmt die Hautfarbe an. Die Rassenwahl zeigt jede Rasse als
+kleines Bild und in der Detailkarte die eigene Figur mit ihrer Ausrüstung.
 
 **Lootboxen öffnen:** Beim Öffnen wackelt eine Truhe in der Farbe der
 Box-Stufe, springt auf (`ding/truhe_offen`, mit dem Box-Klang), strahlt und

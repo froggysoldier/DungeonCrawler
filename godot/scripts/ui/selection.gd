@@ -24,10 +24,20 @@ static func _head(parent: Node, bb: String) -> void:
 	Kit.text(parent, "[b]%s[/b]" % Kit.col(bb, "accent"), 14)
 
 
-static func _race_detail(parent: Node, r: Dictionary) -> void:
+static func _race_detail(parent: Node, r: Dictionary, p: Dictionary = {}) -> void:
 	var v := Kit.card(parent, "Item", 4)
-	_head(v, "Rasse: " + Kit.esc(GameTabs.race_name(r.id)))
-	Kit.text(v, Kit.esc(r.description), 12)
+	var top := Kit.hbox(v, 12)
+	# So sieht die Figur mit dieser Rasse (und der jetzigen Ausrüstung) aus
+	var look := Sprites.hero_name({"race": r.id, "equipment": J.nn(p, "equipment", {})})
+	var st := Kit.Stage.new()
+	st.items = [{"name": look, "scale": 5, "foot": Vector2(44, 84)}]
+	st.custom_minimum_size = Vector2(88, 100)
+	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	top.add_child(st)
+	var tv := Kit.vbox(top, 4)
+	tv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_head(tv, "Rasse: " + Kit.esc(GameTabs.race_name(r.id)))
+	Kit.text(tv, Kit.esc(r.description), 12)
 	_bonus(v, Bonuses.describe(r.get("bonuses")))
 	if r.id == "mensch":
 		Kit.text(v, "[b]Anpassungsfähig:[/b] %s" % Kit.muted("4 freie Stat-Punkte zum Verteilen."), 12)
@@ -130,7 +140,8 @@ static func show_selection(gv: GameView) -> Modals.Job:
 			for ro in races:
 				var r: Dictionary = ro.race
 				var avail: bool = ro.available
-				var bb := "[b]%s[/b]\n%s" % [Kit.esc(r.name), Kit.small(Kit.esc(r.description))]
+				var face := Kit.img(Sprites.hero_name({"race": r.id}), null, 2)
+				var bb := "%s [b]%s[/b]\n%s" % [face, Kit.esc(r.name), Kit.small(Kit.esc(r.description))]
 				if not avail:
 					bb += "\n" + Kit.small(Kit.col("Gesperrt – Bedingung: " + Kit.esc(r.requirement.text if r.get("requirement") != null else ""), "danger"))
 				var rid: String = r.id
@@ -167,7 +178,7 @@ static func show_selection(gv: GameView) -> Modals.Job:
 			Kit.clear(detail_el)
 			var r: Dictionary = J.find(races, func(x): return x.race.id == state.race).race
 			var cc = J.find(classes, func(x): return x.klass.id == state.klass)
-			_race_detail(detail_el, r)
+			_race_detail(detail_el, r, s.player)
 			if cc != null:
 				_class_detail(detail_el, cc.klass)
 				_stats_preview(detail_el, s, r, cc.klass)
