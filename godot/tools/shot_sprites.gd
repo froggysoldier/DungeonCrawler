@@ -15,9 +15,9 @@ class Sheet:
 		var cols := int(size.x / cell)
 		var entries: Array = []
 		for m in Db.t("monsters", "MONSTERS"):
-			entries.append([m.id, "kreatur/" + Sprites.sprite_for(m.id), m.color])
+			entries.append([m.id, Sprites.sprite_name(m.id), m.color])
 		for m in Db.t("monsters", "HOOD_BOSSES"):
-			entries.append([m.id, "kreatur/" + Sprites.sprite_for(m.id), m.color])
+			entries.append([m.id, Sprites.sprite_name(m.id), m.color])
 		entries.append(["held", "kreatur/held", null])
 		entries.append(["haustier", "kreatur/haustier", "#e0a0c8"])
 		for n in PixelArt.names("reittier/"):

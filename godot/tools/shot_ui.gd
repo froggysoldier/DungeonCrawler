@@ -77,6 +77,12 @@ func _initialize() -> void:
 					total += gv.map.last_draw_ms
 				print("Karte zeichnen: %.2f ms pro Bild (Mittel über 60 Bilder)" % (total / 60))
 			await shot(mode)
+			if mode == "versus":
+				# Danach die Boss-Kammer ohne Dialog, näher herangezoomt
+				Modals.instance.close_all()
+				main.view.zoom_map(10)
+				await wait(0.8)
+				await shot("versus_karte")
 		_:
 			var s := Game.new_game({"name": "Mira", "answers": {}, "seed": seed, "meta": Meta.empty_meta()})
 			if mode != "dialog":
@@ -110,8 +116,15 @@ func _initialize() -> void:
 				gv.zoom_map(10)
 				s.monsters = []
 				var spot = TH.free_neighbor(s, s.player.pos)
-				var m := Monsters.spawn_monster(s, TH.monster_def("kellerratte"), 1, spot, 0)
-				m.hp = 1
+				# Mit BOSS=id steht stattdessen dieser Boss daneben (und hält den Schlag aus)
+				var boss_id := OS.get_environment("BOSS")
+				var m: Dictionary
+				if boss_id != "":
+					var def = J.find(Db.t("monsters", "HOOD_BOSSES"), func(b): return b.id == boss_id)
+					m = Monsters.spawn_boss(s, def, spot, 0, -1, s.floor)
+				else:
+					m = Monsters.spawn_monster(s, TH.monster_def("kellerratte"), 1, spot, 0)
+					m.hp = 1
 				m.ausweichen = -200
 				m.aware = true
 				s.monsters.append(m)

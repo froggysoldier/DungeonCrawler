@@ -53,23 +53,32 @@ func _initialize() -> void:
 	for sheet_name in sheets:
 		var list: Array = sheets[sheet_name]
 		var rows := ceili(list.size() / float(COLS))
+		# Große Bilder zeilenweise unter die Zellen legen
 		var big: Array = _big.filter(func(b): return b[0] == sheet_name)
-		var big_h := 0
+		var places: Array = []
+		var bx := 0
+		var by := rows * T
+		var shelf := 0
 		for b in big:
-			big_h = maxi(big_h, b[2].get_height())
-		var img := Image.create(COLS * T, rows * T + ceili(big_h / float(T)) * T, false, Image.FORMAT_RGBA8)
+			var bw := ceili(b[2].get_width() / float(T)) * T
+			if bx + bw > COLS * T:
+				bx = 0
+				by += shelf
+				shelf = 0
+			places.append(Vector2i(bx, by))
+			bx += bw
+			shelf = maxi(shelf, ceili(b[2].get_height() / float(T)) * T)
+		var img := Image.create(COLS * T, by + shelf if not big.is_empty() else rows * T, false, Image.FORMAT_RGBA8)
 		for i in list.size():
 			var sub: Image = list[i][1]
 			var at := Vector2i((i % COLS) * T, (i / COLS) * T)
 			img.blit_rect(sub, Rect2i(Vector2i.ZERO, sub.get_size()), at)
 			index[list[i][0]] = {"sheet": sheet_name, "x": at.x, "y": at.y, "w": sub.get_width(), "h": sub.get_height()}
-		var bx := 0
-		for b in big:
-			var sub: Image = b[2]
-			var at := Vector2i(bx, rows * T)
+		for bi in big.size():
+			var sub: Image = big[bi][2]
+			var at: Vector2i = places[bi]
 			img.blit_rect(sub, Rect2i(Vector2i.ZERO, sub.get_size()), at)
-			index[b[1]] = {"sheet": sheet_name, "x": at.x, "y": at.y, "w": sub.get_width(), "h": sub.get_height()}
-			bx += ceili(sub.get_width() / float(T)) * T
+			index[big[bi][1]] = {"sheet": sheet_name, "x": at.x, "y": at.y, "w": sub.get_width(), "h": sub.get_height()}
 		img.save_png(out.path_join(sheet_name + ".png"))
 		if preview != "":
 			DirAccess.make_dir_recursive_absolute(preview)
@@ -82,12 +91,12 @@ func _initialize() -> void:
 
 
 func _add(sheet_name: String, name: String, img: Image) -> void:
-	# Große Bilder belegen mehrere Zellen: vorher auf eine neue Zeile gehen
+	if not sheets.has(sheet_name):
+		sheets[sheet_name] = []
+	# Große Bilder belegen mehrere Zellen und kommen ans Ende des Bogens
 	if img.get_width() > T or img.get_height() > T:
 		_big.append([sheet_name, name, img])
 		return
-	if not sheets.has(sheet_name):
-		sheets[sheet_name] = []
 	sheets[sheet_name].append([name, img])
 
 
@@ -191,6 +200,8 @@ func _build_all() -> void:
 		_add("kreaturen", "kreatur/" + n, sprite(n, Defs.CREATURES[n]))
 	for n in Defs.OVERLAYS:
 		_add("kreaturen", "aufsatz/" + n, sprite(n, Defs.OVERLAYS[n]))
+	for n in Defs.BOSSES:
+		_add("bosse", "boss/" + n, _bottom(sprite(n, Defs.BOSSES[n]), 1))
 	for n in Defs.MOUNTS:
 		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n]))
 	_add("kreaturen", "aufsatz/schatten", _shadow(14, 5))
@@ -223,6 +234,17 @@ func _build_all() -> void:
 			for open in [false, true]:
 				_add("kacheln", "tuer/%s_%s_%s" % ["boss" if boss else "holz", "quer" if hor else "laengs", "offen" if open else "zu"], _door(open, hor, boss))
 	_add("kacheln", "treppe", _stairs())
+
+
+## Bild nach unten schieben, bis unten nur noch `margin` leere Zeilen bleiben.
+func _bottom(img: Image, margin: int) -> Image:
+	var used := img.get_used_rect()
+	var shift := img.get_height() - margin - used.end.y
+	if shift <= 0:
+		return img
+	var out := Image.create(img.get_width(), img.get_height(), false, Image.FORMAT_RGBA8)
+	out.blit_rect(img, used, Vector2i(used.position.x, used.position.y + shift))
+	return out
 
 
 # ================================================================ Hilfen

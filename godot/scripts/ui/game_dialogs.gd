@@ -182,10 +182,12 @@ static func maybe_versus(gv: GameView) -> void:
 		var bp := Portrait.new()
 		bp.custom_minimum_size = Vector2(220, 240)
 		bp.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		var kind := Sprites.sprite_for(boss.defId)
+		var look := Sprites.sprite_name(boss.defId)
 		var col = boss.color
 		var unk: bool = info.insight >= 3
-		bp.draw_fn = func(ci: CanvasItem): Sprites.draw_portrait(ci, kind, col, Vector2(110, 226), 10, {"crown": true, "flip": true, "unknown": unk})
+		# Eigene Boss-Figuren sind größer: kleiner vergrößern, damit sie ins Bild passen
+		var sc := 10 if PixelArt.size_of(look).y <= 16 else 8
+		bp.draw_fn = func(ci: CanvasItem): Sprites.draw_portrait(ci, look, col, Vector2(110, 226), sc, {"crown": true, "flip": true, "unknown": unk})
 		right.add_child(bp)
 		_center_label(right, info.name, 30, Color("#ff7a6a"), 700, true)
 		_center_label(right, "%s · %s" % [rank, info.level], 13, UiTheme.MUTED)

@@ -852,15 +852,19 @@ func _draw_dynamic_body() -> void:
 		else:
 			ring = _col(_hex_or(info.challenge.color, "#a39a8c"), 0.75)
 		_ground(ci, sx, sy, ring, Color("#ffcc33") if boss else (Color("#ff5a4a") if elite else null))
-		var name := "kreatur/" + Sprites.sprite_for(mo.defId, mo.rank == "geist")
+		var name := Sprites.sprite_name(mo.defId, mo.rank == "geist")
+		# Größere Figuren (eigene Boss-Bilder) stehen mittig auf der Kachel und ragen nach oben
+		var sz := PixelArt.size_of(name)
+		var gx := (sz.x - TILE) / 2
+		var gy := sz.y - TILE
 		# Wache Monster wippen um einen Kunstpixel
 		var bob: float = 0.0 if asleep or fmod(time / 260.0 + mo.pos.x * 1.7, 2.0) < 1.0 else -px
 		var mod := Color(1, 1, 1, 0.75 if mo.rank == "geist" else 1.0)
 		if asleep:
 			mod = Color(0.8, 0.8, 0.9, mod.a)
-		_figure(ci, mo.uid, name, sx, sy - px + bob, mo.color, p.x > ppos.x, mod, false, not asleep)
-		var top := sprite_top(name) - 1
-		if boss:
+		_figure(ci, mo.uid, name, sx - gx * px, sy - (gy + 1) * px + bob, mo.color, p.x > ppos.x, mod, false, not asleep)
+		var top := sprite_top(name) - 1 - gy
+		if boss and not name.begins_with("boss/"):
 			_spr(ci, "aufsatz/krone", sx + 4 * px, sy + (top - 5) * px + bob)
 		if unknown:
 			_spr(ci, "aufsatz/frage", sx + 10 * px, sy + (top - 3) * px)
@@ -869,7 +873,7 @@ func _draw_dynamic_body() -> void:
 			var fl := 0.5 + 0.4 * sin(time / 70.0 + mo.pos.x)
 			_spr(ci, "aufsatz/ring_gross", sx - 2 * px, sy + 9 * px, null, false, Color(1, 0.55, 0.15, fl))
 		if mo.hp < mo.maxHp and info.showHealthBar:
-			_hp_bar(ci, sx, sy, top - (6 if boss else 0), float(mo.hp) / mo.maxHp, "#ff5a4a")
+			_hp_bar(ci, sx, sy, top - (6 if boss and not name.begins_with("boss/") else 0), float(mo.hp) / mo.maxHp, "#ff5a4a")
 		_level_pill(ci, sx, sy, J.s(mo.level) if info.insight <= 1 else "?", info.challenge.color)
 		# Zustände als kleine farbige Quadrate oben rechts
 		var conds := Conditions.condition_list(mo)
@@ -918,9 +922,10 @@ func _draw_dynamic_body() -> void:
 
 ## Ein besiegtes Monster: erst weiß, dann fliegen seine Pixel auseinander und fallen.
 func _draw_burst(ci: CanvasItem, b: Dictionary) -> void:
-	var name := "kreatur/" + Sprites.sprite_for(String(b.defId), b.rank == "geist")
-	var sx := _sx(b.at.x)
-	var sy := _sy(b.at.y) - px
+	var name := Sprites.sprite_name(String(b.defId), b.rank == "geist")
+	var sz := PixelArt.size_of(name)
+	var sx := _sx(b.at.x) - (sz.x - TILE) / 2 * px
+	var sy := _sy(b.at.y) - (sz.y - TILE + 1) * px
 	var k: float = b.k
 	if k < 0.1:
 		PixelArt.draw_texture(ci, PixelArt.silhouette(name), Vector2(sx, sy), px)
@@ -932,8 +937,8 @@ func _draw_burst(ci: CanvasItem, b: Dictionary) -> void:
 		var q: Vector2i = pix[i][0]
 		var c: Color = pix[i][1]
 		var h := Tiles.hash(q.x, q.y, 77)
-		var dx := (q.x - 7.5) * (0.5 + h) * t * 1.4
-		var dy := (q.y - 9.0) * (0.3 + h * 0.5) * t + 10.0 * t * t
+		var dx := (q.x - sz.x / 2.0 + 0.5) * (0.5 + h) * t * 1.4
+		var dy := (q.y - sz.y * 0.56) * (0.3 + h * 0.5) * t + 10.0 * t * t
 		ci.draw_rect(Rect2(sx + roundf(q.x + dx) * px, sy + roundf(q.y + dy) * px, px, px), Color(c, c.a * alpha))
 
 

@@ -51,26 +51,33 @@ static func pet_sprite(species: String) -> Array:
 	return ["kreatur/" + e[0], e[1]] if e != null else ["kreatur/haustier", "#e0a0c8"]
 
 
+## Voller Bildname einer Monsterart: eigene Boss-Figur, sonst die Kreatur.
+static func sprite_name(def_id: String, rank_ghost: bool = false) -> String:
+	if not rank_ghost and PixelArt.has("boss/" + def_id):
+		return "boss/" + def_id
+	return "kreatur/" + sprite_for(def_id, rank_ghost)
+
+
 static func sprite_for(def_id: String, rank_ghost: bool = false) -> String:
 	if rank_ghost:
 		return "geist"
 	return BY_DEF.get(def_id, "kobold")
 
 
-## Großes Porträt: Figur ganzzahlig vergrößert, Füße mittig bei foot.
-## opts: flip, crown, unknown.
-static func draw_portrait(ci: CanvasItem, kind: String, tint: Variant, foot: Vector2, scale: int, opts: Dictionary = {}) -> void:
-	var name := "kreatur/" + kind
+## Großes Porträt: Figur (voller Bildname) ganzzahlig vergrößert, Füße mittig
+## bei foot. opts: flip, crown (nicht bei eigenen Boss-Figuren), unknown.
+static func draw_portrait(ci: CanvasItem, name: String, tint: Variant, foot: Vector2, scale: int, opts: Dictionary = {}) -> void:
 	var flip: bool = opts.get("flip", false)
+	var sz := PixelArt.size_of(name)
 	PixelArt.draw_foot(ci, "aufsatz/schatten", foot + Vector2(0, 3 * scale), scale)
 	PixelArt.draw_foot(ci, name, foot, scale, tint, flip)
 	var img := PixelArt.image(name)
 	var top: int = img.get_used_rect().position.y if img else 0
-	var origin := foot - Vector2(8 * scale, 16 * scale)
-	if opts.get("crown", false):
-		PixelArt.draw(ci, "aufsatz/krone", origin + Vector2(4 * scale, (top - 6) * scale), scale)
+	var origin := foot - Vector2(sz.x * scale / 2.0, sz.y * scale)
+	if opts.get("crown", false) and not name.begins_with("boss/"):
+		PixelArt.draw(ci, "aufsatz/krone", origin + Vector2((sz.x / 2 - 4) * scale, (top - 6) * scale), scale)
 	if opts.get("unknown", false):
-		PixelArt.draw(ci, "aufsatz/frage", origin + Vector2(11 * scale, (top - 3) * scale), scale)
+		PixelArt.draw(ci, "aufsatz/frage", origin + Vector2((sz.x - 5) * scale, (top - 3) * scale), scale)
 
 
 ## Die Spielfigur als Porträt.

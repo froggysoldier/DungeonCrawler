@@ -22,8 +22,10 @@ func test_jedes_monster_hat_eine_figur(t) -> void:
 	var names: Array = []
 	for list in [Db.t("monsters", "MONSTERS"), Db.t("monsters", "HOOD_BOSSES")]:
 		for m in list:
-			names.append("kreatur/" + Sprites.sprite_for(m.id))
-	names.append("kreatur/" + Sprites.sprite_for("", true))
+			names.append(Sprites.sprite_name(m.id))
+	names.append(Sprites.sprite_name("", true))
+	for m in Db.t("monsters", "HOOD_BOSSES"):
+		t.ok(Sprites.sprite_name(m.id).begins_with("boss/"), "%s hat eine eigene Figur" % m.id)
 	for n in ["held", "haustier", "mensch"]:
 		names.append("kreatur/" + n)
 	t.eq(_missing(names), [], "Figuren")

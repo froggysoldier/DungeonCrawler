@@ -314,6 +314,111 @@
   "x": 48,
   "y": 16
  },
+ "boss/der_hausmeister": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 32,
+  "y": 0
+ },
+ "boss/die_sammlerin": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 0,
+  "y": 0
+ },
+ "boss/hausverwalter": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 32,
+  "y": 32
+ },
+ "boss/heizungsbestie": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 0,
+  "y": 32
+ },
+ "boss/kammerjaeger": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 160,
+  "y": 0
+ },
+ "boss/kanalkoenigin": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 64,
+  "y": 32
+ },
+ "boss/kesselkoenigin": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 128,
+  "y": 0
+ },
+ "boss/koenig_kanalratte": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 64,
+  "y": 0
+ },
+ "boss/kommandant_schlamm": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 96,
+  "y": 32
+ },
+ "boss/mottenmutter": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 192,
+  "y": 0
+ },
+ "boss/muttis_mixer": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 96,
+  "y": 0
+ },
+ "boss/nixe": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 160,
+  "y": 32
+ },
+ "boss/pfandbaron": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 224,
+  "y": 0
+ },
+ "boss/rattenkaiser": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 192,
+  "y": 32
+ },
+ "boss/schwarzmarkt_oger": {
+  "h": 24,
+  "sheet": "bosse",
+  "w": 24,
+  "x": 128,
+  "y": 32
+ },
  "ding/bombe": {
   "h": 16,
   "sheet": "dinge",
