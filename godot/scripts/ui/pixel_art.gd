@@ -28,6 +28,8 @@ static var _index: Dictionary = {}
 static var _sheets: Dictionary = {}
 static var _images: Dictionary = {}
 static var _tinted: Dictionary = {}
+## Zur Laufzeit zusammengesetzte Bilder (Spielfigur mit Ausrüstung): Name -> Image.
+static var _runtime: Dictionary = {}
 
 
 static func _load() -> void:
@@ -42,7 +44,13 @@ static func _load() -> void:
 
 static func has(name: String) -> bool:
 	_load()
-	return _index.has(name)
+	return _index.has(name) or _runtime.has(name)
+
+
+## Ein zur Laufzeit gebautes Bild unter einem Namen bereitstellen; danach geht
+## es wie jedes Bild aus den Bögen (Tönen, Silhouette, Zeichnen).
+static func register(name: String, img: Image) -> void:
+	_runtime[name] = img
 
 
 static func names(prefix: String = "") -> Array:
@@ -78,12 +86,16 @@ static func entry(name: String) -> Dictionary:
 
 
 static func size_of(name: String) -> Vector2i:
+	if _runtime.has(name):
+		return (_runtime[name] as Image).get_size()
 	var e := entry(name)
 	return e.rect.size if not e.is_empty() else Vector2i.ZERO
 
 
 ## Einzelbild als Image (für Rahmen und Werkzeuge).
 static func image(name: String) -> Image:
+	if _runtime.has(name):
+		return (_runtime[name] as Image).duplicate()
 	var e := entry(name)
 	if e.is_empty():
 		return null
@@ -225,4 +237,5 @@ static func reset() -> void:
 	_sheets = {}
 	_images = {}
 	_tinted = {}
+	_runtime = {}
 	_pixel_lists = {}

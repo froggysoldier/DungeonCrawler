@@ -280,7 +280,7 @@ func _frame(name: String, key: String, moving: bool, idle: bool = true) -> Strin
 	if not idle or not PixelArt.has(alt):
 		return name
 	var time: float = frame_anim.get("time", 0.0)
-	if name in WALKERS:
+	if name.get_slice("@", 0) in WALKERS:
 		return alt if moving and fmod(time / 130.0, 2.0) >= 1.0 else name
 	# Jede Figur mit eigenem Takt, damit nicht alle gleichzeitig schlagen
 	var phase := float(absi(key.hash()) % 97) * 11.0
@@ -967,7 +967,7 @@ func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
 		_spr(ci, mount_name, sx, sy, null, flip)
 	var lift := (5 if riding and not vehicle else (3 if riding else 1)) * px
 	var walking: bool = anim != null and anim.player_moving(frame_anim.get("now", -1.0)) > 0
-	_figure(ci, "p", "kreatur/held", sx, sy - lift + (0.0 if walking else bob), null, flip, Color.WHITE, walking)
+	_figure(ci, "p", Sprites.hero_name(p), sx, sy - lift + (0.0 if walking else bob), null, flip, Color.WHITE, walking)
 	if riding and vehicle:
 		_spr(ci, mount_name, sx, sy, null, flip)
 	# Zustände des Crawlers als farbige Ringe

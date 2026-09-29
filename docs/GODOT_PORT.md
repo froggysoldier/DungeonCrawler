@@ -58,7 +58,7 @@ Die Bilder liegen in `assets/pixel` als PNG-Bögen:
 
 | Bogen | Inhalt |
 |---|---|
-| `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur, Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
+| `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur, Ausrüstungs-Aufsätze der Spielfigur (`ausruestung/…`), Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
 | `bosse.png` | Eigene Figuren der 15 Bosse, 24 × 24 Pixel; sie stehen auf ihrer Kachel und ragen darüber hinaus |
 | `kacheln.png` | Böden (9 Materialien × 4 Varianten), Wände (3 Etagen × 4 Varianten, Krone und Vorderseite), Türen, Treppe |
 | `dinge.png` | Gegenstände am Boden, Symbole der 15 Ausrüstungsplätze (`slot_…`), Fallen, Geschosse |
@@ -102,6 +102,15 @@ Farbe (Ausrüstung zeigt das Symbol ihres Platzes in Seltenheitsfarbe).
 Ausrüstungsraster mit abgeblendeten leeren Plätzen, Zielkarten im Kampf),
 `Kit.img` bettet es als `[img]` in BBCode ein (Tooltips auf der Karte). Der
 Crawler-Reiter zeigt Spielfigur und Haustier.
+
+**Ausrüstung an der Figur:** Für jeden sichtbaren Platz (Kopf, Gesicht, Hals,
+Schultern, Brust, Rücken, Arme, Hände, Gürtel, Beine, Füße, Waffe) gibt es einen
+Aufsatz im Raster der Spielfigur, ohne eigenen Umriss und in der
+Seltenheitsfarbe getönt. `Sprites.hero_name(player)` legt die Aufsätze der
+angelegten Teile über die Figur (der Rücken liegt dahinter), zieht einen Umriss
+um das Ganze und stellt das Ergebnis samt Laufbild mit `PixelArt.register`
+unter einem eigenen Namen bereit. Karte, Crawler-Reiter und Versus-Bildschirm
+zeichnen diese Figur.
 
 **Schriften:** Fließtext in Montserrat, Überschriften, Knöpfe, Reiter und die
 Karte in Pixelify Sans. Pixelify ist bei Größen in Zehnerschritten ganz

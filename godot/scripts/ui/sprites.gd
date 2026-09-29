@@ -115,7 +115,80 @@ static func draw_portrait(ci: CanvasItem, name: String, tint: Variant, foot: Vec
 		PixelArt.draw(ci, "aufsatz/frage", origin + Vector2((sz.x - 5) * scale, (top - 3) * scale), scale)
 
 
-## Die Spielfigur als Porträt.
-static func draw_hero(ci: CanvasItem, foot: Vector2, scale: int, flip: bool = false) -> void:
+## Die Spielfigur als Porträt (name aus hero_name, sonst ohne Ausrüstung).
+static func draw_hero(ci: CanvasItem, foot: Vector2, scale: int, flip: bool = false, name: String = "kreatur/held") -> void:
 	PixelArt.draw_foot(ci, "aufsatz/schatten", foot + Vector2(0, 3 * scale), scale)
-	PixelArt.draw_foot(ci, "kreatur/held", foot, scale, null, flip)
+	PixelArt.draw_foot(ci, name, foot, scale, null, flip)
+
+
+# ---------------------------------------------------------------- Ausrüstung an der Figur
+
+## Sichtbare Ausrüstungsplätze in Zeichenreihenfolge; GEAR_BEHIND liegt hinter der Figur.
+const GEAR_BEHIND := ["ruecken"]
+const GEAR_FRONT := ["beine", "fuesse", "brust", "guertel", "hals", "schultern", "arme", "haende", "gesicht", "kopf", "waffe"]
+const OUTLINE := Color("#181425")
+
+
+## Bildname der Spielfigur mit ihrer angelegten Ausrüstung. Ohne sichtbare
+## Ausrüstung die schlichte Figur; sonst wird sie einmal zusammengesetzt (auch
+## das Laufbild „_2“) und unter einem Namen aus Plätzen und Farben abgelegt.
+static func hero_name(p: Dictionary) -> String:
+	var eq: Dictionary = p.get("equipment", {})
+	var parts: Array = []
+	for slot in GEAR_BEHIND + GEAR_FRONT:
+		if eq.get(slot) != null and PixelArt.has("ausruestung/" + slot):
+			parts.append("%s=%s" % [slot, item_color(eq[slot])])
+	if parts.is_empty():
+		return "kreatur/held"
+	var name := "kreatur/held@" + ",".join(parts)
+	if not PixelArt.has(name):
+		PixelArt.register(name, _compose_hero(eq, ""))
+		PixelArt.register(name + "_2", _compose_hero(eq, "_2"))
+	return name
+
+
+static func _compose_hero(eq: Dictionary, frame: String) -> Image:
+	var base := PixelArt.image("kreatur/held" + frame)
+	var img := Image.create(base.get_width(), base.get_height(), false, Image.FORMAT_RGBA8)
+	var gear := {}
+	for slot in GEAR_BEHIND:
+		_gear_layer(img, eq, slot, frame, gear)
+	for y in base.get_height():
+		for x in base.get_width():
+			var c := base.get_pixel(x, y)
+			if c.a > 0.5:
+				img.set_pixel(x, y, c)
+				gear.erase(Vector2i(x, y))
+	for slot in GEAR_FRONT:
+		_gear_layer(img, eq, slot, frame, gear)
+	# Umriss dort, wo die Ausrüstung über die Figur hinausragt
+	var w := img.get_width()
+	var h := img.get_height()
+	var edge: Array = []
+	for y in h:
+		for x in w:
+			if img.get_pixel(x, y).a > 0.5:
+				continue
+			for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				if gear.has(Vector2i(x, y) + d):
+					edge.append(Vector2i(x, y))
+					break
+	for q in edge:
+		img.set_pixelv(q, OUTLINE)
+	return img
+
+
+static func _gear_layer(img: Image, eq: Dictionary, slot: String, frame: String, gear: Dictionary) -> void:
+	var it = eq.get(slot)
+	var n := "ausruestung/" + slot
+	if it == null or not PixelArt.has(n):
+		return
+	if PixelArt.has(n + frame):
+		n += frame
+	var src := PixelArt.texture(n, item_color(it)).get_image()
+	for y in mini(src.get_height(), img.get_height()):
+		for x in mini(src.get_width(), img.get_width()):
+			var c := src.get_pixel(x, y)
+			if c.a > 0.5:
+				img.set_pixel(x, y, c)
+				gear[Vector2i(x, y)] = true

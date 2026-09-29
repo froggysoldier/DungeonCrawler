@@ -135,7 +135,7 @@ static func item_body(gv: GameView, v: Node, it: Dictionary, with_actions: bool,
 static func portrait(s: Dictionary) -> Control:
 	var st := Kit.Stage.new()
 	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	st.items = [{"name": "kreatur/held", "scale": 4, "foot": Vector2(36, 66)}]
+	st.items = [{"name": Sprites.hero_name(s.player), "scale": 4, "foot": Vector2(36, 66)}]
 	st.custom_minimum_size = Vector2(72, 80)
 	var pet = s.player.get("pet")
 	if pet != null:

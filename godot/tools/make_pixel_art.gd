@@ -138,7 +138,7 @@ func _valid(ch: String) -> bool:
 
 
 ## Baut ein Bild aus Zeichenzeilen: Schattierung, dann Umriss.
-func sprite(name: String, rows: Array) -> Image:
+func sprite(name: String, rows: Array, outline: bool = true) -> Image:
 	var h := rows.size()
 	var w := String(rows[0]).length()
 	var grid: Array = []
@@ -173,7 +173,7 @@ func sprite(name: String, rows: Array) -> Image:
 			line.append(ch)
 		out.append(line)
 	# Umriss um alles außer den Zeichen ohne Umriss
-	for y in h:
+	for y in (h if outline else 0):
 		for x in w:
 			if grid[y][x] != ".":
 				continue
@@ -204,6 +204,8 @@ func _build_all() -> void:
 		_add("bosse", "boss/" + n, _bottom(sprite(n, Defs.BOSSES[n]), 1))
 	for n in Defs.MOUNTS:
 		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n]))
+	for n in Defs.GEAR:
+		_add("kreaturen", "ausruestung/" + n, sprite(n, Defs.GEAR[n], false))
 	_add("kreaturen", "aufsatz/schatten", _shadow(14, 5))
 	_add("kreaturen", "aufsatz/schatten_klein", _shadow(10, 3))
 	_add("kreaturen", "aufsatz/ring", _ring(16, 7))

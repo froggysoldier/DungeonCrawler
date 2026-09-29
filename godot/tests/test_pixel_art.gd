@@ -139,3 +139,31 @@ func test_bilder_in_der_oberflaeche(t) -> void:
 	t.eq(slot.custom_minimum_size, Vector2(40, 36), "festes Feld")
 	t.lt(slot.items[0].mod.a, 1.0, "leerer Platz abgeblendet")
 	slot.free()
+
+
+func _gear(slot: String, rarity: String) -> Dictionary:
+	return {"kind": "ausruestung", "slot": slot, "rarity": rarity}
+
+
+func test_ausruestung_an_der_figur(t) -> void:
+	for slot in Sprites.GEAR_BEHIND + Sprites.GEAR_FRONT:
+		t.ok(PixelArt.has("ausruestung/" + slot), "%s hat einen Aufsatz" % slot)
+		t.has(GameTabs.EQUIP_ORDER, slot, "%s ist ein Ausrüstungsplatz" % slot)
+	t.eq(Sprites.hero_name({"equipment": {}}), "kreatur/held", "ohne Ausrüstung die schlichte Figur")
+	t.eq(Sprites.hero_name({"equipment": {"ring1": _gear("ring", "episch")}}), "kreatur/held", "Ringe sieht man nicht")
+	var eq := {"kopf": _gear("kopf", "selten"), "waffe": _gear("waffe", "episch"), "fuesse": _gear("fuesse", "gewoehnlich")}
+	var n := Sprites.hero_name({"equipment": eq})
+	t.ok(n != "kreatur/held" and PixelArt.has(n) and PixelArt.has(n + "_2"), "zusammengesetzt, mit Laufbild")
+	t.eq(PixelArt.size_of(n), PixelArt.size_of("kreatur/held"), "gleich groß wie die Figur")
+	t.eq(Sprites.hero_name({"equipment": eq}), n, "gleiche Ausrüstung, gleicher Name")
+	var img := PixelArt.image(n)
+	var base := PixelArt.image("kreatur/held")
+	t.ok(img.get_pixel(7, 1) != base.get_pixel(7, 1), "Helm über den Haaren")
+	t.eq(img.get_pixel(7, 4), base.get_pixel(7, 4), "Gesicht bleibt frei")
+	t.eq(img.get_pixel(13, 1), Sprites.OUTLINE, "Umriss um die Waffenspitze")
+	t.ok(PixelArt.image(n + "_2").get_pixel(3, 13) != img.get_pixel(3, 13), "Stiefel im Laufbild versetzt")
+	var eq2 := eq.duplicate(true)
+	eq2.kopf.rarity = "episch"
+	t.ok(Sprites.hero_name({"equipment": eq2}) != n, "andere Seltenheit, andere Figur")
+	t.not_null(PixelArt.texture(n), "tönbar wie jedes Bild")
+	t.not_null(PixelArt.silhouette(n), "Aufblitzen möglich")
