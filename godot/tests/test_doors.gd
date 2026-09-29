@@ -30,7 +30,7 @@ func test_tuer_oeffnen_und_schliessen(t) -> void:
 	var front = null
 	for d in [[1, 0], [-1, 0], [0, 1], [0, -1]]:
 		var q := {"x": door.x + d[0], "y": door.y + d[1]}
-		if MapGen.tile_at(s.map, q.x, q.y) == "floor" and s.map.roomAt[MapGen.idx(s.map, q.x, q.y)] == -1:
+		if MapGen.is_walkable(s.map, q.x, q.y) and s.map.roomAt[MapGen.idx(s.map, q.x, q.y)] == -1:
 			front = q
 			break
 	s.player.pos = front.duplicate()

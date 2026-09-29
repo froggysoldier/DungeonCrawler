@@ -2,7 +2,7 @@ class_name Parity
 extends RefCounted
 ## Hilfen für die Replay-Tests: Kurzzustand, Vergleich, Aktionen ausführen.
 
-const TILE_CHARS := {"wall": "#", "floor": ".", "stairs": ">", "door": "+", "dooropen": "'"}
+const TILE_CHARS := {"wall": "#", "floor": ".", "stairs": ">", "door": "+", "dooropen": "'", "wasser": "~", "schlamm": ",", "kiste": "k", "fass": "f"}
 
 
 ## Kompakter Zustand für den Vergleich (Karte als Text statt riesiger Listen).

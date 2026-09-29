@@ -46,7 +46,10 @@ func test_karten_zusammenhaengend(t) -> void:
 		var reach := _reachable(s, s.player.pos)
 		var bad := 0
 		for i in s.map.tiles.size():
-			if s.map.tiles[i] != "wall" and not reach.has(i):
+			# Kisten stehen im Weg, Geheimkammern sind absichtlich abgeschnitten
+			var ri: int = s.map.roomAt[i]
+			var secret: bool = ri >= 0 and s.map.rooms[ri].get("feature") == "geheim"
+			if s.map.tiles[i] != "wall" and not Dungeon.is_crate(s.map.tiles[i]) and not secret and not reach.has(i):
 				bad += 1
 		t.eq(bad, 0, "Seed %d: alles erreichbar" % seed)
 		var kinds: Array = s.map.rooms.map(func(r): return r.kind)

@@ -4,7 +4,7 @@ extends RefCounted
 ## Gegenstände am Boden, Treppe, Türen, andere Crawler, Fallen und alles,
 ## was ein Safe Room bietet (Automat, Wirt, Bett, Toilette, Laden, Boxen).
 
-const FURNITURE_NAMES := {"automat": "Gratis-Automat", "wirt": "Wirt an der Theke", "bett": "Bett", "toilette": "Toilette"}
+const FURNITURE_NAMES := {"automat": "Gratis-Automat", "wirt": "Wirt an der Theke", "bett": "Bett", "toilette": "Toilette", "schrein": "Schrein"}
 
 
 static func _row(parent: Node, bb: String, size: int = 14) -> HBoxContainer:
@@ -42,6 +42,24 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 		for d in doors:
 			var at := {"x": d.x, "y": d.y}
 			Kit.button(f, "Tür schließen", func(): gv.act(func(): return Game.close_door(s, at)), "SmallButton")
+	var locked := Game.adjacent_locked_doors(s)
+	if not locked.is_empty():
+		any = true
+		Kit.section(v, "Verschlossene Tür")
+		for d in locked:
+			var at := {"x": d.x, "y": d.y}
+			var f := Kit.flow(v, 4)
+			if Dungeon.has_key_for(s, at):
+				Kit.button(f, "Aufschließen", func(): gv.act(func(): return Game.open_door(s, at)), "SmallButton")
+			Kit.button(f, "Schloss knacken (%d %%)" % J.rnd(Dungeon.lockpick_chance(s) * 100), func(): gv.act(func(): return Game.pick_lock(s, at)), "SmallButton")
+	var crates := Dungeon.adjacent_crates(s)
+	if not crates.is_empty():
+		any = true
+		var f := Kit.flow(v, 4)
+		for c in crates:
+			var at := {"x": c.x, "y": c.y}
+			var label := "Kiste zerschlagen" if MapGen.tile_at(s.map, c.x, c.y) == "kiste" else "Fass zerschlagen"
+			Kit.button(f, label, func(): gv.act(func(): return Game.smash(s, at)), "SmallButton")
 	var people := Crawlers.talkable(s)
 	if not people.is_empty():
 		any = true
@@ -81,6 +99,8 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 	if room != null and room.kind == "safe":
 		any = true
 		_safe_room(gv, v, room)
+	elif room != null and room.get("feature") != null:
+		any = _feature_room(gv, v, room) or any
 	if any:
 		root.add_child(v)
 		Kit.spacer(root, 6)
@@ -136,24 +156,7 @@ static func _safe_room(gv: GameView, v: VBoxContainer, room: Dictionary) -> void
 		Kit.button(v, "Toilette benutzen", func(): gv.act(func(): return Game.toilet(s)), "SmallButton").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	var shop = room.get("shop")
 	if shop != null and (legacy or near.call("haendler")):
-		_subhead(v, "Laden")
-		Kit.text(v, Kit.esc(shop.keeper) + (" – wirkt verstimmt" if shop.mood < 70 else ""), 12, "muted")
-		var offers: Array = shop.offers
-		for i in offers.size():
-			var o: Dictionary = offers[i]
-			var idx: int = i
-			var total := Shop.offer_price(o.price, o.item, s)
-			var menge := J.num(o.item, "menge")
-			var h := Kit.hbox(v, 6)
-			var name_l := Kit.text(h, Kit.col(Kit.esc(Identify.item_name(s, o.item)) + (" ×%s" % J.s(menge) if menge > 1 else ""), Db.t("items", "RARITY_COLORS")[o.item.rarity]), 13)
-			name_l.tooltip_text = ", ".join(Identify.describe_item(s, o.item).bonuses)
-			name_l.mouse_filter = Control.MOUSE_FILTER_PASS
-			name_l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			Kit.label(h, "%d G" % total, 12, "muted").size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			Kit.button(h, "Kaufen", func(): gv.act(func(): return Game.buy_offer(s, idx)), "SmallButton", s.player.gold < total)
-			Kit.button(h, "Feilschen", func(): gv.act(func(): return Game.haggle_offer(s, idx)), "SmallButton", o.get("haggled", false))
-		Kit.text(v, "Verkaufen: im Inventar-Tab beim Gegenstand.", 12, "muted")
-		GameTabs.quest_card(gv, v, Quests.quest_of(s, str(room.id)))
+		_shop(gv, v, room, shop)
 	var boxes: Array = s.player.boxes
 	if not boxes.is_empty():
 		Kit.spacer(v, 6)
@@ -171,6 +174,52 @@ static func _safe_room(gv: GameView, v: VBoxContainer, room: Dictionary) -> void
 			Kit.button(v, "Weniger anzeigen" if gv.show_all_boxes else "%d weitere anzeigen" % (boxes.size() - 3), func():
 				gv.show_all_boxes = not gv.show_all_boxes
 				gv.refresh_here(), "LinkBtn").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+
+
+static func _shop(gv: GameView, v: VBoxContainer, room: Dictionary, shop: Dictionary) -> void:
+	var s := gv.s
+	_subhead(v, "Laden" if room.kind == "safe" else "Wanderhändler")
+	Kit.text(v, Kit.esc(shop.keeper) + (" – wirkt verstimmt" if shop.mood < 70 else ""), 12, "muted")
+	var offers: Array = shop.offers
+	for i in offers.size():
+		var o: Dictionary = offers[i]
+		var idx: int = i
+		var total := Shop.offer_price(o.price, o.item, s)
+		var menge := J.num(o.item, "menge")
+		var h := Kit.hbox(v, 6)
+		var name_l := Kit.text(h, Kit.col(Kit.esc(Identify.item_name(s, o.item)) + (" ×%s" % J.s(menge) if menge > 1 else ""), Db.t("items", "RARITY_COLORS")[o.item.rarity]), 13)
+		name_l.tooltip_text = ", ".join(Identify.describe_item(s, o.item).bonuses)
+		name_l.mouse_filter = Control.MOUSE_FILTER_PASS
+		name_l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		Kit.label(h, "%d G" % total, 12, "muted").size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		Kit.button(h, "Kaufen", func(): gv.act(func(): return Game.buy_offer(s, idx)), "SmallButton", s.player.gold < total)
+		Kit.button(h, "Feilschen", func(): gv.act(func(): return Game.haggle_offer(s, idx)), "SmallButton", o.get("haggled", false))
+	Kit.text(v, "Verkaufen: im Inventar-Tab beim Gegenstand.", 12, "muted")
+	GameTabs.quest_card(gv, v, Quests.quest_of(s, str(room.id)))
+
+
+## Besondere Räume: Schrein, Nest, Wanderhändler.
+static func _feature_room(gv: GameView, v: VBoxContainer, room: Dictionary) -> bool:
+	var s := gv.s
+	var any := false
+	for f in J.arr(room, "furniture"):
+		if Fov.chebyshev(f.pos, s.player.pos) > 1:
+			continue
+		match f.kind:
+			"schrein":
+				any = true
+				Kit.section(v, "Schrein")
+				Kit.text(v, "Eine flackernde Kerze, ein paar Opfergaben. Beten kann helfen. Oder auch nicht.", 12, "muted")
+				var ff: Dictionary = f
+				Kit.button(v, "Beten", func(): gv.act(func(): return Game.use_furniture(s, ff)), "SmallButton").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+			"schrein_leer":
+				any = true
+				Kit.text(v, "Der Schrein ist erloschen.", 12, "muted")
+			"haendler":
+				if room.get("shop") != null:
+					any = true
+					_shop(gv, v, room, room.shop)
+	return any
 
 
 static func _subhead(v: Node, text: String) -> void:

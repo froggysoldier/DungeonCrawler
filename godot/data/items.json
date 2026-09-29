@@ -2683,6 +2683,13 @@
    },
    "flavor": "Blümchenmuster. Unzerstörbar.",
    "wert": 60
+  },
+  {
+   "id": "schluessel",
+   "name": "Rostiger Schlüssel",
+   "kind": "schluessel",
+   "flavor": "Schwer, rostig, mit einem Anhänger aus Draht. Irgendwo auf dieser Etage gibt es eine Tür, die darauf wartet.",
+   "wert": 0
   }
  ],
  "FOOD_IDS": [

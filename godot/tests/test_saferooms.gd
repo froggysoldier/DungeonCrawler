@@ -56,7 +56,9 @@ func test_nur_material_am_boden(t) -> void:
 		for s in _floors(seed):
 			for e in s.items:
 				var r = MapGen.room_of(s.map, e.pos)
-				if r != null and r.get("antechamberOf") != null:
+				if r != null and (r.get("antechamberOf") != null or r.get("feature") != null):
+					continue
+				if e.item.kind == "schluessel":
 					continue
 				t.ok(ids.has(e.item.get("baseId", "")), "%d/%d: %s" % [seed, s.floor, e.item.get("baseId")])
 

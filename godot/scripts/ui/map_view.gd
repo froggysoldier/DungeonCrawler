@@ -407,7 +407,8 @@ static func door_name(open: bool, horizontal: bool, boss: bool) -> String:
 	return "tuer/%s_%s_%s" % ["boss" if boss else "holz", "quer" if horizontal else "laengs", "offen" if open else "zu"]
 
 
-const PROPS := ["kiste", "fass", "regal", "geruempel", "eimer"]
+## Nur Dekoration; echte Kisten und Fässer sind eigene Kacheln (zerschlagbar).
+const PROPS := ["regal", "geruempel", "eimer"]
 
 
 ## Böden, Schatten, Dekoration, Türen und Wände in Weltkoordinaten (Kachel · Größe).
@@ -449,7 +450,12 @@ func _draw_static(ci: CanvasItem) -> void:
 			if mat == null:
 				mat = Tiles.room_material(room)
 				materials[ri] = mat
-			_spr(ci, "boden/%s%d" % [mat, floori(Tiles.hash(x, y) * 4)], sx, sy)
+			if tile == Dungeon.WATER or tile == Dungeon.MUD:
+				_spr(ci, "boden/%s%d" % [tile, floori(Tiles.hash(x, y) * 4)], sx, sy)
+				if tile == Dungeon.WATER and vis.has(i):
+					_animated.append(["water", x, y])
+			else:
+				_spr(ci, "boden/%s%d" % [mat, floori(Tiles.hash(x, y) * 4)], sx, sy)
 			# Harte Schatten unter und neben Wänden
 			var n: bool = y == 0 or tl[i - mw] == "wall"
 			var we: bool = x == 0 or tl[i - 1] == "wall"
@@ -466,7 +472,9 @@ func _draw_static(ci: CanvasItem) -> void:
 				_draw_decal(ci, sx, sy, x, y, s.floor)
 			# Einrichtung an den Wänden normaler Räume (nur Dekoration)
 			if rkind == "normal" and tile == "floor" and (n or we or ea) and Tiles.hash(x, y, 5) < 0.09:
-				_spr(ci, "moebel/" + PROPS[floori(Tiles.hash(x, y, 6) * 5)], sx, sy)
+				_spr(ci, "moebel/" + PROPS[floori(Tiles.hash(x, y, 6) * PROPS.size())], sx, sy)
+			if Dungeon.is_crate(tile):
+				_spr(ci, "moebel/" + tile, sx, sy)
 			if tile == "stairs":
 				if vis.has(i):
 					_animated.append(["stairs", x, y])
@@ -475,7 +483,7 @@ func _draw_static(ci: CanvasItem) -> void:
 			if room != null:
 				for f in J.arr(room, "furniture"):
 					if f.pos.x == x and f.pos.y == y:
-						if f.kind == "automat" or f.kind == "haendler" or f.kind == "wirt":
+						if f.kind in ["automat", "haendler", "wirt", "schrein"]:
 							_animated.append(["furniture", x, y, f.kind])
 						else:
 							_spr(ci, "moebel/" + f.kind, sx, sy)
@@ -493,6 +501,8 @@ func _draw_static(ci: CanvasItem) -> void:
 					_animated.append(["lairdoor", x, y, tile == "dooropen", horizontal])
 				else:
 					_spr(ci, door_name(tile == "dooropen", horizontal, lair), sx, sy)
+				if tile == "door" and Dungeon.lock_at(s, J.pos(x, y)) != null:
+					_spr(ci, "aufsatz/schloss", sx, sy)
 
 	# --- Wände: Krone von oben, Vorderseite zum Raum hin, helle Kanten
 	var th := Tiles.wall_theme(s.floor)
@@ -569,6 +579,13 @@ func _draw_live() -> void:
 			"lairdoor":
 				_glow(ci, sx + T / 2, sy + T / 2, "#ff3c28", 0.45 + 0.3 * sin(time / 400.0))
 				_spr(ci, door_name(a[3], a[4], true), sx, sy)
+			"water":
+				# Lichtreflexe wandern langsam über das Wasser
+				var wp: float = Tiles.hash(a[1], a[2], 13)
+				var t := fmod(time / 2600.0 + wp, 1.0)
+				var al := 0.35 * sin(t * PI)
+				_rect(ci, sx, sy, 4 + floori(t * 18), 8 + floori(wp * 12), 5, 1, Color(0.8, 0.95, 1.0, al))
+				_rect(ci, sx, sy, 20 - floori(t * 12), 20 + floori(wp * 6), 3, 1, Color(0.8, 0.95, 1.0, al * 0.7))
 			"torch":
 				var ph: float = Tiles.hash(a[1], a[2], 12) * 1000.0
 				_glow(ci, sx + T / 2, sy + 10 * px, "#ff9a3c", 0.38 + 0.12 * sin((time + ph) / 90.0) + 0.06 * sin((time + ph) / 37.0))
@@ -602,6 +619,9 @@ func _draw_furniture(ci: CanvasItem, kind: String, sx: float, sy: float, time: f
 		"automat":
 			_glow(ci, sx + T / 2, sy + T / 2, "#78dcff", 0.35 + 0.2 * sin(time / 350.0))
 			_spr(ci, "moebel/automat", sx, sy)
+		"schrein":
+			_glow(ci, sx + T / 2, sy + 10 * px, "#ffb45a", 0.3 + 0.1 * sin(time / 130.0) + 0.05 * sin(time / 47.0))
+			_spr(ci, "moebel/schrein", sx, sy)
 		"haendler", "wirt":
 			# Figur hinter der Theke
 			var bob := 2 * px if fmod(time / 700.0, 2.0) < 1.0 else 0

@@ -431,6 +431,24 @@ Bossen schneller und höher; danach blendet sie wieder aus. Schalter „Ton“,
 - Zustände stehen auf der Karte (farbige Punkte, flackernder Rand bei Brand),
   im Tooltip, in der Zielliste und an der eigenen Lebensleiste.
 
+### 3.25 Gelände und besondere Räume
+Jede Etage bekommt Gelände und Sonderräume (`scripts/engine/dungeon.gd`):
+
+| Baustein | Wirkung |
+|---|---|
+| Seichtes Wasser | begehbar, löscht Brand bei Crawler und Monstern |
+| Schlamm | wer hineintritt, verliert den nächsten Zug (Crawler und Monster) |
+| Kisten und Fässer | versperren den Weg; hineinlaufen zerschlägt sie: meist leer oder Material, manchmal Gold oder Vorräte, selten ein Mimic |
+| Schatzkammer | ummauert, Türen verschlossen; der rostige Schlüssel liegt im selben Viertel. Alternativ Schloss knacken (Geschick, Fallenkunde), Fehlschläge können Schläfer wecken |
+| Geheimkammer | hinter einer Wand; Geheimtüren fallen in bis zu 2 Feldern Abstand auf (Intelligenz, Wahrnehmung), Warten sucht mit |
+| Monsternest | Rudel eines schwachen Monsters; ist das Nest leer, liegen Gold und Beute darin |
+| Schrein | einmal beten: Segen (80 Züge), volle Heilung, nichts oder ein Fluch (40 Züge); Charisma hilft |
+| Wanderhändler | Laden außerhalb der Safe Rooms: kaufen, feilschen, verkaufen |
+| Hinterhalt | leerer Raum; beim Betreten treten wache Gegner aus den Zugängen |
+
+Ummauerte Kammern entstehen nur, wenn danach noch alle anderen Räume und
+Treppen erreichbar sind; Auftragsziele liegen nie darin.
+
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
 1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben

@@ -21,7 +21,7 @@ static func find_path(m: Dictionary, from: Dictionary, to: Dictionary, passable:
 		if x < 0 or y < 0 or x >= width or y >= height:
 			return false
 		var t: String = tiles[y * width + x]
-		return t == "floor" or t == "stairs" or t == "dooropen" or (through_doors and t == "door")
+		return t == "floor" or t == "stairs" or t == "dooropen" or t == "wasser" or t == "schlamm" or (through_doors and t == "door")
 	var is_door := func(x: int, y: int) -> bool:
 		if x < 0 or y < 0 or x >= width or y >= height:
 			return false

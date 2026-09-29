@@ -265,6 +265,13 @@ static func make_noise(s: Dictionary, at: Dictionary, radius: int) -> void:
 
 
 static func monster_turn(s: Dictionary, m: Dictionary) -> void:
+	var before := J.pcopy(m.pos)
+	_monster_turn(s, m)
+	if s.status == "playing" and J.has_same(s.monsters, m) and (m.pos.x != before.x or m.pos.y != before.y):
+		Dungeon.on_monster_step(s, m)
+
+
+static func _monster_turn(s: Dictionary, m: Dictionary) -> void:
 	if s.status != "playing" or not J.has_same(s.monsters, m):
 		return
 	var died := Conditions.turn(s, m, func(x, part): Combat.kill_monster(s, x, null, false, ["t:%s" % part] + Observer.target_facets(s, x) + Observer.self_facets(s)))
@@ -277,6 +284,9 @@ static func monster_turn(s: Dictionary, m: Dictionary) -> void:
 		return
 	if m.aware:
 		m.asleep = false
+	if m.get("mudStuck"):
+		m.erase("mudStuck")
+		return
 	if m.get("stunned") and m.stunned > 0:
 		m.stunned -= 1
 		if Sight.player_sees(s, m.pos):

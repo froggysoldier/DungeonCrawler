@@ -32,7 +32,7 @@ static func _reward(s: Dictionary, kind: String) -> Dictionary:
 
 ## Ein Raum weit weg vom Crawler.
 static func _far_room(s: Dictionary) -> Variant:
-	var rooms: Array = s.map.rooms.filter(func(r): return r.kind == "normal")
+	var rooms: Array = s.map.rooms.filter(func(r): return r.kind == "normal" and not r.get("sealed"))
 	var here: Dictionary = s.player.pos
 	var far := rooms.filter(func(r): return J.cheb({"x": r.x, "y": r.y}, here) >= 18)
 	var list := far if not far.is_empty() else rooms

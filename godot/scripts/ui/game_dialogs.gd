@@ -6,6 +6,16 @@ extends RefCounted
 const FURNITURE_TEXT := {
 	"automat": "Gratis-Automat – ein Gegenstand pro Crawler", "haendler": "Händler – kaufen, verkaufen, feilschen",
 	"wirt": "Wirt – Essen und ein Zimmer zum Schlafen", "bett": "Bett – acht Stunden Schlaf", "toilette": "Toilette – die Regel gilt",
+	"schrein": "Schrein – beten: Segen, Heilung oder Fluch", "schrein_leer": "Erloschener Schrein",
+	"nest": "Monsternest – bewohnt", "nest_leer": "Leeres Nest",
+}
+
+## Gelände und Hindernisse: Titel, Farbe, Hinweis.
+const TERRAIN_TEXT := {
+	"wasser": ["Seichtes Wasser", "#7cc4ff", "Löscht Feuer an allem, was hindurchgeht."],
+	"schlamm": ["Schlamm", "#c09a6a", "Wer hineintritt, braucht einen Zug, um wieder herauszukommen."],
+	"kiste": ["Kiste", "#c09a6a", "Hineinlaufen zum Zerschlagen. Manchmal ist etwas drin."],
+	"fass": ["Fass", "#c09a6a", "Hineinlaufen zum Zerschlagen. Manchmal ist etwas drin."],
 }
 
 
@@ -91,6 +101,11 @@ static func tooltip_for(gv: GameView, t: Variant, detail: bool = false) -> Varia
 		parts.append("[b]%s[/b]\n%s" % [Kit.col(FURNITURE_TEXT.get(fu.kind, fu.kind), "#9fd0ff"), Kit.small(Kit.muted("Hineinlaufen zum Benutzen"))])
 	if m.tiles[i] == "stairs":
 		parts.append("[b]%s[/b]" % Kit.col("Treppenhaus nach unten", "#ffcc33"))
+	if TERRAIN_TEXT.has(m.tiles[i]):
+		var tt: Array = TERRAIN_TEXT[m.tiles[i]]
+		parts.append("[b]%s[/b]\n%s" % [Kit.col(tt[0], tt[1]), Kit.small(Kit.muted(tt[2]))])
+	if m.tiles[i] == "door" and Dungeon.lock_at(s, tp) != null:
+		parts.append("[b]%s[/b]\n%s" % [Kit.col("Verschlossene Tür", "#feae34"), Kit.small(Kit.muted("Mit dem passenden Schlüssel aufschließen oder das Schloss knacken."))])
 	if (m.tiles[i] == "door" or m.tiles[i] == "dooropen") and Game.is_lair_door(s, tp):
 		parts.append("[b]%s[/b]\n%s" % [Kit.col("Tür zur Boss-Kammer", "#ff7a6a"), Kit.small(Kit.muted("Sie verriegelt sich hinter dir, bis der Boss besiegt ist."))])
 	if room != null and room.get("visited", false):

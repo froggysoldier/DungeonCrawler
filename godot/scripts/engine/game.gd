@@ -246,7 +246,7 @@ static func plan_path(s: Dictionary, target: Dictionary) -> Variant:
 		return null
 	var is_target := func(x: int, y: int) -> bool: return x == target.x and y == target.y
 	var ok := func(x: int, y: int) -> bool:
-		return known.call(x, y) and Ai.monster_at(s, J.pos(x, y)) == null and (is_target.call(x, y) or MapGen.furniture_at(m, J.pos(x, y)) == null)
+		return known.call(x, y) and Ai.monster_at(s, J.pos(x, y)) == null and (is_target.call(x, y) or (MapGen.furniture_at(m, J.pos(x, y)) == null and Dungeon.lock_at(s, J.pos(x, y)) == null))
 	var path = Pathfinding.find_path(m, s.player.pos, target, func(x, y): return ok.call(x, y) and (is_target.call(x, y) or not Traps.avoid_tile(s, x, y)), 6000, true)
 	if path == null:
 		path = Pathfinding.find_path(m, s.player.pos, target, ok, 6000, true)
@@ -271,8 +271,11 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 		var tr = MapGen.room_of(s.map, to)
 		if tr == null or tr.id != lair.id:
 			return _fail("Die Tür ist verriegelt. Hier kommst du erst wieder heraus, wenn der Boss besiegt ist.")
-	if MapGen.tile_at(s.map, to.x, to.y) == "door":
+	var to_tile := MapGen.tile_at(s.map, to.x, to.y)
+	if to_tile == "door":
 		return open_door(s, to)
+	if Dungeon.is_crate(to_tile):
+		return smash(s, to)
 	if not Pathfinding.can_step(s.map, p.pos, to):
 		return _fail("Durch einen Türrahmen geht es nur gerade hindurch." if Pathfinding.is_door(s.map, to.x, to.y) or Pathfinding.is_door(s.map, p.pos.x, p.pos.y) else "Da ist eine Wand.")
 	if Ai.monster_at(s, to) != null:
@@ -281,6 +284,9 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 	if other != null and not other.party:
 		return _fail("Da steht %s." % other.name)
 	if p.get("immobile") and not Traps.struggle(s):
+		end_turn(s)
+		return _ok()
+	if Dungeon.stuck_in_mud(s):
 		end_turn(s)
 		return _ok()
 	var pet = p.pet
@@ -294,6 +300,7 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 	Events.emit(s, {"type": "moved"})
 	after_move(s)
 	Traps.on_player_step(s)
+	Dungeon.on_player_step(s)
 	if Mounts.mount_step(s):
 		end_turn(s, true)
 	return _ok()
@@ -324,6 +331,10 @@ static func open_door(s: Dictionary, at: Dictionary) -> Dictionary:
 		return _fail("Hier ist keine geschlossene Tür.")
 	if absi(at.x - p.pos.x) + absi(at.y - p.pos.y) != 1:
 		return _fail("Türen öffnet man von vorne, nicht schräg.")
+	if Dungeon.lock_at(s, at) != null:
+		var res := Dungeon.try_door(s, at)
+		if not res.ok:
+			return _fail(res.message)
 	s.map.tiles[MapGen.idx(s.map, at.x, at.y)] = "dooropen"
 	var behind = null
 	for d in MapGen.DIRS4:
@@ -341,6 +352,42 @@ static func open_door(s: Dictionary, at: Dictionary) -> Dictionary:
 	after_move(s)
 	end_turn(s)
 	return _ok()
+
+
+## Verschlossene Tür: Schloss knacken (kostet einen Zug).
+static func pick_lock(s: Dictionary, at: Dictionary) -> Dictionary:
+	if s.status != "playing":
+		return _fail("Das Spiel ist vorbei.")
+	var res := Dungeon.pick_lock(s, at)
+	if not res.ok:
+		return _fail(res.message)
+	end_turn(s)
+	return _ok()
+
+
+## Kiste oder Fass zerschlagen (kostet einen Zug).
+static func smash(s: Dictionary, at: Dictionary) -> Dictionary:
+	if s.status != "playing":
+		return _fail("Das Spiel ist vorbei.")
+	if J.cheb(at, s.player.pos) != 1:
+		return _fail("Dafür musst du direkt daneben stehen.")
+	var res := Dungeon.smash(s, at)
+	if not res.ok:
+		return _fail(res.message)
+	after_move(s)
+	end_turn(s)
+	return _ok()
+
+
+## Verschlossene Türen neben dem Crawler.
+static func adjacent_locked_doors(s: Dictionary) -> Array:
+	var p: Dictionary = s.player.pos
+	var out := []
+	for d in MapGen.DIRS4:
+		var q := J.pos(p.x + d[0], p.y + d[1])
+		if MapGen.tile_at(s.map, q.x, q.y) == "door" and Dungeon.lock_at(s, q) != null:
+			out.append(q)
+	return out
 
 
 static func close_door(s: Dictionary, at: Dictionary) -> Dictionary:
@@ -410,6 +457,8 @@ static func wait(s: Dictionary) -> Dictionary:
 		end_turn(s)
 		return _ok()
 	s.player.ausdauer = mini(Player.max_ausdauer(s), s.player.ausdauer + 1)
+	# Wer wartet, sieht sich um: Geheimtüren in der Nähe fallen eher auf
+	Dungeon.detect(s, visible_tiles(s))
 	end_turn(s)
 	return _ok()
 
@@ -572,6 +621,7 @@ static func after_move(s: Dictionary) -> void:
 		Log.add(s, "Du entdeckst ein Treppenhaus nach unten!", "system")
 		Events.emit(s, {"type": "stairsFound"})
 	Traps.detect(s, vis)
+	Dungeon.detect(s, vis)
 	var room = current_room(s)
 	var room_id: int = room.id if room != null else -1
 	if room_id != s.currentRoom:
@@ -621,6 +671,7 @@ static func _on_enter_room(s: Dictionary, room: Dictionary) -> void:
 		if boss != null and not room.get("versusShown"):
 			room.versusShown = true
 			s.pendingVersus = boss.uid
+	Dungeon.on_enter_room(s, room, first)
 	if room.get("antechamberOf") != null and first:
 		Log.add(s, "Hinter der rot beschlagenen Tür rumort etwas Großes. Das hier ist der Vorraum einer Boss-Kammer.", "gefahr")
 	if (room.kind == "boss" or room.kind == "arena") and first:
@@ -960,6 +1011,18 @@ static func use_furniture(s: Dictionary, f: Dictionary) -> Dictionary:
 				var shop := Shop.ensure_shop(s, room)
 				Log.add(s, "%s: „Schau dich um. Anfassen kostet nichts. Kaufen schon.“" % String(shop.keeper).split(",")[0], "dialog")
 			return _ok()
+		"schrein", "schrein_leer":
+			var res := Dungeon.pray(s, f)
+			if not res.ok:
+				return _fail(res.message)
+			end_turn(s)
+			return _ok()
+		"nest":
+			Log.add(s, "Das Nest stinkt nach nassem Fell. Solange hier noch jemand wohnt, lässt sich darin nichts finden.", "info")
+			return _ok()
+		"nest_leer":
+			Log.add(s, "Ein leeres, kaltes Nest. Hier ist nichts mehr.", "info")
+			return _ok()
 	return _ok()
 
 
@@ -1192,9 +1255,10 @@ static func answer_talk_show(s: Dictionary, index: int) -> Dictionary:
 
 # ================================================================ Laden
 
+## Raum mit Laden: Safe Room oder Wanderhändler.
 static func _safe_room(s: Dictionary) -> Variant:
 	var room = current_room(s)
-	return room if room != null and room.kind == "safe" else null
+	return room if room != null and (room.kind == "safe" or room.get("feature") == "markt") else null
 
 
 static func buy_offer(s: Dictionary, index: int) -> Dictionary:
@@ -1213,7 +1277,7 @@ static func haggle_offer(s: Dictionary, index: int) -> Dictionary:
 
 static func sell_item(s: Dictionary, uid: String) -> Dictionary:
 	if _safe_room(s) == null:
-		return _fail("Verkaufen kannst du nur im Laden eines Safe Rooms.")
+		return _fail("Verkaufen kannst du nur bei einem Händler.")
 	return _wrap(Shop.sell(s, uid))
 
 

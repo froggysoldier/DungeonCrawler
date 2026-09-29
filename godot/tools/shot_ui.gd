@@ -93,6 +93,35 @@ func _initialize() -> void:
 				await wait(2.0)
 				await shot("dialog")
 			var gv: GameView = main.view
+			if mode == "gelaende":
+				# Neben ein besonderes Feld stellen (FEATURE=schatz, schrein, markt, nest, wasser, schlamm)
+				var want := OS.get_environment("FEATURE")
+				var target = null
+				if want == "wasser" or want == "schlamm":
+					var i: int = s.map.tiles.find(want)
+					target = {"x": i % int(s.map.width), "y": i / int(s.map.width)}
+				elif want == "schatz":
+					var k: String = s.map.locks.keys()[0]
+					target = {"x": int(k.split(",")[0]), "y": int(k.split(",")[1])}
+				else:
+					var r = J.find(s.map.rooms, func(x): return x.get("feature") == want)
+					target = r.furniture[0].pos if r != null and not J.arr(r, "furniture").is_empty() else MapGen.center(r)
+				var spot = MapGen.random_open_tile(s, target, 3, func(q): return Ai.occupied(s, q) or J.cheb(q, target) < 1 or (want == "schatz" and MapGen.room_of(s.map, q) != null and MapGen.room_of(s.map, q).get("sealed")))
+				if want == "schatz":
+					for d in MapGen.DIRS4:
+						var q := J.pos(target.x + d[0], target.y + d[1])
+						var qr = MapGen.room_of(s.map, q)
+						if MapGen.is_walkable(s.map, q.x, q.y) and (qr == null or not qr.get("sealed")):
+							spot = q
+				TH.teleport(s, spot)
+				s.monsters = s.monsters.filter(func(mo): return Fov.chebyshev(mo.pos, s.player.pos) > 6 or mo.get("nest") != null)
+				Game.after_move(s)
+				gv.zoom_map(10)
+				gv.refresh_side()
+				await wait(1.2)
+				await shot("gelaende_" + want)
+				quit()
+				return
 			if mode == "fackeln":
 				# In den ersten normalen Raum mit Fackel stellen
 				for r in s.map.rooms:

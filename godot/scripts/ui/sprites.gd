@@ -47,7 +47,7 @@ const PETS := {
 
 
 ## Bild je Gegenstandsart (ding/…); Ausrüstung zeigt das Symbol ihres Platzes.
-const ITEM_SPRITES := {"gold": "gold", "karte": "karte", "box": "truhe", "verbrauch": "trank", "buch": "buch", "schrott": "mutter"}
+const ITEM_SPRITES := {"gold": "gold", "karte": "karte", "box": "truhe", "verbrauch": "trank", "buch": "buch", "schrott": "mutter", "schluessel": "schluessel"}
 
 
 ## Farbe eines Gegenstands: Box-Stufe oder Seltenheit.

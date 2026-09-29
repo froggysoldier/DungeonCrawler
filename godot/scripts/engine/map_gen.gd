@@ -21,7 +21,7 @@ static func tile_at(m: Dictionary, x: int, y: int) -> String:
 
 static func is_walkable(m: Dictionary, x: int, y: int) -> bool:
 	var t := tile_at(m, x, y)
-	return t == "floor" or t == "stairs" or t == "dooropen"
+	return t == "floor" or t == "stairs" or t == "dooropen" or t == Dungeon.WATER or t == Dungeon.MUD
 
 
 ## Wände und geschlossene Türen blockieren die Sicht.
@@ -294,8 +294,9 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 		if not cands.is_empty():
 			room = R.pick(s, cands)
 		else:
-			var all: Array = hood_rooms.call(hood)
-			room = R.pick(s, all) if not all.is_empty() else _pick_empty(s)
+			# Kein passender Raum: der größte, damit Automat, Wirt und Bett Platz haben
+			var all: Array = J.sort(hood_rooms.call(hood), func(a, b): return b.w * b.h - a.w * a.h)
+			room = all[0] if not all.is_empty() else _pick_empty(s)
 		if room == null:
 			continue
 		var variant := "freebie" if R.chance(s, 0.5) else "restaurant"
@@ -395,6 +396,9 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 		m.tiles[idx(m, c.x, c.y)] = "stairs"
 		r.description += " In einer Ecke führt eine schmale Treppe in die Tiefe."
 
+	# --- Gelände, Kammern, Kisten
+	Dungeon.shape(s, m, start_room)
+
 	# --- Bewohner
 	var occupied := {}
 	var start := center(start_room)
@@ -447,8 +451,8 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 				k += 1
 				i += 1
 			if broke:
-				# break im inneren for-Schleifenkopf von TS: i wurde dort nicht erhöht
-				pass
+				# Kein freier Boden mehr (etwa ganz unter Wasser): Raum ist voll
+				break
 
 	# Geister früherer Crawler, die auf dieser Etage gestorben sind
 	var floor_ghosts := ghosts.filter(func(g): return g.floor == floor).slice(0, 2)
@@ -480,6 +484,9 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 			var p = _random_floor_in(s, m, r, occupied)
 			if p != null:
 				items.append({"pos": p, "item": Items.roll_material(s)})
+
+	# --- Besondere Räume: Schatz, Nest, Schrein, Händler, Hinterhalt
+	Dungeon.populate(s, m, monsters, items, occupied, floor, start)
 
 	return {"map": m, "monsters": monsters, "items": items, "start": start}
 

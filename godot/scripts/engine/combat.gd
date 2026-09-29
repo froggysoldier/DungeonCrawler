@@ -436,6 +436,7 @@ static func kill_monster(s: Dictionary, m: Dictionary, t: Variant, by_pet: Varia
 	Fx.death(s, m)
 	s.monsters = J.without(s.monsters, m)
 	s.counters.kills += 1
+	Dungeon.on_kill(s, m)
 	s.counters.killsByDef[m.defId] = int(J.num(s.counters.killsByDef, m.defId)) + 1
 	if m.rank == "elite":
 		s.counters.eliteKills += 1

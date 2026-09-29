@@ -533,6 +533,9 @@ const FLOORS := {
 	"marmor": {"base": "#aba597", "gap": "#8a8478", "vein": "#7d776c"},
 	"blutstein": {"base": "#3f1f22", "gap": "#1d0d10", "vein": "#8a2a2a"},
 	"arena": {"base": "#8a7350", "gap": "#6c5a3e"},
+	# Gelände (Dungeon.WATER, Dungeon.MUD): kacheln nahtlos
+	"wasser": {"base": "#2c5878", "gap": "#1c3a52"},
+	"schlamm": {"base": "#4f3d2a", "gap": "#33271b"},
 }
 
 
@@ -686,6 +689,42 @@ func _floor(mat: String, v: int) -> Image:
 						y += 1 if _r() < 0.7 else 0
 					if i % 3 == 0:
 						img.set_pixel(x + i, y + 1, vein.darkened(0.3))
+		"wasser":
+			# Tiefes Blau mit waagerechten Wellen, nahtlos an den Rändern
+			for yy in T:
+				for xx in T:
+					var w := sin((xx + v * 5) * TAU / 16.0 + yy * 0.9) * 0.5 + 0.5
+					var c := base.lerp(gap, 0.35 * (1.0 - w))
+					img.set_pixel(xx, yy, _jit(c, 0.02, _r()))
+			for n in 4:
+				var y := (n * 8 + _ri(1, 6)) % T
+				var x := _ri(0, T - 1)
+				for i in _ri(4, 8):
+					img.set_pixel((x + i) % T, y, base.lightened(0.25))
+					if i > 0 and i < 3:
+						img.set_pixel((x + i) % T, (y + 1) % T, base.lightened(0.1))
+		"schlamm":
+			# Braune Masse mit dunklen Mulden, nassem Glanz und Blasen
+			for yy in T:
+				for xx in T:
+					img.set_pixel(xx, yy, _jit(base, 0.06, _r()))
+			for n in 5:
+				var cx := _ri(3, 28)
+				var cy := _ri(3, 28)
+				var rr := _ri(2, 4)
+				for yy in range(cy - rr, cy + rr + 1):
+					for xx in range(cx - rr - 1, cx + rr + 2):
+						var dx := (xx - cx) / (rr + 1.0)
+						var dy := float(yy - cy) / rr
+						if dx * dx + dy * dy <= 1.0:
+							img.set_pixel(posmod(xx, T), posmod(yy, T), _jit(gap, 0.05, _r()))
+				img.set_pixel(posmod(cx - 1, T), posmod(cy - rr, T), base.lightened(0.18))
+			for n in 3:
+				var bx := _ri(2, 29)
+				var by := _ri(2, 29)
+				img.set_pixel(bx, by, base.lightened(0.35))
+				img.set_pixel(bx + 1, by, base.lightened(0.15))
+				img.set_pixel(bx, by + 1, gap.darkened(0.2))
 	return img
 
 

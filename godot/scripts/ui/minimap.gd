@@ -70,6 +70,10 @@ func _draw() -> void:
 				col = Color("#ffcc33")
 			elif tile == "door" or tile == "dooropen":
 				col = Color("#a0703a")
+			elif tile == Dungeon.WATER:
+				col = Color("#3a6f9a")
+			elif tile == Dungeon.MUD:
+				col = Color("#5e4a32")
 			else:
 				var ri: int = m.roomAt[i]
 				if ri >= 0:
