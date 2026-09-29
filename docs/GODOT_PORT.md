@@ -61,7 +61,7 @@ Die Bilder liegen in `assets/pixel` als PNG-Bögen:
 | `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur, Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
 | `bosse.png` | Eigene Figuren der 15 Bosse, 24 × 24 Pixel; sie stehen auf ihrer Kachel und ragen darüber hinaus |
 | `kacheln.png` | Böden (9 Materialien × 4 Varianten), Wände (3 Etagen × 4 Varianten, Krone und Vorderseite), Türen, Treppe |
-| `dinge.png` | Gegenstände am Boden, Fallen, Geschosse |
+| `dinge.png` | Gegenstände am Boden, Symbole der 15 Ausrüstungsplätze (`slot_…`), Fallen, Geschosse |
 | `einrichtung.png` | Automat, Bett, Toilette, Theke, Kisten, Fässer, Regale, Gerümpel, Eimer, Flecken |
 
 `index.json` hält fest, wo jedes Bild im Bogen liegt (Name → Bogen, x, y,
@@ -82,7 +82,8 @@ an. Er überschreibt vorhandene Bögen nur mit `--force`, damit Änderungen aus
 einem Pixel-Editor nicht verloren gehen. Neue Monsterarten brauchen einen
 Eintrag in `Sprites.BY_DEF`, neue Bosse eine eigene Figur (`boss/<id>`);
 `test_pixel_art` prüft, dass es zu jedem Monster,
-jeder Falle, jedem Reittier und jedem Möbelstück ein Bild gibt.
+jeder Falle, jedem Reittier, jedem Möbelstück, jedem Gegenstand und jedem
+Ausrüstungsplatz ein Bild gibt.
 
 **Bewegung:** Fledermäuse, Motten, Tauben und Drohnen flattern, Irrlichter
 flackern, Geister wabern, Schleime quellen, jeweils mit einem zweiten Bild
@@ -93,6 +94,14 @@ weißes Aufblitzen, Pixelzerfall, Beben bei schweren Treffern und goldene
 Funken. Wandfackeln in gewöhnlichen Räumen, Boss-Kammern, Arenen und Gilden
 flackern und hellen die Dunkelheit um sich auf. Haustiere erscheinen als ihre
 Art (Katze, Hund, Kellerraptor, Minidrache …).
+
+**Oberfläche:** Dieselben Bilder stehen auch neben dem Text.
+`Sprites.item_sprite(it)` und `Sprites.monster_sprite(m)` liefern Bildname und
+Farbe (Ausrüstung zeigt das Symbol ihres Platzes in Seltenheitsfarbe).
+`Kit.icon` setzt ein Bild als Control ein (Gegenstandskarten, „Hier liegt“,
+Ausrüstungsraster mit abgeblendeten leeren Plätzen, Zielkarten im Kampf),
+`Kit.img` bettet es als `[img]` in BBCode ein (Tooltips auf der Karte). Der
+Crawler-Reiter zeigt Spielfigur und Haustier.
 
 **Schriften:** Fließtext in Montserrat, Überschriften, Knöpfe, Reiter und die
 Karte in Pixelify Sans. Pixelify ist bei Größen in Zehnerschritten ganz
@@ -106,7 +115,7 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | `UI_SMOKE_ALL=1 ./test.sh ui_smoke` | Alle aufgezeichneten Partien (bis Etage 3) durch die Oberfläche spielen, dauert einige Minuten |
 | `godot --headless --path godot -s res://tools/record_fixtures.gd` | Aufnahmen für die Replay-Tests neu erzeugen (Karten, Replays, Anzeige-Helfer), nach absichtlichen Änderungen an Inhalten oder Regeln |
 | `godot --headless --path godot -s res://tools/balance_sim.gd [-- anzahl]` | Ein Bot spielt Partien bis Etage 3 und gibt eine Tabelle aus (Stufe, Kills, Todesursache …) |
-| `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte), `fx` (Angriff in sechs Bildern, mit `BOSS=id` gegen einen Boss), `fackeln` |
+| `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `combat`, `ausruestung` (Inventar, Crawler-Reiter und Tooltip mit Ausrüstung und Haustier), `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte), `fx` (Angriff in sechs Bildern, mit `BOSS=id` gegen einen Boss), `fackeln` |
 | `xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- bild.png [vergrößerung]` | Alle Monster in ihrer echten Farbe, dazu Spielfigur, Reittiere, Gegenstände, Fallen |
 | `godot --headless --path godot -s res://tools/make_pixel_art.gd -- --force [--preview ordner]` | Pixel-Bögen aus den Vorlagen neu erzeugen (überschreibt Änderungen aus Pixel-Editoren) |
 

@@ -612,30 +612,14 @@ func _draw_furniture(ci: CanvasItem, kind: String, sx: float, sy: float, time: f
 			_spr(ci, "moebel/" + kind, sx, sy)
 
 
-const ITEM_SPRITES := {"gold": "gold", "karte": "karte", "box": "truhe", "verbrauch": "trank", "buch": "buch", "schrott": "mutter"}
-
-
 func _draw_item(ci: CanvasItem, it: Dictionary, sx: float, sy: float, is_visible: bool, time: float) -> void:
-	var col: String
-	if it.kind == "box" and it.get("box") != null:
-		col = Db.world("BOX_TIER_COLORS")[it.box.tier]
-	else:
-		col = Db.t("items", "RARITY_COLORS")[it.rarity]
+	var col := Sprites.item_color(it)
 	var T := tile_px
 	if is_visible and (it.rarity != "gewoehnlich" or it.kind == "box"):
 		_glow(ci, sx + T / 2, sy + T / 2, col, 0.5 + 0.25 * sin(time / 420.0 + sx), false)
 	_spr(ci, "aufsatz/schatten_klein", sx + 3 * px, sy + 11 * px)
-	var name: String
-	var tint: Variant = col
-	if it.kind == "wurf":
-		name = "bombe" if it.get("explosion") else "stein"
-		tint = null
-	elif it.kind == "verbrauch" and col == "#c8c8c8":
-		name = "trank"
-		tint = "#d8604a"
-	else:
-		name = ITEM_SPRITES.get(it.kind, "edelstein")
-	_spr(ci, "ding/" + name, sx, sy, tint)
+	var look := Sprites.item_sprite(it)
+	_spr(ci, look[0], sx, sy, look[1])
 
 
 func _draw_fog() -> void:

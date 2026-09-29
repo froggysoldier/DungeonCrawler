@@ -39,7 +39,7 @@ func test_fallen_reittiere_einrichtung(t) -> void:
 		names.append("reittier/" + id)
 	for k in ["automat", "bett", "toilette", "theke"] + MapView.PROPS:
 		names.append("moebel/" + k)
-	for k in MapView.ITEM_SPRITES.values() + ["edelstein", "stein", "bombe"]:
+	for k in Sprites.ITEM_SPRITES.values() + ["edelstein", "stein", "bombe"]:
 		names.append("ding/" + k)
 	t.eq(_missing(names), [], "Fallen, Reittiere, Möbel, Gegenstände")
 
@@ -95,3 +95,47 @@ func test_toenen_ersetzt_alle_schluessel(t) -> void:
 	t.lt(r[0].v, r[2].v, "Schatten dunkler als Grundfarbe")
 	t.gt(r[4].v, r[2].v, "Glanz heller als Grundfarbe")
 	t.ok(PixelArt.texture("kreatur/ratte", "#b08a6a") == tex, "Zwischenspeicher")
+
+
+func test_gegenstaende_und_plaetze_haben_bilder(t) -> void:
+	var names: Array = []
+	for slot in GameTabs.EQUIP_ORDER:
+		var n := Sprites.slot_sprite(slot)
+		t.ok(n.begins_with("ding/slot_"), "%s hat ein eigenes Symbol" % slot)
+		names.append(n)
+	t.eq(Sprites.slot_sprite("ring2"), "ding/slot_ring", "zweiter Ring")
+	t.eq(Sprites.slot_sprite("fussring1"), "ding/slot_fussring", "Fußring")
+	var kinds := {}
+	for base in Db.t("items", "BASE_ITEMS"):
+		var it: Dictionary = base.duplicate()
+		it.rarity = "selten"
+		var look := Sprites.item_sprite(it)
+		names.append(look[0])
+		kinds[it.kind] = true
+		if it.get("slot") != null:
+			t.eq(look[0], "ding/slot_" + it.slot, "%s zeigt seinen Platz" % it.id)
+			t.eq(look[1], GameTabs.rarity_color("selten"), "%s in Seltenheitsfarbe" % it.id)
+	t.ok(kinds.has("ausruestung") and kinds.has("wurf") and kinds.has("verbrauch"), "Arten abgedeckt")
+	names.append(Sprites.item_sprite({"kind": "box", "rarity": "gewoehnlich", "box": {"tier": "bronze"}})[0])
+	t.eq(_missing(names), [], "Bilder für Gegenstände")
+
+
+func test_bilder_in_der_oberflaeche(t) -> void:
+	# Im Fließtext: [img] findet die getönte, vergrößerte Textur
+	var bb := Kit.img("ding/slot_waffe", "#5aa0ff", 2)
+	t.matches(bb, "^\\[img=32x32\\]res://pixel_bb/.+\\[/img\\]$", "BBCode mit Größe")
+	var path := bb.get_slice("]", 1).get_slice("[", 0)
+	var tex: Texture2D = load(path)
+	t.not_null(tex, "Textur über den Pfad ladbar")
+	if tex != null:
+		t.eq(tex.get_size(), Vector2(32, 32), "vorab vergrößert")
+		t.gt(tex.get_image().get_used_rect().size.x, 0, "nicht leer")
+	t.eq(Kit.img("ding/gibt_es_nicht"), "", "unbekanntes Bild")
+	# Als Control: Größe ist das vergrößerte Bild oder das vorgegebene Feld
+	var ic := Kit.icon(null, "kreatur/ratte", "#b08a6a", 3)
+	t.eq(ic.custom_minimum_size, Vector2(48, 48), "Figur dreifach")
+	ic.free()
+	var slot := Kit.icon(null, "ding/slot_ring", null, 2, Vector2(40, 36), true)
+	t.eq(slot.custom_minimum_size, Vector2(40, 36), "festes Feld")
+	t.lt(slot.items[0].mod.a, 1.0, "leerer Platz abgeblendet")
+	slot.free()

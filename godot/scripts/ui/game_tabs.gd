@@ -29,7 +29,10 @@ static func race_name(id: String) -> String:
 ## Eine Gegenstandskarte mit Werten und (optional) Knöpfen.
 static func item_card(gv: GameView, parent: Node, it: Dictionary, with_actions: bool, from: String = "inv") -> VBoxContainer:
 	var v := Kit.card(parent, "Item", 2)
-	item_body(gv, v, it, with_actions, from)
+	var h := Kit.hbox(v, 10)
+	var look := Sprites.item_sprite(it)
+	Kit.icon(h, look[0], look[1], 2, Vector2(36, 36)).size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	item_body(gv, Kit.vbox(h, 2), it, with_actions, from)
 	return v
 
 
@@ -128,6 +131,20 @@ static func item_body(gv: GameView, v: Node, it: Dictionary, with_actions: bool,
 
 # ================================================================ Crawler
 
+## Die Spielfigur mit Haustier als kleine Pixel-Bühne.
+static func portrait(s: Dictionary) -> Control:
+	var st := Kit.Stage.new()
+	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	st.items = [{"name": "kreatur/held", "scale": 4, "foot": Vector2(36, 66)}]
+	st.custom_minimum_size = Vector2(72, 80)
+	var pet = s.player.get("pet")
+	if pet != null:
+		var look := Sprites.pet_sprite(String(pet.get("species", "")))
+		st.items.append({"name": look[0], "tint": look[1], "scale": 3, "foot": Vector2(92, 66), "flip": true, "mod": Color.WHITE if pet.alive else Color(1, 1, 1, 0.4)})
+		st.custom_minimum_size.x = 118
+	return st
+
+
 static func crawler_tab(gv: GameView, root: VBoxContainer) -> void:
 	var s := gv.s
 	var p: Dictionary = s.player
@@ -151,12 +168,17 @@ static func crawler_tab(gv: GameView, root: VBoxContainer) -> void:
 		var bl := J.num(p, "blase")
 		Kit.bar(bars, bl / 100.0, "Blase %d %%%s" % [J.rnd(bl), " – such eine Toilette!" if bl >= 80 else ""], "#b3261e" if bl >= 80 else "#8a7a1e", "#ff8a4a" if bl >= 80 else "#e0d04a", 20, bl >= 80)
 	Kit.bar(bars, float(p.xp) / need, "XP %s / %d (Level %d)" % [J.s(p.xp), need, p.level], "#5a3fc4", "#b39cff")
-	var who := "%s · früher: %s" % [Kit.esc(p.name), Kit.esc(p.background)]
+	var who := "früher: %s" % Kit.esc(p.background)
 	if p.get("race") != null:
 		who += " · " + Kit.esc(race_name(p.race))
 	if p.get("klass") != null:
 		who += " · [b]%s[/b]" % Kit.col(Kit.esc(Db.klass(p.klass).name), "accent")
-	Kit.text(root, who, 12, "muted")
+	var me := Kit.hbox(root, 10)
+	me.add_child(portrait(s))
+	var mv := Kit.vbox(me, 2)
+	mv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	Kit.label(mv, p.name, 20, null, 700).add_theme_font_override("font", UiFonts.pixel(700))
+	Kit.text(mv, who, 12, "muted")
 	if not Game.has_unlock(s, "stats"):
 		Kit.spacer(root, 6)
 		Kit.locked(root, "Gesperrt: Deine Werte siehst du erst nach dem Tutorial.\nFinde die [b]Gilde der Einweisung[/b].")
@@ -365,21 +387,24 @@ static func inventory_tab(gv: GameView, root: VBoxContainer) -> void:
 			Kit.text(root, "Nichts.", 14, "muted")
 	else:
 		Kit.section(root, "Ausrüstung")
-		var g := Kit.grid(root, 3, 8, 3)
+		var g := Kit.grid(root, 3, 8, 4)
 		for slot in EQUIP_ORDER:
 			var it = p.equipment.get(slot)
-			Kit.label(g, equip_name(slot), 13, "muted")
+			Kit.icon(g, Sprites.slot_sprite(slot), rarity_color(it.rarity) if it != null else null, 2, Vector2(32, 32), it == null)
 			if it != null:
 				var d := Identify.describe_item(s, it)
-				var name_rt := Kit.text(g, Kit.col(Kit.esc(Identify.item_name(s, it)), rarity_color(it.rarity)), 13)
+				var name_rt := Kit.text(g, "%s\n%s" % [Kit.col(Kit.esc(Identify.item_name(s, it)), rarity_color(it.rarity)), Kit.small(Kit.muted(equip_name(slot)))], 13, null, 0)
 				var tip: Array = [J.nn(d, "flavor", "")]
 				tip.append_array(d.bonuses)
 				name_rt.tooltip_text = " | ".join(tip)
 				name_rt.mouse_filter = Control.MOUSE_FILTER_PASS
+				name_rt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 				var sl: String = slot
-				Kit.button(g, "Ablegen", func(): gv.act(func(): return Game.unequip(s, sl)), "SmallButton")
+				Kit.button(g, "Ablegen", func(): gv.act(func(): return Game.unequip(s, sl)), "SmallButton").size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			else:
-				Kit.label(g, "–", 13, "muted").size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				var l := Kit.label(g, equip_name(slot), 13, "muted")
+				l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+				l.modulate.a = 0.7
 				g.add_child(Control.new())
 		Kit.section(root, "Rucksack (%d)" % p.inventory.size())
 		if p.inventory.is_empty():

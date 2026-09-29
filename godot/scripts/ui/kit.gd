@@ -257,6 +257,63 @@ static func card(parent: Node, variant: String = "Item", sep: int = 3) -> VBoxCo
 	return v
 
 
+## Pixel-Bild als Control, ganzzahlig vergrößert und mittig in einem Feld der
+## Größe box (sonst genau so groß wie das Bild). dim blendet es ab (leerer Platz).
+static func icon(parent: Node, name: String, tint: Variant = null, scale: int = 2, box: Vector2 = Vector2.ZERO, dim: bool = false) -> Stage:
+	var st := Stage.new()
+	var sz := Vector2(PixelArt.size_of(name) * scale)
+	st.custom_minimum_size = box if box != Vector2.ZERO else sz
+	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	st.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	st.items = [{"name": name, "tint": tint, "scale": scale, "center": true, "mod": Color(1, 1, 1, 0.3) if dim else Color.WHITE}]
+	return _add(parent, st)
+
+
+## Pixel-Bild im BBCode-Text (Tooltips). Das Bild wird vorab pixelgenau
+## vergrößert (Text braucht die weiche Filterung) und bekommt einen Pfad im
+## Ressourcen-Zwischenspeicher, über den [img] es findet.
+static var _bb_images := {}
+
+
+static func img(name: String, tint: Variant = null, scale: int = 1) -> String:
+	var key := "roh" if tint == null else ((tint as Color).to_html() if tint is Color else String(tint).trim_prefix("#"))
+	var path := "res://pixel_bb/%s_%s_%d.tex" % [name.replace("/", "_"), key, scale]
+	if not _bb_images.has(path):
+		var src := PixelArt.texture(name, tint)
+		if src == null:
+			return ""
+		var im := src.get_image()
+		im.resize(im.get_width() * scale, im.get_height() * scale, Image.INTERPOLATE_NEAREST)
+		var tex := ImageTexture.create_from_image(im)
+		tex.take_over_path(path)
+		_bb_images[path] = tex
+	var sz := PixelArt.size_of(name) * scale
+	return "[img=%dx%d]%s[/img]" % [sz.x, sz.y, path]
+
+
+## Kleine Bühne für Pixel-Figuren: jedes Element {name, tint, scale} steht
+## entweder mittig (center) oder mit den Füßen bei foot, auf Wunsch mit Schatten.
+class Stage:
+	extends Control
+	var items: Array = []
+
+	func _init() -> void:
+		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+
+	func _draw() -> void:
+		for e in items:
+			var sc: int = e.get("scale", 2)
+			var mod: Color = e.get("mod", Color.WHITE)
+			if e.get("center", false):
+				var sz := Vector2(PixelArt.size_of(e.name) * sc)
+				PixelArt.draw(self, e.name, ((size - sz) / 2.0).floor(), sc, e.get("tint"), false, mod)
+				continue
+			var foot: Vector2 = e.foot
+			if e.get("shadow", true):
+				PixelArt.draw_foot(self, "aufsatz/schatten", foot + Vector2(0, 3 * sc), sc)
+			PixelArt.draw_foot(self, e.name, foot, sc, e.get("tint"), e.get("flip", false), mod)
+
+
 ## Balken mit Verlauf und Beschriftung (HP, Ausdauer, XP …).
 class Bar:
 	extends Control

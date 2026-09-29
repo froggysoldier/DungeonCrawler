@@ -29,7 +29,9 @@ static func tooltip_for(gv: GameView, t: Variant, detail: bool = false) -> Varia
 		var blocker = Combat.technique_blocker(s, mon, tech)
 		var info := Identify.describe_monster(s, mon)
 		var color = "#b0a898" if info.insight >= 3 else mon.color
-		parts.append("[b]%s[/b]%s" % [Kit.col(Kit.esc(info.name), color), (" " + Kit.muted(Kit.esc(info.rank))) if info.rank != null else ""])
+		var look := Sprites.monster_sprite(mon)
+		var fig := Kit.img(look[0], look[1], 2 if PixelArt.size_of(look[0]).y <= 16 else 1)
+		parts.append("%s [b]%s[/b]%s" % [fig, Kit.col(Kit.esc(info.name), color), (" " + Kit.muted(Kit.esc(info.rank))) if info.rank != null else ""])
 		parts.append(Kit.muted("%s · %s" % [Kit.esc(info.level), Identify.INSIGHT_NAMES[info.insight]]))
 		parts.append("Herausforderung: [b]%s[/b] %s" % [Kit.col(Kit.esc(info.challenge.name), info.challenge.color), Kit.small(Kit.muted("(%s)" % Kit.esc(info.challenge.hint)))])
 		var hl := Kit.esc(info.health)
@@ -68,7 +70,8 @@ static func tooltip_for(gv: GameView, t: Variant, detail: bool = false) -> Varia
 	if not items.is_empty():
 		var lines: Array = []
 		for e in items:
-			var line := Kit.col(Kit.esc(Identify.item_name(s, e.item)), GameTabs.rarity_color(e.item.rarity))
+			var look := Sprites.item_sprite(e.item)
+			var line := Kit.img(look[0], look[1]) + " " + Kit.col(Kit.esc(Identify.item_name(s, e.item)), GameTabs.rarity_color(e.item.rarity))
 			if detail:
 				var d := Identify.describe_item(s, e.item)
 				var extra: Array = []

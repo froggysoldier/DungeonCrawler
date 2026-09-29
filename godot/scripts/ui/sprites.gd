@@ -1,7 +1,8 @@
 class_name Sprites
 extends RefCounted
-## Welche Pixel-Figur zu welcher Monsterart gehört, dazu große Porträts
-## (Versus-Bildschirm). Die Bilder liegen in res://assets/pixel/kreaturen.png.
+## Welche Pixel-Figur zu welcher Monsterart gehört, welches Bild zu welchem
+## Gegenstand, dazu große Porträts (Versus-Bildschirm). Die Bilder liegen in
+## res://assets/pixel (kreaturen.png, bosse.png, dinge.png).
 
 const BY_DEF := {
 	"kellerratte": "ratte", "rattenmensch": "ratte", "rattenschamane": "ratte", "knochenratte": "ratte", "koenig_kanalratte": "ratte", "rattenkaiser": "ratte",
@@ -43,6 +44,40 @@ const PETS := {
 	"Minidrache": ["drache", "#c8503a"], "Wolpertinger": ["hase", "#c8a878"], "Fledermaus": ["fledermaus", "#7a6a8a"],
 	"Ratte": ["ratte", "#9a8a7a"], "Spinne": ["spinne", "#6a5a7a"],
 }
+
+
+## Bild je Gegenstandsart (ding/…); Ausrüstung zeigt das Symbol ihres Platzes.
+const ITEM_SPRITES := {"gold": "gold", "karte": "karte", "box": "truhe", "verbrauch": "trank", "buch": "buch", "schrott": "mutter"}
+
+
+## Farbe eines Gegenstands: Box-Stufe oder Seltenheit.
+static func item_color(it: Dictionary) -> String:
+	if it.kind == "box" and it.get("box") != null:
+		return Db.world("BOX_TIER_COLORS")[it.box.tier]
+	return Db.t("items", "RARITY_COLORS")[it.rarity]
+
+
+## [Bildname, Farbe] für einen Gegenstand (Karte, Inventar, Tooltips).
+static func item_sprite(it: Dictionary) -> Array:
+	var col := item_color(it)
+	if it.kind == "wurf":
+		return ["ding/" + ("bombe" if it.get("explosion") else "stein"), null]
+	if it.kind == "verbrauch" and col == "#c8c8c8":
+		return ["ding/trank", "#d8604a"]
+	if it.get("slot") != null:
+		return [slot_sprite(it.slot), col]
+	return ["ding/" + ITEM_SPRITES.get(it.kind, "edelstein"), col]
+
+
+## Symbol eines Ausrüstungsplatzes (ring1/ring2 → Ring, fussring1/2 → Fußring).
+static func slot_sprite(slot: String) -> String:
+	var base := slot.trim_suffix("1").trim_suffix("2")
+	return "ding/slot_" + base if PixelArt.has("ding/slot_" + base) else "ding/edelstein"
+
+
+## [Bildname, Farbe] für ein Monster, wie es auf der Karte steht.
+static func monster_sprite(m: Dictionary) -> Array:
+	return [sprite_name(m.defId, m.get("rank") == "geist"), m.color]
 
 
 ## [Bildname, Farbe] für eine Haustier-Art; Unbekanntes wird ein allgemeines Haustier.

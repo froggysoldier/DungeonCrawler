@@ -26,7 +26,10 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 		Kit.section(v, "Hier liegt")
 		for e in items:
 			var uid: String = e.item.uid
-			var h := _row(v, Kit.col(Kit.esc(Identify.item_name(s, e.item)), Db.t("items", "RARITY_COLORS")[e.item.rarity]))
+			var h := Kit.hbox(v, 8)
+			var look := Sprites.item_sprite(e.item)
+			Kit.icon(h, look[0], look[1], 2)
+			Kit.text(h, Kit.col(Kit.esc(Identify.item_name(s, e.item)), Db.t("items", "RARITY_COLORS")[e.item.rarity]), 14).size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			Kit.button(h, "Aufheben", func(): gv.act(func(): return Game.pickup(s, uid)), "SmallButton")
 	if Game.on_stairs(s):
 		any = true

@@ -313,10 +313,20 @@ static func _target_row(gv: GameView, list: Node, m: Dictionary) -> void:
 	var uid: String = m.uid
 	var cp := ClickPanel.new("Button")
 	cp.fixed_panel = UiTheme.get_theme().get_stylebox("panel", "TargetSel" if sel else "Target")
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cp.add_child(row)
+	# Die Figur, wie sie auf der Karte steht (eigene Boss-Figuren sind größer)
+	var look := Sprites.monster_sprite(m)
+	var fig := Kit.icon(row, look[0], look[1], 2 if PixelArt.size_of(look[0]).y > 16 else 3, Vector2(48, 48))
+	if m.get("rank") == "geist":
+		fig.modulate.a = 0.75
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 2)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	cp.add_child(v)
+	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(v)
 	var name_col = "#b0a898" if info.insight >= 3 else m.color
 	Kit.text(v, "[b]%s[/b] %s %s" % [Kit.col(Kit.esc(info.name), name_col), Kit.small(Kit.muted("%s · %d %s" % [Kit.esc(info.level), d, "Feld" if d == 1 else "Felder"])), Kit.small(Kit.col(Kit.esc(info.challenge.name), info.challenge.color))], 13)
 	var line := Kit.esc(info.health)

@@ -1,7 +1,7 @@
 extends SceneTree
 ## Entwicklerwerkzeug: startet das Spiel, spielt kurz und speichert Bildschirmfotos.
 ##   xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus [seed]
-## Modi: title, interview, game, dialog, walk, tabs, combat, select, versus,
+## Modi: title, interview, game, dialog, walk, tabs, combat, ausruestung, select, versus,
 ## talkshow, safe, floor3, fx (Angriff mit Ausfallschritt, Aufblitzen, Zerfall),
 ## fackeln (Raum mit Wandfackeln)
 
@@ -133,6 +133,38 @@ func _initialize() -> void:
 				for i in 6:
 					await shot("fx_%d" % i)
 					await wait(0.05)
+				quit()
+				return
+			if mode == "ausruestung":
+				# Freigeschaltet, mit angelegter Ausrüstung, Rucksack und Haustier
+				s.unlocks.append_array(["inventar", "stats", "minimap", "skills"])
+				var rar: Array = Db.t("items", "RARITY_ORDER")
+				for slot in ["kopf", "brust", "haende", "beine", "fuesse", "waffe", "hals", "ring"]:
+					var it := Items.generate_equipment(s, rar[(slot.length() + 1) % 5], [slot])
+					s.player.equipment[slot if slot != "ring" else "ring1"] = it
+				for i in 3:
+					s.player.inventory.append(Items.generate_equipment(s, rar[i + 1]))
+				s.player.inventory.append(Items.create_item(s, "stein", 3))
+				s.player.pet = Extras.make_pet_of("Katze", "Minka")
+				s.player.pet.pos = TH.free_neighbor(s, s.player.pos)
+				var here := Items.generate_equipment(s, "episch", ["waffe"])
+				s.items.append({"pos": J.pcopy(s.player.pos), "item": here})
+				s.monsters = []
+				gv.zoom_map(10)
+				gv.refresh_here()
+				for t in ["inventar", "crawler"]:
+					gv.tab = t
+					gv.refresh_side()
+					await wait(0.4)
+					await shot("ausruestung_" + t)
+					if t == "inventar":
+						gv._tab_scroll.scroll_vertical = 100000
+						await wait(0.3)
+						await shot("ausruestung_rucksack")
+				gv.hover = J.pcopy(s.player.pos)
+				gv._update_tooltip()
+				await wait(0.3)
+				await shot("ausruestung_tooltip")
 				quit()
 				return
 			if mode == "walk" or mode == "tabs" or mode == "combat":
