@@ -149,7 +149,7 @@ const RACE_LOOKS := {
 	"hobgoblin": {"skin": "#c8783a", "body": "normal"},
 	"katzenmensch": {"skin": "#d8843a", "body": "normal"},
 	"troll": {"skin": "#7f9a78", "body": "gross"},
-	"minotaurus": {"skin": "#8a5a3a", "body": "gross"},
+	"minotaurus": {"skin": "#744428", "body": "gross"},
 	"golem": {"skin": "#b8804a", "body": "gross"},
 	"kelleroger": {"skin": "#b8966a", "body": "gross"},
 	"pilzling": {"skin": "#ece0c8", "body": "normal"},
@@ -159,7 +159,7 @@ const RACE_LOOKS := {
 	"wasserspeier": {"skin": "#8e8e96", "body": "breit"},
 	"ghulblut": {"skin": "#98a888", "body": "normal"},
 	"blechmensch": {"skin": "#a8b0b8", "body": "normal"},
-	"drachenblut": {"skin": "#d89060", "body": "normal"},
+	"drachenblut": {"skin": "#c86a40", "body": "normal"},
 }
 
 
