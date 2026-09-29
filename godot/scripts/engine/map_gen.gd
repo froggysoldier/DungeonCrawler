@@ -21,7 +21,7 @@ static func tile_at(m: Dictionary, x: int, y: int) -> String:
 
 static func is_walkable(m: Dictionary, x: int, y: int) -> bool:
 	var t := tile_at(m, x, y)
-	return t == "floor" or t == "stairs" or t == "dooropen" or t == Dungeon.WATER or t == Dungeon.MUD
+	return t == "floor" or t == "stairs" or t == "dooropen" or t == Dungeon.WATER or t == Dungeon.MUD or t == Kanalstadt.BRIDGE
 
 
 ## Wände und geschlossene Türen blockieren die Sicht.
@@ -398,6 +398,8 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 
 	# --- Gelände, Kammern, Kisten
 	Dungeon.shape(s, m, start_room)
+	if floor == Kanalstadt.FLOOR_NO:
+		Kanalstadt.shape(s, m)
 
 	# --- Bewohner
 	var occupied := {}
@@ -487,6 +489,8 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 
 	# --- Besondere Räume: Schatz, Nest, Schrein, Händler, Hinterhalt
 	Dungeon.populate(s, m, monsters, items, occupied, floor, start)
+	if floor == Kanalstadt.FLOOR_NO:
+		Kanalstadt.populate(s, m, monsters, occupied)
 
 	return {"map": m, "monsters": monsters, "items": items, "start": start}
 

@@ -74,6 +74,10 @@ func _draw() -> void:
 				col = Color("#3a6f9a")
 			elif tile == Dungeon.MUD:
 				col = Color("#5e4a32")
+			elif tile == Kanalstadt.CANAL:
+				col = Color("#1f4a66")
+			elif tile == Kanalstadt.BRIDGE:
+				col = Color("#8a6a44")
 			else:
 				var ri: int = m.roomAt[i]
 				if ri >= 0:

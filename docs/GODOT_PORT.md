@@ -163,6 +163,7 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | `test_ui_smoke` | Eine Partie komplett über die Spielansicht gespielt: keine Laufzeitfehler, Spielverlauf unverändert |
 | `test_dungeon` | Gelände und Sonderräume: entstehen, alles bleibt erreichbar, Kisten, Schlamm, Wasser, Schlüssel, Schloss knacken, Geheimtür, Schrein, Nest, Hinterhalt, Wanderhändler |
 | `test_boss_fight` | Bosskämpfe: Daten vollständig, Ankündigen und Treffen, Ausweichen, Pause, Ansturm, Formen, Phasen mit Verstärkung |
+| `test_kanalstadt` | Etage 3: Kanäle und Brücken, alles erreichbar, Siedlung mit drei Händlern und Bewohnern ohne Monster, neue Monster mit Bild und Bestiarium |
 | `test_sound` | Klänge hörbar und nicht übersteuert; Musik in Schleife, ohne Naht, alle Geräusche vorhanden |
 | `test_pixel_art` | Zu allem, was gezeichnet wird, gibt es ein Bild; Tönen ersetzt alle Magenta-Stufen; Haustier-Arten und zweite Bilder |
 | `test_effects` | Engine meldet Angriff, Treffer, Tod und Aufstieg; Animator macht daraus Ausfallschritt, Aufblitzen, Zerfall, Beben, Funken |

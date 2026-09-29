@@ -12,7 +12,7 @@ const WATER := "wasser"
 const MUD := "schlamm"
 const CRATES := ["kiste", "fass"]
 ## Kacheln, die man betreten kann (zusätzlich zu Boden, Treppe, offener Tür).
-const WALKABLE := [WATER, MUD]
+const WALKABLE := [WATER, MUD, "bruecke"]
 
 const FEATURE_NAMES := {
 	"schatz": "Schatzkammer", "geheim": "Geheimkammer", "nest": "Monsternest",
@@ -512,6 +512,10 @@ static func on_enter_room(s: Dictionary, room: Dictionary, first: bool) -> void:
 		Log.add(s, "Die Schatzkammer! Hier lohnt es sich, jede Ecke abzusuchen.", "loot")
 		Events.emit(s, {"type": "treasureFound", "room": room.id})
 	elif room.get("feature") == "markt":
+		if room.get("siedlung") and not s.get("townNoted"):
+			s.townNoted = true
+			Log.add(s, "Du betrittst die Siedlung der Kanalstadt. Laternen, Wäscheleinen, Stimmen. Hier wohnen Leute, und die Monster bleiben draußen.", "system")
+			Events.emit(s, {"type": "townFound"})
 		var shop := Shop.ensure_shop(s, room)
 		if first:
 			Log.add(s, "%s (%s): %s" % [String(shop.keeper).split(",")[0], shop.get("title", "Wanderhändler"), shop.get("greeting", "„Nur hereinspaziert.“")], "dialog")

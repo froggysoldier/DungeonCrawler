@@ -1619,6 +1619,431 @@
     "fliegend",
     "blendend"
    ]
+  },
+  {
+   "id": "schlickkrebs",
+   "name": "Schlickkrebs",
+   "glyph": "c",
+   "color": "#b0503a",
+   "levels": [
+    6,
+    9
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 24,
+   "hpPerLevel": 5,
+   "dmg": [
+    4,
+    7
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 70,
+   "ruestung": 4,
+   "ausweichen": 5,
+   "size": "mittel",
+   "behavior": "melee",
+   "xp": 46,
+   "weight": 5,
+   "pack": [
+    1,
+    2
+   ],
+   "flavor": "Groß wie ein Hund, gepanzert wie ein Kleinwagen. Klappert mit den Scheren wie mit Kastagnetten.",
+   "tags": [
+    "aquatisch",
+    "tier"
+   ],
+   "abilities": [
+    "gepanzert"
+   ]
+  },
+  {
+   "id": "stromaal",
+   "name": "Stromaal",
+   "glyph": "e",
+   "color": "#5a8ab0",
+   "levels": [
+    7,
+    10
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 24,
+   "hpPerLevel": 4,
+   "dmg": [
+    4,
+    7
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 80,
+   "ruestung": 0,
+   "ausweichen": 20,
+   "size": "mittel",
+   "behavior": "ranged",
+   "range": 3,
+   "xp": 52,
+   "weight": 3,
+   "flavor": "Er hängt an einem durchgebissenen Stromkabel und hat Geschmack daran gefunden. Seine Stöße kribbeln bis in die Zähne.",
+   "tags": [
+    "aquatisch"
+   ],
+   "abilities": [
+    "blendend"
+   ]
+  },
+  {
+   "id": "riesenegel",
+   "name": "Riesenblutegel",
+   "glyph": "l",
+   "color": "#6a3a4a",
+   "levels": [
+    6,
+    9
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 26,
+   "hpPerLevel": 6,
+   "dmg": [
+    3,
+    6
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 75,
+   "ruestung": 1,
+   "ausweichen": 0,
+   "size": "mittel",
+   "behavior": "melee",
+   "xp": 44,
+   "weight": 4,
+   "flavor": "Ein Egel, so lang wie ein Arm. Er saugt, bis er platzt oder du umfällst. Meistens platzt er zuerst. Meistens.",
+   "tags": [
+    "aquatisch",
+    "tier"
+   ],
+   "abilities": [
+    "blutig",
+    "regeneriert"
+   ]
+  },
+  {
+   "id": "gullyqualle",
+   "name": "Gullyqualle",
+   "glyph": "j",
+   "color": "#c090d0",
+   "levels": [
+    6,
+    9
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 16,
+   "hpPerLevel": 4,
+   "dmg": [
+    3,
+    6
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 75,
+   "ruestung": 0,
+   "ausweichen": 25,
+   "size": "mittel",
+   "behavior": "melee",
+   "xp": 40,
+   "weight": 4,
+   "pack": [
+    1,
+    3
+   ],
+   "flavor": "Schwebt knapp über dem Wasser, leuchtet sanft und nesselt wie ein Brennnesselfeld aus Glas.",
+   "tags": [
+    "aquatisch"
+   ],
+   "abilities": [
+    "gift",
+    "fliegend"
+   ]
+  },
+  {
+   "id": "lumpensammler",
+   "name": "Lumpensammler",
+   "glyph": "h",
+   "color": "#8a7a5a",
+   "levels": [
+    6,
+    9
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 22,
+   "hpPerLevel": 4,
+   "dmg": [
+    3,
+    6
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 75,
+   "ruestung": 1,
+   "ausweichen": 20,
+   "size": "mittel",
+   "behavior": "coward",
+   "xp": 42,
+   "weight": 3,
+   "flavor": "Ein Bewohner der Kanäle, der alles sammelt, was nicht festgeschraubt ist. Deine Taschen sind nicht festgeschraubt.",
+   "tags": [
+    "humanoid"
+   ],
+   "abilities": [
+    "diebisch",
+    "schnell"
+   ]
+  },
+  {
+   "id": "rohrgolem",
+   "name": "Rohrgolem",
+   "glyph": "G",
+   "color": "#7a8a90",
+   "levels": [
+    8,
+    11
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 50,
+   "hpPerLevel": 8,
+   "dmg": [
+    5,
+    9
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 65,
+   "ruestung": 5,
+   "ausweichen": 0,
+   "size": "gross",
+   "behavior": "melee",
+   "xp": 72,
+   "weight": 2,
+   "flavor": "Ein Haufen Rohre, Muffen und Schellen, der irgendwann beschlossen hat, zu laufen. Es gluckert in ihm.",
+   "tags": [
+    "konstrukt"
+   ],
+   "abilities": [
+    "gepanzert"
+   ]
+  },
+  {
+   "id": "schimmelteppich",
+   "name": "Schimmelteppich",
+   "glyph": "m",
+   "color": "#7aa05a",
+   "levels": [
+    6,
+    10
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 30,
+   "hpPerLevel": 6,
+   "dmg": [
+    3,
+    6
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 70,
+   "ruestung": 0,
+   "ausweichen": 0,
+   "size": "gross",
+   "behavior": "stationary",
+   "xp": 40,
+   "weight": 3,
+   "flavor": "Ein flauschiger grüner Teppich an der Wand. Er atmet. Er sporelt. Er hat Hunger auf Lungen.",
+   "tags": [
+    "pflanze"
+   ],
+   "abilities": [
+    "gift"
+   ]
+  },
+  {
+   "id": "kloakenhund",
+   "name": "Kloakenhund",
+   "glyph": "d",
+   "color": "#6a5a3a",
+   "levels": [
+    6,
+    9
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 18,
+   "hpPerLevel": 4,
+   "dmg": [
+    3,
+    6
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 80,
+   "ruestung": 1,
+   "ausweichen": 15,
+   "size": "mittel",
+   "behavior": "melee",
+   "xp": 38,
+   "weight": 5,
+   "pack": [
+    2,
+    3
+   ],
+   "flavor": "Verwilderte Hunde, die in Rudeln durch die Kanäle ziehen. Das Fell ist nass, die Laune schlecht.",
+   "tags": [
+    "tier"
+   ],
+   "abilities": [
+    "schnell"
+   ]
+  },
+  {
+   "id": "schleusenwaerter",
+   "name": "Verlorener Schleusenwärter",
+   "glyph": "Z",
+   "color": "#5a7a6a",
+   "levels": [
+    7,
+    10
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 34,
+   "hpPerLevel": 6,
+   "dmg": [
+    4,
+    8
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 75,
+   "ruestung": 2,
+   "ausweichen": 0,
+   "size": "mittel",
+   "behavior": "melee",
+   "xp": 56,
+   "weight": 3,
+   "flavor": "Er öffnet und schließt noch immer seine Schleuse. Wer dabei stört, bekommt den Schlüsselbund zu spüren.",
+   "tags": [
+    "untot",
+    "humanoid"
+   ],
+   "abilities": [
+    "furchterregend"
+   ]
+  },
+  {
+   "id": "faulgasblase",
+   "name": "Faulgasblase",
+   "glyph": "o",
+   "color": "#a0b050",
+   "levels": [
+    6,
+    9
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 10,
+   "hpPerLevel": 3,
+   "dmg": [
+    2,
+    4
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 70,
+   "ruestung": 0,
+   "ausweichen": 30,
+   "size": "klein",
+   "behavior": "melee",
+   "xp": 34,
+   "weight": 3,
+   "flavor": "Eine schwebende Blase aus Kanalgas. Schlag sie besser nicht, wenn du daneben stehst. Oder überhaupt.",
+   "tags": [
+    "elementar"
+   ],
+   "abilities": [
+    "fliegend",
+    "explodiert"
+   ]
+  },
+  {
+   "id": "treibgut_mimic",
+   "name": "Treibgut-Haufen",
+   "glyph": "&",
+   "color": "#7a6a4a",
+   "levels": [
+    7,
+    10
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 30,
+   "hpPerLevel": 6,
+   "dmg": [
+    4,
+    8
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 75,
+   "ruestung": 2,
+   "ausweichen": 0,
+   "size": "mittel",
+   "behavior": "stationary",
+   "xp": 48,
+   "weight": 2,
+   "flavor": "Ein Haufen Treibgut am Ufer. Ein alter Koffer, ein Schirm, ein Fahrrad. Und Zähne. Viele Zähne.",
+   "tags": [
+    "mimic"
+   ]
+  },
+  {
+   "id": "brueckentroll",
+   "name": "Brückentroll",
+   "glyph": "T",
+   "color": "#6a8a5a",
+   "levels": [
+    8,
+    11
+   ],
+   "floors": [
+    3
+   ],
+   "hp": 55,
+   "hpPerLevel": 8,
+   "dmg": [
+    5,
+    10
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 70,
+   "ruestung": 3,
+   "ausweichen": 0,
+   "size": "gross",
+   "behavior": "melee",
+   "xp": 80,
+   "weight": 2,
+   "flavor": "Er wohnt unter einer Brücke und verlangt Zoll. Die Währung ist Blut. Wechselgeld gibt er nicht.",
+   "tags": [
+    "troll"
+   ],
+   "abilities": [
+    "regeneriert"
+   ]
   }
  ],
  "HOOD_BOSSES": [

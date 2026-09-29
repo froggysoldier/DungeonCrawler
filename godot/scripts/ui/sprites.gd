@@ -34,6 +34,9 @@ const BY_DEF := {
 	"pilzmensch": "pilz",
 	"mottenmann": "motte", "mottenmutter": "motte",
 	"taubenschwarm": "vogel",
+	"schlickkrebs": "krebs", "stromaal": "aal", "riesenegel": "egel", "gullyqualle": "qualle",
+	"lumpensammler": "mensch", "rohrgolem": "maschine", "schimmelteppich": "pilz", "kloakenhund": "hund",
+	"schleusenwaerter": "zombie", "faulgasblase": "irrlicht", "treibgut_mimic": "sack", "brueckentroll": "troll",
 	"die_sammlerin": "mensch", "der_hausmeister": "mensch", "kammerjaeger": "mensch", "pfandbaron": "mensch", "hausverwalter": "mensch",
 }
 

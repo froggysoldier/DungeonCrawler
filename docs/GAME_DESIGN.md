@@ -497,6 +497,27 @@ Bosse kämpfen in drei Phasen (`scripts/engine/boss_fight.gd`):
   `data/monsters.json` (`BOSS_SPECIALS`, `HOOD_BOSSES[].specials`,
   `phaseLines`).
 
+### 3.27 Etage 3: Die Kanalstadt
+Etage 3 hat eine eigene Gestalt (`scripts/engine/kanalstadt.gd`):
+
+- **Kanäle:** Zwei waagerechte und ein senkrechter Kanal, je zwei Felder
+  breit, ziehen quer über die Karte. Tiefes Wasser ist nicht begehbar, aber
+  durchsichtig: Man sieht über den Kanal hinweg, und Fernkämpfer schießen
+  hinüber. Wo ein Gang kreuzt, liegt eine **Brücke**; durchquert ein Kanal
+  einen normalen Raum, wird er dort zu seichtem Wasser. Besondere Räume,
+  Türen und Treppen bleiben unberührt, alles bleibt erreichbar.
+- **Siedlung:** Drei Räume nahe der Kartenmitte bilden die Siedlung der
+  Kanalstadt, jeder mit eigenem Händler (Pumpwerk-Apotheke, Waffenmarkt am
+  Wehr, Schrottplatz unter der Brücke oder Kuriositätenkabinett). Dort
+  wohnen feste **Bewohner** mit eigenen Sätzen; sie bieten Aufträge an,
+  gehen aber nicht mit auf Reisen. Monster betreten die Siedlung nicht und
+  wachsen dort auch nicht nach.
+- **Zwölf neue Monster:** Schlickkrebs, Stromaal, Riesenblutegel,
+  Gullyqualle, Lumpensammler, Rohrgolem, Schimmelteppich, Kloakenhund,
+  Verlorener Schleusenwärter, Faulgasblase, Treibgut-Haufen und Brückentroll,
+  dazu vier neue Figuren (Krebs, Aal, Egel, Qualle). Zusammen mit den zehn
+  bisherigen hat Etage 3 jetzt 22 eigene Monster.
+
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
 1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben

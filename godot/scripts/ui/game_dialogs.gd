@@ -16,6 +16,8 @@ const TERRAIN_TEXT := {
 	"schlamm": ["Schlamm", "#c09a6a", "Wer hineintritt, braucht einen Zug, um wieder herauszukommen."],
 	"kiste": ["Kiste", "#c09a6a", "Hineinlaufen zum Zerschlagen. Manchmal ist etwas drin."],
 	"fass": ["Fass", "#c09a6a", "Hineinlaufen zum Zerschlagen. Manchmal ist etwas drin."],
+	"kanal": ["Kanal", "#5a9ac8", "Tief und trüb. Hinüber geht es nur über eine Brücke, aber man sieht und schießt hindurch."],
+	"bruecke": ["Brücke", "#c09a6a", "Knarrende Planken über dem Kanal."],
 }
 
 

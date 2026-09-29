@@ -93,6 +93,34 @@ func _initialize() -> void:
 				await wait(2.0)
 				await shot("dialog")
 			var gv: GameView = main.view
+			if mode == "kanalstadt":
+				# Etage 3: an eine Brücke (FEATURE=bruecke) oder in die Siedlung (FEATURE=siedlung)
+				TH.tutorial(s)
+				TH.to_floor3(s)
+				if s.pendingSelection:
+					Classes.choose(s, "mensch", Classes.class_options(s)[0].klass.id)
+				s.pendingDialogs.clear()
+				var want := OS.get_environment("FEATURE")
+				var spot = null
+				if want == "siedlung":
+					var town = J.find(s.map.rooms, func(r): return r.get("siedlung"))
+					spot = MapGen._random_floor_in(s, s.map, town, {})
+				else:
+					var i: int = s.map.tiles.find("bruecke")
+					spot = {"x": i % int(s.map.width), "y": i / int(s.map.width)}
+				TH.teleport(s, spot)
+				s.monsters = s.monsters.filter(func(mo): return Fov.chebyshev(mo.pos, s.player.pos) > 7)
+				Game.after_move(s)
+				main.start_game(s)
+				await wait(1.2)
+				gv = main.view
+				gv.zoom_map(-10)
+				gv.zoom_map(1)
+				gv.refresh_side()
+				await wait(1.2)
+				await shot("kanalstadt_" + want)
+				quit()
+				return
 			if mode == "bossangriff":
 				# Vor einen Boss stellen, der gerade einen Spezialangriff ankündigt
 				var boss = J.find(s.monsters, func(mo): return mo.rank == "nachbarschaftsboss")

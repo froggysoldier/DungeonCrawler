@@ -31,6 +31,9 @@ static func _allowed_tile(s: Dictionary, m: Dictionary, p: Dictionary) -> bool:
 	if m.get("homeRoom") != null:
 		return r == m.homeRoom
 	var kind = s.map.rooms[r].kind if r >= 0 else null
+	# In die Siedlung der Kanalstadt trauen sich Monster nicht
+	if r >= 0 and s.map.rooms[r].get("siedlung"):
+		return false
 	return kind != "boss" and kind != "arena"
 
 

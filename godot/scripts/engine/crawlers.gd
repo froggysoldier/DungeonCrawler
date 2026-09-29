@@ -170,7 +170,8 @@ static func talk_to(s: Dictionary, uid: String) -> Dictionary:
 	var pd: Dictionary = _c("PERSONALITIES")[c.personality]
 	var first: bool = not c.met
 	c.met = true
-	Log.add(s, "%s: „%s“" % [c.name, R.pick(s, pd.greetings)], "dialog")
+	var line: String = R.pick(s, Db.world("RESIDENT_LINES")) if c.get("resident") else R.pick(s, pd.greetings)
+	Log.add(s, "%s: „%s“" % [c.name, line], "dialog")
 	if first:
 		Events.emit(s, {"type": "crawlerMet", "name": c.name, "personality": c.personality})
 	if c.personality == "feindselig" and not Combat.is_in_safe_room(s, s.player.pos):
@@ -202,6 +203,8 @@ static func invite(s: Dictionary, uid: String) -> Dictionary:
 		return {"ok": false, "message": "Da ist niemand."}
 	if c.party:
 		return {"ok": false, "message": "%s ist schon in deiner Party." % c.name}
+	if c.get("resident"):
+		return {"ok": false, "message": "%s: „Nett gemeint. Aber jemand muss hier unten die Stellung halten.“" % c.name}
 	if party(s).size() >= int(_c("PARTY_MAX")):
 		return {"ok": false, "message": "Deine Party ist voll (vier Crawler inklusive dir)."}
 	if c.get("refusedUntil") and s.turn < c.refusedUntil:
@@ -412,7 +415,7 @@ static func turn(s: Dictionary) -> void:
 			if _seen(s, c) and R.chance(s, 0.004):
 				Log.add(s, J.replace1(R.pick(s, _c("PARTY_BARKS")), "{name}", c.name), "dialog")
 			continue
-		if d > 20 and R.chance(s, 0.0006 * s.floor):
+		if d > 20 and not c.get("resident") and R.chance(s, 0.0006 * s.floor):
 			_crawler_dies(s, c)
 			continue
 		if c.personality == "verzweifelt" or d <= 1:
@@ -420,7 +423,8 @@ static func turn(s: Dictionary) -> void:
 		if R.chance(s, 0.25):
 			var q: Array = R.pick(s, DIRS)
 			var p := J.pos(c.pos.x + q[0], c.pos.y + q[1])
-			if Pathfinding.can_step(s.map, c.pos, p) and not _blocked(s, p, c) and not Combat.is_in_safe_room(s, p):
+			var home_ok: bool = c.get("home") == null or (MapGen.room_of(s.map, p) != null and MapGen.room_of(s.map, p).id == c.home)
+			if Pathfinding.can_step(s.map, c.pos, p) and not _blocked(s, p, c) and not Combat.is_in_safe_room(s, p) and home_ok:
 				c.pos = p
 
 

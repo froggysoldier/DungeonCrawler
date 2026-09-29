@@ -5498,6 +5498,330 @@
    "tier": "silber",
    "box": "abenteurer",
    "category": "bestiarium"
+  },
+  {
+   "id": "art_schlickkrebs_1",
+   "name": "Neu im Bestiarium: Schlickkrebs",
+   "description": "Besiege zum ersten Mal: Schlickkrebs.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schlickkrebs_2",
+   "name": "Routine: Schlickkrebs",
+   "description": "Besiege 10-mal: Schlickkrebs.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schlickkrebs_3",
+   "name": "Plage beseitigt: Schlickkrebs",
+   "description": "Besiege 30-mal: Schlickkrebs.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_stromaal_1",
+   "name": "Neu im Bestiarium: Stromaal",
+   "description": "Besiege zum ersten Mal: Stromaal.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_stromaal_2",
+   "name": "Routine: Stromaal",
+   "description": "Besiege 10-mal: Stromaal.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_stromaal_3",
+   "name": "Plage beseitigt: Stromaal",
+   "description": "Besiege 30-mal: Stromaal.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_riesenegel_1",
+   "name": "Neu im Bestiarium: Riesenblutegel",
+   "description": "Besiege zum ersten Mal: Riesenblutegel.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_riesenegel_2",
+   "name": "Routine: Riesenblutegel",
+   "description": "Besiege 10-mal: Riesenblutegel.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_riesenegel_3",
+   "name": "Plage beseitigt: Riesenblutegel",
+   "description": "Besiege 30-mal: Riesenblutegel.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_gullyqualle_1",
+   "name": "Neu im Bestiarium: Gullyqualle",
+   "description": "Besiege zum ersten Mal: Gullyqualle.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_gullyqualle_2",
+   "name": "Routine: Gullyqualle",
+   "description": "Besiege 10-mal: Gullyqualle.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_gullyqualle_3",
+   "name": "Plage beseitigt: Gullyqualle",
+   "description": "Besiege 30-mal: Gullyqualle.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_lumpensammler_1",
+   "name": "Neu im Bestiarium: Lumpensammler",
+   "description": "Besiege zum ersten Mal: Lumpensammler.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_lumpensammler_2",
+   "name": "Routine: Lumpensammler",
+   "description": "Besiege 10-mal: Lumpensammler.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_lumpensammler_3",
+   "name": "Plage beseitigt: Lumpensammler",
+   "description": "Besiege 30-mal: Lumpensammler.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rohrgolem_1",
+   "name": "Neu im Bestiarium: Rohrgolem",
+   "description": "Besiege zum ersten Mal: Rohrgolem.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rohrgolem_2",
+   "name": "Routine: Rohrgolem",
+   "description": "Besiege 10-mal: Rohrgolem.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rohrgolem_3",
+   "name": "Plage beseitigt: Rohrgolem",
+   "description": "Besiege 30-mal: Rohrgolem.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schimmelteppich_1",
+   "name": "Neu im Bestiarium: Schimmelteppich",
+   "description": "Besiege zum ersten Mal: Schimmelteppich.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schimmelteppich_2",
+   "name": "Routine: Schimmelteppich",
+   "description": "Besiege 10-mal: Schimmelteppich.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schimmelteppich_3",
+   "name": "Plage beseitigt: Schimmelteppich",
+   "description": "Besiege 30-mal: Schimmelteppich.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kloakenhund_1",
+   "name": "Neu im Bestiarium: Kloakenhund",
+   "description": "Besiege zum ersten Mal: Kloakenhund.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kloakenhund_2",
+   "name": "Routine: Kloakenhund",
+   "description": "Besiege 10-mal: Kloakenhund.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_kloakenhund_3",
+   "name": "Plage beseitigt: Kloakenhund",
+   "description": "Besiege 30-mal: Kloakenhund.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schleusenwaerter_1",
+   "name": "Neu im Bestiarium: Verlorener Schleusenwärter",
+   "description": "Besiege zum ersten Mal: Verlorener Schleusenwärter.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schleusenwaerter_2",
+   "name": "Routine: Verlorener Schleusenwärter",
+   "description": "Besiege 10-mal: Verlorener Schleusenwärter.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_schleusenwaerter_3",
+   "name": "Plage beseitigt: Verlorener Schleusenwärter",
+   "description": "Besiege 30-mal: Verlorener Schleusenwärter.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_faulgasblase_1",
+   "name": "Neu im Bestiarium: Faulgasblase",
+   "description": "Besiege zum ersten Mal: Faulgasblase.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_faulgasblase_2",
+   "name": "Routine: Faulgasblase",
+   "description": "Besiege 10-mal: Faulgasblase.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_faulgasblase_3",
+   "name": "Plage beseitigt: Faulgasblase",
+   "description": "Besiege 30-mal: Faulgasblase.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_treibgut_mimic_1",
+   "name": "Neu im Bestiarium: Treibgut-Haufen",
+   "description": "Besiege zum ersten Mal: Treibgut-Haufen.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_treibgut_mimic_2",
+   "name": "Routine: Treibgut-Haufen",
+   "description": "Besiege 10-mal: Treibgut-Haufen.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_treibgut_mimic_3",
+   "name": "Plage beseitigt: Treibgut-Haufen",
+   "description": "Besiege 30-mal: Treibgut-Haufen.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_brueckentroll_1",
+   "name": "Neu im Bestiarium: Brückentroll",
+   "description": "Besiege zum ersten Mal: Brückentroll.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_brueckentroll_2",
+   "name": "Routine: Brückentroll",
+   "description": "Besiege 10-mal: Brückentroll.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_brueckentroll_3",
+   "name": "Plage beseitigt: Brückentroll",
+   "description": "Besiege 30-mal: Brückentroll.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
   }
  ]
 }

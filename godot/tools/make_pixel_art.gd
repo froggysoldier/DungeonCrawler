@@ -536,6 +536,10 @@ const FLOORS := {
 	# Gelände (Dungeon.WATER, Dungeon.MUD): kacheln nahtlos
 	"wasser": {"base": "#2c5878", "gap": "#1c3a52"},
 	"schlamm": {"base": "#4f3d2a", "gap": "#33271b"},
+	# Kanalstadt (Kanalstadt.CANAL, Kanalstadt.BRIDGE)
+	"kanal": {"base": "#16383a", "gap": "#081a1e"},
+	"bruecke": {"base": "#7a5a3a", "gap": "#2c1e14"},
+	"bruecke_quer": {"base": "#7a5a3a", "gap": "#2c1e14"},
 }
 
 
@@ -703,6 +707,51 @@ func _floor(mat: String, v: int) -> Image:
 					img.set_pixel((x + i) % T, y, base.lightened(0.25))
 					if i > 0 and i < 3:
 						img.set_pixel((x + i) % T, (y + 1) % T, base.lightened(0.1))
+		"kanal":
+			# Tiefes, dunkles Wasser mit trägen Schlieren, nahtlos
+			for yy in T:
+				for xx in T:
+					var w := sin((xx + v * 7) * TAU / 32.0 + yy * 0.45) * 0.5 + 0.5
+					img.set_pixel(xx, yy, _jit(base.lerp(gap, 0.5 * (1.0 - w)), 0.02, _r()))
+			for n in 3:
+				var y := (n * 11 + _ri(0, 8)) % T
+				var x := _ri(0, T - 1)
+				for i in _ri(6, 12):
+					img.set_pixel((x + i) % T, y, base.lightened(0.18))
+			if v == 3:
+				# Treibgut
+				var tx := _ri(6, 22)
+				var ty := _ri(8, 22)
+				for i in 5:
+					img.set_pixel(tx + i, ty, Color("#6a5a3a"))
+					img.set_pixel(tx + i, ty + 1, Color("#4a3a26"))
+		"bruecke", "bruecke_quer":
+			# Planken über Wasser; Geländer an den Seiten (längs: links und rechts)
+			var water := Color("#1c3a4a")
+			img.fill(water)
+			for p in 8:
+				var col := _jit(base, 0.1, _r())
+				for i in T:
+					for k in 3:
+						var a := p * 4 + k
+						var c := col if k < 2 else gap
+						if k == 0:
+							c = col.lightened(0.12)
+						if i < 3 or i > 28:
+							continue
+						if mat == "bruecke":
+							img.set_pixel(i, a, c)
+						else:
+							img.set_pixel(a, i, c)
+			for i in T:
+				for k in 2:
+					var rail := Color("#4a3422") if k == 0 else Color("#6a4c30")
+					if mat == "bruecke":
+						img.set_pixel(1 + k, i, rail)
+						img.set_pixel(29 + k, i, rail)
+					else:
+						img.set_pixel(i, 1 + k, rail)
+						img.set_pixel(i, 29 + k, rail)
 		"schlamm":
 			# Braune Masse mit dunklen Mulden, nassem Glanz und Blasen
 			for yy in T:

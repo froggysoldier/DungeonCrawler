@@ -201,6 +201,7 @@ static func _enter_floor(s: Dictionary, floor: int, meta: Dictionary) -> void:
 				break
 		pet.pos = spot if spot != null else J.pcopy(gen.start)
 	Crawlers.populate(s, gen.start)
+	Kanalstadt.add_residents(s)
 	TalkShow.snapshot_floor(s)
 	after_move(s)
 
@@ -574,7 +575,7 @@ static func _respawn(s: Dictionary) -> void:
 		var count: int = s.monsters.filter(func(m): return m.hood == hood.id and m.rank == "normal").size()
 		if count >= 14:
 			continue
-		var rooms: Array = s.map.rooms.filter(func(r): return r.hood == hood.id and r.kind == "normal")
+		var rooms: Array = s.map.rooms.filter(func(r): return r.hood == hood.id and r.kind == "normal" and not r.get("siedlung"))
 		if rooms.is_empty():
 			continue
 		var room: Dictionary = R.pick(s, rooms)

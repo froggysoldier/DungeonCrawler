@@ -50,7 +50,9 @@ static func ensure_shop(s: Dictionary, room: Dictionary) -> Dictionary:
 
 ## Wanderhändler: Waffen, Apotheke, Schrott oder Kuriositäten (data/world.json, WANDER_SHOPS).
 static func _ensure_wander(s: Dictionary, room: Dictionary) -> Dictionary:
-	var def: Dictionary = R.pick(s, Db.world("WANDER_SHOPS"))
+	var shops: Array = Db.world("WANDER_SHOPS")
+	var fixed = room.get("shopType")
+	var def: Dictionary = J.find(shops, func(x): return x.id == fixed) if fixed != null else R.pick(s, shops)
 	var offers := []
 	for entry in R.shuffle(s, def.items.duplicate()).slice(0, int(def.pick)):
 		offers.append(Items.create_item(s, entry[0], int(entry[1])))

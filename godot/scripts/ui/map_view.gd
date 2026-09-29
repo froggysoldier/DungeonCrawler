@@ -450,10 +450,14 @@ func _draw_static(ci: CanvasItem) -> void:
 			if mat == null:
 				mat = Tiles.room_material(room)
 				materials[ri] = mat
-			if tile == Dungeon.WATER or tile == Dungeon.MUD:
+			if tile == Dungeon.WATER or tile == Dungeon.MUD or tile == Kanalstadt.CANAL:
 				_spr(ci, "boden/%s%d" % [tile, floori(Tiles.hash(x, y) * 4)], sx, sy)
-				if tile == Dungeon.WATER and vis.has(i):
+				if (tile == Dungeon.WATER or tile == Kanalstadt.CANAL) and vis.has(i):
 					_animated.append(["water", x, y])
+			elif tile == Kanalstadt.BRIDGE:
+				# Kanal links oder rechts: Brücke führt nach oben und unten
+				var across: bool = MapGen.tile_at(m, x - 1, y) == Kanalstadt.CANAL or MapGen.tile_at(m, x + 1, y) == Kanalstadt.CANAL
+				_spr(ci, "boden/%s%d" % ["bruecke" if across else "bruecke_quer", floori(Tiles.hash(x, y) * 4)], sx, sy)
 			else:
 				_spr(ci, "boden/%s%d" % [mat, floori(Tiles.hash(x, y) * 4)], sx, sy)
 			# Harte Schatten unter und neben Wänden
