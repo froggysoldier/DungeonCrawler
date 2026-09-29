@@ -158,6 +158,17 @@ ohne Threads aus und läuft deshalb auf jedem einfachen Webserver (etwa
 nacheinander erzeugt, ein Klang pro Bild. Die Ausgabe landet in `build/`, das
 nicht eingecheckt wird.
 
+### Web-Link
+
+`./web-link.sh` baut eine Fassung für einen claude.ai-Artifact-Link nach
+`build/web-link`. Der Dienst liefert nur Dateien bis 15 MB und nur bestimmte
+Dateitypen aus. Deshalb liegt die Engine gzip-gepackt als `engine.wasm` bei
+(10 statt 39 MB) und die Spieldaten als `daten.wasm`. Die Seite
+`godot/tools/web_link/index.html` leitet Godots Anfragen nach `index.wasm` und
+`index.pck` darauf um und entpackt die Engine im Browser mit
+`DecompressionStream`. Die Seite zeigt beim Laden Titel, Fortschritt und die
+wichtigsten Tasten.
+
 Entwicklerschalter: `--schnellstart` startet direkt eine Partie (Seed 1, ohne
 Interview). Im Web geht das über `"args":["--schnellstart"]` in der
 erzeugten `index.html`.
