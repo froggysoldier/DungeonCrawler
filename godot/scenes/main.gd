@@ -34,6 +34,8 @@ func _clear() -> void:
 	if view != null and is_instance_valid(view):
 		view.queue_free()
 	view = null
+	# Musik nur im Spiel; die Spielansicht meldet Etage und Kampf selbst
+	sound.music(0)
 	modals.clear_toasts()
 	Kit.clear(screen_root)
 

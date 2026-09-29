@@ -402,10 +402,16 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
   zerstört werden, Tiere erholen sich beim Schlafen. Im Safe Room steigt man ab.
   Taste M zum Auf- und Absteigen.
 
-### 3.23 Klänge
-Im Browser erzeugt (keine Audiodateien): Lootbox (Knarzen und Glitzern, je
+### 3.23 Klänge und Musik
+Im Spiel erzeugt (keine Audiodateien): Lootbox (Knarzen und Glitzern, je
 nach Stufe länger), Level-Aufstieg (Fanfare), Achievement (Glockenschlag),
-neuer Skill. Schalter „Ton an/aus“ in der oberen Leiste.
+neuer Skill, Kampfbeginn und -ende, Versus-Bildschirm, Tippgeräusch.
+Musik: Jede Etage hat eine Klangkulisse aus tiefem, schwebendem Brummen
+(Keller: Luftzug; Kanalstadt: fließendes Wasser) und zufälligen Geräuschen
+(Tropfen, Knarzen, Ketten, fernes Grollen, Blubbern). Im Kampf blendet eine
+Chiptune-Schleife in a-Moll ein (Bass, Arpeggio, Melodie, Schlagzeug), bei
+Bossen schneller und höher; danach blendet sie wieder aus. Schalter „Ton“,
+„Tippen“ und „Musik“ in der oberen Leiste.
 
 ### 3.24 Zustände im Kampf
 | Zustand | Wirkung | Quellen |

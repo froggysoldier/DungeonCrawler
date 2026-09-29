@@ -411,6 +411,9 @@ var _vis_cache: Dictionary = {}
 
 func _update_combat_mode() -> void:
 	var now: bool = s.status == "playing" and in_combat()
+	if sound():
+		var boss := now and J.some(combat_targets(), func(m): return m.rank != "normal" and m.rank != "elite")
+		sound().music(s.floor if s.status == "playing" else 0, now, boss)
 	_combat_frame.combat = now
 	_combat_frame.queue_redraw()
 	if now and fight == null:
@@ -976,6 +979,7 @@ func refresh_top() -> void:
 		["Hilfe", func(): GameDialogs.show_help(self), "Alle Tasten (H)", false],
 		["Ton: %s" % ("an" if sound() and sound().enabled else "aus"), _toggle_sound, "Klänge für Lootboxen, Level-Aufstieg und Achievements", false],
 		["Tippen: %s" % ("an" if sound() and sound().typing_on else "aus"), _toggle_typing, "Weiches Tastenklicken, wenn Texte getippt werden", not (sound() and sound().enabled)],
+		["Musik: %s" % ("an" if sound() and sound().music_on else "aus"), _toggle_music, "Klangkulisse der Etage und Kampfmusik", not (sound() and sound().enabled)],
 	]:
 		var btn := Kit.button(_top, b[0], b[1], "PillButton", b[3], b[2])
 		btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -1016,6 +1020,13 @@ func _toggle_sound() -> void:
 	sound().set_enabled(not sound().enabled)
 	if sound().enabled:
 		sound().play_sfx([{"kind": "skill"}])
+	refresh_top()
+
+
+func _toggle_music() -> void:
+	if not sound():
+		return
+	sound().set_music(not sound().music_on)
 	refresh_top()
 
 

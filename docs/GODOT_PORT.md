@@ -43,7 +43,7 @@ godot/
 | `game_here.gd`, `game_tabs.gd`, `game_combat.gd`, `game_dialogs.gd` | Seitenleiste, Reiter, Kampfsequenz, Tooltip, Versus, Talkshow, Hilfe |
 | `selection.gd`, `screens.gd` | Rassen- und Klassenwahl, Titel, Interview, Ende |
 | `modals.gd`, `typing.gd` | Dialoge mit Warteschlange, Schreibmaschinen-Effekt |
-| `sound.gd` | Klänge im Spiel erzeugt, ohne Audiodateien |
+| `sound.gd` | Klänge und Musik im Spiel erzeugt, ohne Audiodateien: Brummen je Etage als nahtlose Schleife, zufällige Geräusche, Kampfschleife mit Überblenden |
 | `ui_theme.gd`, `kit.gd`, `click_panel.gd` | Designsystem (Farben, Knöpfe, Karten) und Bausteine |
 
 ## Pixel-Grafik
@@ -160,7 +160,7 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | `test_ui_helpers` | Anzeige-Helfer (Uhrzeit, nächste Ziele, Bodenmaterial, Zufall je Kachel, Beschreibungen) identisch zur Aufnahme |
 | `test_engine`, `test_combat_zones`, `test_ai`, `test_skills` … | Spielregeln einzeln: Kampf, Gegner, Skills, Klassen, Magie, Fallen, Handwerk, Haustiere, Reittiere, Sponsoren, Talkshow, Achievements |
 | `test_ui_smoke` | Eine Partie komplett über die Spielansicht gespielt: keine Laufzeitfehler, Spielverlauf unverändert |
-| `test_sound` | Klänge hörbar und nicht übersteuert |
+| `test_sound` | Klänge hörbar und nicht übersteuert; Musik in Schleife, ohne Naht, alle Geräusche vorhanden |
 | `test_pixel_art` | Zu allem, was gezeichnet wird, gibt es ein Bild; Tönen ersetzt alle Magenta-Stufen; Haustier-Arten und zweite Bilder |
 | `test_effects` | Engine meldet Angriff, Treffer, Tod und Aufstieg; Animator macht daraus Ausfallschritt, Aufblitzen, Zerfall, Beben, Funken |
 
