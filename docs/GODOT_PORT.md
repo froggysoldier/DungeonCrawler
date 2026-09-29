@@ -58,7 +58,8 @@ Die Bilder liegen in `assets/pixel` als PNG-Bögen:
 
 | Bogen | Inhalt |
 |---|---|
-| `kreaturen.png` | 34 Kreaturen, Spielfigur, Haustier, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
+| `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur, Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
+| `bosse.png` | Eigene Figuren der 15 Bosse, 24 × 24 Pixel; sie stehen auf ihrer Kachel und ragen darüber hinaus |
 | `kacheln.png` | Böden (9 Materialien × 4 Varianten), Wände (3 Etagen × 4 Varianten, Krone und Vorderseite), Türen, Treppe |
 | `dinge.png` | Gegenstände am Boden, Fallen, Geschosse |
 | `einrichtung.png` | Automat, Bett, Toilette, Theke, Kisten, Fässer, Regale, Gerümpel, Eimer, Flecken |
@@ -79,7 +80,8 @@ Textvorlagen in `tools/pixel_defs.gd` und aus prozeduralen Mustern (Böden,
 Wände, Türen) erzeugt. Der Generator legt Umriss und Schattierung automatisch
 an. Er überschreibt vorhandene Bögen nur mit `--force`, damit Änderungen aus
 einem Pixel-Editor nicht verloren gehen. Neue Monsterarten brauchen einen
-Eintrag in `Sprites.BY_DEF`; `test_pixel_art` prüft, dass es zu jedem Monster,
+Eintrag in `Sprites.BY_DEF`, neue Bosse eine eigene Figur (`boss/<id>`);
+`test_pixel_art` prüft, dass es zu jedem Monster,
 jeder Falle, jedem Reittier und jedem Möbelstück ein Bild gibt.
 
 **Bewegung:** Fledermäuse, Motten, Tauben und Drohnen flattern, Irrlichter
@@ -104,7 +106,7 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | `UI_SMOKE_ALL=1 ./test.sh ui_smoke` | Alle aufgezeichneten Partien (bis Etage 3) durch die Oberfläche spielen, dauert einige Minuten |
 | `godot --headless --path godot -s res://tools/record_fixtures.gd` | Aufnahmen für die Replay-Tests neu erzeugen (Karten, Replays, Anzeige-Helfer), nach absichtlichen Änderungen an Inhalten oder Regeln |
 | `godot --headless --path godot -s res://tools/balance_sim.gd [-- anzahl]` | Ein Bot spielt Partien bis Etage 3 und gibt eine Tabelle aus (Stufe, Kills, Todesursache …) |
-| `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte), `fx` (Angriff in sechs Bildern), `fackeln` |
+| `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte), `fx` (Angriff in sechs Bildern, mit `BOSS=id` gegen einen Boss), `fackeln` |
 | `xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- bild.png [vergrößerung]` | Alle Monster in ihrer echten Farbe, dazu Spielfigur, Reittiere, Gegenstände, Fallen |
 | `godot --headless --path godot -s res://tools/make_pixel_art.gd -- --force [--preview ordner]` | Pixel-Bögen aus den Vorlagen neu erzeugen (überschreibt Änderungen aus Pixel-Editoren) |
 
