@@ -380,7 +380,7 @@ static func counter_strike(s: Dictionary, m: Dictionary) -> void:
 	Fx.strike(s, s.player.pos, m.pos)
 	Fx.float_text(s, m.pos, str(dmg), Fx.COLORS.schaden)
 	Fx.hit(s, m.pos)
-	Log.add(s, "Du weichst aus und konterst sofort: %d Schaden an %s." % [dmg, Identify.name_of(s, m)], "kampf")
+	Log.add(s, "Du weichst aus und konterst sofort: %d Schaden an %s." % [dmg, Identify.name_of(s, m, "dat")], "kampf")
 	var t := {"part": "faust", "move": "normal"}
 	if m.hp > 0:
 		return
@@ -429,7 +429,7 @@ static func _explode(s: Dictionary, m: Dictionary) -> void:
 		s.counters.damageTaken += taken
 		Log.add(s, "Die Explosion erwischt dich für %d Schaden." % taken, "gefahr")
 		if s.player.hp <= 0:
-			Death.handle_lethal(s, "durch die Explosion von %s zerfetzt" % Identify.name_of_dat(s, m))
+			Death.handle_lethal(s, "durch die Explosion %s zerfetzt" % Identify.von(s, m))
 		else:
 			Events.emit(s, {"type": "explosion", "damage": taken, "source": m.name})
 

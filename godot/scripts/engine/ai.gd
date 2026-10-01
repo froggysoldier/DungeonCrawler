@@ -158,7 +158,7 @@ static func _attack_player(s: Dictionary, m: Dictionary, ranged: bool) -> void:
 		if m.hp <= 0:
 			Combat.kill_monster(s, m, null)
 	if p.hp <= 0:
-		Death.handle_lethal(s, "getötet von %s" % Identify.name_of_dat(s, m))
+		Death.handle_lethal(s, "getötet %s" % Identify.von(s, m))
 		return
 	Events.emit(s, {"type": "damageTaken", "amount": dmg, "source": m.name, "facets": source})
 	Abilities.on_monster_hit(s, m)
@@ -422,7 +422,7 @@ static func pet_turn(s: Dictionary) -> void:
 		Fx.shot(s, pet.pos, spell_target.pos, "magie")
 		spell_target.hp -= dmg
 		spell_target.aware = true
-		Log.add(s, "%s schießt Magische Geschosse aus den Augen: %d Schaden an %s." % [pet.name, dmg, Identify.name_of(s, spell_target)], "kampf")
+		Log.add(s, "%s schießt Magische Geschosse aus den Augen: %d Schaden an %s." % [pet.name, dmg, Identify.name_of(s, spell_target, "dat")], "kampf")
 		if spell_target.hp <= 0:
 			Combat.kill_monster(s, spell_target, null, true)
 		return

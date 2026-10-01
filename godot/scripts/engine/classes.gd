@@ -286,7 +286,7 @@ static func use_ability(s: Dictionary, technique: Dictionary) -> Dictionary:
 			var gold: int = 5 + m.level * 3 + int(J.num(m, "stolenGold"))
 			m.stolenGold = 0
 			Inventory.add_to_inventory(s, Items.create_gold(s, gold))
-			Log.add(s, "Deine Finger sind schneller als %s. Du erbeutest %d Gold." % [Identify.name_of(s, m), gold], "loot")
+			Log.add(s, "Deine Finger sind schneller als %s. Du erbeutest %d Gold." % [Identify.name_of(s, m, "nom"), gold], "loot")
 			if R.chance(s, 0.3):
 				var loot := Items.roll_ground_item(s)
 				Inventory.add_to_inventory(s, loot)

@@ -46,29 +46,46 @@ static func _is_boss(m: Dictionary) -> bool:
 	return m.rank == "nachbarschaftsboss" or m.rank == "boroughboss"
 
 
-## Der Name, den der Crawler für dieses Monster kennt.
-static func name_of(s: Dictionary, m: Dictionary) -> String:
+## Der Name, den der Crawler für dieses Monster kennt, mitten im Satz und
+## im passenden Fall ("nom", "akk", "dat").
+## Bossnamen mit Artikel werden dekliniert: „trifft den Rattenkaiser“,
+## „getötet von der Nixe“.
+static func name_of(s: Dictionary, m: Dictionary, case: String = "akk") -> String:
 	var insight := monster_insight(s, m)
 	if insight <= 2:
-		return m.name
+		return decline(m.name, case)
 	if insight == 4:
-		return "etwas sehr Gefährliches"
-	return "ein unbekannter Boss" if _is_boss(m) else "ein unbekanntes %s Wesen" % SIZE_WORDS[m.size]
+		return "etwas sehr Gefährlichem" if case == "dat" else "etwas sehr Gefährliches"
+	if _is_boss(m):
+		return {"nom": "ein unbekannter Boss", "akk": "einen unbekannten Boss", "dat": "einem unbekannten Boss"}[case]
+	return ("einem unbekannten %s Wesen" % SIZE_DAT[m.size]) if case == "dat" else ("ein unbekanntes %s Wesen" % SIZE_WORDS[m.size])
 
 
-## Name im Dativ, z. B. nach „von“.
+## Name im Dativ, z. B. nach „mit“.
 static func name_of_dat(s: Dictionary, m: Dictionary) -> String:
-	var insight := monster_insight(s, m)
-	if insight <= 2:
-		return m.name
-	if insight == 4:
-		return "etwas sehr Gefährlichem"
-	return "einem unbekannten Boss" if _is_boss(m) else "einem unbekannten %s Wesen" % SIZE_DAT[m.size]
+	return name_of(s, m, "dat")
 
 
-## Name am Satzanfang (großgeschrieben).
+## „von“ mit Namen: „vom Rattenkaiser“, „von der Nixe“, „von Kellerratte“.
+static func von(s: Dictionary, m: Dictionary) -> String:
+	var n := name_of(s, m, "dat")
+	return ("vom " + n.substr(4)) if n.begins_with("dem ") else ("von " + n)
+
+
+## Name am Satzanfang (großgeschrieben, Nominativ).
 static func name_of_cap(s: Dictionary, m: Dictionary) -> String:
-	return J.cap(name_of(s, m))
+	return J.cap(name_of(s, m, "nom"))
+
+
+## Artikel am Namensanfang klein und im passenden Fall.
+static func decline(name: String, case: String) -> String:
+	if name.begins_with("Der "):
+		return {"nom": "der ", "akk": "den ", "dat": "dem "}[case] + name.substr(4)
+	if name.begins_with("Die "):
+		return ("der " if case == "dat" else "die ") + name.substr(4)
+	if name.begins_with("Das "):
+		return ("dem " if case == "dat" else "das ") + name.substr(4)
+	return name
 
 
 static func condition_word(hp: float, max_v: float) -> String:

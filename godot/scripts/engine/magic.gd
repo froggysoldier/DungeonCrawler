@@ -272,7 +272,7 @@ static func cast_spell(s: Dictionary, id: String, opts: Dictionary = {}) -> Dict
 			else:
 				target.ruestung = maxi(0, armor_before - 2)
 				if armor_before > 0:
-					Log.add(s, "Die Säure frisst sich in die Panzerung von %s." % Identify.name_of(s, target), "kampf")
+					Log.add(s, "Die Säure frisst sich in die Panzerung %s." % Identify.von(s, target), "kampf")
 	p.mp = J.num(p, "mp") - cost
 	var cds: Dictionary = p.spellCooldowns.duplicate() if p.get("spellCooldowns") != null else {}
 	cds[id] = def.cooldown

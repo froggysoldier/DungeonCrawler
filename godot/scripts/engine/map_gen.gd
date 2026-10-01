@@ -437,7 +437,8 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 			var level: int = maxi(mob_level[0], J.rnd(mob_level[0] + d * 1.6 * (mob_level[1] - mob_level[0]) + R.int_(s, -1, 0)))
 			var mdef: Dictionary = Monsters.pick_monster_def(s, floor, level)
 			var lv := Monsters.clamp_level(mdef, level)
-			var pack_size: int = R.int_(s, mdef.pack[0], mdef.pack[1]) if mdef.get("pack") != null else 1
+			# Nahe dem Start nur Einzelgänger: der erste Kampf soll kein Rudel sein
+			var pack_size: int = R.int_(s, mdef.pack[0], mdef.pack[1]) if mdef.get("pack") != null and d >= 0.15 else 1
 			var k := 0
 			var broke := false
 			while k < pack_size and i < count + 1:
@@ -488,9 +489,10 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 				items.append({"pos": p, "item": Items.roll_material(s)})
 
 	# --- Besondere Räume: Schatz, Nest, Schrein, Händler, Hinterhalt
-	Dungeon.populate(s, m, monsters, items, occupied, floor, start)
+	# Die Siedlung der Kanalstadt zuerst, damit sie die Räume nahe der Mitte bekommt
 	if floor == Kanalstadt.FLOOR_NO:
 		Kanalstadt.populate(s, m, monsters, occupied)
+	Dungeon.populate(s, m, monsters, items, occupied, floor, start)
 
 	return {"map": m, "monsters": monsters, "items": items, "start": start}
 

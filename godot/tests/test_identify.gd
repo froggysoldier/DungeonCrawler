@@ -59,3 +59,23 @@ func test_seltenheit_unlesbar(t) -> void:
 	t.ok(J.every(Identify.describe_item(s, epic).bonuses, func(b): return String(b).begins_with("?")), "Boni geschätzt")
 	s.player.level = 6
 	t.eq(Identify.describe_item(s, epic).name, epic.name, "erkannt")
+
+
+func test_bossnamen_dekliniert(t) -> void:
+	t.eq(Identify.decline("Der Rattenkaiser", "akk"), "den Rattenkaiser", "Akkusativ maskulin")
+	t.eq(Identify.decline("Der Rattenkaiser", "dat"), "dem Rattenkaiser", "Dativ maskulin")
+	t.eq(Identify.decline("Der Rattenkaiser", "nom"), "der Rattenkaiser", "Nominativ maskulin")
+	t.eq(Identify.decline("Die Nixe vom Überlauf", "akk"), "die Nixe vom Überlauf", "Akkusativ feminin")
+	t.eq(Identify.decline("Die Nixe vom Überlauf", "dat"), "der Nixe vom Überlauf", "Dativ feminin")
+	t.eq(Identify.decline("Kellerratte", "dat"), "Kellerratte", "ohne Artikel unverändert")
+	var s := TH.make(1201, {"beruf": 1})
+	var boss := Monsters.spawn_boss(s, BossFight.boss_def("rattenkaiser"), {"x": 1, "y": 1}, 0, 0, 3)
+	t.eq(Identify.monster_insight(s, boss), 4, "Stufe 1 erkennt den Boss nicht")
+	t.eq(Identify.name_of(s, boss), "etwas sehr Gefährliches", "unbekannt, Akkusativ")
+	t.eq(Identify.von(s, boss), "von etwas sehr Gefährlichem", "unbekannt, Dativ")
+	while s.player.level < 16:
+		Player.gain_xp(s, 500)
+	t.le(Identify.monster_insight(s, boss), 2, "hohe Stufe erkennt ihn")
+	t.eq(Identify.name_of(s, boss), "den Rattenkaiser", "trifft den Rattenkaiser")
+	t.eq(Identify.von(s, boss), "vom Rattenkaiser", "getötet vom Rattenkaiser")
+	t.eq(Identify.name_of_cap(s, boss), "Der Rattenkaiser", "Satzanfang")

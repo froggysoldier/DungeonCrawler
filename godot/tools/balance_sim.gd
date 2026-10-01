@@ -9,8 +9,16 @@ func _initialize() -> void:
 	var count := int(args[0]) if args.size() > 0 else 30
 	var results: Array = []
 	print("seed  status        lvl  kills  zug    klasse          follower  ach  bosse  ursache")
+	var only := OS.get_environment("SEED")
 	for seed in range(1, count + 1):
+		if only != "" and int(only) != seed:
+			continue
 		var s := _run_bot(seed)
+		if only != "":
+			var room = Game.current_room(s)
+			print("Ende: Zug %d, Pos %s, Raum %s, HP %d/%d, Stufe %d, Freischaltungen %s, Blase %s" % [s.turn, s.player.pos, room.name if room != null else "-", s.player.hp, Player.max_hp(s), s.player.level, s.unlocks, J.num(s.player, "blase")])
+			for l in s.log.slice(-40):
+				print("   %d %s" % [l.turn, l.text])
 		var r := {
 			"seed": seed,
 			"status": "SIEG" if s.status == "victory" else "E%d %s" % [s.floor, s.status],
@@ -54,7 +62,21 @@ func _go_to(s: Dictionary, target: Dictionary) -> bool:
 			return false
 		return not J.some(s.monsters, func(m): return m.pos.x == x and m.pos.y == y)
 	var path = Pathfinding.find_path(s.map, s.player.pos, target, passable, 8000, true)
+	if path == null:
+		# Versperrt ein Monster den einzigen Weg, wird es eben angegriffen
+		var through := func(x: int, y: int) -> bool:
+			var r: int = s.map.roomAt[y * w + x]
+			if r >= 0 and lairs.has(r) and r != target_room:
+				return false
+			return (x == target.x and y == target.y) or (MapGen.furniture_at(s.map, J.pos(x, y)) == null and Dungeon.lock_at(s, J.pos(x, y)) == null)
+		path = Pathfinding.find_path(s.map, s.player.pos, target, through, 8000, true)
 	if path == null or path.is_empty():
+		return false
+	var blocker = Ai.monster_at(s, path[0])
+	if blocker != null:
+		for t in [{"part": "waffe", "move": "normal"}, {"part": "tritt", "move": "normal"}, {"part": "faust", "move": "normal"}]:
+			if Combat.technique_blocker(s, blocker, t) == null and Game.attack(s, blocker.uid, t).ok:
+				return true
 		return false
 	return Game.move_step(s, path[0]).ok
 
@@ -65,7 +87,9 @@ func _fight(s: Dictionary) -> bool:
 		return false
 	J.sort(near, func(a, b): return a.hp - b.hp)
 	var adj: Dictionary = near[0]
-	for t in [{"part": "tritt", "move": "stampfen"}, {"part": "tritt", "move": "normal"}, {"part": "faust", "move": "normal"}]:
+	if Magic.knows_spell(s, "geschoss") and adj.hp > 6 and int(J.num(s.player, "mp")) >= 4 and Game.cast(s, "geschoss", {"targetUid": adj.uid, "mana": mini(6, int(s.player.mp))}).ok:
+		return true
+	for t in [{"part": "tritt", "move": "stampfen"}, {"part": "waffe", "move": "normal"}, {"part": "tritt", "move": "normal"}, {"part": "faust", "move": "normal"}]:
 		# Scheitert der Angriff (etwa ohne Ausdauer), lieber warten als stehen bleiben
 		if Combat.technique_blocker(s, adj, t) == null and Game.attack(s, adj.uid, t).ok:
 			return true
@@ -77,6 +101,104 @@ func _nearest_room(s: Dictionary, kind: String) -> Variant:
 	var rooms: Array = s.map.rooms.filter(func(r): return r.kind == kind)
 	J.sort(rooms, func(a, b): return J.cheb(_center(a), s.player.pos) - J.cheb(_center(b), s.player.pos))
 	return rooms[0] if not rooms.is_empty() else null
+
+
+const RARITY_RANK := {"gewoehnlich": 0, "ungewoehnlich": 1, "selten": 2, "episch": 3, "legendaer": 4, "himmlisch": 5}
+
+
+## Ist it besser als das, was im Platz steckt? (Seltenheit, dann Wert)
+func _better(it: Dictionary, cur: Variant) -> bool:
+	if cur == null:
+		return true
+	var a: int = RARITY_RANK.get(it.get("rarity", "gewoehnlich"), 0)
+	var b: int = RARITY_RANK.get(cur.get("rarity", "gewoehnlich"), 0)
+	return a > b or (a == b and float(J.nn(it, "wert", 0)) > float(J.nn(cur, "wert", 0)))
+
+
+func _calm(s: Dictionary) -> bool:
+	return not J.some(s.monsters, func(m): return m.aware and J.cheb(m.pos, s.player.pos) <= 6)
+
+
+func _find_item(s: Dictionary, pred: Callable) -> Variant:
+	return J.find(s.player.inventory, pred)
+
+
+## Pflege außerhalb des Kampfes: Werte verteilen, bessere Ausrüstung anlegen,
+## Zauberbücher lesen. true = es wurde etwas getan, das keinen Zug kostet.
+func _maintain(s: Dictionary) -> void:
+	var p: Dictionary = s.player
+	while int(J.num(p, "statPoints")) > 0 and Game.has_unlock(s, "stats"):
+		var key := "kon" if p.stats.kon <= p.stats.str else "str"
+		if not Game.allocate_stat(s, key).ok:
+			break
+	for it in p.inventory.duplicate():
+		if it.kind == "ausruestung" and it.get("slot") != null and _better(it, p.equipment.get(it.slot)):
+			Game.equip(s, it.uid)
+		elif it.kind == "buch" and it.get("spell") != null and not Magic.knows_spell(s, it.spell):
+			Game.use_item(s, it.uid)
+
+
+## Zustände behandeln und heilen. true = ein Zug wurde verbraucht.
+func _survive(s: Dictionary) -> bool:
+	var p: Dictionary = s.player
+	var max_hp := Player.max_hp(s)
+	# Brennen: am Boden wälzen (Warten löscht), wenn niemand daneben steht
+	if Conditions.player_has(s, "brennen") and not J.some(s.monsters, func(m): return J.cheb(m.pos, p.pos) <= 1):
+		return Game.wait(s).ok
+	if Conditions.player_has(s, "blutung"):
+		var band = _find_item(s, func(i): return i.kind == "verbrauch" and i.get("effekt") != null and i.effekt.get("bandage"))
+		if band != null and Game.use_item(s, band.uid).ok:
+			return true
+		if band == null and Game.craft_item(s, "verband").ok:
+			return true
+	if Conditions.player_has(s, "gift"):
+		var anti = _find_item(s, func(i): return i.baseId == "gegengift")
+		if anti != null and Game.use_item(s, anti.uid).ok:
+			return true
+		if Magic.knows_spell(s, "entgiften") and Game.cast(s, "entgiften").ok:
+			return true
+	if p.hp < max_hp * 0.6 and Magic.knows_spell(s, "heilen") and Game.cast(s, "heilen").ok:
+		return true
+	if p.hp < max_hp * 0.45:
+		var pot = _find_item(s, func(i):
+			var e = i.get("effekt")
+			return i.kind == "verbrauch" and e != null and (e.get("heal") or e.get("healPct")))
+		if pot != null and Game.use_item(s, pot.uid).ok:
+			return true
+	return false
+
+
+## Zum nächsten Safe Room und schlafen, wenn es sich lohnt. true = Zug verbraucht.
+func _rest(s: Dictionary, threshold: float) -> bool:
+	var p: Dictionary = s.player
+	if p.hp >= Player.max_hp(s) * threshold or Game.time_left(s) < 400:
+		return false
+	var safe = _nearest_room(s, "safe")
+	if safe == null:
+		return false
+	if not Combat.is_in_safe_room(s, p.pos):
+		if J.cheb(_center(safe), p.pos) > 40 and p.hp >= Player.max_hp(s) * 0.45:
+			return false
+		return _go_to(s, _center(safe)) or Game.wait(s).ok
+	for b in p.boxes.duplicate():
+		Game.open_box(s, b.uid)
+	var room = Game.current_room(s)
+	if room != null and not room.get("freebieTaken", false):
+		Game.take_freebie(s)
+	_maintain(s)
+	return Game.sleep(s).ok or Game.wait(s).ok
+
+
+## Zur Toilette im nächsten Safe Room. true = Zug verbraucht.
+func _toilet(s: Dictionary) -> bool:
+	var safe = _nearest_room(s, "safe")
+	if safe == null or Game.time_left(s) < 400:
+		return false
+	if Combat.is_in_safe_room(s, s.player.pos):
+		return Game.toilet(s).ok
+	if J.some(s.monsters, func(m): return J.cheb(m.pos, s.player.pos) <= 1):
+		return false
+	return _go_to(s, _center(safe))
 
 
 func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
@@ -100,37 +222,23 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 		if p.get("klass") != null and not p.get("abilityCooldown") and J.some(s.monsters, func(m): return J.cheb(m.pos, p.pos) <= 1):
 			if Classes.use_ability(s, {"part": "tritt", "move": "normal"}).ok:
 				continue
-		# Heilen
-		if p.hp < Player.max_hp(s) * 0.45:
-			var pot = J.find(p.inventory, func(i):
-				var e = i.get("effekt")
-				return i.kind == "verbrauch" and e != null and (e.get("heal") or e.get("healPct")))
-			if pot != null and Game.use_item(s, pot.uid).ok:
-				continue
-			var safe = _nearest_room(s, "safe")
-			if safe != null and not Combat.is_in_safe_room(s, p.pos):
-				if _fight(s):
-					continue
-				if not _go_to(s, _center(safe)):
-					Game.wait(s)
-				continue
-			if safe != null:
-				for b in p.boxes.duplicate():
-					Game.open_box(s, b.uid)
-				for it in p.inventory.duplicate():
-					if it.kind == "ausruestung":
-						Game.equip(s, it.uid)
-				if not Game.sleep(s).ok:
-					Game.wait(s)
-				continue
+		if _survive(s):
+			continue
+		# Die Blase: rechtzeitig zur Toilette im Safe Room
+		if float(J.num(p, "blase")) >= 70 and _toilet(s):
+			continue
+		# Fast tot: zum Safe Room, auch mitten im Kampf
+		if p.hp < Player.max_hp(s) * 0.3 and _rest(s, 0.3):
+			continue
 		if _fight(s):
 			continue
+		if _calm(s):
+			_maintain(s)
+			if _rest(s, 0.65):
+				continue
 		if J.some(s.items, func(e): return e.pos.x == p.pos.x and e.pos.y == p.pos.y and e.item.kind != "wurf"):
 			Game.pickup(s)
-			# Neue Ausrüstung sofort anlegen, wenn der Platz frei ist
-			for it in p.inventory.duplicate():
-				if it.kind == "ausruestung" and p.equipment.get(it.get("slot", "")) == null:
-					Game.equip(s, it.uid)
+			_maintain(s)
 		if phase == "guild":
 			if s.unlocks.has("inventar"):
 				phase = "clear"
@@ -140,12 +248,20 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 				Game.wait(s)
 			continue
 		if phase == "clear":
-			# Normale Mobs in der Nähe jagen, bis Level 4, dann Bosse
+			# Gegenstände in der Nähe aufsammeln, wenn es ruhig ist
+			if _calm(s):
+				var loot = J.find(s.items, func(e): return e.item.kind != "wurf" and J.cheb(e.pos, p.pos) <= 6 and Fov.has_line_of_sight(s.map, p.pos, e.pos) and MapGen.furniture_at(s.map, e.pos) == null)
+				if loot != null and _go_to(s, loot.pos):
+					continue
+			# Normale Mobs in der Nähe jagen, ab Stufe 5 auch Nachbarschaftsbosse
 			var targets: Array = s.monsters.filter(func(m):
-				var rank_ok: bool = (m.rank == "normal" or m.rank == "elite") if p.level < 5 else m.rank == "nachbarschaftsboss"
-				return rank_ok and m.level <= p.level + (1 if m.rank != "nachbarschaftsboss" else 4))
+				if m.rank == "nachbarschaftsboss":
+					return p.level >= 5 and m.level <= p.level + 3
+				if m.rank == "elite":
+					return m.level <= p.level - 1
+				return m.rank == "normal" and m.level <= p.level + 1)
 			J.sort(targets, func(a, b): return J.cheb(a.pos, p.pos) - J.cheb(b.pos, p.pos))
-			if targets.is_empty() or s.turn - s.floorStartTurn > 1700:
+			if targets.is_empty() or Game.time_left(s) < 700:
 				phase = "stairs"
 				continue
 			if not _go_to(s, targets[0].pos):

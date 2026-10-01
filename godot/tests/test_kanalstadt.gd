@@ -39,6 +39,13 @@ func test_alles_erreichbar(t) -> void:
 		t.not_null(Pathfinding.find_path(m, s.player.pos, TH.stairs(s), ok, 40000, true), "Treppe (%d)" % seed)
 
 
+func test_siedlung_auf_jeder_karte(t) -> void:
+	for seed in [4821, 4822, 4823, 4824, 4825, 4826]:
+		var s := _floor3(seed)
+		t.eq(s.map.rooms.filter(func(r): return r.get("siedlung")).size(), 3, "drei Räume (%d)" % seed)
+		t.ge(Crawlers.crawlers(s).filter(func(c): return c.get("resident")).size(), 3, "Bewohner (%d)" % seed)
+
+
 func test_siedlung(t) -> void:
 	var s := _floor3(4821)
 	var town: Array = s.map.rooms.filter(func(r): return r.get("siedlung"))

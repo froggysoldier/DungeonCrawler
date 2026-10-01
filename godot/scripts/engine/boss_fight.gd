@@ -221,7 +221,7 @@ static func _resolve(s: Dictionary, m: Dictionary) -> void:
 	Fx.hit(s, p.pos, true)
 	Log.add(s, "%s %s %d Schaden." % [who, sp.hit, dmg], "gefahr")
 	if p.hp <= 0:
-		Death.handle_lethal(s, "getötet von %s" % Identify.name_of_dat(s, m))
+		Death.handle_lethal(s, "getötet %s" % Identify.von(s, m))
 		return
 	Events.emit(s, {"type": "damageTaken", "amount": dmg, "source": m.name, "facets": ["z:boss", "t:spezial"]})
 	var cond = sp.get("cond")

@@ -227,11 +227,11 @@ func test_nest_ausraeumen(t) -> void:
 		var mobs: Array = s.monsters.filter(func(m): return m.get("nest") == nest.id)
 		t.ge(mobs.size(), 3, "Rudel")
 		var spot: Dictionary = nest.furniture[0].pos
-		var at_nest := func() -> int: return s.items.filter(func(e): return e.pos.x == spot.x and e.pos.y == spot.y).size()
-		var before: int = at_nest.call()
 		for m in mobs:
 			Combat.kill_monster(s, m, null)
-		t.ge(at_nest.call(), before + 2, "Beute im Nest")
+		var near_nest := func() -> Array: return s.items.filter(func(e): return J.cheb(e.pos, spot) <= 1)
+		t.ge(near_nest.call().size(), 2, "Beute beim Nest")
+		t.ok(J.every(near_nest.call(), func(e): return MapGen.furniture_at(s.map, e.pos) == null), "Beute liegt nicht auf dem Nest (erreichbar)")
 		t.ok(J.some(nest.furniture, func(f): return f.kind == "nest_leer"), "Nest leer")
 		return
 	t.ok(false, "kein Nest gefunden")

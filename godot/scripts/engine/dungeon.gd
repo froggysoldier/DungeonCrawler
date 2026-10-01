@@ -299,8 +299,8 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, items: Array
 		r.feature = "schrein"
 		r.furniture = [{"kind": "schrein", "pos": spot}]
 		r.description += " Zwischen dem Gerümpel steht ein kleiner Schrein mit einer flackernden Kerze. Jemand hat Opfergaben hingelegt."
-	# Wanderhändler
-	if not cands.is_empty():
+	# Wanderhändler (in der Kanalstadt gibt es dafür die Märkte der Siedlung)
+	if not cands.is_empty() and floor != Kanalstadt.FLOOR_NO:
 		var r: Dictionary = cands.pop_front()
 		var spot = _free_spot(s, m, r, occupied)
 		if spot != null:
@@ -532,8 +532,13 @@ static func on_kill(s: Dictionary, mo: Dictionary) -> void:
 	var at: Dictionary = MapGen.center(room)
 	for f in J.arr(room, "furniture"):
 		if f.kind == "nest":
-			at = f.pos
 			f.kind = "nest_leer"
+			# Die Beute rollt aus dem Nest auf ein freies Feld daneben
+			for d in MapGen.DIRS4:
+				var q := J.pos(f.pos.x + d[0], f.pos.y + d[1])
+				if MapGen.is_walkable(s.map, q.x, q.y) and MapGen.furniture_at(s.map, q) == null:
+					at = q
+					break
 	s.items.append({"pos": J.pcopy(at), "item": Items.create_gold(s, R.int_(s, 15, 35) * s.floor)})
 	s.items.append({"pos": J.pcopy(at), "item": Items.roll_ground_item(s)})
 	Log.add(s, "Das Nest ist leer. Zwischen Knochen und Lumpen glänzt etwas.", "loot")

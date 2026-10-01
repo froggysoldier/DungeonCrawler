@@ -72,7 +72,7 @@ static func cure(s: Dictionary) -> bool:
 ## Wird aufgerufen, wenn ein Monster den Crawler getroffen hat.
 static func on_monster_hit(s: Dictionary, m: Dictionary) -> void:
 	if has(m, "gift") and R.chance(s, 0.4):
-		poison(s, m.name, 1 + floori(m.level / 4.0))
+		poison(s, Identify.name_of_cap(s, m), 1 + floori(m.level / 4.0))
 	if has(m, "diebisch") and s.player.gold > 0 and not m.get("stolenGold") and R.chance(s, 0.5):
 		var amount: int = mini(s.player.gold, 5 + m.level * 3)
 		s.player.gold -= amount
@@ -118,7 +118,7 @@ static func _summon(s: Dictionary, m: Dictionary) -> void:
 		minion.homeRoom = m.homeRoom
 	s.monsters.append(minion)
 	m.summoned = int(J.num(m, "summoned")) + 1
-	Log.add(s, "%s ruft Verstärkung: %s taucht auf!" % [Identify.name_of_cap(s, m), Identify.name_of(s, minion)], "gefahr")
+	Log.add(s, "%s ruft Verstärkung: %s taucht auf!" % [Identify.name_of_cap(s, m), Identify.name_of(s, minion, "nom")], "gefahr")
 
 
 static func _is_taken(s: Dictionary, p: Dictionary) -> bool:

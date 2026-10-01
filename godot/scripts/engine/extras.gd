@@ -87,11 +87,11 @@ static func try_tame(s: Dictionary) -> Dictionary:
 		s.monsters = J.without(s.monsters, cand)
 		p.pet = make_pet_of(species, Db.t("pets", "PET_SPECIES")[species].name)
 		p.pet.pos = J.pcopy(cand.pos)
-		Log.add(s, "%s schnuppert am Leckerli, frisst es – und folgt dir ab jetzt. Du hast ein neues Haustier!" % Identify.name_of(s, cand), "system")
+		Log.add(s, "%s schnuppert am Leckerli, frisst es – und folgt dir ab jetzt. Du hast ein neues Haustier!" % Identify.name_of_cap(s, cand), "system")
 		Events.emit(s, {"type": "petGained", "species": species, "how": "zaehmen"})
 	else:
 		cand.aware = true
-		Log.add(s, "%s frisst das Leckerli und beißt dir zum Dank in die Hand. Zähmen fehlgeschlagen." % Identify.name_of(s, cand), "kampf")
+		Log.add(s, "%s frisst das Leckerli und beißt dir zum Dank in die Hand. Zähmen fehlgeschlagen." % Identify.name_of_cap(s, cand), "kampf")
 	return {"handled": true}
 
 

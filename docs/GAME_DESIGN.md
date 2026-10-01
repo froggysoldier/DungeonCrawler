@@ -72,6 +72,8 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   Tooltip) und einen **Vorraum** mit 2–3 normalen Wachen: Man läuft nie
   unvermittelt hinein. Beim Betreten verriegelt sich die Tür, bis der Boss
   fällt; ein **Versus-Bildschirm** zeigt Crawler gegen Boss.
+- **Ruhiger Start:** Im Umkreis von etwa 18 Feldern um den Startraum gibt es
+  keine Rudel, nur Einzelgänger; Elite-Gegner erst weiter weg.
 - **Bodenfunde:** In normalen Räumen liegt nur Handwerksmaterial (Schrott,
   Steine, Flaschen …). Echte Beute liegt nur im Vorraum der Boss-Kammern.
 - **Gilden und Safe Rooms** haben Mauern und **Türen**. Geschlossene Türen
