@@ -84,6 +84,10 @@ static func _seal(m: Dictionary, r: Dictionary, start: Dictionary) -> Array:
 	var blocked := {}
 	for d in doors:
 		blocked[MapGen.idx(m, d.x, d.y)] = true
+	# Schon verschlossene Türen anderer Kammern zählen als zu
+	for k in J.nn(m, "locks", {}).keys():
+		var parts: PackedStringArray = String(k).split(",")
+		blocked[MapGen.idx(m, int(parts[0]), int(parts[1]))] = true
 	if doors.is_empty() or r.w < 2 or r.h < 2 or not _all_reachable(m, start, blocked, r.id):
 		m.tiles = tiles
 		m.roomAt = room_at
@@ -307,11 +311,15 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, items: Array
 			r.feature = "markt"
 			r.furniture = [{"kind": "haendler", "pos": spot}]
 			r.description += " Hinter einem Klapptisch steht ein Händler mit einem Bauchladen voller Kram. Er sieht nicht so aus, als hätte er Angst."
-	# Hinterhalt: ein leerer Raum, in dem es beim Betreten zu spät ist
-	if not cands.is_empty():
-		var r: Dictionary = cands.pop_front()
+	# Hinterhalt: ein leerer Raum, in dem es beim Betreten zu spät ist.
+	# Weit weg vom Start, Gegner der mittleren Stufe, auf Etage 1 nur zwei.
+	var far: Array = cands.filter(func(r): return MapGen.dist(MapGen.center(r), start) > 20)
+	if not far.is_empty():
+		var r: Dictionary = far[0]
+		cands.erase(r)
 		r.feature = "hinterhalt"
-		r.ambush = {"level": mob_level[1], "count": R.int_(s, 2, 3) + (1 if floor >= 3 else 0)}
+		var mid: int = floori((mob_level[0] + mob_level[1]) / 2.0)
+		r.ambush = {"level": mid, "count": 2 if floor == 1 else R.int_(s, 2, 3) + (1 if floor >= 3 else 0)}
 		monsters.assign(monsters.filter(func(mo): return MapGen.room_of(m, mo.pos) == null or MapGen.room_of(m, mo.pos).id != r.id))
 
 

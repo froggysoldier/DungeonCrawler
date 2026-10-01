@@ -257,8 +257,8 @@
    "hp": 14,
    "hpPerLevel": 4,
    "dmg": [
-    3,
-    5
+    2,
+    4
    ],
    "dmgPerLevel": 1,
    "treffer": 75,
@@ -783,8 +783,8 @@
    "hp": 6,
    "hpPerLevel": 2,
    "dmg": [
-    2,
-    4
+    1,
+    3
    ],
    "dmgPerLevel": 1,
    "treffer": 70,

@@ -446,7 +446,8 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 				if p == null:
 					broke = true
 					break
-				var mob := Monsters.spawn_monster(s, mdef, lv, p, r.hood, d > 0.2 and R.chance(s, 0.07))
+				# Elite-Gegner erst in einigem Abstand zum Start, auf Etage 1 noch weiter weg
+				var mob := Monsters.spawn_monster(s, mdef, lv, p, r.hood, d > (0.35 if floor == 1 else 0.2) and R.chance(s, 0.07))
 				# Ein Teil der Bewohner schläft – Gelegenheit für einen Hinterhalt
 				if mob.behavior != "stationary" and R.chance(s, 0.3):
 					mob.asleep = true

@@ -290,3 +290,24 @@ func test_haendlertypen(t) -> void:
 			t.ok(J.some(shop.offers, func(o): return o.item.get("slot") == "waffe"), "Waffenhändler hat Waffen")
 	for id in ["waffen", "apotheke", "schrott", "kurio"]:
 		t.ok(seen.has(id), "%s kommt vor" % id)
+
+
+## Schatzkammer und Geheimkammer dürfen nie den einzigen Weg abschneiden,
+## auch nicht zusammen (die zweite Prüfung muss das Schloss der ersten kennen).
+func test_kammern_schneiden_nichts_ab(t) -> void:
+	for seed in [4813, 708, 1219, 2026]:
+		var s := TH.make(seed, {"beruf": 1})
+		while true:
+			var m: Dictionary = s.map
+			var ok := func(x: int, y: int) -> bool: return Dungeon.lock_at(s, J.pos(x, y)) == null
+			for r in m.rooms:
+				if r.get("sealed") or r.kind == "boss" or r.kind == "arena":
+					continue
+				var c := MapGen.center(r)
+				if MapGen.is_walkable(m, c.x, c.y):
+					t.not_null(Pathfinding.find_path(m, s.player.pos, c, ok, 40000, true), "Seed %d, Etage %d, Raum %d" % [seed, s.floor, r.id])
+			t.not_null(Pathfinding.find_path(m, s.player.pos, TH.stairs(s), ok, 40000, true), "Seed %d, Etage %d: Treppe" % [seed, s.floor])
+			if s.floor >= 3:
+				break
+			TH.teleport(s, TH.stairs(s))
+			Game.descend(s, {"ghosts": []})

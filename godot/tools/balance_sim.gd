@@ -10,7 +10,8 @@ func _initialize() -> void:
 	var results: Array = []
 	print("seed  status        lvl  kills  zug    klasse          follower  ach  bosse  ursache")
 	var only := OS.get_environment("SEED")
-	for seed in range(1, count + 1):
+	var from := int(OS.get_environment("FROM")) if OS.get_environment("FROM") != "" else 1
+	for seed in range(from, count + 1):
 		if only != "" and int(only) != seed:
 			continue
 		var s := _run_bot(seed)
@@ -71,6 +72,13 @@ func _go_to(s: Dictionary, target: Dictionary) -> bool:
 			return (x == target.x and y == target.y) or (MapGen.furniture_at(s.map, J.pos(x, y)) == null and Dungeon.lock_at(s, J.pos(x, y)) == null)
 		path = Pathfinding.find_path(s.map, s.player.pos, target, through, 8000, true)
 	if path == null or path.is_empty():
+		if OS.get_environment("SEED") != "" and s.turn % 200 == 1:
+			var any = Pathfinding.find_path(s.map, s.player.pos, target, func(x, y): return true, 8000, true)
+			var nb := []
+			for d in [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]:
+				var q := J.pos(s.player.pos.x + d[0], s.player.pos.y + d[1])
+				nb.append("%s:%s%s" % [d, MapGen.tile_at(s.map, q.x, q.y), "M" if MapGen.furniture_at(s.map, q) != null else ""])
+			print("    kein Weg zu %s (ohne Regeln: %s), Nachbarn %s" % [target, any != null, nb])
 		return false
 	var blocker = Ai.monster_at(s, path[0])
 	if blocker != null:
@@ -210,6 +218,10 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 	while s.status == "playing" and guard < 18000:
 		guard += 1
 		var p: Dictionary = s.player
+		if OS.get_environment("SEED") != "" and s.turn % 200 == 0 and s.turn != int(J.num(s, "_dbgTurn")):
+			s._dbgTurn = s.turn
+			var rr = Game.current_room(s)
+			print("  [Zug %d] Phase %s, Pos %s, Raum %s, HP %d/%d, Blase %d, wach in der Nähe %d" % [s.turn, phase, p.pos, rr.name if rr != null else "-", p.hp, Player.max_hp(s), int(J.num(p, "blase")), s.monsters.filter(func(m): return m.aware and J.cheb(m.pos, p.pos) <= 7).size()])
 		if s.floor > max_floor:
 			break
 		if s.floor != floor_no:
@@ -247,6 +259,13 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 			if not _go_to(s, _center(g)):
 				Game.wait(s)
 			continue
+		# Wer uns beschießt oder verfolgt, wird zuerst angegangen (Schützen nicht ignorieren)
+		if phase != "guild":
+			var attackers: Array = s.monsters.filter(func(m): return m.aware and m.get("homeRoom") == null and J.cheb(m.pos, p.pos) <= 7 and Fov.has_line_of_sight(s.map, p.pos, m.pos))
+			if not attackers.is_empty():
+				J.sort(attackers, func(a, b): return J.cheb(a.pos, p.pos) - J.cheb(b.pos, p.pos))
+				if _go_to(s, attackers[0].pos):
+					continue
 		if phase == "clear":
 			# Gegenstände in der Nähe aufsammeln, wenn es ruhig ist
 			if _calm(s):
@@ -264,7 +283,22 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 			if targets.is_empty() or Game.time_left(s) < 700:
 				phase = "stairs"
 				continue
-			if not _go_to(s, targets[0].pos):
+			# Das nächste erreichbare Ziel (Monster in verschlossenen Kammern übergehen)
+			var moved := false
+			if s.get("_unreachable") == null:
+				s._unreachable = {}
+			var tried := 0
+			for tg in targets:
+				if s.turn - int(s._unreachable.get(tg.uid, -1000)) < 50:
+					continue
+				if _go_to(s, tg.pos):
+					moved = true
+					break
+				s._unreachable[tg.uid] = s.turn
+				tried += 1
+				if tried >= 3:
+					break
+			if not moved:
 				Game.wait(s)
 			continue
 		# Treppe: die nächste bevorzugen

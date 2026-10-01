@@ -73,7 +73,9 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   unvermittelt hinein. Beim Betreten verriegelt sich die Tür, bis der Boss
   fällt; ein **Versus-Bildschirm** zeigt Crawler gegen Boss.
 - **Ruhiger Start:** Im Umkreis von etwa 18 Feldern um den Startraum gibt es
-  keine Rudel, nur Einzelgänger; Elite-Gegner erst weiter weg.
+  keine Rudel, nur Einzelgänger. Elite-Gegner tauchen auf Etage 1 erst weit
+  vom Start auf (auf den tieferen Etagen etwas früher). Fernkämpfer auf
+  Etage 1 (Irrlicht, Grauer Späher) machen etwas weniger Schaden.
 - **Bodenfunde:** In normalen Räumen liegt nur Handwerksmaterial (Schrott,
   Steine, Flaschen …). Echte Beute liegt nur im Vorraum der Boss-Kammern.
 - **Gilden und Safe Rooms** haben Mauern und **Türen**. Geschlossene Türen
@@ -468,7 +470,7 @@ Jede Etage bekommt Gelände und Sonderräume (`scripts/engine/dungeon.gd`):
 | Monsternest | Rudel eines schwachen Monsters; ist das Nest leer, liegen Gold und Beute darin |
 | Schrein | einmal beten: Segen (80 Züge), volle Heilung, nichts oder ein Fluch (40 Züge); Charisma hilft |
 | Wanderhändler | Laden außerhalb der Safe Rooms: kaufen, feilschen, verkaufen |
-| Hinterhalt | leerer Raum; beim Betreten treten wache Gegner aus den Zugängen |
+| Hinterhalt | leerer Raum, mindestens 20 Felder vom Start; beim Betreten treten wache Gegner der mittleren Etagenstufe aus den Zugängen (Etage 1: zwei, danach zwei bis vier) |
 
 Ummauerte Kammern entstehen nur, wenn danach noch alle anderen Räume und
 Treppen erreichbar sind; Auftragsziele liegen nie darin.
