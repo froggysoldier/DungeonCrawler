@@ -745,7 +745,7 @@ func _on_map_click(t: Vector2i, button: int) -> void:
 		else:
 			act(func(): return Game.wait(s))
 		return
-	var closed_door := MapGen.in_bounds(s.map, t.x, t.y) and (MapGen.tile_at(s.map, t.x, t.y) == "door" or Dungeon.is_crate(MapGen.tile_at(s.map, t.x, t.y)))
+	var closed_door := MapGen.in_bounds(s.map, t.x, t.y) and (MapGen.tile_at(s.map, t.x, t.y) == "door" or Dungeon.is_crate(MapGen.tile_at(s.map, t.x, t.y)) or MapGen.tile_at(s.map, t.x, t.y) == Tiefgarage.WRECK)
 	if Fov.chebyshev(tp, s.player.pos) == 1 and (Pathfinding.can_step(s.map, s.player.pos, tp) or closed_door):
 		act(func(): return Game.move_step(s, tp))
 		return

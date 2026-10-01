@@ -52,6 +52,13 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 			if Dungeon.has_key_for(s, at):
 				Kit.button(f, "Aufschließen", func(): gv.act(func(): return Game.open_door(s, at)), "SmallButton")
 			Kit.button(f, "Schloss knacken (%d %%)" % J.rnd(Dungeon.lockpick_chance(s) * 100), func(): gv.act(func(): return Game.pick_lock(s, at)), "SmallButton")
+	var wrecks := Tiefgarage.adjacent_wrecks(s)
+	if not wrecks.is_empty():
+		any = true
+		var fw := Kit.flow(v, 4)
+		for wr in wrecks:
+			var wat := {"x": wr.x, "y": wr.y}
+			Kit.button(fw, "Wrack durchsuchen", func(): gv.act(func(): return Game.search_wreck(s, wat)), "SmallButton")
 	var crates := Dungeon.adjacent_crates(s)
 	if not crates.is_empty():
 		any = true

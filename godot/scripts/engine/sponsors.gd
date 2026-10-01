@@ -64,7 +64,7 @@ static func signals_of(e: Dictionary) -> Array:
 			return ["dodge"]
 		"bossDodged":
 			return ["dodge", "boss|dodge"]
-		"crateSmashed":
+		"crateSmashed", "wreckSearched":
 			return ["crate"]
 		"secretFound":
 			return ["secret"]

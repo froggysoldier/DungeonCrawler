@@ -450,7 +450,7 @@ func _draw_static(ci: CanvasItem) -> void:
 			if mat == null:
 				mat = Tiles.room_material(room)
 				materials[ri] = mat
-			if tile == Dungeon.WATER or tile == Dungeon.MUD or tile == Kanalstadt.CANAL:
+			if tile == Dungeon.WATER or tile == Dungeon.MUD or tile == Kanalstadt.CANAL or tile == Tiefgarage.OIL:
 				_spr(ci, "boden/%s%d" % [tile, floori(Tiles.hash(x, y) * 4)], sx, sy)
 				if (tile == Dungeon.WATER or tile == Kanalstadt.CANAL) and vis.has(i):
 					_animated.append(["water", x, y])
@@ -472,12 +472,15 @@ func _draw_static(ci: CanvasItem) -> void:
 			if ea:
 				_rect(ci, sx, sy, TILE - 2, 0 if not n else 4, 2, TILE - (0 if not n else 4), shade2)
 			var rkind = room.kind if room != null else null
+			# Parkdeck: weiße Stellplatzlinien an den Längsseiten
+			if room != null and room.get("parkdeck") and (y == room.y or y == room.y + room.h - 1) and (x - room.x) % 2 == 0 and tile != "wall":
+				_rect(ci, sx, sy, 0, 2, 2, TILE - 4, Color(0.85, 0.85, 0.8, 0.55))
 			if tile == "floor" and rkind != "safe" and rkind != "guild":
 				_draw_decal(ci, sx, sy, x, y, s.floor)
 			# Einrichtung an den Wänden normaler Räume (nur Dekoration)
 			if rkind == "normal" and tile == "floor" and (n or we or ea) and Tiles.hash(x, y, 5) < 0.09:
 				_spr(ci, "moebel/" + PROPS[floori(Tiles.hash(x, y, 6) * PROPS.size())], sx, sy)
-			if Dungeon.is_crate(tile):
+			if Dungeon.is_crate(tile) or Tiefgarage.is_wreck(tile):
 				_spr(ci, "moebel/" + tile, sx, sy)
 			if tile == "stairs":
 				if vis.has(i):

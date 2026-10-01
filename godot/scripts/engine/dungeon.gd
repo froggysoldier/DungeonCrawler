@@ -12,7 +12,7 @@ const WATER := "wasser"
 const MUD := "schlamm"
 const CRATES := ["kiste", "fass"]
 ## Kacheln, die man betreten kann (zusätzlich zu Boden, Treppe, offener Tür).
-const WALKABLE := [WATER, MUD, "bruecke"]
+const WALKABLE := [WATER, MUD, "bruecke", "oel"]
 
 const FEATURE_NAMES := {
 	"schatz": "Schatzkammer", "geheim": "Geheimkammer", "nest": "Monsternest",
@@ -450,14 +450,23 @@ static func on_player_step(s: Dictionary) -> void:
 	elif t == MUD:
 		p.mud = true
 		Log.add(s, "Schmatz. Deine Füße versinken im Schlamm.", "info")
+	elif t == Tiefgarage.OIL:
+		match Tiefgarage.step_on_oil(s, p.pos, Conditions.player_has(s, "brennen")):
+			"fire":
+				Log.add(s, "Du trittst brennend ins Öl. WUSCH – die Pfütze geht in Flammen auf!", "gefahr")
+				Conditions.inflict_player(s, "brennen", 3, 4, "Das brennende Öl")
+			"slip":
+				p.mud = "oel"
+				Log.add(s, "Du rutschst auf dem Öl aus und landest unsanft auf dem Hintern.", "info")
 
 
 ## Steckt der Crawler im Schlamm, kostet der nächste Schritt einen Zug.
 static func stuck_in_mud(s: Dictionary) -> bool:
 	if not s.player.get("mud"):
 		return false
+	var oil: bool = s.player.mud is String and s.player.mud == "oel"
 	s.player.erase("mud")
-	Log.add(s, "Du ziehst die Füße mühsam aus dem Schlamm.", "info")
+	Log.add(s, "Du rappelst dich auf. Deine Hose ist jetzt schwarz." if oil else "Du ziehst die Füße mühsam aus dem Schlamm.", "info")
 	return true
 
 
@@ -468,6 +477,16 @@ static func on_monster_step(s: Dictionary, mo: Dictionary) -> void:
 		mo.mudStuck = true
 	elif t == WATER and Conditions.has_condition(mo, "brennen"):
 		mo.conditions.erase("brennen")
+	elif t == Tiefgarage.OIL:
+		match Tiefgarage.step_on_oil(s, mo.pos, Conditions.has_condition(mo, "brennen")):
+			"fire":
+				Conditions.inflict(s, mo, "brennen", 3, 4)
+				if Sight.player_sees(s, mo.pos):
+					Log.add(s, "%s tritt brennend ins Öl. Die Pfütze geht in Flammen auf!" % Identify.name_of_cap(s, mo), "kampf")
+			"slip":
+				mo.mudStuck = true
+				if Sight.player_sees(s, mo.pos):
+					Log.add(s, "%s rutscht auf dem Öl aus." % Identify.name_of_cap(s, mo), "kampf")
 
 
 ## Geheimtüren entdecken: wie Fallen, mit Intelligenz und Wahrnehmung.

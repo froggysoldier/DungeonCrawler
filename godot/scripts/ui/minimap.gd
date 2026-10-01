@@ -78,6 +78,10 @@ func _draw() -> void:
 				col = Color("#1f4a66")
 			elif tile == Kanalstadt.BRIDGE:
 				col = Color("#8a6a44")
+			elif tile == Tiefgarage.OIL:
+				col = Color("#2a2a34")
+			elif Tiefgarage.is_wreck(tile):
+				col = Color("#8a4a3a")
 			else:
 				var ri: int = m.roomAt[i]
 				if ri >= 0:

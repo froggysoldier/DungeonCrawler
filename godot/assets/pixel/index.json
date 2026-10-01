@@ -657,6 +657,34 @@
   "x": 352,
   "y": 32
  },
+ "boden/oel0": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 256,
+  "y": 96
+ },
+ "boden/oel1": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 288,
+  "y": 96
+ },
+ "boden/oel2": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 320,
+  "y": 96
+ },
+ "boden/oel3": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 352,
+  "y": 96
+ },
  "boden/pflaster0": {
   "h": 32,
   "sheet": "kacheln",
@@ -797,110 +825,138 @@
   "x": 96,
   "y": 32
  },
- "boss/der_hausmeister": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 32,
-  "y": 0
- },
- "boss/die_sammlerin": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 0,
-  "y": 0
- },
- "boss/hausverwalter": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 288,
-  "y": 0
- },
- "boss/heizungsbestie": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 256,
-  "y": 0
- },
- "boss/kammerjaeger": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 160,
-  "y": 0
- },
- "boss/kanalkoenigin": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 320,
-  "y": 0
- },
- "boss/kesselkoenigin": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 128,
-  "y": 0
- },
- "boss/koenig_kanalratte": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 64,
-  "y": 0
- },
- "boss/kommandant_schlamm": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 352,
-  "y": 0
- },
- "boss/mottenmutter": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 192,
-  "y": 0
- },
- "boss/muttis_mixer": {
+ "boss/abschleppwurm": {
   "h": 32,
   "sheet": "bosse",
   "w": 32,
   "x": 96,
   "y": 0
  },
- "boss/nixe": {
+ "boss/der_hausmeister": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 160,
+  "y": 0
+ },
+ "boss/die_sammlerin": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 128,
+  "y": 0
+ },
+ "boss/hausverwalter": {
   "h": 32,
   "sheet": "bosse",
   "w": 32,
   "x": 416,
   "y": 0
  },
- "boss/pfandbaron": {
+ "boss/heizungsbestie": {
   "h": 32,
   "sheet": "bosse",
   "w": 32,
-  "x": 224,
+  "x": 384,
   "y": 0
  },
- "boss/rattenkaiser": {
+ "boss/kammerjaeger": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 288,
+  "y": 0
+ },
+ "boss/kanalkoenigin": {
   "h": 32,
   "sheet": "bosse",
   "w": 32,
   "x": 448,
   "y": 0
  },
+ "boss/kesselkoenigin": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 256,
+  "y": 0
+ },
+ "boss/koenig_kanalratte": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 192,
+  "y": 0
+ },
+ "boss/kommandant_schlamm": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 480,
+  "y": 0
+ },
+ "boss/mottenmutter": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 320,
+  "y": 0
+ },
+ "boss/muttis_mixer": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 224,
+  "y": 0
+ },
+ "boss/nixe": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 32,
+  "y": 32
+ },
+ "boss/oelschlick": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 64,
+  "y": 0
+ },
+ "boss/parkwaechter": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 0,
+  "y": 0
+ },
+ "boss/pfandbaron": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 352,
+  "y": 0
+ },
+ "boss/rattenkaiser": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 64,
+  "y": 32
+ },
+ "boss/rostkoenigin": {
+  "h": 32,
+  "sheet": "bosse",
+  "w": 32,
+  "x": 32,
+  "y": 0
+ },
  "boss/schwarzmarkt_oger": {
   "h": 32,
   "sheet": "bosse",
   "w": 32,
-  "x": 384,
-  "y": 0
+  "x": 0,
+  "y": 32
  },
  "ding/bombe": {
   "h": 32,
@@ -1137,63 +1193,63 @@
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 32,
+  "x": 96,
   "y": 32
  },
  "fleck/fleck1": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 128,
+  "x": 192,
   "y": 32
  },
  "fleck/fleck2": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 224,
+  "x": 288,
   "y": 32
  },
  "fleck/pfuetze0": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 480,
-  "y": 0
+  "x": 32,
+  "y": 32
  },
  "fleck/pfuetze1": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 64,
+  "x": 128,
   "y": 32
  },
  "fleck/pfuetze2": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 160,
+  "x": 224,
   "y": 32
  },
  "fleck/riss0": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 0,
+  "x": 64,
   "y": 32
  },
  "fleck/riss1": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 96,
+  "x": 160,
   "y": 32
  },
  "fleck/riss2": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 192,
+  "x": 256,
   "y": 32
  },
  "geschoss/blitz": {
@@ -1907,105 +1963,119 @@
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 192,
+  "x": 256,
   "y": 0
  },
  "moebel/bett": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 224,
+  "x": 288,
   "y": 0
  },
  "moebel/eimer": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 448,
-  "y": 0
+  "x": 0,
+  "y": 32
  },
  "moebel/fackel": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 128,
+  "x": 192,
   "y": 0
  },
  "moebel/fackel_2": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 160,
+  "x": 224,
   "y": 0
  },
  "moebel/fass": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 352,
+  "x": 416,
   "y": 0
  },
  "moebel/geruempel": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 416,
+  "x": 480,
   "y": 0
  },
  "moebel/kiste": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 320,
+  "x": 384,
   "y": 0
  },
  "moebel/nest": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 64,
+  "x": 128,
   "y": 0
  },
  "moebel/nest_leer": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 96,
+  "x": 160,
   "y": 0
  },
  "moebel/regal": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 384,
+  "x": 448,
   "y": 0
  },
  "moebel/schrein": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 0,
+  "x": 64,
   "y": 0
  },
  "moebel/schrein_leer": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 32,
+  "x": 96,
   "y": 0
  },
  "moebel/theke": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 288,
+  "x": 352,
   "y": 0
  },
  "moebel/toilette": {
   "h": 32,
   "sheet": "einrichtung",
   "w": 32,
-  "x": 256,
+  "x": 320,
+  "y": 0
+ },
+ "moebel/wrack": {
+  "h": 32,
+  "sheet": "einrichtung",
+  "w": 32,
+  "x": 0,
+  "y": 0
+ },
+ "moebel/wrack_leer": {
+  "h": 32,
+  "sheet": "einrichtung",
+  "w": 32,
+  "x": 32,
   "y": 0
  },
  "reittier/bobbycar": {
@@ -2054,231 +2124,231 @@
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 256,
+  "x": 384,
   "y": 160
  },
  "tuer/boss_laengs_offen": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 224,
+  "x": 352,
   "y": 160
  },
  "tuer/boss_laengs_zu": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 192,
+  "x": 320,
   "y": 160
  },
  "tuer/boss_quer_offen": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 160,
+  "x": 288,
   "y": 160
  },
  "tuer/boss_quer_zu": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 128,
+  "x": 256,
   "y": 160
  },
  "tuer/holz_laengs_offen": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 96,
+  "x": 224,
   "y": 160
  },
  "tuer/holz_laengs_zu": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 64,
+  "x": 192,
   "y": 160
  },
  "tuer/holz_quer_offen": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 32,
+  "x": 160,
   "y": 160
  },
  "tuer/holz_quer_zu": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 0,
+  "x": 128,
   "y": 160
  },
  "wand/1_front0": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 288,
+  "x": 416,
   "y": 96
  },
  "wand/1_front1": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 352,
+  "x": 480,
   "y": 96
  },
  "wand/1_front2": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 416,
-  "y": 96
- },
- "wand/1_front3": {
-  "h": 32,
-  "sheet": "kacheln",
-  "w": 32,
-  "x": 480,
-  "y": 96
- },
- "wand/1_oben0": {
-  "h": 32,
-  "sheet": "kacheln",
-  "w": 32,
-  "x": 256,
-  "y": 96
- },
- "wand/1_oben1": {
-  "h": 32,
-  "sheet": "kacheln",
-  "w": 32,
-  "x": 320,
-  "y": 96
- },
- "wand/1_oben2": {
-  "h": 32,
-  "sheet": "kacheln",
-  "w": 32,
-  "x": 384,
-  "y": 96
- },
- "wand/1_oben3": {
-  "h": 32,
-  "sheet": "kacheln",
-  "w": 32,
-  "x": 448,
-  "y": 96
- },
- "wand/2_front0": {
-  "h": 32,
-  "sheet": "kacheln",
-  "w": 32,
   "x": 32,
   "y": 128
  },
- "wand/2_front1": {
+ "wand/1_front3": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
   "x": 96,
   "y": 128
  },
- "wand/2_front2": {
+ "wand/1_oben0": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 160,
-  "y": 128
+  "x": 384,
+  "y": 96
  },
- "wand/2_front3": {
+ "wand/1_oben1": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 224,
-  "y": 128
+  "x": 448,
+  "y": 96
  },
- "wand/2_oben0": {
+ "wand/1_oben2": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
   "x": 0,
   "y": 128
  },
- "wand/2_oben1": {
+ "wand/1_oben3": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
   "x": 64,
   "y": 128
  },
- "wand/2_oben2": {
+ "wand/2_front0": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 128,
+  "x": 160,
   "y": 128
  },
- "wand/2_oben3": {
+ "wand/2_front1": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 192,
+  "x": 224,
   "y": 128
  },
- "wand/3_front0": {
+ "wand/2_front2": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
   "x": 288,
   "y": 128
  },
- "wand/3_front1": {
+ "wand/2_front3": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
   "x": 352,
   "y": 128
  },
- "wand/3_front2": {
+ "wand/2_oben0": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 416,
+  "x": 128,
   "y": 128
  },
- "wand/3_front3": {
+ "wand/2_oben1": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
-  "x": 480,
+  "x": 192,
   "y": 128
  },
- "wand/3_oben0": {
+ "wand/2_oben2": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
   "x": 256,
   "y": 128
  },
- "wand/3_oben1": {
+ "wand/2_oben3": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
   "x": 320,
   "y": 128
  },
- "wand/3_oben2": {
+ "wand/3_front0": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 416,
+  "y": 128
+ },
+ "wand/3_front1": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 480,
+  "y": 128
+ },
+ "wand/3_front2": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 32,
+  "y": 160
+ },
+ "wand/3_front3": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 96,
+  "y": 160
+ },
+ "wand/3_oben0": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
   "x": 384,
   "y": 128
  },
- "wand/3_oben3": {
+ "wand/3_oben1": {
   "h": 32,
   "sheet": "kacheln",
   "w": 32,
   "x": 448,
   "y": 128
+ },
+ "wand/3_oben2": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 0,
+  "y": 160
+ },
+ "wand/3_oben3": {
+  "h": 32,
+  "sheet": "kacheln",
+  "w": 32,
+  "x": 64,
+  "y": 160
  }
 }

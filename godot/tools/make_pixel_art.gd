@@ -540,6 +540,8 @@ const FLOORS := {
 	"kanal": {"base": "#16383a", "gap": "#081a1e"},
 	"bruecke": {"base": "#7a5a3a", "gap": "#2c1e14"},
 	"bruecke_quer": {"base": "#7a5a3a", "gap": "#2c1e14"},
+	# Tiefgaragen (Tiefgarage.OIL): schwarzes Öl auf Beton mit buntem Schimmer
+	"oel": {"base": "#1c1c22", "gap": "#595b5c"},
 }
 
 
@@ -707,6 +709,29 @@ func _floor(mat: String, v: int) -> Image:
 					img.set_pixel((x + i) % T, y, base.lightened(0.25))
 					if i > 0 and i < 3:
 						img.set_pixel((x + i) % T, (y + 1) % T, base.lightened(0.1))
+		"oel":
+			# Betonrand, darauf eine glänzende schwarze Lache mit Regenbogenschlieren
+			for yy in T:
+				for xx in T:
+					img.set_pixel(xx, yy, _jit(gap, 0.05, _r()))
+			var cx := 16.0 + _ri(-2, 2)
+			var cy := 16.0 + _ri(-2, 2)
+			for yy in T:
+				for xx in T:
+					var dx := (xx - cx) / (13.0 + v)
+					var dy := (yy - cy) / (11.0 + (3 - v))
+					var wob := sin(xx * 0.7 + v) * 0.08 + cos(yy * 0.5 + v * 2) * 0.08
+					if dx * dx + dy * dy <= 1.0 + wob:
+						img.set_pixel(xx, yy, _jit(base, 0.04, _r()))
+			var sheen := [Color("#5a3a7a"), Color("#2a6a6a"), Color("#7a6a2a"), Color("#3a4a8a")]
+			for n in 3:
+				var y := int(cy) - 6 + n * 5
+				var x := int(cx) - 7 + _ri(0, 4)
+				for i in _ri(5, 9):
+					if img.get_pixel(clampi(x + i, 0, T - 1), y) .r < 0.2:
+						img.set_pixel(clampi(x + i, 0, T - 1), y, sheen[(n + i / 3) % sheen.size()])
+			img.set_pixel(int(cx) - 4, int(cy) - 5, Color("#d0d0e0"))
+			img.set_pixel(int(cx) - 3, int(cy) - 5, Color("#8a8aa0"))
 		"kanal":
 			# Tiefes, dunkles Wasser mit trägen Schlieren, nahtlos
 			for yy in T:

@@ -277,6 +277,8 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 		return open_door(s, to)
 	if Dungeon.is_crate(to_tile):
 		return smash(s, to)
+	if Tiefgarage.is_wreck(to_tile):
+		return search_wreck(s, to)
 	if not Pathfinding.can_step(s.map, p.pos, to):
 		return _fail("Durch einen Türrahmen geht es nur gerade hindurch." if Pathfinding.is_door(s.map, to.x, to.y) or Pathfinding.is_door(s.map, p.pos.x, p.pos.y) else "Da ist eine Wand.")
 	if Ai.monster_at(s, to) != null:
@@ -373,6 +375,20 @@ static func smash(s: Dictionary, at: Dictionary) -> Dictionary:
 	if J.cheb(at, s.player.pos) != 1:
 		return _fail("Dafür musst du direkt daneben stehen.")
 	var res := Dungeon.smash(s, at)
+	if not res.ok:
+		return _fail(res.message)
+	after_move(s)
+	end_turn(s)
+	return _ok()
+
+
+## Autowrack durchsuchen (kostet einen Zug).
+static func search_wreck(s: Dictionary, at: Dictionary) -> Dictionary:
+	if s.status != "playing":
+		return _fail("Das Spiel ist vorbei.")
+	if J.cheb(at, s.player.pos) != 1:
+		return _fail("Dafür musst du direkt daneben stehen.")
+	var res := Tiefgarage.search(s, at)
 	if not res.ok:
 		return _fail(res.message)
 	after_move(s)

@@ -522,6 +522,30 @@ Etage 3 hat eine eigene Gestalt (`scripts/engine/kanalstadt.gd`):
   dazu vier neue Figuren (Krebs, Aal, Egel, Qualle). Zusammen mit den zehn
   bisherigen hat Etage 3 jetzt 22 eigene Monster.
 
+### 3.28 Etage 2: Die Tiefgaragen
+Etage 2 hat ein eigenes Thema (`scripts/engine/tiefgarage.gd`): die zu einem
+Labyrinth verschmolzenen Tiefgaragen der Stadt, mit eigenen Raumnamen
+(Parkdeck, Rampe, Kassenhäuschen, Waschstraße, Reifenlager …).
+
+- **Parkdecks:** Bis zu vier große Räume werden Parkdecks mit weißen
+  Stellplatzlinien und Reihen von **Autowracks** an den Längsseiten; die
+  Mitte bleibt als Fahrspur frei. Wracks versperren den Weg, aber nicht die
+  Sicht. Hineinlaufen durchsucht ein Wrack einmal: Kram, Vorräte, Gold,
+  manchmal Ausrüstung oder Werkzeug. In jedem fünften Wrack springt die
+  **Alarmanlage** an und weckt alles im Umkreis von neun Feldern.
+- **Öl:** Ölpfützen auf den Decks und in Gängen. Wer hineintritt, rutscht
+  oft aus und verliert den nächsten Zug (Monster auch). Wer brennend
+  hineintritt, setzt die Pfütze in Brand.
+- **Eigene Bosse:** Der Parkwächter (ruft Verstärkung, Ansturm und
+  Trümmerhagel), Die Rostkönigin (gepanzert, Stampfen und Schockwelle), Der
+  Ölschlick (Gift, Flammenteppich, Giftwolke) und Der Abschleppwurm (schnell,
+  Ansturm und Stampfen), jeder mit eigener Figur, Phasensätzen und Beute
+  (Parkscheiben-Schild, Strafzettelblock, Rostkrone, Ölkanister-Rucksack,
+  Abschlepphaken). Die Bosse von Etage 1 tauchen hier nicht mehr auf.
+- **Sechs neue Monster:** Rostkäfer, Ölschleim, Abgasgeist, Wütender
+  Parkautomat, Verwilderte Garagenkatze und Reifenstapel (ein Mimic).
+- Neue Achievement-Familien: Autowracks durchsuchen, Alarmanlagen auslösen.
+
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
 1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben

@@ -289,6 +289,10 @@ static func on_event(s: Dictionary, e: Dictionary) -> void:
 			track(s, "hergestellt.%s" % e.recipe)
 		"crateSmashed":
 			track(s, "kisten")
+		"wreckSearched":
+			track(s, "wracks")
+		"carAlarm":
+			track(s, "alarmanlagen")
 		"secretFound":
 			track(s, "geheimtueren")
 		"lockPicked":

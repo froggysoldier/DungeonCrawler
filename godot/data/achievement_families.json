@@ -1143,6 +1143,27 @@
    ],
    "text": "Schließe {n} Auftragsketten ab.",
    "category": "sozial"
+  },
+  {
+   "id": "wracks",
+   "stat": "wracks",
+   "stages": [
+    5,
+    15,
+    40
+   ],
+   "text": "Durchsuche {n} Autowracks.",
+   "category": "erkundung"
+  },
+  {
+   "id": "alarmanlagen",
+   "stat": "alarmanlagen",
+   "stages": [
+    1,
+    5
+   ],
+   "text": "Löse {n} Alarmanlagen aus.",
+   "category": "ueberleben"
   }
  ]
 }

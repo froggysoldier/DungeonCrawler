@@ -5822,6 +5822,168 @@
    "tier": "silber",
    "box": "abenteurer",
    "category": "bestiarium"
+  },
+  {
+   "id": "art_rostkaefer_1",
+   "name": "Neu im Bestiarium: Rostkäfer",
+   "description": "Besiege zum ersten Mal: Rostkäfer.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rostkaefer_2",
+   "name": "Routine: Rostkäfer",
+   "description": "Besiege 10-mal: Rostkäfer.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_rostkaefer_3",
+   "name": "Plage beseitigt: Rostkäfer",
+   "description": "Besiege 30-mal: Rostkäfer.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_oelschleim_1",
+   "name": "Neu im Bestiarium: Ölschleim",
+   "description": "Besiege zum ersten Mal: Ölschleim.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_oelschleim_2",
+   "name": "Routine: Ölschleim",
+   "description": "Besiege 10-mal: Ölschleim.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_oelschleim_3",
+   "name": "Plage beseitigt: Ölschleim",
+   "description": "Besiege 30-mal: Ölschleim.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_abgasgeist_1",
+   "name": "Neu im Bestiarium: Abgasgeist",
+   "description": "Besiege zum ersten Mal: Abgasgeist.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_abgasgeist_2",
+   "name": "Routine: Abgasgeist",
+   "description": "Besiege 10-mal: Abgasgeist.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_abgasgeist_3",
+   "name": "Plage beseitigt: Abgasgeist",
+   "description": "Besiege 30-mal: Abgasgeist.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_parkautomat_1",
+   "name": "Neu im Bestiarium: Wütender Parkautomat",
+   "description": "Besiege zum ersten Mal: Wütender Parkautomat.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_parkautomat_2",
+   "name": "Routine: Wütender Parkautomat",
+   "description": "Besiege 10-mal: Wütender Parkautomat.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_parkautomat_3",
+   "name": "Plage beseitigt: Wütender Parkautomat",
+   "description": "Besiege 30-mal: Wütender Parkautomat.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_garagenkatze_1",
+   "name": "Neu im Bestiarium: Verwilderte Garagenkatze",
+   "description": "Besiege zum ersten Mal: Verwilderte Garagenkatze.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_garagenkatze_2",
+   "name": "Routine: Verwilderte Garagenkatze",
+   "description": "Besiege 10-mal: Verwilderte Garagenkatze.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_garagenkatze_3",
+   "name": "Plage beseitigt: Verwilderte Garagenkatze",
+   "description": "Besiege 30-mal: Verwilderte Garagenkatze.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_reifenstapel_mimic_1",
+   "name": "Neu im Bestiarium: Reifenstapel",
+   "description": "Besiege zum ersten Mal: Reifenstapel.",
+   "comment": "Neuer Eintrag im Bestiarium. Die Art ist wenig begeistert.",
+   "tier": "bronze",
+   "box": null,
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_reifenstapel_mimic_2",
+   "name": "Routine: Reifenstapel",
+   "description": "Besiege 10-mal: Reifenstapel.",
+   "comment": "Zehn Stück. Du erkennst sie inzwischen am Geruch.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "bestiarium"
+  },
+  {
+   "id": "art_reifenstapel_mimic_3",
+   "name": "Plage beseitigt: Reifenstapel",
+   "description": "Besiege 30-mal: Reifenstapel.",
+   "comment": "Dreißig. Irgendwo schreibt jemand einen Artenschutzantrag. Zu spät.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "bestiarium"
   }
  ]
 }

@@ -93,6 +93,27 @@ func _initialize() -> void:
 				await wait(2.0)
 				await shot("dialog")
 			var gv: GameView = main.view
+			if mode == "tiefgarage":
+				# Etage 2: neben ein Autowrack auf einem Parkdeck
+				TH.tutorial(s)
+				TH.teleport(s, TH.stairs(s))
+				Game.descend(s, {"ghosts": []})
+				s.pendingDialogs.clear()
+				var deck = J.find(s.map.rooms, func(r): return r.get("parkdeck") and J.some(range(r.x, r.x + r.w), func(x): return s.map.tiles[MapGen.idx(s.map, x, r.y)] == "wrack"))
+				var spot = MapGen._random_floor_in(s, s.map, deck, {})
+				TH.teleport(s, spot)
+				s.monsters = s.monsters.filter(func(mo): return Fov.chebyshev(mo.pos, s.player.pos) > 7)
+				Game.after_move(s)
+				main.start_game(s)
+				await wait(1.2)
+				gv = main.view
+				gv.zoom_map(-10)
+				gv.zoom_map(1)
+				gv.refresh_side()
+				await wait(1.2)
+				await shot("tiefgarage")
+				quit()
+				return
 			if mode == "kanalstadt":
 				# Etage 3: an eine Brücke (FEATURE=bruecke) oder in die Siedlung (FEATURE=siedlung)
 				TH.tutorial(s)

@@ -18,6 +18,9 @@ const TERRAIN_TEXT := {
 	"fass": ["Fass", "#c09a6a", "Hineinlaufen zum Zerschlagen. Manchmal ist etwas drin."],
 	"kanal": ["Kanal", "#5a9ac8", "Tief und trüb. Hinüber geht es nur über eine Brücke, aber man sieht und schießt hindurch."],
 	"bruecke": ["Brücke", "#c09a6a", "Knarrende Planken über dem Kanal."],
+	"oel": ["Ölpfütze", "#a0a0b0", "Rutschig: Wer hineintritt, landet oft auf dem Hintern. Wer brennt, setzt sie in Brand."],
+	"wrack": ["Autowrack", "#d08a6a", "Hineinlaufen zum Durchsuchen. Manchmal springt die Alarmanlage an."],
+	"wrack_leer": ["Ausgeräumtes Wrack", "#8a8a8a", "Hier ist nichts mehr zu holen."],
 }
 
 

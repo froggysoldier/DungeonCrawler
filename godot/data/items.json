@@ -2690,6 +2690,68 @@
    "kind": "schluessel",
    "flavor": "Schwer, rostig, mit einem Anhänger aus Draht. Irgendwo auf dieser Etage gibt es eine Tür, die darauf wartet.",
    "wert": 0
+  },
+  {
+   "id": "parkscheibe_schild",
+   "name": "Parkscheiben-Schild",
+   "kind": "ausruestung",
+   "slot": "haende",
+   "bonuses": {
+    "ruestung": 3,
+    "ausweichen": 2
+   },
+   "flavor": "Eingestellt auf 10:30. Seit Jahren. Hält trotzdem jeden Schlag ab.",
+   "wert": 30
+  },
+  {
+   "id": "strafzettelblock",
+   "name": "Strafzettelblock des Parkwächters",
+   "kind": "ausruestung",
+   "slot": "guertel",
+   "bonuses": {
+    "krit": 5,
+    "stats": {
+     "cha": 1
+    }
+   },
+   "flavor": "Jeder Zettel ein kleiner Triumph. Die Monster hassen es.",
+   "wert": 28
+  },
+  {
+   "id": "rostkrone",
+   "name": "Rostkrone",
+   "kind": "ausruestung",
+   "slot": "kopf",
+   "bonuses": {
+    "ruestung": 2,
+    "maxHp": 8
+   },
+   "flavor": "Aus Radkappen geschweißt. Schwer, schief und unglaublich würdevoll.",
+   "wert": 32
+  },
+  {
+   "id": "oelkanister_rucksack",
+   "name": "Ölkanister-Rucksack",
+   "kind": "ausruestung",
+   "slot": "ruecken",
+   "bonuses": {
+    "maxAusdauer": 3,
+    "ausweichen": 3
+   },
+   "flavor": "Gluckert bei jedem Schritt. Riecht nach Tankstelle. Du rutschst nie wieder aus.",
+   "wert": 26
+  },
+  {
+   "id": "abschlepphaken",
+   "name": "Abschlepphaken",
+   "kind": "ausruestung",
+   "slot": "waffe",
+   "waffenSchaden": 11,
+   "bonuses": {
+    "treffer": 4
+   },
+   "flavor": "Hat schon ganze Lastwagen bewegt. Ein Kobold ist da kein Problem.",
+   "wert": 34
   }
  ],
  "FOOD_IDS": [

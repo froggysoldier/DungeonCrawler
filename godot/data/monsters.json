@@ -2044,6 +2044,216 @@
    "abilities": [
     "regeneriert"
    ]
+  },
+  {
+   "id": "rostkaefer",
+   "name": "Rostkäfer",
+   "glyph": "b",
+   "color": "#b0603a",
+   "levels": [
+    3,
+    6
+   ],
+   "floors": [
+    2
+   ],
+   "hp": 12,
+   "hpPerLevel": 4,
+   "dmg": [
+    2,
+    4
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 70,
+   "ruestung": 2,
+   "ausweichen": 5,
+   "size": "klein",
+   "behavior": "melee",
+   "xp": 22,
+   "weight": 6,
+   "pack": [
+    2,
+    3
+   ],
+   "flavor": "Käfer, die sich von Autoblech ernähren. Sie knacken beim Laufen wie alte Scharniere.",
+   "tags": [
+    "insekt"
+   ],
+   "abilities": [
+    "gepanzert"
+   ]
+  },
+  {
+   "id": "oelschleim",
+   "name": "Ölschleim",
+   "glyph": "s",
+   "color": "#2a2a30",
+   "levels": [
+    3,
+    6
+   ],
+   "floors": [
+    2
+   ],
+   "hp": 18,
+   "hpPerLevel": 5,
+   "dmg": [
+    2,
+    4
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 65,
+   "ruestung": 0,
+   "ausweichen": 0,
+   "size": "mittel",
+   "behavior": "melee",
+   "xp": 26,
+   "weight": 5,
+   "flavor": "Ein Klumpen Altöl, der sich bewegt. Er hinterlässt eine schwarze Spur und einen Geruch, den man nie wieder vergisst.",
+   "tags": [
+    "schleim"
+   ],
+   "abilities": [
+    "gift"
+   ]
+  },
+  {
+   "id": "abgasgeist",
+   "name": "Abgasgeist",
+   "glyph": "A",
+   "color": "#8a8a90",
+   "levels": [
+    4,
+    7
+   ],
+   "floors": [
+    2
+   ],
+   "hp": 12,
+   "hpPerLevel": 3,
+   "dmg": [
+    2,
+    4
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 70,
+   "ruestung": 0,
+   "ausweichen": 30,
+   "size": "mittel",
+   "behavior": "ranged",
+   "range": 4,
+   "xp": 30,
+   "weight": 4,
+   "flavor": "Der Auspuffqualm von tausend Staus, zusammengeballt zu schlechter Laune. Er hustet dich an. Aus der Ferne.",
+   "tags": [
+    "geist"
+   ],
+   "abilities": [
+    "fliegend",
+    "blendend"
+   ]
+  },
+  {
+   "id": "parkautomat",
+   "name": "Wütender Parkautomat",
+   "glyph": "$",
+   "color": "#c0c040",
+   "levels": [
+    4,
+    7
+   ],
+   "floors": [
+    2
+   ],
+   "hp": 22,
+   "hpPerLevel": 5,
+   "dmg": [
+    3,
+    5
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 70,
+   "ruestung": 3,
+   "ausweichen": 0,
+   "size": "mittel",
+   "behavior": "stationary",
+   "range": 4,
+   "xp": 28,
+   "weight": 3,
+   "flavor": "Er spuckt Münzen. Sehr schnell. Sehr gezielt. Ein Parkticket hat er seit Jahren nicht mehr gedruckt.",
+   "tags": [
+    "konstrukt"
+   ]
+  },
+  {
+   "id": "garagenkatze",
+   "name": "Verwilderte Garagenkatze",
+   "glyph": "f",
+   "color": "#8a7a6a",
+   "levels": [
+    3,
+    6
+   ],
+   "floors": [
+    2
+   ],
+   "hp": 12,
+   "hpPerLevel": 3,
+   "dmg": [
+    2,
+    4
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 80,
+   "ruestung": 0,
+   "ausweichen": 25,
+   "size": "klein",
+   "behavior": "melee",
+   "xp": 22,
+   "weight": 5,
+   "pack": [
+    1,
+    2
+   ],
+   "flavor": "Lebt unter Motorhauben, wo es warm war. Jetzt ist es kalt, und die Katze ist schlecht gelaunt.",
+   "tags": [
+    "tier"
+   ],
+   "abilities": [
+    "schnell",
+    "blutig"
+   ]
+  },
+  {
+   "id": "reifenstapel_mimic",
+   "name": "Reifenstapel",
+   "glyph": "0",
+   "color": "#3a3a3a",
+   "levels": [
+    4,
+    7
+   ],
+   "floors": [
+    2
+   ],
+   "hp": 28,
+   "hpPerLevel": 6,
+   "dmg": [
+    3,
+    6
+   ],
+   "dmgPerLevel": 1,
+   "treffer": 70,
+   "ruestung": 3,
+   "ausweichen": 0,
+   "size": "mittel",
+   "behavior": "stationary",
+   "xp": 30,
+   "weight": 2,
+   "flavor": "Ein ordentlicher Stapel Winterreifen. Der unterste hat Zähne.",
+   "tags": [
+    "mimic"
+   ]
   }
  ],
  "HOOD_BOSSES": [
@@ -2628,6 +2838,159 @@
    "phaseLines": [
     "%s hebt das Zepter. Das Quieken wird zum Chor.",
     "%s wirft den Mantel ab. Darunter nur Zähne und Wut."
+   ]
+  },
+  {
+   "id": "parkwaechter",
+   "name": "Der Parkwächter",
+   "glyph": "P",
+   "color": "#4a6aa0",
+   "level": 9,
+   "hp": 105,
+   "dmg": [
+    5,
+    9
+   ],
+   "treffer": 75,
+   "ruestung": 3,
+   "ausweichen": 5,
+   "size": "gross",
+   "xp": 190,
+   "rank": "nachbarschaftsboss",
+   "floors": [
+    2
+   ],
+   "intro": "Ein Mann in blauer Uniform tritt aus seinem Kassenhäuschen. Er zückt einen Block. „Sie stehen im Halteverbot. Mit Ihrem ganzen Leben.“",
+   "flavor": "Hat in dreißig Jahren keinen einzigen Strafzettel zurückgenommen. Wird jetzt nicht damit anfangen.",
+   "loot": [
+    "parkscheibe_schild",
+    "strafzettelblock"
+   ],
+   "abilities": [
+    "furchterregend",
+    "rufer"
+   ],
+   "specials": [
+    "ansturm",
+    "wurfhagel"
+   ],
+   "phaseLines": [
+    "%s pfeift auf seiner Trillerpfeife. Irgendwo springen Schranken auf.",
+    "%s zerreißt seinen Block. „Keine Verwarnungen mehr!“"
+   ]
+  },
+  {
+   "id": "rostkoenigin",
+   "name": "Die Rostkönigin",
+   "glyph": "Q",
+   "color": "#b0603a",
+   "level": 10,
+   "hp": 160,
+   "dmg": [
+    7,
+    12
+   ],
+   "treffer": 75,
+   "ruestung": 5,
+   "ausweichen": 0,
+   "size": "gross",
+   "xp": 210,
+   "rank": "nachbarschaftsboss",
+   "floors": [
+    2
+   ],
+   "intro": "Aus einem Berg von Autowracks erhebt sich eine Gestalt aus Blech, Kotflügeln und Auspuffrohren. Auf dem Kopf trägt sie eine Krone aus Radkappen.",
+   "flavor": "Sie herrscht über alles, was nicht mehr fährt. Das ist hier unten eine ganze Menge.",
+   "loot": [
+    "rostkrone"
+   ],
+   "abilities": [
+    "gepanzert",
+    "furchterregend"
+   ],
+   "specials": [
+    "stampfen",
+    "schockwelle"
+   ],
+   "phaseLines": [
+    "%s ächzt und knirscht. Rostflocken regnen von der Decke.",
+    "%s reißt sich eine Tür aus der Brust und schleudert sie weg. Darunter glüht es rot."
+   ]
+  },
+  {
+   "id": "oelschlick",
+   "name": "Der Ölschlick",
+   "glyph": "O",
+   "color": "#2a2a30",
+   "level": 9,
+   "hp": 110,
+   "dmg": [
+    4,
+    8
+   ],
+   "treffer": 70,
+   "ruestung": 2,
+   "ausweichen": 0,
+   "size": "riesig",
+   "xp": 200,
+   "rank": "nachbarschaftsboss",
+   "floors": [
+    2
+   ],
+   "intro": "Der Boden glänzt plötzlich schwarz. Dann steht der Boden auf. Ein Berg aus Altöl, Schmiere und Bremsflüssigkeit gluckert dich an.",
+   "flavor": "Alles, was jemals aus einem Motor getropft ist, hat sich hier gesammelt. Und es hat Gefühle entwickelt. Schlechte.",
+   "loot": [
+    "oelkanister_rucksack"
+   ],
+   "abilities": [
+    "gift",
+    "regeneriert"
+   ],
+   "specials": [
+    "flammenteppich",
+    "giftwolke"
+   ],
+   "phaseLines": [
+    "%s blubbert. Schwarze Pfützen breiten sich aus.",
+    "%s fängt an zu qualmen. Ein Funke, und alles brennt."
+   ]
+  },
+  {
+   "id": "abschleppwurm",
+   "name": "Der Abschleppwurm",
+   "glyph": "W",
+   "color": "#a08a40",
+   "level": 10,
+   "hp": 115,
+   "dmg": [
+    6,
+    10
+   ],
+   "treffer": 75,
+   "ruestung": 3,
+   "ausweichen": 5,
+   "size": "riesig",
+   "xp": 210,
+   "rank": "nachbarschaftsboss",
+   "floors": [
+    2
+   ],
+   "intro": "Etwas Langes, Gelbes windet sich zwischen den Säulen. Am Schwanzende baumelt ein riesiger Stahlhaken. Er hat schon viele abgeschleppt.",
+   "flavor": "Er schleppt alles ab, was falsch parkt. Und für ihn parkt jeder falsch.",
+   "loot": [
+    "abschlepphaken"
+   ],
+   "abilities": [
+    "blutig",
+    "schnell"
+   ],
+   "specials": [
+    "ansturm",
+    "stampfen"
+   ],
+   "phaseLines": [
+    "%s rollt sich zusammen. Der Haken schwingt.",
+    "%s schlägt mit dem Haken nach allem, was sich bewegt. Und nach dem, was sich nicht bewegt."
    ]
   }
  ],

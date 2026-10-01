@@ -21,12 +21,62 @@
   },
   {
    "floor": 2,
-   "name": "Die tieferen Keller",
-   "intro": "Die zweite Etage sieht aus wie die erste – nur dunkler, feuchter und mit mehr Zähnen. Die Systemstimme verspricht „spannende neue Features“. Das klingt nicht gut.",
+   "name": "Die Tiefgaragen",
+   "intro": "Unter den Kellern liegen die Tiefgaragen der ganzen Stadt – zu einem einzigen Labyrinth aus Parkdecks, Rampen und Lüftungsschächten verschmolzen. Autowracks stehen in Reih und Glied, Öl glänzt auf dem Beton, und irgendwo heult eine Alarmanlage, die niemand mehr abstellt.",
    "duration": 2400,
    "mobLevel": [
     3,
     7
+   ],
+   "flavors": [
+    {
+     "name": "Parkdeck",
+     "description": "Reihen von Autos, die nie wieder fahren werden. Die Scheiben sind beschlagen. Von innen."
+    },
+    {
+     "name": "Rampe zum Unterdeck",
+     "description": "Eine schräge Betonbahn mit Reifenspuren, die in die falsche Richtung führen."
+    },
+    {
+     "name": "Kassenhäuschen",
+     "description": "Ein Glaskasten mit einem Schild: „Bitte am Automaten zahlen“. Der Automat ist weg. Das Schild ist geblieben."
+    },
+    {
+     "name": "Waschstraße",
+     "description": "Riesige Bürsten hängen schlaff von der Decke. Eine dreht sich noch. Ganz langsam."
+    },
+    {
+     "name": "Reifenlager",
+     "description": "Stapel von Winterreifen bis unter die Decke. Es riecht nach Gummi und nach etwas, das darin wohnt."
+    },
+    {
+     "name": "Lüftungszentrale",
+     "description": "Ventilatoren groß wie Karussells. Wenn sie anspringen, wackelt der Boden."
+    },
+    {
+     "name": "Frauenparkplätze",
+     "description": "Gut beleuchtet, mit Kameras. Die Kameras zeigen nichts mehr. Das Licht flackert trotzdem tapfer."
+    },
+    {
+     "name": "Ladestation",
+     "description": "E-Auto-Säulen mit abgerissenen Kabeln. Ab und zu springt ein Funke über."
+    },
+    {
+     "name": "Hausmeisterbüro der Garage",
+     "description": "Ein Schreibtisch, ein Kalender von vor dem Ende, eine kalte Tasse Kaffee. Jemand hat hier gerne gearbeitet."
+    },
+    {
+     "name": "Fundbüro",
+     "description": "Regale voller Regenschirme, Handschuhe und Kindersitze. Niemand holt mehr etwas ab."
+    },
+    {
+     "name": "Notausgang",
+     "description": "Ein grünes Schild zeigt auf eine Wand. Der Ausgang ist eingestürzt. Das Schild glaubt noch an ihn."
+    },
+    {
+     "name": "Stellplatz für Wohnmobile",
+     "description": "Ein Wohnmobil steht schief in der Ecke. Die Gardinen sind zugezogen. Die Tür auch."
+    }
    ]
   },
   {
