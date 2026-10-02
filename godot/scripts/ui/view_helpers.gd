@@ -8,7 +8,7 @@ const BEAST_STAGES := [1, 10, 30]
 
 ## Züge als Uhrzeit (3 Minuten pro Zug), ab einem Tag mit „T“.
 static func format_time(turns: int) -> String:
-	var minutes := turns * 3
+	var minutes := turns * int(Db.world("MINUTES_PER_TURN"))
 	var d := minutes / 1440
 	var h := (minutes % 1440) / 60
 	var m := minutes % 60

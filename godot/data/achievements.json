@@ -2343,7 +2343,7 @@
   {
    "id": "fam_schlafend_1",
    "name": "Gute Nacht",
-   "description": "Besiege 1 schlafende Gegner.",
+   "description": "Besiege einen schlafenden Gegner.",
    "comment": "Irgendwo in der Galaxis wettet jemand auf dich. Er gewinnt gerade.",
    "tier": "bronze",
    "box": "abenteurer",
@@ -2370,7 +2370,7 @@
   {
    "id": "fam_fliehend_1",
    "name": "Kein Entkommen",
-   "description": "Besiege 1 fliehende Gegner.",
+   "description": "Besiege einen fliehenden Gegner.",
    "comment": "Die Systemstimme führt Buch. Die Seite mit deinem Namen wird dicker.",
    "tier": "bronze",
    "box": "wurf",
@@ -3252,7 +3252,7 @@
   {
    "id": "fam_tueren_1",
    "name": "Klinkenputzen",
-   "description": "Öffne 1 Türen.",
+   "description": "Öffne eine Tür.",
    "comment": "Neugier ist eine Tugend. Bis sie Zähne hat.",
    "tier": "bronze",
    "box": null,
@@ -3405,7 +3405,7 @@
   {
    "id": "fam_episch_1",
    "name": "Episches Fundstück",
-   "description": "Finde 1 epische Gegenstände.",
+   "description": "Finde einen epischen Gegenstand.",
    "comment": "Glänzende Dinge! Deine Elstergene melden sich.",
    "tier": "silber",
    "box": "waffen",
@@ -3666,7 +3666,7 @@
   {
    "id": "fam_toilette_1",
    "name": "Geschäftsbesuch",
-   "description": "Benutze 1-mal eine Toilette.",
+   "description": "Benutze eine Toilette.",
    "comment": "Dein Körper ist ein Flickenteppich. Ein sehr zäher Flickenteppich.",
    "tier": "bronze",
    "box": null,
@@ -4017,7 +4017,7 @@
   {
    "id": "fam_samariter_1",
    "name": "Erste-Hilfe-Kasten",
-   "description": "Versorge 1 verletzte Crawler.",
+   "description": "Versorge einen verletzten Crawler.",
    "comment": "Freundschaften im Dungeon halten ewig. Also bis zum nächsten Kobold.",
    "tier": "bronze",
    "box": "ueberlebens",
@@ -4116,7 +4116,7 @@
   {
    "id": "fam_fangeschenke_1",
    "name": "Fanpost",
-   "description": "Erhalte 1 Geschenke aus dem Publikum.",
+   "description": "Erhalte ein Geschenk aus dem Publikum.",
    "comment": "Die Galaxis schaut hin. Lächeln!",
    "tier": "bronze",
    "box": null,
@@ -4260,7 +4260,7 @@
   {
    "id": "fam_entdeckte_skills_1",
    "name": "Beobachtet",
-   "description": "Lass den Beobachter 1 eigene Skills für dich entdecken.",
+   "description": "Lass den Beobachter einen eigenen Skill für dich entdecken.",
    "comment": "Stufe um Stufe nach oben, Etage um Etage nach unten.",
    "tier": "bronze",
    "box": "abenteurer",
@@ -4310,6 +4310,321 @@
    "tier": "gold",
    "box": "brawler",
    "category": "fortschritt"
+  },
+  {
+   "id": "fam_kisten_10",
+   "name": "Kleinholz",
+   "description": "Zerschlage 10 Kisten oder Fässer.",
+   "comment": "Zehn Kisten. Der Schreiner in dir weint leise.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_kisten_30",
+   "name": "Fasszerstörer",
+   "description": "Zerschlage 30 Kisten oder Fässer.",
+   "comment": "Dreißig. Irgendwo führt jemand eine Inventurliste und ist verzweifelt.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_kisten_75",
+   "name": "Kistenschreck",
+   "description": "Zerschlage 75 Kisten oder Fässer.",
+   "comment": "Fünfundsiebzig. Die Möbelindustrie hat dich auf eine Liste gesetzt.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_geheimtueren_1",
+   "name": "Da war doch was",
+   "description": "Entdecke eine Geheimtür.",
+   "comment": "Die Wand klang hohl. Du hast hingehört. Die Wand ist beleidigt.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_geheimtueren_3",
+   "name": "Wandklopfer",
+   "description": "Entdecke 3 Geheimtüren.",
+   "comment": "Drei geheime Türen. Die Architekten dieses Dungeons hassen dich.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_geheimtueren_6",
+   "name": "Durchblick",
+   "description": "Entdecke 6 Geheimtüren.",
+   "comment": "Sechs. Für dich gibt es keine Wände mehr, nur Vorschläge.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_schloesser_1",
+   "name": "Klick",
+   "description": "Knacke ein Schloss.",
+   "comment": "Das erste Schloss gibt nach. Es war ein billiges Schloss. Trotzdem.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "technik"
+  },
+  {
+   "id": "fam_schloesser_3",
+   "name": "Fingerfertig",
+   "description": "Knacke 3 Schlösser.",
+   "comment": "Drei Schlösser. Die Zuschauer fragen sich, was du früher beruflich gemacht hast.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "technik"
+  },
+  {
+   "id": "fam_schloesser_6",
+   "name": "Generalschlüssel auf zwei Beinen",
+   "description": "Knacke 6 Schlösser.",
+   "comment": "Sechs Schlösser. Türen öffnen sich inzwischen aus Respekt.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "technik"
+  },
+  {
+   "id": "fam_schatzkammern_1",
+   "name": "Glücksritter",
+   "description": "Betritt eine Schatzkammer.",
+   "comment": "Eine Schatzkammer. Gold, Glanz und garantiert keine Falle. Fast garantiert.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_schatzkammern_3",
+   "name": "Kammerjäger mit Geschmack",
+   "description": "Betritt 3 Schatzkammern.",
+   "comment": "Drei Schatzkammern. Die Regie überlegt, ob sie zu großzügig war.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_nester_1",
+   "name": "Ausgeräuchert",
+   "description": "Räume ein Monsternest aus.",
+   "comment": "Ein Nest weniger. Die Nachbarschaft atmet auf. Die Nachbarschaft besteht aus Monstern.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_nester_3",
+   "name": "Nestbeschmutzer",
+   "description": "Räume 3 Monsternester aus.",
+   "comment": "Drei Nester. Du bist der Albtraum jeder Monstermutter.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_nester_5",
+   "name": "Brutstättenbrecher",
+   "description": "Räume 5 Monsternester aus.",
+   "comment": "Fünf Nester. Die Geburtenrate auf dieser Etage sinkt messbar.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_gebete_1",
+   "name": "Ein stilles Wort",
+   "description": "Bete an einem Schrein.",
+   "comment": "Du hast gebetet. Jemand hat zugehört. Ob das gut war, zeigt sich noch.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_gebete_5",
+   "name": "Stammgast am Schrein",
+   "description": "Bete 5-mal an einem Schrein.",
+   "comment": "Fünf Gebete. Die Götter kennen deine Stimme inzwischen.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_gebete_10",
+   "name": "Frömmler",
+   "description": "Bete 10-mal an einem Schrein.",
+   "comment": "Zehn Gebete. Die Götter haben dich auf stumm geschaltet. Fast.",
+   "tier": "gold",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_hinterhalte_1",
+   "name": "Überrumpelt, nicht erledigt",
+   "description": "Gerate in einen Hinterhalt und lebe weiter.",
+   "comment": "Ein Hinterhalt, und du stehst noch. Die Monster sind ehrlich enttäuscht.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_hinterhalte_3",
+   "name": "Fallenresistent",
+   "description": "Gerate in 3 Hinterhalte und lebe weiter.",
+   "comment": "Drei Hinterhalte überlebt. Du gehst inzwischen rückwärts in jeden Raum.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_boss_ausweichen_1",
+   "name": "Rechtzeitig weg",
+   "description": "Weiche einem angekündigten Boss-Angriff aus.",
+   "comment": "Der Boss hat ausgeholt. Du warst woanders. Gutes Timing.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_boss_ausweichen_5",
+   "name": "Tänzer",
+   "description": "Weiche 5 angekündigten Boss-Angriffen aus.",
+   "comment": "Fünf angekündigte Angriffe ins Leere. Die Bosse beschweren sich bei der Regie.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_boss_ausweichen_15",
+   "name": "Unberührbar",
+   "description": "Weiche 15 angekündigten Boss-Angriffen aus.",
+   "comment": "Fünfzehn Ausweicher. Bosse zielen inzwischen auf die Stelle, an der du gleich sein wirst. Vergeblich.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_ketten_1",
+   "name": "Fortsetzung folgt",
+   "description": "Schließe eine Auftragskette ab.",
+   "comment": "Eine ganze Auftragskette erledigt. Die Auftraggeber reden über dich. Positiv. Meistens.",
+   "tier": "bronze",
+   "box": "fan",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_ketten_3",
+   "name": "Mehrteiler",
+   "description": "Schließe 3 Auftragsketten ab.",
+   "comment": "Drei Ketten. Du bist jetzt die Person, die man anruft.",
+   "tier": "silber",
+   "box": "fan",
+   "category": "sozial"
+  },
+  {
+   "id": "fam_wracks_5",
+   "name": "Handschuhfach-Inspektor",
+   "description": "Durchsuche 5 Autowracks.",
+   "comment": "Fünf Wracks durchsucht. Eine Sammlung von Duftbäumen ist der Anfang.",
+   "tier": "bronze",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_wracks_15",
+   "name": "Schrottplatz-Profi",
+   "description": "Durchsuche 15 Autowracks.",
+   "comment": "Fünfzehn Wracks. Du erkennst Automarken inzwischen am Rost.",
+   "tier": "silber",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_wracks_40",
+   "name": "Ausgeschlachtet",
+   "description": "Durchsuche 40 Autowracks.",
+   "comment": "Vierzig Wracks. Die Parkdecks sind jetzt offiziell leer.",
+   "tier": "gold",
+   "box": "abenteurer",
+   "category": "erkundung"
+  },
+  {
+   "id": "fam_alarmanlagen_1",
+   "name": "Wiu wiu",
+   "description": "Löse eine Alarmanlage aus.",
+   "comment": "Eine Alarmanlage. Halb die Etage weiß jetzt, wo du bist. Glückwunsch.",
+   "tier": "bronze",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_alarmanlagen_5",
+   "name": "Lärmbelästigung",
+   "description": "Löse 5 Alarmanlagen aus.",
+   "comment": "Fünf Alarmanlagen. Die Nachbarn haben eine Beschwerde eingereicht. Die Nachbarn sind Monster.",
+   "tier": "silber",
+   "box": "ueberlebens",
+   "category": "ueberleben"
+  },
+  {
+   "id": "fam_einlagen_1",
+   "name": "Showeinlage",
+   "description": "Erlebe eine Einlage der Show.",
+   "comment": "Deine erste Einlage. Die Regie dreht an Knöpfen, du rennst. So funktioniert Fernsehen.",
+   "tier": "bronze",
+   "box": "fan",
+   "category": "show"
+  },
+  {
+   "id": "fam_einlagen_5",
+   "name": "Stammgast im Programm",
+   "description": "Erlebe 5 Einlagen der Show.",
+   "comment": "Fünf Einlagen. Die Werbepausen richten sich inzwischen nach dir.",
+   "tier": "silber",
+   "box": "fan",
+   "category": "show"
+  },
+  {
+   "id": "fam_einlagen_12",
+   "name": "Sendeformat",
+   "description": "Erlebe 12 Einlagen der Show.",
+   "comment": "Zwölf Einlagen. Man denkt über eine eigene Sendung nach. Mit dir. Gegen deinen Willen.",
+   "tier": "gold",
+   "box": "fan",
+   "category": "show"
+  },
+  {
+   "id": "fam_kopfgelder_1",
+   "name": "Kopfgeldjäger",
+   "description": "Kassiere ein Kopfgeld.",
+   "comment": "Das erste Kopfgeld kassiert. Das Wettbüro zahlt. Zähneknirschend.",
+   "tier": "bronze",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_kopfgelder_3",
+   "name": "Steckbriefsammler",
+   "description": "Kassiere 3 Kopfgelder.",
+   "comment": "Drei Kopfgelder. Die Monster hängen inzwischen Steckbriefe von dir auf.",
+   "tier": "silber",
+   "box": "brawler",
+   "category": "kampf"
+  },
+  {
+   "id": "fam_kopfgelder_8",
+   "name": "Prämienkönig",
+   "description": "Kassiere 8 Kopfgelder.",
+   "comment": "Acht Kopfgelder. Die Show muss ihr Budget neu verhandeln.",
+   "tier": "gold",
+   "box": "brawler",
+   "category": "kampf"
   },
   {
    "id": "art_kellerratte_1",

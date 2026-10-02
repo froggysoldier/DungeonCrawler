@@ -21,13 +21,6 @@ static func xp_to_next(level: int) -> int:
 	return J.rnd(XP_BASE * pow(level, XP_EXPONENT))
 
 
-static func total_xp_for(level: int) -> int:
-	var sum := 0
-	for l in range(1, level):
-		sum += xp_to_next(l)
-	return sum
-
-
 static func challenge_of(diff: int) -> String:
 	if diff <= -5:
 		return "trivial"

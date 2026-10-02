@@ -282,6 +282,3 @@ func close_all() -> void:
 		_back.visible = false
 		job.closed.emit(null)
 
-
-func clear_toasts() -> void:
-	Kit.clear(_toasts)

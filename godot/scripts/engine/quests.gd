@@ -201,7 +201,6 @@ static func accept(s: Dictionary, id: String) -> Dictionary:
 			Crawlers.crawlers(s).append(c)
 			q.targetUid = c.uid
 			# Ein paar Monster halten die Person in Schach
-			var def := Db.floor_def0(s.floor)
 			var pool: Array = Db.t("monsters", "MONSTERS").filter(func(m): return m.floors.has(s.floor) and m.weight > 0 and m.behavior != "stationary")
 			var i := 0
 			while i < 2 and not pool.is_empty():
@@ -214,7 +213,7 @@ static func accept(s: Dictionary, id: String) -> Dictionary:
 						break
 				var md = Monsters.def_by_id(R.pick(s, pool).id)
 				if near != null and md != null:
-					s.monsters.append(Monsters.spawn_monster(s, md, R.int_(s, def.mobLevel[0], def.mobLevel[1]), near, room.hood))
+					s.monsters.append(Monsters.spawn_monster(s, md, Monsters.clamp_level(md, Monsters.roll_level(s)), near, room.hood))
 				i += 1
 	q.status = "aktiv"
 	Log.add(s, "AUFTRAG ANGENOMMEN: %s. %s" % [q.title, hint(s, q)], "system")

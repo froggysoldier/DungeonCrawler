@@ -94,7 +94,7 @@ static func floor_recap(s: Dictionary) -> Dictionary:
 		social.append("Gefallen: %s. Die Systemstimme vermerkt es. Du wirst es nicht so schnell vergessen." % ", ".join(fallen))
 	social.append("Laut letzter Zählung leben noch %s Crawler." % _fmt(Crawlers.population(s).alive))
 	pages.append("\n\n".join(social))
-	return {"title": "Rückblick: Etage %d" % s.floor, "speaker": "Die Systemstimme", "pages": pages}
+	return {"title": "Rückblick: Etage %d" % s.floor, "speaker": Db.world("SYSTEM_NAME"), "pages": pages}
 
 
 static func _fill(s: Dictionary, text: String) -> String:

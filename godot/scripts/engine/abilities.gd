@@ -129,6 +129,3 @@ static func _is_taken(s: Dictionary, p: Dictionary) -> bool:
 		return true
 	return J.some(s.monsters, func(o): return o.pos.x == p.x and o.pos.y == p.y)
 
-
-static func is_adjacent(a: Dictionary, b: Dictionary) -> bool:
-	return J.cheb(a, b) <= 1

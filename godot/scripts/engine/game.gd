@@ -163,7 +163,7 @@ static func new_game(opts: Dictionary) -> Dictionary:
 			return d.name if d != null else t)
 		pages.append("Die Systemstimme hat dich analysiert. Deine Eigenschaften: %s. Details findest du im Crawler-Tab." % ", ".join(names))
 	pages.append("Du hast nichts. Kein Inventar, keine Karte, keine Ahnung. Irgendwo auf dieser Etage gibt es eine Gilde der Einweisung – such sie. Bis dahin kannst du genau einen Gegenstand in der Hand halten. Und deine Fäuste. Und Füße. Viel Spaß!")
-	s.pendingDialogs.append({"title": "%s – Staffel %d" % [show_name, s.season], "speaker": "Die Systemstimme", "pages": pages})
+	s.pendingDialogs.append({"title": "%s – Staffel %d" % [show_name, s.season], "speaker": Db.world("SYSTEM_NAME"), "pages": pages})
 	Events.emit(s, {"type": "start"})
 	return s
 
@@ -286,8 +286,10 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 		return _fail("Durch einen Türrahmen geht es nur gerade hindurch." if Pathfinding.is_door(s.map, to.x, to.y) or Pathfinding.is_door(s.map, p.pos.x, p.pos.y) else "Da ist eine Wand.")
 	if Ai.monster_at(s, to) != null:
 		return _fail("Da steht ein Gegner.")
+	# Friedliche Crawler lassen dich vorbei (ihr tauscht die Plätze), damit
+	# niemand dauerhaft einen engen Gang versperrt
 	var other = Crawlers.crawler_at(s, to)
-	if other != null and not other.party:
+	if other != null and not other.party and other.personality == "feindselig":
 		return _fail("Da steht %s." % other.name)
 	if p.get("immobile") and not Traps.struggle(s):
 		end_turn(s)
@@ -300,6 +302,8 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 		pet.pos = J.pcopy(p.pos)
 	if other != null:
 		other.pos = J.pcopy(p.pos)
+		if not other.party:
+			Log.add(s, "Du drängst dich an %s vorbei." % other.name, "info")
 	p.lastMoveDir = J.pos(to.x - p.pos.x, to.y - p.pos.y)
 	p.pos = J.pcopy(to)
 	s.counters.steps += 1
@@ -587,7 +591,6 @@ static func _tick_time(s: Dictionary, turns: int, before: int) -> void:
 
 
 static func _respawn(s: Dictionary) -> void:
-	var def := Db.floor_def0(s.floor)
 	var vis := visible_tiles(s)
 	for hood in s.map.hoods:
 		if not hood.bossAlive:
@@ -602,8 +605,9 @@ static func _respawn(s: Dictionary) -> void:
 		var p := J.pos(R.int_(s, room.x, room.x + room.w - 1), R.int_(s, room.y, room.y + room.h - 1))
 		if vis.has(MapGen.idx(s.map, p.x, p.y)) or Ai.occupied(s, p) or MapGen.tile_at(s.map, p.x, p.y) != "floor":
 			continue
-		var level := R.int_(s, def.mobLevel[0], def.mobLevel[1])
-		s.monsters.append(Monsters.spawn_for_floor(s, s.floor, level, p, hood.id, R.chance(s, 0.05)))
+		var level := Monsters.roll_level(s)
+		# Elite-Nachzügler erst, wenn der Crawler ein paar Stufen hat
+		s.monsters.append(Monsters.spawn_for_floor(s, s.floor, level, p, hood.id, R.chance(s, 0.05) and int(s.player.level) >= 3))
 
 
 static func _kick_from_safe_room(s: Dictionary) -> void:
@@ -1354,7 +1358,7 @@ static func descend(s: Dictionary, meta: Dictionary) -> Dictionary:
 		pages.append("Kaum hast du die Treppe verlassen, zieht dich ein Lichtstrahl zurück in die Gilde der Einweisung. %s wartet schon. „Es ist so weit. Etage 3. Zeit, dich zu entscheiden, was du sein willst.“" % s.guideName)
 		pages.append("„Du darfst deine RASSE wählen – oder Mensch bleiben. Einige Rassen hast du dir durch dein Verhalten erst freigeschaltet. Und die Systemstimme hat dir eine persönliche KLASSENLISTE erstellt – basierend darauf, wie du bisher gekämpft hast. Die drei Empfehlungen oben passen am besten zu dir.“")
 		pages.append("„Jede Klasse bringt eine besondere Fähigkeit mit. Überleg gut. Das kannst du nicht rückgängig machen.“")
-	s.pendingDialogs.append({"title": "Etage %d: %s" % [next, def.name], "speaker": "Die Systemstimme", "pages": pages})
+	s.pendingDialogs.append({"title": "Etage %d: %s" % [next, def.name], "speaker": Db.world("SYSTEM_NAME"), "pages": pages})
 	return _ok()
 
 

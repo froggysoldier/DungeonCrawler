@@ -223,10 +223,6 @@ func tile_from_local(p: Vector2) -> Vector2i:
 	return Vector2i(floori((p.x + _cam_px.x) / tile_px), floori((p.y + _cam_px.y) / tile_px))
 
 
-func tile_to_local(t: Vector2i) -> Vector2:
-	return Vector2(t.x * tile_px - _cam_px.x, t.y * tile_px - _cam_px.y)
-
-
 func _gui_input(ev: InputEvent) -> void:
 	if ev is InputEventMouseMotion:
 		var t := tile_from_local(ev.position)
@@ -379,10 +375,6 @@ class StaticLayer:
 		var t0 := Time.get_ticks_usec()
 		view._draw_static(self)
 		view.last_static_ms = (Time.get_ticks_usec() - t0) / 1000.0
-
-
-func _known(i: int, memory: bool) -> bool:
-	return visible_set.has(i) or (memory and s.map.explored[i])
 
 
 func _wall(x: int, y: int) -> bool:

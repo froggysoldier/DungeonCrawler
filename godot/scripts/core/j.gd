@@ -154,10 +154,6 @@ static func pcopy(p: Dictionary) -> Dictionary:
 	return {"x": int(p.x), "y": int(p.y)}
 
 
-static func peq(a: Dictionary, b: Dictionary) -> bool:
-	return a.x == b.x and a.y == b.y
-
-
 ## Chebyshev-Abstand zweier Positionen.
 static func cheb(a: Dictionary, b: Dictionary) -> int:
 	return maxi(absi(int(a.x) - int(b.x)), absi(int(a.y) - int(b.y)))
@@ -212,14 +208,6 @@ static func find(list: Array, f: Callable) -> Variant:
 		if f.call(x):
 			return x
 	return null
-
-
-## Index des ersten Elements, das die Bedingung erfüllt (oder -1).
-static func find_index(list: Array, f: Callable) -> int:
-	for i in list.size():
-		if f.call(list[i]):
-			return i
-	return -1
 
 
 static func some(list: Array, f: Callable) -> bool:

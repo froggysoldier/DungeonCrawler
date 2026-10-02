@@ -150,3 +150,25 @@ func test_rubbellose(t) -> void:
 			outcomes["anders"] = true
 		s.monsters = []
 	t.ge(outcomes.size(), 3, "verschiedene Ergebnisse")
+
+
+func test_feilschen_beim_wanderhaendler(t) -> void:
+	var s := TH.make(3201, {"beruf": 1})
+	TH.ready(s)
+	var room = J.find(s.map.rooms, func(r): return r.get("feature") == "markt")
+	if room == null:
+		room = J.find(s.map.rooms, func(r): return r.kind == "normal")
+		room.feature = "markt"
+	var shop := Shop.ensure_shop(s, room)
+	var offer: Dictionary = shop.offers[0]
+	var before: int = offer.price
+	# Charisma 0: Feilschen misslingt fast sicher, der Preis darf nicht sinken
+	s.player.stats.cha = 0
+	for i in shop.offers.size():
+		shop.offers[i].erase("haggled")
+	Shop.haggle(s, room, 0)
+	if String(s.log.back().text).contains("beleidigt"):
+		t.gt(offer.price, before, "misslungenes Feilschen macht es teurer (%d -> %d)" % [before, offer.price])
+	else:
+		t.lt(offer.price, before, "gelungenes Feilschen macht es billiger")
+	t.eq(int(offer.base), before, "eigener Grundpreis")

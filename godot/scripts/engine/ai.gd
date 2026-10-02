@@ -2,7 +2,7 @@ class_name Ai
 extends RefCounted
 ## Monster, Haustier und ihre Züge.
 
-const DIRS := [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+const DIRS := Pathfinding.DIRS
 
 
 static func occupied(s: Dictionary, p: Dictionary, except: Variant = null) -> bool:
@@ -34,7 +34,8 @@ static func _allowed_tile(s: Dictionary, m: Dictionary, p: Dictionary) -> bool:
 	# In die Siedlung der Kanalstadt trauen sich Monster nicht
 	if r >= 0 and s.map.rooms[r].get("siedlung"):
 		return false
-	return kind != "boss" and kind != "arena"
+	# Safe Rooms: das schimmernde Feld an der Tür hält jedes Monster draußen
+	return kind != "boss" and kind != "arena" and kind != "safe"
 
 
 static func _neighbors_of(p: Dictionary) -> Array:
@@ -66,7 +67,7 @@ static func _wander(s: Dictionary, m: Dictionary) -> void:
 		return
 	var d: Array = R.pick(s, DIRS)
 	var p := J.pos(m.pos.x + d[0], m.pos.y + d[1])
-	if Pathfinding.can_step(s.map, m.pos, p) and not occupied(s, p, m) and _allowed_tile(s, m, p) and not Combat.is_in_safe_room(s, p):
+	if Pathfinding.can_step(s.map, m.pos, p) and not occupied(s, p, m) and _allowed_tile(s, m, p):
 		m.pos = p
 
 
@@ -239,17 +240,23 @@ static func _spot_player(s: Dictionary, m: Dictionary, text: String) -> void:
 		if Sight.player_sees(s, m.pos):
 			Log.add(s, "%s stößt einen markerschütternden Schrei aus." % Identify.name_of_cap(s, m), "gefahr")
 		Conditions.inflict_player(s, "furcht", 4, 1, Identify.name_of_cap(s, m))
+	# Artgenossen im Umkreis von 6 Feldern hören den Alarm; andere Arten nur,
+	# wenn sie direkt daneben (3 Felder) im selben Raum stehen.
 	var warned := 0
+	var room := int(s.map.roomAt[MapGen.idx(s.map, m.pos.x, m.pos.y)])
 	for o in s.monsters:
-		if is_same(o, m) or o.aware or o.get("asleep") or o.get("homeRoom") != null or J.cheb(o.pos, m.pos) > 6:
+		if is_same(o, m) or o.aware or o.get("asleep") or o.get("homeRoom") != null:
 			continue
-		if o.defId != m.defId and o.hood != m.hood:
+		var d := J.cheb(o.pos, m.pos)
+		var kin: bool = o.defId == m.defId and d <= 6
+		var near: bool = d <= 3 and room >= 0 and int(s.map.roomAt[MapGen.idx(s.map, o.pos.x, o.pos.y)]) == room
+		if not kin and not near:
 			continue
 		o.aware = true
 		o.lastSeen = J.pcopy(s.player.pos)
 		warned += 1
 	if warned and Sight.player_sees(s, m.pos):
-		Log.add(s, "%s warnt %s." % [Identify.name_of_cap(s, m), "einen Artgenossen" if warned == 1 else "%d Artgenossen" % warned], "gefahr")
+		Log.add(s, "%s schlägt Alarm: %s." % [Identify.name_of_cap(s, m), "ein weiteres Wesen wird aufmerksam" if warned == 1 else "%d weitere Wesen werden aufmerksam" % warned], "gefahr")
 
 
 ## Lärm weckt Schlafende und lockt Wache an.

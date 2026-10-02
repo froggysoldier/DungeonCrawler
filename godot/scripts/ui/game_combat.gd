@@ -176,7 +176,7 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 	_sub(c1, "Sonstiges")
 	var bo := Kit.flow(c1, 4)
 	Kit.button(bo, "Deckung", func(): gv.act(func(): return Game.defend(s)), "Button", false, "Bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung, +2 Ausdauer")
-	var potion = J.find(p.inventory, func(i): return i.kind == "verbrauch" and i.get("effekt") != null and (J.num(i.effekt, "heal") or J.num(i.effekt, "healPct")))
+	var potion = Player.heal_item(s)
 	if potion != null:
 		var puid: String = potion.uid
 		Kit.button(bo, "%s trinken" % Identify.item_name(s, potion), func(): gv.act(func(): return Game.use_item(s, puid)))

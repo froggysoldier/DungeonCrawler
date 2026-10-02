@@ -24,10 +24,6 @@ const RESIDENTS := [
 ]
 
 
-static func is_canal(t: String) -> bool:
-	return t == CANAL
-
-
 # ================================================================ Erzeugen
 
 ## Felder, die Kanäle nicht anrühren: besondere Räume samt Rand, Treppen, Türen.
@@ -84,11 +80,7 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, occupied: Di
 	var cands: Array = m.rooms.filter(func(r):
 		if r.kind != "normal" or r.get("feature") != null or r.get("sealed") or r.get("antechamberOf") != null or r.w * r.h < 16:
 			return false
-		for y in range(r.y, r.y + r.h):
-			for x in range(r.x, r.x + r.w):
-				if m.tiles[MapGen.idx(m, x, y)] == "stairs":
-					return false
-		return true)
+		return not MapGen.room_has_tile(m, r, "stairs"))
 	if cands.is_empty():
 		return
 	J.sort(cands, func(a, b): return MapGen.dist(MapGen.center(a), mid) - MapGen.dist(MapGen.center(b), mid))

@@ -172,10 +172,6 @@ static func disarm_chance(s: Dictionary, t: Dictionary) -> float:
 	return maxf(10, minf(95, base)) / 100.0
 
 
-static func disarmable(s: Dictionary) -> Array:
-	return _traps(s).filter(func(t): return not t.hidden and J.cheb(t.pos, s.player.pos) <= 1)
-
-
 static func disarm(s: Dictionary, uid: String) -> Dictionary:
 	var t = J.find(_traps(s), func(x): return x.uid == uid)
 	if t == null or t.hidden:

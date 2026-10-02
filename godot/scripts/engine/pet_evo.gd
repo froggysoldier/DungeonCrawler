@@ -69,11 +69,6 @@ static func form_name(pet: Dictionary) -> String:
 	return species
 
 
-static func pet_has(s: Dictionary, a: String) -> bool:
-	var pet = s.player.pet
-	return pet != null and pet.alive and J.arr(pet, "abilities").has(a)
-
-
 static func equip_gear(s: Dictionary, uid: String) -> Dictionary:
 	var p: Dictionary = s.player
 	var pet = p.pet

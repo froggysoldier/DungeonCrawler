@@ -116,7 +116,17 @@ static func pick_monster_def(s: Dictionary, floor: int, level: int) -> Dictionar
 	var on_floor := monsters.filter(func(m): return m.floors.has(floor))
 	var pool := on_floor.filter(func(m): return level >= m.levels[0] and level <= m.levels[1] + 2)
 	var list: Array = pool if not pool.is_empty() else (on_floor if not on_floor.is_empty() else monsters)
-	return R.weighted(s, list.map(func(m): return [m, m.weight]))
+	# Arten von weiter oben kommen tiefer unten nur noch halb so oft vor,
+	# damit jede Etage ihre eigenen Bewohner zeigt
+	return R.weighted(s, list.map(func(m): return [m, m.weight * (0.5 if m.floors[0] < floor else 1.0)]))
+
+
+## Zufällige Stufe für Nachzügler (Nachspawns, Mimics, Auftragsgegner): im
+## Bereich der Etage, aber höchstens zwei Stufen über dem Crawler.
+static func roll_level(s: Dictionary) -> int:
+	var lv: Array = Db.floor_def0(s.floor).mobLevel
+	var hi: int = clampi(int(s.player.level) + 2, int(lv[0]), int(lv[1]))
+	return R.int_(s, int(lv[0]), hi)
 
 
 static func clamp_level(def: Dictionary, level: int) -> int:

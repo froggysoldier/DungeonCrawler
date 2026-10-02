@@ -66,3 +66,24 @@ func test_warnen_artgenossen(t) -> void:
 	Ai.monster_turn(s, a)
 	t.ok(a.aware, "a bemerkt")
 	t.ok(b.aware or not MapGen.is_walkable(s.map, at.call(8).x, at.call(8).y), "b gewarnt")
+
+
+func test_alarm_nur_fuer_artgenossen_und_nachbarn(t) -> void:
+	var s := TH.make(9100, {"beruf": 1})
+	var at := _arena(s)
+	var a := _spawn(s, "ghul", 2, at.call(3))
+	var fern := _spawn(s, "kobold", 2, at.call(8))
+	var nah := _spawn(s, "kobold", 2, at.call(5))
+	s.monsters = [a, fern, nah]
+	Ai.monster_turn(s, a)
+	t.ok(a.aware, "a bemerkt")
+	t.ok(nah.aware, "andere Art direkt daneben wird aufmerksam")
+	t.ok(not fern.aware, "andere Art weiter weg bleibt ahnungslos")
+
+
+func test_monster_betreten_keine_safe_rooms(t) -> void:
+	var s := TH.make(9101, {"beruf": 1})
+	var safe = TH.room(s, "safe")
+	var inside := MapGen.center(safe)
+	var m := _spawn(s, "heinzelmann", 1, inside)
+	t.ok(not Ai._allowed_tile(s, m, inside), "Safe Room ist für Monster gesperrt")

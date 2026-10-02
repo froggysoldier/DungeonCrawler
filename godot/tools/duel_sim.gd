@@ -3,6 +3,7 @@ extends SceneTree
 ## Der Crawler hat die Stufe, die ein gründlicher Spieler dort etwa erreicht,
 ## und kämpft mit Faust und Tritt; Tränke benutzt er nicht.
 ##   godot --headless --path godot -s res://tools/duel_sim.gd [-- etage stufe duelle]
+##   Umgebung: KIT=1 Ausrüstung und Tränke, MLVL=n Monsterstufe, BOSSONLY=1, NOSPECIAL=1, LOG=1
 
 const LEVEL_BY_FLOOR := {1: 3, 2: 6, 3: 9}
 
@@ -24,6 +25,9 @@ func _initialize() -> void:
 		for def in defs:
 			var boss: bool = def.has("rank") and (def.rank == "nachbarschaftsboss" or def.rank == "boroughboss")
 			var mlvl: int = def.level if boss else Monsters.clamp_level(def, Db.floor_def(fl).mobLevel[1])
+			# MLVL=n: Monster auf Stufe n (soweit die Art das erlaubt)
+			if not boss and OS.get_environment("MLVL") != "":
+				mlvl = Monsters.clamp_level(def, int(OS.get_environment("MLVL")))
 			var wins := 0
 			var lost := 0.0
 			var turns := 0

@@ -52,7 +52,8 @@ func test_erfahrung_nach_stufenabstand(t) -> void:
 	var m = J.find(s.monsters, func(x): return x.rank == "normal")
 	s.player.level = m.level + 6
 	t.eq(Progression.kill_xp(s, m).challenge, "trivial", "trivial")
-	s.player.level = maxi(1, m.level - 4)
+	s.player.level = 1
+	m.level = 5
 	t.gt(Progression.kill_xp(s, m).xp, m.xp, "Bonus")
 	t.gt(Progression.xp_to_next(5), Progression.xp_to_next(4) * 1.3, "Kurve")
 

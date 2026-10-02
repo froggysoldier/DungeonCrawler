@@ -20,3 +20,17 @@ func test_lookup_by_id(t) -> void:
 	t.eq(data.by_id("items", "BASE_ITEMS", "heiltrank").get("id"), "heiltrank", "Heiltrank per ID")
 	t.eq(data.by_id("monsters", "MONSTERS", "kellerratte").get("id"), "kellerratte", "Kellerratte per ID")
 	t.eq(data.by_id("items", "BASE_ITEMS", "gibtsnicht"), {}, "unbekannte ID")
+
+
+func test_jede_familienstufe_ist_ein_achievement(t) -> void:
+	var ids := {}
+	for a in Db.t("achievements", "ACHIEVEMENTS"):
+		ids[a.id] = true
+	var missing := []
+	for fam in Db.t("achievement_families", "familyTable"):
+		for n in fam.stages:
+			var id := "fam_%s_%s" % [fam.id, J.s(n)]
+			if not ids.has(id):
+				missing.append(id)
+	t.eq(missing, [], "Familienstufen ohne Eintrag in achievements.json")
+

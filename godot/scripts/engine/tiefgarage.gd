@@ -41,11 +41,7 @@ static func shape(s: Dictionary, m: Dictionary) -> void:
 			return false
 		if r.w < 6 or r.h < 4:
 			return false
-		for y in range(r.y, r.y + r.h):
-			for x in range(r.x, r.x + r.w):
-				if m.tiles[MapGen.idx(m, x, y)] == "stairs":
-					return false
-		return true)
+		return not MapGen.room_has_tile(m, r, "stairs"))
 	J.sort(cands, func(a, b): return b.w * b.h - a.w * a.h)
 	var decks: Array = cands.slice(0, 4)
 	for i in decks.size():
@@ -125,11 +121,7 @@ static func search(s: Dictionary, at: Dictionary) -> Dictionary:
 static func _free_beside(s: Dictionary, at: Dictionary) -> Variant:
 	if J.cheb(at, s.player.pos) == 1 and MapGen.is_walkable(s.map, s.player.pos.x, s.player.pos.y):
 		return J.pcopy(s.player.pos)
-	for d in MapGen.DIRS4:
-		var q := J.pos(at.x + d[0], at.y + d[1])
-		if MapGen.is_walkable(s.map, q.x, q.y) and MapGen.furniture_at(s.map, q) == null:
-			return q
-	return null
+	return MapGen.free_beside(s.map, at)
 
 
 ## Ein Wesen betritt eine Ölpfütze. burning: brennt es gerade?

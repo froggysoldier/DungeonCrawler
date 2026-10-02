@@ -68,7 +68,7 @@ static func _ensure_wander(s: Dictionary, room: Dictionary) -> Dictionary:
 		"title": def.title,
 		"greeting": def.greeting,
 		# Wanderhändler sind etwas teurer: Sie tragen alles selbst
-		"offers": offers.map(func(item): return {"item": item, "price": J.rnd(_base_price(item) * 1.15)}),
+		"offers": offers.map(func(item): return {"item": item, "price": J.rnd(_base_price(item) * 1.15), "base": J.rnd(_base_price(item) * 1.15)}),
 		"mood": 100,
 	}
 	return room.shop
@@ -138,7 +138,8 @@ static func haggle(s: Dictionary, room: Dictionary, index: int) -> Dictionary:
 	var cha: float = Player.effective_stats(s).cha
 	var haggler := Player.skill_level(s, "feilschen")
 	var chance := maxf(0.1, minf(0.92, 0.3 + (cha - 5) * 0.05 + (shop.mood - 100) / 200.0 + haggler * 0.04))
-	var base := _base_price(offer.item)
+	# Wanderhändler haben einen eigenen, höheren Grundpreis
+	var base := int(J.nn(offer, "base", _base_price(offer.item)))
 	if R.next(s) < chance:
 		var pct := J.rnd(5 + R.next(s) * 20 * minf(1.5, cha / 10.0))
 		var discount: int = mini(int(MAX_DISCOUNT * 100) + haggler, pct + floori(haggler / 2.0))

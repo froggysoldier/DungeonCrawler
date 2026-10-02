@@ -82,7 +82,7 @@
     2
    ],
    "hp": 10,
-   "hpPerLevel": 4,
+   "hpPerLevel": 3,
    "dmg": [
     2,
     4
@@ -93,8 +93,8 @@
    "ausweichen": 10,
    "size": "klein",
    "behavior": "melee",
-   "xp": 12,
-   "weight": 8,
+   "xp": 15,
+   "weight": 6,
    "pack": [
     1,
     2
@@ -162,7 +162,7 @@
    "ausweichen": 0,
    "size": "mittel",
    "behavior": "melee",
-   "xp": 10,
+   "xp": 13,
    "weight": 6,
    "flavor": "Eine wabbelnde Masse aus Kellerfeuchtigkeit und Bosheit. Faustschläge bleiben kurz stecken.",
    "tags": [
@@ -299,7 +299,7 @@
    "ausweichen": 0,
    "size": "mittel",
    "behavior": "stationary",
-   "xp": 18,
+   "xp": 27,
    "weight": 3,
    "flavor": "Ein Müllsack mit Zähnen. Er wartet. Er hat Zeit. Er riecht.",
    "tags": [
@@ -331,7 +331,7 @@
    "ausweichen": 5,
    "size": "mittel",
    "behavior": "melee",
-   "xp": 26,
+   "xp": 32,
    "weight": 2,
    "flavor": "Alpenländischer Katzenkopf-Lindwurm. Faucht, beißt und ist beleidigt, wenn man ihn für eine Eidechse hält.",
    "tags": [
@@ -366,7 +366,7 @@
    "ausweichen": 5,
    "size": "mittel",
    "behavior": "melee",
-   "xp": 28,
+   "xp": 32,
    "weight": 2,
    "flavor": "Isst gerne Verstorbene. Ist bereit, bei dir eine Ausnahme zu machen.",
    "tags": [
@@ -469,7 +469,7 @@
    "size": "winzig",
    "behavior": "ranged",
    "range": 3,
-   "xp": 16,
+   "xp": 19,
    "weight": 2,
    "flavor": "Schießt glühende Toastscheiben. Das ist die Zukunft, vor der dich deine Mutter gewarnt hat.",
    "tags": [
@@ -722,7 +722,7 @@
    "ausweichen": 0,
    "size": "winzig",
    "behavior": "melee",
-   "xp": 12,
+   "xp": 13,
    "weight": 5,
    "flavor": "Aus Keramik. Zipfelmütze. Angelrute. Mordlust.",
    "tags": [
@@ -829,7 +829,7 @@
    "ausweichen": 0,
    "size": "mittel",
    "behavior": "stationary",
-   "xp": 20,
+   "xp": 24,
    "weight": 2,
    "flavor": "Es kommt aus dem Bodenablauf. Es will nicht weg. Es ist giftig. Und irgendwie feucht.",
    "tags": [
@@ -864,7 +864,7 @@
    "ausweichen": 0,
    "size": "gross",
    "behavior": "stationary",
-   "xp": 26,
+   "xp": 41,
    "weight": 1,
    "flavor": "Sie steht im Schleudergang. Sie steht immer im Schleudergang. Komm ihr nicht zu nah.",
    "tags": [
@@ -972,7 +972,7 @@
    "ausweichen": 0,
    "size": "gross",
    "behavior": "melee",
-   "xp": 45,
+   "xp": 47,
    "weight": 3,
    "flavor": "Noch in der Ausbildung. Die Prüfung heißt: dich zerquetschen.",
    "tags": [
@@ -1285,7 +1285,7 @@
    "ausweichen": 0,
    "size": "gross",
    "behavior": "melee",
-   "xp": 70,
+   "xp": 88,
    "weight": 3,
    "flavor": "Jemand hat es als Baby das Klo hinuntergespült. Es hat nicht vergeben.",
    "tags": [
@@ -1644,7 +1644,7 @@
    "ausweichen": 5,
    "size": "mittel",
    "behavior": "melee",
-   "xp": 46,
+   "xp": 50,
    "weight": 5,
    "pack": [
     1,
@@ -1828,7 +1828,7 @@
    "ausweichen": 0,
    "size": "gross",
    "behavior": "melee",
-   "xp": 72,
+   "xp": 92,
    "weight": 2,
    "flavor": "Ein Haufen Rohre, Muffen und Schellen, der irgendwann beschlossen hat, zu laufen. Es gluckert in ihm.",
    "tags": [
@@ -2035,7 +2035,7 @@
    "ausweichen": 0,
    "size": "gross",
    "behavior": "melee",
-   "xp": 80,
+   "xp": 94,
    "weight": 2,
    "flavor": "Er wohnt unter einer Brücke und verlangt Zoll. Die Währung ist Blut. Wechselgeld gibt er nicht.",
    "tags": [
@@ -2178,7 +2178,7 @@
    "size": "mittel",
    "behavior": "stationary",
    "range": 4,
-   "xp": 28,
+   "xp": 31,
    "weight": 3,
    "flavor": "Er spuckt Münzen. Sehr schnell. Sehr gezielt. Ein Parkticket hat er seit Jahren nicht mehr gedruckt.",
    "tags": [
@@ -2248,7 +2248,7 @@
    "ausweichen": 0,
    "size": "mittel",
    "behavior": "stationary",
-   "xp": 30,
+   "xp": 44,
    "weight": 2,
    "flavor": "Ein ordentlicher Stapel Winterreifen. Der unterste hat Zähne.",
    "tags": [

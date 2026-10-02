@@ -140,6 +140,3 @@ func _draw(ci: RID, rect: Rect2) -> void:
 		RenderingServer.canvas_item_add_rect(ci, Rect2(inner.position.x + dx, inner.position.y, inner.size.x - 2 * dx, unit), Color(bg_color.lightened(bevel), bg_color.a))
 		RenderingServer.canvas_item_add_rect(ci, Rect2(inner.position.x + dx, inner.end.y - unit, inner.size.x - 2 * dx, unit), Color(bg_color.darkened(bevel * 1.6), bg_color.a))
 
-
-func duplicate_box() -> PixelBox:
-	return duplicate()

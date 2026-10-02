@@ -86,7 +86,10 @@ func _go_to(s: Dictionary, target: Dictionary) -> bool:
 			if Combat.technique_blocker(s, blocker, t) == null and Game.attack(s, blocker.uid, t).ok:
 				return true
 		return false
-	return Game.move_step(s, path[0]).ok
+	var res := Game.move_step(s, path[0])
+	if OS.get_environment("SEED") != "" and not res.ok and s.turn % 200 == 0:
+		print("    Schritt nach %s scheitert: %s (Feld %s)" % [path[0], res.get("message"), MapGen.tile_at(s.map, path[0].x, path[0].y)])
+	return res.ok
 
 
 func _fight(s: Dictionary) -> bool:
@@ -150,6 +153,12 @@ func _maintain(s: Dictionary) -> void:
 func _survive(s: Dictionary) -> bool:
 	var p: Dictionary = s.player
 	var max_hp := Player.max_hp(s)
+	# Gegenmittel aus dem Rucksack (Kühlpack, Augentropfen, Baldrian)
+	for id in Conditions.IDS:
+		if Conditions.player_has(s, id):
+			var cure = _find_item(s, func(i): return i.kind == "verbrauch" and i.get("effekt") != null and J.arr(i.effekt, "clear").has(id))
+			if cure != null and Game.use_item(s, cure.uid).ok:
+				return true
 	# Brennen: am Boden wälzen (Warten löscht), wenn niemand daneben steht
 	if Conditions.player_has(s, "brennen") and not J.some(s.monsters, func(m): return J.cheb(m.pos, p.pos) <= 1):
 		return Game.wait(s).ok
@@ -221,7 +230,8 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 		if OS.get_environment("SEED") != "" and s.turn % 200 == 0 and s.turn != int(J.num(s, "_dbgTurn")):
 			s._dbgTurn = s.turn
 			var rr = Game.current_room(s)
-			print("  [Zug %d] Phase %s, Pos %s, Raum %s, HP %d/%d, Blase %d, wach in der Nähe %d" % [s.turn, phase, p.pos, rr.name if rr != null else "-", p.hp, Player.max_hp(s), int(J.num(p, "blase")), s.monsters.filter(func(m): return m.aware and J.cheb(m.pos, p.pos) <= 7).size()])
+			var near: Array = s.monsters.filter(func(m): return m.aware and J.cheb(m.pos, p.pos) <= 7)
+			print("  [Zug %d] Phase %s, Pos %s, Raum %s, HP %d/%d, Blase %d, wach in der Nähe %d %s" % [s.turn, phase, p.pos, rr.name if rr != null else "-", p.hp, Player.max_hp(s), int(J.num(p, "blase")), near.size(), near.map(func(m): return "%s@%s(%s)" % [m.defId, m.pos, m.behavior])])
 		if s.floor > max_floor:
 			break
 		if s.floor != floor_no:

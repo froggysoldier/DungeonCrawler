@@ -434,14 +434,38 @@ static func _explode(s: Dictionary, m: Dictionary) -> void:
 			Events.emit(s, {"type": "explosion", "damage": taken, "source": m.name})
 
 
-## by_pet: true = Haustier, Text = Name eines Party-Mitglieds.
-static func kill_monster(s: Dictionary, m: Dictionary, t: Variant, by_pet: Variant = false, facets: Variant = null) -> void:
+## by_pet: true = Haustier, Text = Name eines anderen Crawlers.
+## credit: false, wenn ein fremder Crawler (nicht in der Party) getötet hat –
+## dann gibt es für dich weder Erfahrung noch Zähler, Kopfgeld oder Boss-Box.
+## Ein fremder Crawler hat getötet: Beute fällt, das Viertel merkt sich den
+## Boss, aber dir wird nichts gutgeschrieben.
+static func _uncredited_kill(s: Dictionary, m: Dictionary, killer: Variant) -> void:
+	if Sight.player_sees(s, m.pos):
+		Log.add(s, "%s tötet %s!" % [String(killer), Identify.name_of(s, m)], "kampf")
+	for drop in Items.roll_mob_drop(s, m.level, m.rank == "elite"):
+		drop_near(s, drop, m.pos)
+	if m.get("loot") != null:
+		for id in m.loot:
+			drop_near(s, Items.create_item(s, id), m.pos)
+	if m.rank == "nachbarschaftsboss":
+		var hood = s.map.hoods[m.hood] if m.hood >= 0 and m.hood < s.map.hoods.size() else null
+		if hood != null:
+			hood.bossAlive = false
+		drop_near(s, Items.create_area_map(s, m.hood), m.pos)
+	if m.defId == "abtruenniger_crawler":
+		Crawlers.population(s).alive -= 1
+
+
+static func kill_monster(s: Dictionary, m: Dictionary, t: Variant, by_pet: Variant = false, facets: Variant = null, credit: bool = true) -> void:
 	if not J.has_same(s.monsters, m):
 		return
 	Fx.death(s, m)
 	s.monsters = J.without(s.monsters, m)
-	s.counters.kills += 1
 	Dungeon.on_kill(s, m)
+	if not credit:
+		_uncredited_kill(s, m, by_pet)
+		return
+	s.counters.kills += 1
 	ShowEvents.on_kill(s, m)
 	s.counters.killsByDef[m.defId] = int(J.num(s.counters.killsByDef, m.defId)) + 1
 	if m.rank == "elite":

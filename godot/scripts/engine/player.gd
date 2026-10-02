@@ -112,6 +112,11 @@ static func gain_xp(s: Dictionary, amount: float) -> int:
 	return gained
 
 
+## Erster Heilgegenstand im Rucksack (Trank, Essen, Pflaster) oder null.
+static func heal_item(s: Dictionary) -> Variant:
+	return J.find(s.player.inventory, func(i): return i.kind == "verbrauch" and i.get("effekt") != null and (J.num(i.effekt, "heal") or J.num(i.effekt, "healPct")))
+
+
 static func clamp_vitals(s: Dictionary) -> void:
 	var b := total_bonuses(s)
 	s.player.hp = mini(s.player.hp, max_hp(s, b))

@@ -61,11 +61,6 @@ static func name_of(s: Dictionary, m: Dictionary, case: String = "akk") -> Strin
 	return ("einem unbekannten %s Wesen" % SIZE_DAT[m.size]) if case == "dat" else ("ein unbekanntes %s Wesen" % SIZE_WORDS[m.size])
 
 
-## Name im Dativ, z. B. nach „mit“.
-static func name_of_dat(s: Dictionary, m: Dictionary) -> String:
-	return name_of(s, m, "dat")
-
-
 ## „von“ mit Namen: „vom Rattenkaiser“, „von der Nixe“, „von Kellerratte“.
 static func von(s: Dictionary, m: Dictionary) -> String:
 	var n := name_of(s, m, "dat")

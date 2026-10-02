@@ -2,7 +2,7 @@ class_name Crawlers
 extends RefCounted
 ## Andere Crawler, Party und Bevölkerung.
 
-const DIRS := [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+const DIRS := Pathfinding.DIRS
 
 
 static func _c(name: String) -> Variant:
@@ -344,7 +344,7 @@ static func _hit_monster(s: Dictionary, c: Dictionary, m: Dictionary) -> void:
 			c.dmg = [c.dmg[0] + 1, c.dmg[1] + 2]
 			if _seen(s, c):
 				Log.add(s, "%s steigt auf Level %d auf." % [c.name, c.level], "system")
-		Combat.kill_monster(s, m, null, c.name)
+		Combat.kill_monster(s, m, null, c.name, null, c.get("party", false))
 
 
 static func hurt_crawler(s: Dictionary, c: Dictionary, dmg: int, by: String) -> void:

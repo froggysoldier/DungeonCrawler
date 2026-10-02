@@ -26,11 +26,7 @@ static func _candidates(m: Dictionary) -> Array:
 	return m.rooms.filter(func(r):
 		if r.kind != "normal" or r.get("antechamberOf") != null or r.get("feature") != null:
 			return false
-		for y in range(r.y, r.y + r.h):
-			for x in range(r.x, r.x + r.w):
-				if m.tiles[MapGen.idx(m, x, y)] == "stairs":
-					return false
-		return true)
+		return not MapGen.room_has_tile(m, r, "stairs"))
 
 
 static func _passable(m: Dictionary, i: int, blocked: Dictionary) -> bool:
@@ -275,7 +271,9 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, items: Array
 				if p3 != null:
 					items.append({"pos": p3, "item": Items.create_gold(s, R.int_(s, 10, 30) * floor) if R.chance(s, 0.6) else Items.create_item(s, "heiltrank")})
 	items.assign(items.filter(func(e): return e.pos != null))
-	var cands: Array = R.shuffle(s, _candidates(m).filter(func(r): return r.w * r.h >= 20 and MapGen.dist(MapGen.center(r), start) > 12))
+	# Etage 1: Nest und andere Fallen-Räume nicht gleich neben dem Start
+	var min_dist := 24 if floor == 1 else 12
+	var cands: Array = R.shuffle(s, _candidates(m).filter(func(r): return r.w * r.h >= 20 and MapGen.dist(MapGen.center(r), start) > min_dist))
 	# Monsternest: ein Rudel schwacher Monster um ein Nest
 	if not cands.is_empty():
 		var r: Dictionary = cands.pop_front()
@@ -284,7 +282,7 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, items: Array
 		if spot != null:
 			r.furniture = [{"kind": "nest", "pos": spot}]
 		var def: Dictionary = Monsters.pick_monster_def(s, floor, mob_level[0])
-		for k in R.int_(s, 4, 6):
+		for k in R.int_(s, 3, 5) if floor == 1 else R.int_(s, 4, 6):
 			var p = MapGen._random_floor_in(s, m, r, occupied)
 			if p == null:
 				break
@@ -429,7 +427,7 @@ static func smash(s: Dictionary, at: Dictionary) -> Dictionary:
 		var def = Monsters.def_by_id("muellsack_mimic")
 		if def == null:
 			def = Monsters.pick_monster_def(s, s.floor, Db.floor_def(s.floor).mobLevel[0])
-		var mob := Monsters.spawn_monster(s, def, Monsters.clamp_level(def, Db.floor_def(s.floor).mobLevel[1]), J.pcopy(at), MapGen.hood_of(m, at))
+		var mob := Monsters.spawn_monster(s, def, Monsters.clamp_level(def, Monsters.roll_level(s)), J.pcopy(at), MapGen.hood_of(m, at))
 		mob.aware = true
 		s.monsters.append(mob)
 		Log.add(s, "Du schlägst %s auf – und es schlägt zurück! Das war kein Behälter." % what, "gefahr")
@@ -561,11 +559,9 @@ static func on_kill(s: Dictionary, mo: Dictionary) -> void:
 		if f.kind == "nest":
 			f.kind = "nest_leer"
 			# Die Beute rollt aus dem Nest auf ein freies Feld daneben
-			for d in MapGen.DIRS4:
-				var q := J.pos(f.pos.x + d[0], f.pos.y + d[1])
-				if MapGen.is_walkable(s.map, q.x, q.y) and MapGen.furniture_at(s.map, q) == null:
-					at = q
-					break
+			var q = MapGen.free_beside(s.map, f.pos)
+			if q != null:
+				at = q
 	s.items.append({"pos": J.pcopy(at), "item": Items.create_gold(s, R.int_(s, 15, 35) * s.floor)})
 	s.items.append({"pos": J.pcopy(at), "item": Items.roll_ground_item(s)})
 	Log.add(s, "Das Nest ist leer. Zwischen Knochen und Lumpen glänzt etwas.", "loot")

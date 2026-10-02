@@ -71,7 +71,7 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 	if not people.is_empty():
 		any = true
 		Kit.section(v, "Andere Crawler")
-		var healer = J.find(s.player.inventory, func(i): return i.kind == "verbrauch" and i.get("effekt") != null and (J.num(i.effekt, "heal") or J.num(i.effekt, "healPct")))
+		var healer = Player.heal_item(s)
 		for c in people:
 			var uid: String = c.uid
 			var party: bool = c.get("party", false)

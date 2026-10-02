@@ -181,11 +181,16 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
   Art passt (feige Gnome und Heinzelmännchen, Diebe mit Beute, kleine
   verletzte Tiere). Ein Teil schläft und wacht durch Lärm auf; Kampflärm,
   Explosionen und Stolperdrähte locken andere an die Stelle. Entdeckte
-  Monster warnen Artgenossen, suchen dich an der letzten bekannten Stelle,
+  Monster schlagen Alarm: Artgenossen im Umkreis von sechs Feldern und andere
+  Arten direkt daneben (drei Felder, gleicher Raum) werden aufmerksam. Sie
+  suchen dich an der letzten bekannten Stelle,
   Fernkämpfer halten Abstand, Elite und Bosse geraten bei wenig Leben in
   Raserei.
 - Was andere Crawler oder weit entfernte Monster tun, erfährst du nur, wenn
-  du es siehst.
+  du es siehst. Tötet ein fremder Crawler (nicht in deiner Party) ein Monster,
+  bekommst du dafür weder Erfahrung noch Zähler, Kopfgeld oder Boss-Box.
+  Friedliche Crawler lassen dich vorbei: Läufst du in sie hinein, tauscht ihr
+  die Plätze.
 - **Elite-Mobs** (stärkere Varianten, bessere Beute).
 - **15 Bosse**, jede Etage zieht aus ihrem eigenen Pool (Etage 1: Die Sammlerin,
   Der Hausmeister, König der Kanalratten, Muttis Mega-Mixer, Kammerjäger,
@@ -199,7 +204,8 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
 - Mobs fliehen bei wenig Leben, verlieren das Interesse, wenn man weit weg ist.
 
 ### 3.7 Safe Rooms
-- Keine Gewalt; Mobs, die angreifen, werden weggebeamt.
+- Keine Gewalt; Mobs, die angreifen, werden weggebeamt. Monster betreten
+  Safe Rooms nie, auch nicht auf der Flucht oder Verfolgung.
 - **Eingerichtet:** Jeder Safe Room hat einen **Gratis-Automaten** (1 Gegenstand
   pro Crawler; meist nützlich, manchmal ein Scherzartikel), einen Händler,
   ein Bett und eine Toilette. **Restaurants** haben zusätzlich einen Wirt mit
@@ -414,7 +420,8 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
 - **Wanderhändler** (Sonderraum) haben ein eigenes Sortiment: Waffenhändler,
   Wanderapotheke (mit Zauberbüchern), Schrotthändler (Handwerksmaterial,
   Klappwerkbank) oder Kuriositätenhändler (Tattoos, Talismane, Eier). Sie
-  sind etwas teurer als die Läden in den Safe Rooms.
+  sind etwas teurer als die Läden in den Safe Rooms; auch Feilschen rechnet
+  mit diesem höheren Grundpreis.
 - Neue Achievement-Familien: Kisten, Geheimtüren, Schlösser, Schatzkammern,
   Nester, Gebete, Hinterhalte, Boss-Angriffen ausweichen, Auftragsketten.
 
@@ -497,6 +504,16 @@ Bosse kämpfen in drei Phasen (`scripts/engine/boss_fight.gd`):
   (Kesselkönigin, Hausverwalter, Rattenkaiser) sind allein kaum zu schaffen
   und brauchen Zauber, Haustier oder Party. Boss-Regeneration 1,5 % pro Zug,
   Diener fünf Stufen unter dem Boss, höchstens drei Rufe.
+- **Stufen der Gegner:** Sie steigen mit dem Abstand zum Start (Abstand hoch
+  1,3, also nahe am Start langsam). Nachzügler – Nachspawns, Mimics in Kisten,
+  Wächter bei Rettungsaufträgen – liegen höchstens zwei Stufen über dem
+  Crawler (innerhalb des Bereichs der Etage).
+- **Erfahrung nach Gefahr:** Schwere Arten (Ghul, Tatzelwurm, Waschmaschine,
+  Troll-Lehrling, Reifenstapel, Kanalkroko, Rohrgolem, Brückentroll …) geben
+  mehr Erfahrung, damit sich das Risiko lohnt (Faustregel: Erfahrung im
+  Verhältnis zu Lebenspunkten mal Schaden nicht unter drei Viertel des
+  Etagenmittels). Arten von höheren Etagen kommen tiefer unten nur halb so oft
+  vor, damit jede Etage ihre eigenen Bewohner zeigt.
 - Welche Angriffe ein Boss kann und seine Phasensätze stehen in
   `data/monsters.json` (`BOSS_SPECIALS`, `HOOD_BOSSES[].specials`,
   `phaseLines`).

@@ -212,7 +212,7 @@ static func _build() -> void:
 	_add("fruehaufsteher", ["descend"], func(e, s): return s.turn - s.floorStartTurn <= 480)
 	_add("last_minute", ["descend"], func(e, s): return s.collapseAt - s.turn <= 20)
 	_add("absteiger", ["descend"], func(e, s): return true)
-	# ------------------------------------------------ data/achievements_more.json
+	# ------------------------------------------------ Bestiarium, Bosse, Technik, Beute, Fortschritt
 	_add("spinnen", K, func(e, s): return _kill_of(e, "kellerspinne") and _killed(s, ["kellerspinne"]) == 5)
 	_add("fledermaus", K, func(e, s): return FLYERS.has(e.monster.defId) and _killed(s, FLYERS) == 10)
 	_add("kroete_fern", K, func(e, s): return _kill_of(e, "blaehkroete") and _tech(e, "part") == "wurf")
@@ -290,7 +290,7 @@ static func _build() -> void:
 		return r != null and r.get("requirement") != null)
 	_add("faehigkeit", ["abilityUsed"], func(e, s): return true)
 	_add("showtime", ["abilityUsed"], func(e, s): return e.ability == "showtime")
-	# ------------------------------------------------ data/achievements_social.json
+	# ------------------------------------------------ Fallen, Handwerk, Soziales, Show, Haustiere, Reittiere
 	_add("adlerauge", ["trapDetected"], func(e, s): return true)
 	_add("reingetreten", ["trapTriggered"], func(e, s): return e.onPlayer)
 	_add("entschaerfer", ["trapDisarmed"], func(e, s): return e.success)

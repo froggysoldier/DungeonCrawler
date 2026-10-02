@@ -125,3 +125,36 @@ func test_party_kaempft_mit(t) -> void:
 	for i in 10:
 		Game.wait(s)
 	t.ok(rat.hp < 60 or not J.has_same(s.monsters, rat), "Ratte verletzt")
+
+
+func test_fremde_kills_zaehlen_nicht(t) -> void:
+	var s := TH.make(3101, {"beruf": 1})
+	_tutorial(s)
+	s.player.pos = _open_spot(s)
+	var rat := Monsters.spawn_monster(s, Db.monster("kellerratte"), 1, TH.free_neighbor(s, s.player.pos), 0)
+	s.monsters = [rat]
+	var kills: int = s.counters.kills
+	var xp: int = s.player.xp
+	Combat.kill_monster(s, rat, null, "Heike Brandt", null, false)
+	t.ok(not J.has_same(s.monsters, rat), "Ratte tot")
+	t.eq(s.counters.kills, kills, "kein Kill für dich")
+	t.eq(s.player.xp, xp, "keine Erfahrung für dich")
+	var rat2 := Monsters.spawn_monster(s, Db.monster("kellerratte"), 1, TH.free_neighbor(s, s.player.pos), 0)
+	s.monsters = [rat2]
+	Combat.kill_monster(s, rat2, null, "Heike Brandt", null, true)
+	t.eq(s.counters.kills, kills + 1, "Party-Kill zählt")
+
+
+func test_friedliche_lassen_dich_vorbei(t) -> void:
+	var s := TH.make(3102, {"beruf": 1})
+	_tutorial(s)
+	s.player.pos = _open_spot(s)
+	s.monsters = []
+	var c := _neighbor(s, "eigenbroetler")
+	var from: Dictionary = J.pcopy(s.player.pos)
+	var to: Dictionary = J.pcopy(c.pos)
+	t.ok(Game.move_step(s, to).ok, "vorbeigedrängt")
+	t.eq(s.player.pos, to, "du stehst jetzt dort")
+	t.eq(c.pos, from, "der Crawler steht auf deinem alten Feld")
+	var h := _neighbor(s, "feindselig")
+	t.ok(not Game.move_step(s, h.pos).ok, "Feindselige lassen dich nicht durch")

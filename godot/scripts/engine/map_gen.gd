@@ -115,6 +115,24 @@ static func hood_of(m: Dictionary, p: Dictionary) -> int:
 	return 3 if left else 2
 
 
+## Liegt in diesem Raum ein Feld der Art t (etwa die Treppe)?
+static func room_has_tile(m: Dictionary, r: Dictionary, t: String) -> bool:
+	for y in range(r.y, r.y + r.h):
+		for x in range(r.x, r.x + r.w):
+			if m.tiles[idx(m, x, y)] == t:
+				return true
+	return false
+
+
+## Erstes begehbares Feld ohne Möbel direkt neben at (vier Richtungen) oder null.
+static func free_beside(m: Dictionary, at: Dictionary) -> Variant:
+	for d in DIRS4:
+		var q := J.pos(at.x + d[0], at.y + d[1])
+		if is_walkable(m, q.x, q.y) and furniture_at(m, q) == null:
+			return q
+	return null
+
+
 static func center(r: Dictionary) -> Dictionary:
 	return J.pos(floori(r.x + r.w / 2.0), floori(r.y + r.h / 2.0))
 
@@ -433,10 +451,12 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 		if r.kind != "normal":
 			continue
 		var d := dist(center(r), start) / float(max_dist)
+		# Stufen steigen nahe am Start langsam, ganz hinten wie gehabt
+		var dl := pow(d, 1.3)
 		var count: int = R.int_(s, 2, 3) if r.get("antechamberOf") != null else R.weighted(s, [[0, 2], [1, 4], [2, 3], [3, 1]])
 		var i := 0
 		while i < count:
-			var level: int = maxi(mob_level[0], J.rnd(mob_level[0] + d * 1.6 * (mob_level[1] - mob_level[0]) + R.int_(s, -1, 0)))
+			var level: int = maxi(mob_level[0], J.rnd(mob_level[0] + dl * 1.6 * (mob_level[1] - mob_level[0]) + R.int_(s, -1, 0)))
 			var mdef: Dictionary = Monsters.pick_monster_def(s, floor, level)
 			var lv := Monsters.clamp_level(mdef, level)
 			# Nahe dem Start nur Einzelgänger: der erste Kampf soll kein Rudel sein
