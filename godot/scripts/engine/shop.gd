@@ -77,7 +77,7 @@ static func _ensure_wander(s: Dictionary, room: Dictionary) -> Dictionary:
 static func _buy_factor(s: Variant) -> float:
 	if s == null:
 		return 1.0
-	return (0.85 if Abilities.has_special(s, "haendler") else 1.0) * (0.9 if Abilities.has_special(s, "systemkenntnis") else 1.0)
+	return (0.85 if Abilities.has_special(s, "haendler") else 1.0) * (0.9 if Abilities.has_special(s, "systemkenntnis") else 1.0) * ShowEvents.price_factor(s)
 
 
 static func offer_price(price: float, it: Dictionary, s: Variant = null) -> int:

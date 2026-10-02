@@ -21,6 +21,9 @@ var s: Dictionary
 var meta: Dictionary
 
 var tab := "crawler"
+var here_folded := false
+var folds := {}
+var log_filter := "alles"
 var show_all_boxes := false
 var minimap_big := false
 var achv_view := "erfolge"
@@ -59,6 +62,7 @@ var _tip: PanelContainer
 var _tip_text: RichTextLabel
 var _combat_frame: Control
 var _here: VBoxContainer
+var _vitals: VBoxContainer
 var _here_scroll: ScrollContainer
 var _tabs: HBoxContainer
 var _tab_content: VBoxContainer
@@ -66,6 +70,8 @@ var _tab_scroll: ScrollContainer
 var _actionbar: PanelContainer
 var _log_scroll: ScrollContainer
 var _log: VBoxContainer
+var _log_bar: HBoxContainer
+var _log_prev := {}
 var _banner: Control
 
 
@@ -211,8 +217,9 @@ func _build() -> void:
 	_actionbar.theme_type_variation = "ActionBar"
 	bv.add_child(_actionbar)
 	_line(bv)
+	_log_bar = Kit.hbox(Kit.margin(bv, 14, 4, 14, 0), 4)
 	_log_scroll = ScrollContainer.new()
-	_log_scroll.custom_minimum_size = Vector2(0, 170)
+	_log_scroll.custom_minimum_size = Vector2(0, 150)
 	_log_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	bv.add_child(_log_scroll)
 	var lm := Kit.margin(_log_scroll, 14, 8, 14, 8)
@@ -232,6 +239,9 @@ func _build() -> void:
 	var sv := VBoxContainer.new()
 	sv.add_theme_constant_override("separation", 0)
 	side.add_child(sv)
+	var vm := Kit.margin(sv, 14, 10, 14, 10)
+	_vitals = Kit.vbox(vm, 5)
+	_line(sv)
 	_here_scroll = ScrollContainer.new()
 	_here_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	sv.add_child(_here_scroll)
@@ -263,8 +273,8 @@ static func _line(parent: Node) -> void:
 
 func _fit_here() -> void:
 	var h := _here.get_combined_minimum_size().y
-	var sv_h := size.y - 46
-	_here_scroll.custom_minimum_size.y = minf(h + 2, sv_h * 0.45) if h > 1 else 0.0
+	var sv_h := size.y - 46 - _vitals.get_combined_minimum_size().y - 20
+	_here_scroll.custom_minimum_size.y = minf(h + 2, sv_h * 0.42) if h > 1 else 0.0
 
 
 func _layout_minimap() -> void:
@@ -883,6 +893,14 @@ func _unhandled_input(ev: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 	get_viewport().set_input_as_handled()
+	if k == KEY_TAB and not in_combat():
+		var ids := TABS.map(func(t): return t[0])
+		show_tab(ids[(ids.find(tab) + (ids.size() - 1 if ev.shift_pressed else 1)) % ids.size()])
+		return
+	for t in TABS:
+		if ch == String(t[2]).to_lower():
+			show_tab(t[0])
+			return
 	if k == KEY_TAB and in_combat():
 		var list := combat_targets()
 		var idx := -1
@@ -914,12 +932,18 @@ func _unhandled_input(ev: InputEvent) -> void:
 		zoom_map(1)
 	elif ch == "-" or k == KEY_KP_SUBTRACT:
 		zoom_map(-1)
+	elif ch == "n":
+		here_folded = not here_folded
+		refresh_here()
 	elif k == KEY_ESCAPE:
-		traveling = false
 		if pending_spell != null:
 			pending_spell = null
 			say("Zauber abgebrochen.")
 			refresh_actions()
+		elif traveling:
+			traveling = false
+		else:
+			open_menu()
 
 
 func _notification(what: int) -> void:
@@ -947,6 +971,7 @@ func refresh() -> void:
 	_draw_frame()
 	_update_combat_mode()
 	refresh_top()
+	refresh_vitals()
 	refresh_here()
 	refresh_side()
 	refresh_actions()
@@ -958,35 +983,54 @@ func refresh_top() -> void:
 	var p: Dictionary = s.player
 	var def = Db.floor_def(s.floor)
 	var left := Game.time_left(s)
-	var show := Kit.label(_top, Db.world("SHOW_NAME"), 20, UiTheme.ACCENT)
+	var show := Kit.label(_top, Db.world("SHOW_NAME"), 18, UiTheme.ACCENT)
 	show.add_theme_font_override("font", UiFonts.pixel(700))
 	show.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var wide := size.x > 1500
-	if wide:
-		_pill("Staffel %d" % s.season, "muted")
-	_pill_bb("Etage [b]%d[/b]: %s" % [s.floor, Kit.esc(def.name if def else "")])
-	_pill("Einsturz in %s" % ViewHelpers.format_time(left), "text" if left > 120 else "danger", "PillWarn" if left <= 120 else "PillTimer", 700, "Zeit bis zum Einsturz")
+	show.tooltip_text = "Staffel %d" % s.season
+	show.mouse_filter = Control.MOUSE_FILTER_PASS
+	_pill_bb("Etage [b]%d[/b] · %s" % [s.floor, Kit.esc(def.name if def else "")])
+	_pill("Einsturz in %s" % ViewHelpers.format_time(left), "text" if left > 120 else "danger", "PillWarn" if left <= 120 else "PillTimer", 700, "Zeit bis zum Einsturz der Etage")
+	var ev = ShowEvents.active_def(s)
+	if ev != null:
+		_pill("Einlage: " + ShowEvents.label(s), "achv", "PillTimer", 700, ev.text)
 	var sp := Control.new()
 	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_top.add_child(sp)
-	_pill_bb("%s · Lv [b]%d[/b]" % [Kit.esc(p.name), p.level])
 	if Game.has_unlock(s, "zuschauer"):
-		_pill("Zuschauer %s · Follower %s · Hype %d" % [J.de(Viewers.live_viewers(s)), J.de(s.viewers.follower), J.rnd(s.viewers.hype)], "achv")
-	if Game.has_unlock(s, "inventar") and wide:
-		_pill("Crawler übrig %s" % J.de(Crawlers.population(s).alive), "muted", "Pill", 400, "Lebende Crawler laut letzter Zählung")
+		_pill("Zuschauer %s" % J.de(Viewers.live_viewers(s)), "achv", "Pill", 400, "Follower %s · Hype %d%s" % [J.de(s.viewers.follower), J.rnd(s.viewers.hype), (" · Crawler übrig %s" % J.de(Crawlers.population(s).alive)) if Game.has_unlock(s, "inventar") else ""])
 	_pill("Gold %s" % J.s(p.gold), Color("#ffd700"))
-	for b in [
-		["Hilfe", func(): GameDialogs.show_help(self), "Alle Tasten (H)", false],
-		["Ton: %s" % ("an" if sound() and sound().enabled else "aus"), _toggle_sound, "Klänge für Lootboxen, Level-Aufstieg und Achievements", false],
-		["Tippen: %s" % ("an" if sound() and sound().typing_on else "aus"), _toggle_typing, "Weiches Tastenklicken, wenn Texte getippt werden", not (sound() and sound().enabled)],
-		["Musik: %s" % ("an" if sound() and sound().music_on else "aus"), _toggle_music, "Klangkulisse der Etage und Kampfmusik", not (sound() and sound().enabled)],
-	]:
-		var btn := Kit.button(_top, b[0], b[1], "PillButton", b[3], b[2])
-		btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_pill("Lootboxen %d" % p.boxes.size(), "text")
-	var pet = p.get("pet")
-	if pet != null:
-		_pill("Haustier %s %s" % [pet.name, ("%d/%d" % [pet.hp, pet.maxHp]) if pet.alive else "(bewusstlos)"], Color("#ffb3e6"))
+	if not p.boxes.is_empty():
+		_pill("Lootboxen %d" % p.boxes.size(), "accent", "PillTimer", 700, "Öffnen kannst du sie in einem Safe Room")
+	var btn := Kit.button(_top, "Menü", open_menu, "PillButton", false, "Hilfe, Ton und Musik (Esc)")
+	btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+
+## Menü mit Hilfe und Klangeinstellungen.
+func open_menu() -> void:
+	if not modals() or modal_open():
+		return
+	modals().html("Menü", func(root: VBoxContainer):
+		Kit.text(root, "%s · Staffel %d · %s, Level %d" % [Kit.esc(Db.world("SHOW_NAME")), s.season, Kit.esc(s.player.name), s.player.level], 13, "muted")
+		Kit.spacer(root, 6)
+		var g := Kit.grid(root, 2, 12, 8)
+		var rows := [
+			["Ton", func(): return sound() and sound().enabled, _toggle_sound, "Klänge für Lootboxen, Level-Aufstieg und Achievements"],
+			["Musik", func(): return sound() and sound().music_on, _toggle_music, "Klangkulisse der Etage und Kampfmusik"],
+			["Tippgeräusch", func(): return sound() and sound().typing_on, _toggle_typing, "Weiches Tastenklicken, wenn Texte getippt werden"],
+		]
+		for r in rows:
+			Kit.label(g, r[0], 14, null, 600).tooltip_text = r[3]
+			var get_on: Callable = r[1]
+			var toggle: Callable = r[2]
+			var b: Button
+			b = Kit.button(g, "an" if get_on.call() else "aus", func():
+				toggle.call()
+				b.text = "an" if get_on.call() else "aus", "SmallButton")
+			b.custom_minimum_size = Vector2(60, 0)
+		Kit.spacer(root, 8)
+		Kit.button(root, "Steuerung anzeigen (H)", func():
+			modals().close_all()
+			GameDialogs.show_help.call_deferred(self), "Button").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN, "Weiter", 420)
 
 
 func _pill(text: String, color: Variant, variant: String = "Pill", weight: int = 400, tip: String = "") -> void:
@@ -1041,24 +1085,90 @@ func _toggle_typing() -> void:
 
 func refresh_here() -> void:
 	Kit.clear(_here)
-	GameHere.build(self, _here)
+	var tmp := VBoxContainer.new()
+	GameHere.build(self, tmp)
+	if tmp.get_child_count() == 0:
+		tmp.free()
+		_fit_here.call_deferred()
+		return
+	# Kopf mit Ein- und Ausklappen; eingeklappt bleibt nur eine Zeile
+	var head := Kit.hbox(_here, 6)
+	var title := Kit.label(head, "HIER", 14, UiTheme.ACCENT)
+	title.add_theme_font_override("font", UiFonts.pixel(700, 1))
+	title.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var sp := Control.new()
+	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(sp)
+	Kit.button(head, "ausklappen" if here_folded else "einklappen", func():
+		here_folded = not here_folded
+		refresh_here(), "SmallButton", false, "Bereich „Hier“ ein- oder ausklappen (N)")
+	if here_folded:
+		tmp.free()
+		Kit.spacer(_here, 4)
+		_line(_here)
+	else:
+		for c in tmp.get_children():
+			tmp.remove_child(c)
+			_here.add_child(c)
+		tmp.free()
 	_fit_here.call_deferred()
+
+
+func refresh_vitals() -> void:
+	Kit.clear(_vitals)
+	GameVitals.build(self, _vitals)
+
+
+## Einen Reiter der Seitenleiste öffnen.
+func show_tab(id: String) -> void:
+	tab = id
+	_tab_scroll.scroll_vertical = 0
+	refresh_side()
+
+
+const TABS := [
+	["crawler", "Crawler", "P"], ["ziele", "Ziele", "Z"], ["inventar", "Inventar", "I"],
+	["handwerk", "Handwerk", "B"], ["skills", "Skills", "L"], ["erfolge", "Erfolge", "O"],
+]
+
+
+## Reiter, der Aufmerksamkeit braucht (freie Punkte, Angebote, Abgaben).
+func tab_badge(id: String) -> bool:
+	match id:
+		"crawler":
+			return Game.has_unlock(s, "stats") and J.num(s.player, "statPoints") > 0
+		"ziele":
+			var ev = ShowEvents.active(s)
+			if ev != null and ev.get("bountyUid") != null:
+				return true
+			return J.some(Sponsors.states(s), func(st): return st.status == "offer") or J.some(Quests.active_quests(s), func(q): return Quests.can_turn_in(s, q))
+	return false
 
 
 func refresh_side() -> void:
 	Kit.clear(_tabs)
-	for t in [["crawler", "Crawler"], ["inventar", "Inventar"], ["handwerk", "Handwerk"], ["skills", "Skills"], ["erfolge", "Erfolge"]]:
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 3)
+	grid.add_theme_constant_override("v_separation", 3)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_tabs.add_child(grid)
+	for t in TABS:
 		var id: String = t[0]
-		var b := Kit.button(_tabs, t[1], func():
-			tab = id
-			refresh_side(), "TabActive" if tab == id else "TabButton")
+		var b := Kit.button(grid, t[1], func(): show_tab(id), "TabActive" if tab == id else "TabButton", false, "%s (Taste %s)" % [t[1], t[2]])
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		if tab == id:
-			# Goldene Unterkante
-			b.draw.connect(func(): b.draw_rect(Rect2(1, b.size.y - 2, b.size.x - 2, 2), UiTheme.ACCENT))
+		var badge := tab_badge(id)
+		var active: bool = tab == id
+		b.draw.connect(func():
+			if active:
+				# Goldene Unterkante
+				b.draw_rect(Rect2(1, b.size.y - 2, b.size.x - 2, 2), UiTheme.ACCENT)
+			if badge:
+				b.draw_rect(Rect2(b.size.x - 10, 5, 5, 5), UiTheme.ACCENT if not active else Color("#ff8a4a")))
 	Kit.clear(_tab_content)
 	match tab:
 		"crawler": GameTabs.crawler_tab(self, _tab_content)
+		"ziele": GameTabs.goals_tab(self, _tab_content)
 		"inventar": GameTabs.inventory_tab(self, _tab_content)
 		"handwerk": GameTabs.craft_tab(self, _tab_content)
 		"skills": GameTabs.skills_tab(self, _tab_content)
@@ -1099,29 +1209,77 @@ const LOG_COLORS := {
 }
 
 
+const LOG_FILTERS := [
+	["alles", "Alles", []],
+	["kampf", "Kampf", ["kampf", "gefahr"]],
+	["funde", "Beute und Erfolge", ["loot", "achievement", "system"]],
+	["story", "Gespräche", ["dialog", "info"]],
+]
+
+
+func _log_kinds() -> Array:
+	for f in LOG_FILTERS:
+		if f[0] == log_filter:
+			return f[2]
+	return []
+
+
+func set_log_filter(id: String) -> void:
+	log_filter = id
+	refresh_log(true)
+
+
+func _log_line(l: Dictionary, n: int) -> String:
+	var color: String = LOG_COLORS.get(l.kind, "#e9e5dc")
+	var body := Kit.esc(l.text)
+	if l.kind == "dialog":
+		body = "[i]%s[/i]" % body
+	if n > 1:
+		body += " [color=#8a8f9c](%d×)[/color]" % n
+	return "[font_size=11][color=#555b69][b]%s[/b][/color][/font_size]  [color=%s]%s[/color]" % [ViewHelpers.format_time(l.turn), color, body]
+
+
 ## Neue Log-Zeilen werden angehängt und Zeichen für Zeichen getippt.
-func refresh_log() -> void:
+## Gleiche Zeilen direkt hintereinander werden zusammengefasst; der Filter
+## oben blendet ganze Arten aus.
+func refresh_log(rebuild: bool = false) -> void:
+	Kit.clear(_log_bar)
+	var lt := Kit.label(_log_bar, "LOG", 12, "muted")
+	lt.add_theme_font_override("font", UiFonts.pixel(700, 1))
+	lt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	lt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	for f in LOG_FILTERS:
+		var id: String = f[0]
+		Kit.button(_log_bar, f[1], func(): set_log_filter(id), "SmallSel" if log_filter == id else "SmallButton")
 	var entries: Array = s.log
-	var first := _last_log_id < 0
+	var first := _last_log_id < 0 or rebuild
+	if rebuild:
+		_typer.finish_all()
+		Kit.clear(_log)
+		_log_prev = {}
+	var kinds := _log_kinds()
 	var fresh: Array = []
 	if first:
-		fresh = entries.slice(maxi(0, entries.size() - 120))
+		fresh = entries.filter(func(l): return kinds.is_empty() or kinds.has(l.kind))
+		fresh = fresh.slice(maxi(0, fresh.size() - 120))
 	else:
-		fresh = entries.filter(func(l): return int(J.nn(l, "id", 0)) > _last_log_id)
-	if fresh.is_empty() and not first:
-		return
+		fresh = entries.filter(func(l): return int(J.nn(l, "id", 0)) > _last_log_id and (kinds.is_empty() or kinds.has(l.kind)))
 	for l in fresh:
-		var color: String = LOG_COLORS.get(l.kind, "#e9e5dc")
-		var body := Kit.esc(l.text)
-		if l.kind == "dialog":
-			body = "[i]%s[/i]" % body
-		var bb := "[font_size=11][color=#555b69][b]%s[/b][/color][/font_size]  [color=%s]%s[/color]" % [ViewHelpers.format_time(l.turn), color, body]
+		var key: String = "%s|%s" % [l.kind, l.text]
+		if _log_prev.get("key") == key and is_instance_valid(_log_prev.get("rt")):
+			_log_prev.n += 1
+			_typer.finish_all()
+			_log_prev.rt.text = _log_line(l, _log_prev.n)
+			_log_prev.rt.visible = true
+			continue
+		var bb := _log_line(l, 1)
 		var rt := Kit.text(_log, "", 13, null, 3)
 		if first:
 			rt.text = bb
 		else:
 			rt.visible = false
 			_typer.push(rt, bb)
+		_log_prev = {"key": key, "rt": rt, "n": 1}
 	var last = entries.back() if not entries.is_empty() else null
 	if last != null and last.get("id") != null:
 		_last_log_id = int(last.id)

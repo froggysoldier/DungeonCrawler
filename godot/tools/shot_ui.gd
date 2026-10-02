@@ -93,6 +93,22 @@ func _initialize() -> void:
 				await wait(2.0)
 				await shot("dialog")
 			var gv: GameView = main.view
+			if mode == "einlage":
+				# Kopfgeld läuft: neben das markierte Ziel, Reiter „Ziele“
+				var mobs: Array = s.monsters.duplicate()
+				TH.tutorial(s)
+				s.monsters = mobs
+				ShowEvents.start(s, "kopfgeld")
+				var target = J.find(s.monsters, func(m): return m.uid == s.showEvent.bountyUid)
+				target.asleep = true
+				TH.teleport(s, TH.free_neighbor(s, TH.free_neighbor(s, target.pos)))
+				gv.tab = "ziele"
+				gv.refresh()
+				gv.zoom_map(10)
+				await wait(0.8)
+				await shot("einlage")
+				quit()
+				return
 			if mode == "tiefgarage":
 				# Etage 2: neben ein Autowrack auf einem Parkdeck
 				TH.tutorial(s)
@@ -287,7 +303,7 @@ func _initialize() -> void:
 					await wait(0.05)
 				await wait(1.0)
 			if mode == "tabs":
-				for t in ["crawler", "inventar", "handwerk", "skills", "erfolge"]:
+				for t in ["crawler", "ziele", "inventar", "handwerk", "skills", "erfolge"]:
 					gv.tab = t
 					gv.refresh_side()
 					await wait(0.3)

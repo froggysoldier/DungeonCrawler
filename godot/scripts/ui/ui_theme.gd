@@ -152,6 +152,7 @@ static func get_theme() -> Theme:
 	# Kleine Knöpfe
 	var small_pad := Vector4(8, 3, 8, 3)
 	_button(t, "SmallButton", box(Color("#1f222c"), LINE_2, 7, 1, small_pad), box(Color("#262a35"), Color(ACCENT, 0.6), 7, 1, small_pad), box(Color("#181b22"), Color(ACCENT, 0.6), 7, 1, small_pad), box(Color("#1f222c", 0.6), Color(LINE_2, 0.6), 7, 1, small_pad), TEXT, Color(0, 0, 0, 0), 12)
+	_button(t, "SmallSel", box(Color("#2b2616"), ACCENT, 7, 1, small_pad), box(Color("#342d18"), ACCENT, 7, 1, small_pad), box(Color("#2b2616"), ACCENT, 7, 1, small_pad), box(Color("#2b2616", 0.5), Color(ACCENT, 0.5), 7, 1, small_pad), ACCENT, Color(0, 0, 0, 0), 12)
 	_button(t, "SmallPrimary", box(Color("#f0b53a"), Color("#f7c65a"), 7, 1, small_pad), box(Color("#f7c24a"), Color("#ffe08c"), 7, 1, small_pad), box(Color("#e0a42a"), Color("#f7c65a"), 7, 1, small_pad), box(Color("#1a1d25"), LINE, 7, 1, small_pad), Color("#1c1405"), Color("#1c1405"), 12, 700)
 	# Pillen in der Kopfzeile
 	var pill_pad := Vector4(11, 3, 11, 3)

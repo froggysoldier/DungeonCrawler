@@ -14,70 +14,36 @@ static func _vsep(parent: Node) -> void:
 	parent.add_child(l)
 
 
-static func _count_throwables(s: Dictionary) -> int:
-	var n := 0
-	for it in Player.throwables(s):
-		n += int(J.nn(it, "menge", 1))
-	return n
-
-
-## Außerhalb des Kampfes: Körperteil, Ausführung, Fähigkeit, Warten, Zauber.
+## Außerhalb des Kampfes eine schlanke Zeile: gewählter Angriff, Fähigkeit,
+## Warten, Aufheben, Zauber. Körperteil und Ausführung wählt man im Kampf
+## (oder jederzeit mit 1–7 und Q–R).
 static func render_actions(gv: GameView, bar: PanelContainer) -> void:
 	var s := gv.s
 	var f := HFlowContainer.new()
 	f.add_theme_constant_override("h_separation", 8)
 	f.add_theme_constant_override("v_separation", 6)
 	bar.add_child(f)
-	var thr := _count_throwables(s)
-	var weapon = Player.current_weapon(s)
-	var grp := HBoxContainer.new()
-	grp.add_theme_constant_override("separation", 4)
-	f.add_child(grp)
-	for p in Combat.ATTACK_PARTS:
-		var disabled: bool = (p == "waffe" and weapon == null) or (p == "wurf" and thr == 0)
-		var label: String
-		if p == "wurf":
-			label = "Wurf (%d)" % thr
-		elif p == "waffe":
-			label = weapon.name if weapon != null else "Waffe"
-		else:
-			label = Bonuses.PART_NAMES[p]
-		var pp: String = p
-		Kit.kbutton(grp, label, GameView.PART_KEYS[p], func():
-			gv.part = pp
-			if pp == "wurf":
-				gv.move = "normal"
-			if pp != "tritt" and gv.move == "stampfen":
-				gv.move = "normal"
-			gv.refresh_actions(), "SelButton" if gv.part == p else "Button", disabled, "Taste " + GameView.PART_KEYS[p])
-	_vsep(f)
-	var grp2 := HBoxContainer.new()
-	grp2.add_theme_constant_override("separation", 4)
-	f.add_child(grp2)
-	for mv in Combat.ATTACK_MOVES:
-		var cost := Combat.attack_cost({"part": gv.part, "move": mv})
-		var m2: String = mv
-		Kit.kbutton(grp2, Combat.MOVE_NAMES[mv], GameView.MOVE_KEYS[mv], func():
-			gv.move = m2
-			if m2 == "stampfen":
-				gv.part = "tritt"
-			gv.refresh_actions(), "SelButton" if gv.move == mv else "Button", gv.part == "wurf" and mv != "normal", "Taste %s · kostet %d Ausdauer" % [GameView.MOVE_KEYS[mv], cost])
+	var tech := gv.technique()
+	var sel := Kit.text(f, "%s [b]%s[/b] %s" % [Kit.muted("Angriff:"), Kit.col(Kit.esc(Combat.technique_name(tech)), "accent"), Kit.muted("· %d Ausdauer" % Combat.attack_cost(tech))], 13)
+	sel.autowrap_mode = TextServer.AUTOWRAP_OFF
+	sel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	sel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	sel.tooltip_text = "Körperteil mit 1–7, Ausführung mit Q, W, E, R. Im Kampf öffnet sich die volle Auswahl."
+	sel.mouse_filter = Control.MOUSE_FILTER_PASS
 	var ability = Classes.current_ability(s)
 	var cd := int(J.num(s.player, "abilityCooldown"))
 	if ability != null:
 		_vsep(f)
-		Kit.kbutton(f, "Fähigkeit: %s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())), "AbilityButton", cd > 0, "Taste F · " + ability.description)
+		Kit.kbutton(f, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())), "AbilityButton", cd > 0, "Taste F · " + ability.description)
 	_vsep(f)
-	var grp3 := HBoxContainer.new()
-	grp3.add_theme_constant_override("separation", 4)
-	f.add_child(grp3)
-	Kit.button(grp3, "Warten", func(): gv.act(func(): return Game.wait(s)), "Button", false, "Leertaste")
-	Kit.button(grp3, "Aufheben", func(): gv.act(func(): return Game.pickup(s)), "Button", false, "G")
+	var grp := HBoxContainer.new()
+	grp.add_theme_constant_override("separation", 4)
+	f.add_child(grp)
+	Kit.button(grp, "Warten", func(): gv.act(func(): return Game.wait(s)), "Button", false, "Leertaste")
+	Kit.button(grp, "Aufheben", func(): gv.act(func(): return Game.pickup(s)), "Button", false, "G")
+	if s.player.get("mount") != null:
+		Kit.button(grp, "Absteigen" if s.player.get("riding", false) else "Aufsitzen", func(): gv.act(func(): return Game.ride_toggle(s)), "Button", false, "M")
 	_spell_bar(gv, f)
-	var sel := Kit.text(f, "%s [b]%s[/b] · %d Ausdauer" % [Kit.muted("Gewählt:"), Kit.col(Kit.esc(Combat.technique_name(gv.technique())), "accent"), Combat.attack_cost(gv.technique())], 12, "muted")
-	sel.autowrap_mode = TextServer.AUTOWRAP_OFF
-	sel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	sel.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 
 
 ## Zauberleiste: jeder bekannte Zauber als Knopf, mit Kosten und Abklingzeit.
@@ -99,7 +65,7 @@ static func _spell_bar(gv: GameView, f: Node) -> void:
 		var disabled := cd > 0 or J.num(p, "mp") < cost
 		var id: String = k.id
 		Kit.button(grp, "%s (%d MP)%s" % [def.name, cost, (" – %d" % cd) if cd else ""], func(): _spell(gv, id), "SpellSel" if pending else "SpellButton", disabled and not pending, def.description)
-	if J.some(spells, func(k): return k.id == "geschoss"):
+	if gv.pending_spell == "geschoss":
 		Kit.label(grp, "Geschoss-Mana:", 12, "muted").size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		for m in [3, 4, 5, 6]:
 			var mana: int = m

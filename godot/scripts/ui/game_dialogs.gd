@@ -500,6 +500,10 @@ static func show_help(gv: GameView) -> void:
 		["Übersichtskarte", "K oder Klick auf die kleine Karte"],
 		["Untersuchen", "Rechtsklick auf Feld, Gegner oder Gegenstand"],
 		["Text sofort zeigen", "Klick auf den Text oder das Log"],
+		["Reiter", "P Crawler · Z Ziele · I Inventar · B Handwerk · L Skills · O Erfolge · Tab blättert (außerhalb des Kampfes)"],
+		["Bereich „Hier“", "N klappt ein und aus"],
+		["Log", "Filter oben rechts im Log: Alles, Kampf, Beute und Erfolge, Gespräche"],
+		["Menü", "Esc (Ton, Musik, Tippgeräusch)"],
 		["Hilfe", "H"],
 	]
 	gv.modals().html("Steuerung", func(root: VBoxContainer):

@@ -32,6 +32,7 @@ static func total_bonuses(s: Dictionary) -> Dictionary:
 		if k != null:
 			Bonuses.add(b, k.get("bonuses"))
 	Bonuses.add(b, Traits.trait_bonuses(s))
+	Bonuses.add(b, ShowEvents.bonuses(s))
 	# Fähigkeiten eines entwickelten Haustiers
 	var pet = p.pet
 	if pet != null and pet.alive and J.arr(pet, "abilities").has("schutz"):

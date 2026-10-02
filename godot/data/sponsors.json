@@ -465,6 +465,46 @@
      "count": 1
     }
    ]
+  },
+  {
+   "id": "kopfjaeger",
+   "name": "Kopfjäger Wettbüro",
+   "box": "abenteurer",
+   "minFollower": 120,
+   "description": "Ein Wettbüro, das auf Crawler setzt – und gegen sie. Liebt Kopfgelder, Einlagen und alles, worauf man Geld setzen kann.",
+   "likes": {
+    "bounty": 30,
+    "showEvent": 6,
+    "kill|z:elite": 5
+   },
+   "dislike": {
+    "signal": "bounty|lost",
+    "text": "Ein verfallenes Kopfgeld. Das Wettbüro hat auf dich gesetzt. Das Wettbüro ist enttäuscht."
+   },
+   "offer": "„Wir haben eine Quote auf dich. Sie ist schlecht. Genau deshalb wollen wir dich. Das Kopfjäger Wettbüro ist dabei.“",
+   "wishes": [
+    {
+     "text": "Kassiere ein Kopfgeld der Show.",
+     "signals": [
+      "bounty"
+     ],
+     "count": 1
+    },
+    {
+     "text": "Erlebe 2 Einlagen der Show.",
+     "signals": [
+      "showEvent"
+     ],
+     "count": 2
+    },
+    {
+     "text": "Besiege 3 Elite-Gegner.",
+     "signals": [
+      "kill|z:elite"
+     ],
+     "count": 3
+    }
+   ]
   }
  ]
 }

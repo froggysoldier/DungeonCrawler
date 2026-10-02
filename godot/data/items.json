@@ -2752,6 +2752,117 @@
    },
    "flavor": "Hat schon ganze Lastwagen bewegt. Ein Kobold ist da kein Problem.",
    "wert": 34
+  },
+  {
+   "id": "kuehlpack",
+   "name": "Kühlpack",
+   "kind": "verbrauch",
+   "effekt": {
+    "heal": 4,
+    "clear": [
+     "brennen"
+    ]
+   },
+   "flavor": "Einmal knicken, kalt wird es von allein. Löscht, was an dir brennt.",
+   "wert": 6,
+   "ground": 1
+  },
+  {
+   "id": "augentropfen",
+   "name": "Augentropfen",
+   "kind": "verbrauch",
+   "effekt": {
+    "clear": [
+     "blind"
+    ]
+   },
+   "flavor": "Brennen kurz, dann siehst du wieder. Oder umgekehrt.",
+   "wert": 6,
+   "ground": 1
+  },
+  {
+   "id": "baldrian",
+   "name": "Baldriantropfen",
+   "kind": "verbrauch",
+   "effekt": {
+    "clear": [
+     "furcht"
+    ],
+    "ausdauer": 4
+   },
+   "flavor": "Beruhigt die Nerven. Auch die, die dir sagen, dass du weglaufen solltest.",
+   "wert": 5,
+   "ground": 1
+  },
+  {
+   "id": "glueckskeks",
+   "name": "Glückskeks",
+   "kind": "verbrauch",
+   "effekt": {
+    "heal": 2,
+    "buff": {
+     "name": "Glückspilz",
+     "turns": 60,
+     "bonuses": {
+      "krit": 8
+     }
+    }
+   },
+   "flavor": "Auf dem Zettel steht: „Heute triffst du jemanden. Hart.“",
+   "wert": 8,
+   "ground": 1
+  },
+  {
+   "id": "fokuspille",
+   "name": "Blaue Fokuspille",
+   "kind": "verbrauch",
+   "effekt": {
+    "buff": {
+     "name": "Tunnelblick",
+     "turns": 40,
+     "bonuses": {
+      "treffer": 10,
+      "ausweichen": -3
+     }
+    }
+   },
+   "flavor": "Alles wird scharf. Vor allem das, was du schlagen willst.",
+   "wert": 15
+  },
+  {
+   "id": "spruehlack",
+   "name": "Dose Unterbodenschutz",
+   "kind": "verbrauch",
+   "effekt": {
+    "buff": {
+     "name": "Lackpanzer",
+     "turns": 50,
+     "bonuses": {
+      "ruestung": 2
+     }
+    }
+   },
+   "flavor": "Eine Schicht Gummilack auf Haut und Kleidung. Riecht furchtbar, hält aber was ab.",
+   "wert": 10
+  },
+  {
+   "id": "thermoskanne",
+   "name": "Thermoskanne Kaffee",
+   "kind": "verbrauch",
+   "effekt": {
+    "ausdauer": 15,
+    "blase": 20,
+    "buff": {
+     "name": "Hellwach",
+     "turns": 50,
+     "bonuses": {
+      "lichtradius": 1
+     }
+    }
+   },
+   "flavor": "Noch lauwarm. Wer auch immer sie gekocht hat, braucht sie nicht mehr.",
+   "wert": 7,
+   "ground": 1
   }
  ],
  "FOOD_IDS": [

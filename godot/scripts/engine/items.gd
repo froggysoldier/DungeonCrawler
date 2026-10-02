@@ -243,7 +243,7 @@ static func roll_material(s: Dictionary) -> Dictionary:
 static func roll_mob_drop(s: Dictionary, level: int, elite: bool) -> Array:
 	var out := []
 	if R.chance(s, 1.0 if elite else 0.35):
-		out.append(create_gold(s, R.int_(s, 1, 3 + level * 2) * (3 if elite else 1)))
+		out.append(create_gold(s, J.rnd(R.int_(s, 1, 3 + level * 2) * (3 if elite else 1) * ShowEvents.gold_factor(s))))
 	if R.chance(s, 0.6 if elite else 0.12):
 		if elite:
 			out.append(generate_equipment(s, "selten" if R.chance(s, 0.3) else "ungewoehnlich"))

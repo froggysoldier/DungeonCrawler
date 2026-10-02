@@ -29,7 +29,7 @@ func _play(t, r: Dictionary) -> void:
 	var gv := GameView.new(s, Meta.empty_meta())
 	_tree.root.add_child(gv)
 	gv.flush_dialogs()
-	var tabs := ["crawler", "inventar", "handwerk", "skills", "erfolge"]
+	var tabs := GameView.TABS.map(func(x): return x[0])
 	for i in r.actions.size():
 		var a: Dictionary = r.actions[i]
 		modals.close_all()

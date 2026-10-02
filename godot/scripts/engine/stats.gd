@@ -293,6 +293,10 @@ static func on_event(s: Dictionary, e: Dictionary) -> void:
 			track(s, "wracks")
 		"carAlarm":
 			track(s, "alarmanlagen")
+		"showEvent":
+			track(s, "einlagen")
+		"bountyClaimed":
+			track(s, "kopfgelder")
 		"secretFound":
 			track(s, "geheimtueren")
 		"lockPicked":

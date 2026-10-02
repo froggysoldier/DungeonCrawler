@@ -546,6 +546,29 @@ Labyrinth verschmolzenen Tiefgaragen der Stadt, mit eigenen Raumnamen
   Parkautomat, Verwilderte Garagenkatze und Reifenstapel (ein Mimic).
 - Neue Achievement-Familien: Autowracks durchsuchen, Alarmanlagen auslösen.
 
+### 3.29 Einlagen der Show
+Nach dem Tutorial ruft die Regie etwa alle 220–340 Züge eine Einlage aus (die erste rund 120 Züge nach dem Tutorial, nie im Safe Room). Sie gilt nur auf der aktuellen Etage und läuft 30–120 Züge. Oben in der Kopfzeile und im Reiter „Ziele“ steht, welche Einlage läuft und wie lange noch.
+
+| Einlage | Wirkung |
+|---|---|
+| Doppelte Erfahrung | +100 % Erfahrung |
+| Goldrausch | Monster lassen dreimal so viel Gold fallen |
+| Licht aus! | Sichtweite −2, dafür +50 % Erfahrung |
+| Schnäppchenstunde | Händlerpreise −30 % |
+| Erste Hilfe | +2 HP-Regeneration |
+| Kritische Stunde | +15 % Krit-Chance |
+| Kopfgeld | Der stärkste Nicht-Boss der Etage wird markiert (auf der Karte „Kopfgeld“). Wer ihn erledigt, erhält 40 × Etage + 10 × Stufe Gold. Erledigt ihn jemand anderes oder läuft die Zeit ab, verfällt es. |
+
+Dazu: Achievement-Familien „Einlagen“ (1/5/12) und „Kopfgelder“ (1/3/8), Sponsor „Kopfjäger Wettbüro“ (mag Kopfgelder, Einlagen und Elite-Kills, hasst verfallene Kopfgelder) und neue Verbrauchsgegenstände: Kühlpack (löscht Brennen), Augentropfen (gegen Blindheit), Baldriantropfen (gegen Furcht), Glückskeks (+8 % Krit), Blaue Fokuspille (+10 Treffer, −3 Ausweichen), Dose Unterbodenschutz (+2 Rüstung) und Thermoskanne Kaffee (+1 Sichtweite). Sie liegen am Boden, in Autowracks und bei den Wanderhändlern.
+
+### 3.30 Aufbau der Oberfläche
+- **Kopfzeile:** nur Etage, Einsturz-Zeit, laufende Einlage, Zuschauer (Details im Tooltip), Gold, Lootboxen (nur wenn vorhanden) und „Menü“ (Esc) mit Ton, Musik, Tippgeräusch und Steuerung.
+- **Seitenleiste oben, immer sichtbar:** Name, Stufe, Klasse, Balken für HP, Ausdauer, Mana, Blase und Erfahrung, dazu Zustände, Haustier, Reittier und Party in einer Zeile. Freie Wertepunkte erscheinen als Knopf.
+- **„Hier“:** nur wenn es am Standort etwas zu tun gibt; einklappbar (N).
+- **Reiter in zwei Reihen:** Crawler (P), Ziele (Z), Inventar (I), Handwerk (B), Skills (L), Erfolge (O); Tab blättert außerhalb des Kampfes. Ein goldener Punkt zeigt, wo etwas wartet (freie Punkte, Angebote, Abgaben, Kopfgeld). „Ziele“ bündelt Einlage, Aufträge, Sponsoren, Viertel und Party; im Crawler-Reiter lassen sich lange Abschnitte einklappen.
+- **Aktionsleiste außerhalb des Kampfes:** eine Zeile mit dem gewählten Angriff, Fähigkeit, Warten, Aufheben, Reittier und Zaubern. Körperteil und Ausführung wählt man im Kampf (oder mit 1–7, Q–R).
+- **Log:** Filter Alles, Kampf, Beute und Erfolge, Gespräche; gleiche Zeilen hintereinander werden zusammengefasst („(9×)“).
+
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
 1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben

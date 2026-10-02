@@ -145,29 +145,21 @@ static func portrait(s: Dictionary) -> Control:
 	return st
 
 
+## Abschnitt mit Knopf zum Ein- und Ausklappen. Gibt zurück, ob er offen ist.
+static func fold(gv: GameView, root: Node, id: String, title: String, extra_bb: String = "", default_open: bool = true) -> bool:
+	var open: bool = gv.folds.get(id, default_open)
+	var h := Kit.section(root, title, extra_bb)
+	var b := Kit.button(h, "−" if open else "+", func():
+		gv.folds[id] = not open
+		gv.refresh_side(), "SmallButton", false, "Einklappen" if open else "Ausklappen")
+	b.custom_minimum_size = Vector2(24, 0)
+	return open
+
+
 static func crawler_tab(gv: GameView, root: VBoxContainer) -> void:
 	var s := gv.s
 	var p: Dictionary = s.player
 	var b := Player.total_bonuses(s)
-	var mh := Player.max_hp(s, b)
-	var ma := Player.max_ausdauer(s, b)
-	var need := Player.xp_to_next(p.level)
-	var poisoned := J.some(p.buffs, func(x): return x.name == "Vergiftet")
-	var ailments: Array = []
-	for id in Conditions.IDS:
-		if Conditions.player_has(s, id):
-			ailments.append(Conditions.CONDITIONS[id].state)
-	var bars := Kit.vbox(root, 7)
-	var hp: int = maxi(0, p.hp)
-	Kit.bar(bars, float(hp) / mh, "HP %d / %d%s" % [hp, mh, (" · " + ", ".join(ailments)) if not ailments.is_empty() else ""], "#3d7a1e" if poisoned else "#a1201c", "#8fe04a" if poisoned else "#ff5d5d")
-	Kit.bar(bars, float(p.ausdauer) / ma, "Ausdauer %s / %d" % [J.s(p.ausdauer), ma], "#237a45", "#62d68f")
-	if not J.arr(p, "spells").is_empty():
-		var mm := Magic.max_mp(s, b)
-		Kit.bar(bars, J.num(p, "mp") / maxf(1, mm), "Mana %s / %d" % [J.s(J.nn(p, "mp", 0)), mm], "#1e4fb3", "#6fa8ff")
-	if Game.has_unlock(s, "inventar"):
-		var bl := J.num(p, "blase")
-		Kit.bar(bars, bl / 100.0, "Blase %d %%%s" % [J.rnd(bl), " – such eine Toilette!" if bl >= 80 else ""], "#b3261e" if bl >= 80 else "#8a7a1e", "#ff8a4a" if bl >= 80 else "#e0d04a", 20, bl >= 80)
-	Kit.bar(bars, float(p.xp) / need, "XP %s / %d (Level %d)" % [J.s(p.xp), need, p.level], "#5a3fc4", "#b39cff")
 	var who := "früher: %s" % Kit.esc(p.background)
 	if p.get("race") != null:
 		who += " · " + Kit.esc(race_name(p.race))
@@ -232,16 +224,15 @@ static func crawler_tab(gv: GameView, root: VBoxContainer) -> void:
 			specials.append_array(J.arr(rd, "specials"))
 		if kd != null:
 			specials.append_array(J.arr(kd, "specials"))
-		Kit.section(root, "Klasse und Rasse")
-		if kd != null:
-			Kit.text(root, "[b]%s[/b] %s · Fähigkeit: %s" % [Kit.esc(kd.name), Kit.muted("(%s)" % Db.t("classes", "ARCHETYPE_NAMES")[kd.archetype]), Kit.esc(Db.t("classes", "ABILITIES")[kd.ability].name)], 12)
-		if not J.arr(p, "classSkills").is_empty():
-			Kit.text(root, "Klassenskills: %s" % Kit.esc(", ".join(p.classSkills.map(func(id): return Db.skill(id).name if Db.skill(id) != null else id))), 12, "muted")
-		for sp in specials:
-			var t = Db.t("specials", "SPECIAL_TEXT").get(sp)
-			Kit.text(root, "[b]%s:[/b] %s" % [Kit.esc(t.name if t != null else sp), Kit.muted(Kit.esc(t.text if t != null else ""))], 12)
-	if not J.arr(p, "traits").is_empty():
-		Kit.section(root, "Eigenschaften")
+		if fold(gv, root, "klasse", "Klasse und Rasse"):
+			if kd != null:
+				Kit.text(root, "[b]%s[/b] %s · Fähigkeit: %s" % [Kit.esc(kd.name), Kit.muted("(%s)" % Db.t("classes", "ARCHETYPE_NAMES")[kd.archetype]), Kit.esc(Db.t("classes", "ABILITIES")[kd.ability].name)], 12)
+			if not J.arr(p, "classSkills").is_empty():
+				Kit.text(root, "Klassenskills: %s" % Kit.esc(", ".join(p.classSkills.map(func(id): return Db.skill(id).name if Db.skill(id) != null else id))), 12, "muted")
+			for sp in specials:
+				var t = Db.t("specials", "SPECIAL_TEXT").get(sp)
+				Kit.text(root, "[b]%s:[/b] %s" % [Kit.esc(t.name if t != null else sp), Kit.muted(Kit.esc(t.text if t != null else ""))], 12)
+	if not J.arr(p, "traits").is_empty() and fold(gv, root, "traits", "Eigenschaften", Kit.muted("(%d)" % p.traits.size()), false):
 		for id in p.traits:
 			var t = Db.trait_def(id)
 			if t == null:
@@ -271,27 +262,48 @@ static func crawler_tab(gv: GameView, root: VBoxContainer) -> void:
 		Kit.button(f, "Absteigen (M)" if p.get("riding", false) else "Aufsitzen (M)", func(): gv.act(func(): return Game.ride_toggle(s)), "SmallButton")
 		if md.kind == "fahrzeug":
 			Kit.button(f, "Tanken", func(): gv.act(func(): return Game.refuel_mount(s)), "SmallButton")
+
+
+## Ziele: Aufträge, Sponsoren, Viertel der Etage und Party.
+static func goals_tab(gv: GameView, root: VBoxContainer) -> void:
+	var s := gv.s
+	var ev = ShowEvents.active_def(s)
+	if ev != null:
+		var c := Kit.card(root)
+		Kit.text(c, "[b]%s[/b] %s" % [Kit.col("Einlage: " + Kit.esc(ev.name), "achv"), Kit.muted("(noch %d Züge)" % int(s.showEvent.left))], 13)
+		Kit.text(c, Kit.esc(ev.text), 12, "muted")
+		var tid = s.showEvent.get("bountyUid")
+		var target = J.find(s.monsters, func(m): return m.uid == tid) if tid != null else null
+		if target != null:
+			Kit.text(c, "Ziel: %s im %s · %d Gold" % [Kit.esc(Identify.name_of(s, target, "nom")), Kit.esc(s.map.hoods[MapGen.hood_of(s.map, target.pos)].name), int(target.bounty)], 12, "accent")
+	var open := Quests.active_quests(s)
+	var done_count := Quests.quests(s).filter(func(q): return q.status == "erledigt").size()
+	Kit.section(root, "Aufträge", Kit.muted("(%d erledigt)" % done_count) if done_count else "")
+	if open.is_empty():
+		Kit.text(root, "Keine offenen Aufträge. Andere Crawler vergeben welche – sprich sie an.", 12, "muted")
+	for q in open:
+		var v := Kit.card(root)
+		var ready := Quests.can_turn_in(s, q)
+		Kit.text(v, "[b]%s[/b] %s" % [Kit.col(Kit.esc(q.title), "ok" if ready else "accent"), Kit.muted("von " + Kit.esc(q.giver.name))], 13)
+		Kit.text(v, Kit.esc(Quests.hint(s, q)), 12, "ok" if ready else "muted")
+		if q.kind == "jagd" and J.num(q, "count") > 1:
+			Kit.progress(v, J.num(q, "progress") / maxf(1, J.num(q, "count")), "%s von %s" % [J.s(q.progress), J.s(q.count)])
+	if Game.has_unlock(s, "zuschauer"):
+		_sponsors(gv, root)
+	var hoods: Array = s.map.hoods
+	var left: int = hoods.filter(func(h): return h.bossAlive).size()
+	Kit.section(root, "Viertel", Kit.muted("(%d von %d Bossen besiegt)" % [hoods.size() - left, hoods.size()]))
+	for h in hoods:
+		var state := Kit.col("Boss besiegt", "ok") if not h.bossAlive else Kit.col("Boss lebt", "danger")
+		Kit.text(root, "%s · %s%s" % [Kit.esc(h.name), state, Kit.muted(" · Karte gefunden") if h.get("mapFound", false) else ""], 12)
 	var members := Crawlers.party(s)
 	if not members.is_empty():
 		Kit.section(root, "Party (%d von 4)" % (members.size() + 1))
 		for c in members:
 			Kit.text(root, "[b]%s[/b] · Level %d · HP %d/%d · %s Kills %s" % [Kit.col(Kit.esc(c.name), "#8fe38f"), c.level, c.hp, c.maxHp, J.s(J.nn(c, "kills", 0)), Kit.muted("(früher %s)" % Kit.esc(c.background))], 12)
-	var open := Quests.active_quests(s)
-	var done_count := Quests.quests(s).filter(func(q): return q.status == "erledigt").size()
-	if not open.is_empty() or done_count:
-		Kit.section(root, "Aufträge (%d erledigt)" % done_count)
-		if open.is_empty():
-			Kit.text(root, "Keine offenen Aufträge.", 12, "muted")
-		for q in open:
-			var extra := Kit.muted(" (%s/%s)" % [J.s(q.progress), J.s(q.count)]) if q.kind == "jagd" else ""
-			Kit.text(root, "[b]%s[/b] %s\n%s%s" % [Kit.esc(q.title), Kit.muted("von " + Kit.esc(q.giver.name)), Kit.esc(Quests.hint(s, q)), extra], 12)
-	if Game.has_unlock(s, "zuschauer"):
-		_sponsors(gv, root)
 	if not J.arr(s, "fallen").is_empty():
+		Kit.spacer(root, 6)
 		Kit.text(root, "Gefallen: " + Kit.esc(", ".join(s.fallen)), 12, "muted")
-	Kit.section(root, "Viertel")
-	for h in s.map.hoods:
-		Kit.text(root, "%s: %s%s" % [Kit.esc(h.name), "Boss lebt" if h.bossAlive else "Boss besiegt", ", Karte gefunden" if h.get("mapFound", false) else ""], 12)
 
 
 static func _pet(gv: GameView, root: VBoxContainer) -> void:

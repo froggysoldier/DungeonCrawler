@@ -322,6 +322,7 @@ class Bar:
 	var c0 := Color.RED
 	var c1 := Color.RED
 	var pulse := false
+	var font_size := 16
 
 	func _process(_d: float) -> void:
 		if pulse:
@@ -352,8 +353,8 @@ class Bar:
 				draw_rect(Rect2(u, h - 2 * u, fw, u), Color(0, 0, 0, 0.22 * a))
 		if label == "":
 			return
-		var f := UiFonts.pixel(700)
-		var fs := 16
+		var f := UiFonts.pixel(700) if font_size >= 16 else UiFonts.get_font(700)
+		var fs := font_size
 		var y := roundf((h + f.get_ascent(fs) - f.get_descent(fs)) / 2.0)
 		draw_string(f, Vector2(10, y + 2), label, HORIZONTAL_ALIGNMENT_LEFT, w - 12, fs, Color(0, 0, 0, 0.9))
 		draw_string(f, Vector2(8, y), label, HORIZONTAL_ALIGNMENT_LEFT, w - 12, fs, UiTheme.TEXT)

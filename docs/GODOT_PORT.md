@@ -40,7 +40,7 @@ godot/
 | `sprites.gd` | Welche Figur zu welcher Monsterart gehört, große Porträts |
 | `animator.gd` | Gleiten, Kamera, Geschosse, aufsteigende Zahlen |
 | `game_view.gd` | Spielansicht, Eingabe, Kampfmodus, Log |
-| `game_here.gd`, `game_tabs.gd`, `game_combat.gd`, `game_dialogs.gd` | Seitenleiste, Reiter, Kampfsequenz, Tooltip, Versus, Talkshow, Hilfe |
+| `game_vitals.gd`, `game_here.gd`, `game_tabs.gd`, `game_combat.gd`, `game_dialogs.gd` | Feste Lebensanzeige, Seitenleiste, Reiter, Kampfsequenz, Tooltip, Versus, Talkshow, Hilfe, Menü |
 | `selection.gd`, `screens.gd` | Rassen- und Klassenwahl, Titel, Interview, Ende |
 | `modals.gd`, `typing.gd` | Dialoge mit Warteschlange, Schreibmaschinen-Effekt |
 | `sound.gd` | Klänge und Musik im Spiel erzeugt, ohne Audiodateien: Brummen je Etage als nahtlose Schleife, zufällige Geräusche, Kampfschleife mit Überblenden |
@@ -164,6 +164,7 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | `test_dungeon` | Gelände und Sonderräume: entstehen, alles bleibt erreichbar, Kisten, Schlamm, Wasser, Schlüssel, Schloss knacken, Geheimtür, Schrein, Nest, Hinterhalt, Wanderhändler |
 | `test_boss_fight` | Bosskämpfe: Daten vollständig, Ankündigen und Treffen, Ausweichen, Pause, Ansturm, Formen, Phasen mit Verstärkung |
 | `test_kanalstadt` | Etage 3: Kanäle und Brücken, alles erreichbar, Siedlung mit drei Händlern und Bewohnern ohne Monster, neue Monster mit Bild und Bestiarium |
+| `test_show_events` | Einlagen erst nach dem Tutorial, kommen und gehen, Doppelte Erfahrung, Licht aus, Goldrausch, Schnäppchen, Kopfgeld (Auszahlung und Verfall), Ende beim Abstieg, neue Verbrauchsgegenstände, Kopfgeld-Sponsor |
 | `test_tiefgarage` | Etage 2: Parkdecks, Wracks und Öl entstehen, alles erreichbar, Wrack durchsuchen, Alarmanlage, Ausrutschen und brennendes Öl, eigene Bosse und Monster mit Bild, Beute und Bestiarium |
 | `test_sound` | Klänge hörbar und nicht übersteuert; Musik in Schleife, ohne Naht, alle Geräusche vorhanden |
 | `test_pixel_art` | Zu allem, was gezeichnet wird, gibt es ein Bild; Tönen ersetzt alle Magenta-Stufen; Haustier-Arten und zweite Bilder |

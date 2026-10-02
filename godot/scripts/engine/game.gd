@@ -192,6 +192,9 @@ static func _enter_floor(s: Dictionary, floor: int, meta: Dictionary) -> void:
 	s.floorStartTurn = s.turn
 	s.collapseAt = s.turn + def.duration
 	s.lastSpawnTurn = s.turn
+	# Einlagen gelten nur auf ihrer Etage
+	s.erase("showEvent")
+	s.erase("nextShowEvent")
 	var pet = s.player.pet
 	if pet != null:
 		var spot = null
@@ -549,6 +552,7 @@ static func _tick_time(s: Dictionary, turns: int, before: int) -> void:
 	Player.clamp_vitals(s)
 
 	Viewers.tick(s, turns)
+	ShowEvents.tick(s, turns)
 	Magic.tick(s, turns)
 	Extras.egg_tick(s)
 	if p.get("potionCooldown"):
@@ -823,6 +827,9 @@ static func _apply_effect(s: Dictionary, e: Dictionary, is_food: bool) -> void:
 		Abilities.cure(s)
 	if (e.get("bandage") or J.num(e, "healPct") >= 50) and Conditions.clear_player(s, "blutung"):
 		Log.add(s, "Die Blutung hört auf.", "info")
+	for id in J.arr(e, "clear"):
+		if Conditions.clear_player(s, id):
+			Log.add(s, "Das hilft: %s ist vorbei." % Conditions.CONDITIONS[id].name, "info")
 	if e.get("buff") != null:
 		p.buffs = p.buffs.filter(func(b): return b.name != e.buff.name)
 		p.buffs.append(e.buff.duplicate(true))

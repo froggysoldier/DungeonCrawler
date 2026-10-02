@@ -82,6 +82,12 @@ static func signals_of(e: Dictionary) -> Array:
 			return ["quest|fail"]
 		"chainDone":
 			return ["chain"]
+		"showEvent":
+			return ["showEvent"]
+		"bountyClaimed":
+			return ["bounty"]
+		"bountyLost":
+			return ["bounty|lost"]
 	return []
 
 

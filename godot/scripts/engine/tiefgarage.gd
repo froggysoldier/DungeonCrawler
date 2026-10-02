@@ -96,7 +96,7 @@ static func search(s: Dictionary, at: Dictionary) -> Dictionary:
 	if drop == null or roll < 0.3:
 		Log.add(s, "Du durchwühlst das Handschuhfach. Quittungen, ein Kaugummi, eine Sonnenbrille ohne Gläser. Nichts Brauchbares.", "info")
 	elif roll < 0.6:
-		s.items.append({"pos": drop, "item": Items.create_item(s, R.pick(s, ["kleiner_heiltrank", "schokoriegel", "energydrink", "dosenbier", "traubenzucker", "pflaster"]))})
+		s.items.append({"pos": drop, "item": Items.create_item(s, R.pick(s, ["kleiner_heiltrank", "schokoriegel", "energydrink", "dosenbier", "traubenzucker", "pflaster", "thermoskanne", "spruehlack"]))})
 		Log.add(s, "Im Kofferraum liegt eine Tüte vom letzten Einkauf. Einiges davon ist noch gut.", "loot")
 	elif roll < 0.8:
 		s.items.append({"pos": drop, "item": Items.create_gold(s, R.int_(s, 5, 15) * s.floor)})

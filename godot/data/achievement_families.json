@@ -1164,6 +1164,28 @@
    ],
    "text": "Löse {n} Alarmanlagen aus.",
    "category": "ueberleben"
+  },
+  {
+   "id": "einlagen",
+   "stat": "einlagen",
+   "stages": [
+    1,
+    5,
+    12
+   ],
+   "text": "Erlebe {n} Einlagen der Show.",
+   "category": "show"
+  },
+  {
+   "id": "kopfgelder",
+   "stat": "kopfgelder",
+   "stages": [
+    1,
+    3,
+    8
+   ],
+   "text": "Kassiere {n} Kopfgelder.",
+   "category": "kampf"
   }
  ]
 }

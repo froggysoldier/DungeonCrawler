@@ -926,6 +926,8 @@ func _draw_dynamic_body() -> void:
 				label = ["flieht", "#ffd24a"]
 			if label != null:
 				_tag(ci, sx + T / 2, sy + T + px, label[0], label[1])
+		if mo.get("bounty") and (asleep or not (J.num(mo, "downed") > 0 or _cond_turns(mo, "furcht") > 0 or _cond_turns(mo, "blind") > 0 or mo.get("fleeing", false))):
+			_tag(ci, sx + T / 2, sy + T + px, "Kopfgeld", "#ffd700")
 
 	# --- Besiegte zerfallen in Pixel
 	for b in frame_anim.get("bursts", []):

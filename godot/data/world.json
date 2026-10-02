@@ -759,6 +759,22 @@
     [
      "traubenzucker",
      2
+    ],
+    [
+     "kuehlpack",
+     2
+    ],
+    [
+     "augentropfen",
+     2
+    ],
+    [
+     "baldrian",
+     1
+    ],
+    [
+     "fokuspille",
+     1
     ]
    ],
    "pick": 6,
@@ -812,6 +828,10 @@
     [
      "schraubenmutter",
      5
+    ],
+    [
+     "spruehlack",
+     2
     ]
    ],
    "pick": 6,
@@ -867,6 +887,10 @@
     [
      "zuendschluessel_bobbycar",
      1
+    ],
+    [
+     "glueckskeks",
+     2
     ]
    ],
    "pick": 4,
@@ -888,5 +912,87 @@
   "Im Kanal wohnt ein Aal, der Strom gibt. Wir haben versucht, ihn als Batterie zu benutzen. Einmal.",
   "Du bist ein Crawler, oder? Man sieht es an den Augen. Und am Blut.",
   "Nachts hört man die Pumpen. Obwohl sie seit Jahren stillstehen."
- ]
+ ],
+ "SHOW_EVENTS": [
+  {
+   "id": "doppelxp",
+   "name": "Doppelte Erfahrung",
+   "bonuses": {
+    "xpBonus": 100
+   },
+   "turns": [
+    40,
+    60
+   ],
+   "text": "Die Regie hat Langeweile. Für die nächsten Minuten zählt jede Erfahrung doppelt. Los, los, los!"
+  },
+  {
+   "id": "goldrausch",
+   "name": "Goldrausch",
+   "gold": 3,
+   "turns": [
+    40,
+    60
+   ],
+   "text": "Ein Sponsor hat Münzen in die Monster gestopft. Frag nicht wie. Jeder Gegner lässt dreimal so viel Gold fallen."
+  },
+  {
+   "id": "licht_aus",
+   "name": "Licht aus!",
+   "bonuses": {
+    "lichtradius": -2,
+    "xpBonus": 50
+   },
+   "turns": [
+    30,
+    45
+   ],
+   "text": "Jemand in der Regie hat sich auf den Lichtschalter gesetzt. Man sieht weniger, aber die Zuschauer zahlen für Angst: mehr Erfahrung für alles."
+  },
+  {
+   "id": "schnaeppchen",
+   "name": "Schnäppchenstunde",
+   "price": 0.7,
+   "turns": [
+    50,
+    70
+   ],
+   "text": "Alle Händler im Dungeon senken die Preise. Freiwillig. Bestimmt."
+  },
+  {
+   "id": "erste_hilfe",
+   "name": "Erste Hilfe",
+   "bonuses": {
+    "hpRegen": 2
+   },
+   "turns": [
+    40,
+    60
+   ],
+   "text": "Ein Sanitätsdienst-Sponsor sprüht etwas in die Lüftung. Deine Wunden schließen sich schneller. Nebenwirkungen werden später nachgereicht."
+  },
+  {
+   "id": "kritische_stunde",
+   "name": "Kritische Stunde",
+   "bonuses": {
+    "krit": 15
+   },
+   "turns": [
+    35,
+    50
+   ],
+   "text": "Die Zuschauer wollen Volltreffer sehen. Für eine Weile treffen alle Schläge öfter genau dahin, wo es wehtut."
+  },
+  {
+   "id": "kopfgeld",
+   "name": "Kopfgeld",
+   "bounty": true,
+   "turns": [
+    80,
+    120
+   ],
+   "text": "Die Show setzt ein Kopfgeld aus. Wer das markierte Ziel erledigt, kassiert."
+  }
+ ],
+ "SHOW_EVENT_END": "Die Einlage „%s“ ist vorbei. Die Regie widmet sich wieder dem Normalprogramm."
 }
