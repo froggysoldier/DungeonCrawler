@@ -482,7 +482,7 @@ func _draw_static(ci: CanvasItem) -> void:
 			if room != null:
 				for f in J.arr(room, "furniture"):
 					if f.pos.x == x and f.pos.y == y:
-						if f.kind in ["automat", "haendler", "wirt", "schrein"]:
+						if f.kind in ["automat", "haendler", "wirt", "schrein", "bildschirm"]:
 							_animated.append(["furniture", x, y, f.kind])
 						else:
 							_spr(ci, "moebel/" + f.kind, sx, sy)
@@ -626,7 +626,7 @@ func _draw_live() -> void:
 		_draw_item(ci, e.item, _sx(e.pos.x), _sy(e.pos.y), vis.has(i), time)
 
 
-## Einrichtung der Safe Rooms mit Bewegung: Automat, Händler, Wirt.
+## Einrichtung der Safe Rooms mit Bewegung: Automat, Händler, Wirt, Bildschirm.
 func _draw_furniture(ci: CanvasItem, kind: String, sx: float, sy: float, time: float) -> void:
 	var T := tile_px
 	match kind:
@@ -642,8 +642,36 @@ func _draw_furniture(ci: CanvasItem, kind: String, sx: float, sy: float, time: f
 			_spr(ci, "kreatur/mensch", sx, sy - 10 * px + bob, "#8a4a3a" if kind == "wirt" else "#3a6a8a")
 			_spr(ci, "moebel/theke", sx, sy)
 			_rect(ci, sx, sy, 8, 20, 16, 2, Color("#e7c46a") if kind == "wirt" else Color("#9fd0ff"))
+		"bildschirm":
+			_draw_screen(ci, sx, sy, time)
 		_:
 			_spr(ci, "moebel/" + kind, sx, sy)
+
+
+## Fernseher auf zwei Beinen: tagsüber Testbild, während der Highlights
+## flimmerndes Programm mit rotem Punkt.
+func _draw_screen(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
+	var live := Highlights.on_air(s)
+	if live:
+		_glow(ci, sx + tile_px / 2, sy + 14 * px, "#7fb4ff", 0.35 + 0.15 * sin(time / 90.0))
+	var dark := Color("#14161c")
+	_rect(ci, sx, sy, 9, 24, 2, 6, dark)
+	_rect(ci, sx, sy, 21, 24, 2, 6, dark)
+	_rect(ci, sx, sy, 3, 5, 26, 20, dark)
+	_rect(ci, sx, sy, 4, 6, 24, 18, Color("#3a3f50"))
+	if live:
+		var phase := int(time / 260.0)
+		var cols := [Color("#2b4a8a"), Color("#3a7a6a"), Color("#8a4a3a"), Color("#6a3a8a")]
+		_rect(ci, sx, sy, 5, 7, 22, 16, cols[phase % cols.size()])
+		_rect(ci, sx, sy, 7 + (phase * 5) % 14, 12, 6, 8, Color("#e9e5dc"))
+		_rect(ci, sx, sy, 5, 19, 22, 4, Color(0, 0, 0, 0.45))
+		if fmod(time / 500.0, 2.0) < 1.3:
+			_rect(ci, sx, sy, 23, 8, 2, 2, Color("#ff4040"))
+	else:
+		var bars := ["#b8b8b8", "#b8b800", "#00b8b8", "#00b800", "#b800b8", "#b80000"]
+		for i in bars.size():
+			_rect(ci, sx, sy, 5 + i * 4 - (1 if i == 5 else 0), 7, 4 if i < 5 else 3, 16, Color(bars[i]).darkened(0.35))
+		_rect(ci, sx, sy, 5, 19, 22, 4, Color("#20202a"))
 
 
 func _draw_item(ci: CanvasItem, it: Dictionary, sx: float, sy: float, is_visible: bool, time: float) -> void:

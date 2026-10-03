@@ -264,6 +264,25 @@ static func crawler_tab(gv: GameView, root: VBoxContainer) -> void:
 			Kit.button(f, "Tanken", func(): gv.act(func(): return Game.refuel_mount(s)), "SmallButton")
 
 
+## Die Show: Highlights, Einladungen und was als Nächstes möglich ist.
+static func _show_card(s: Dictionary, root: VBoxContainer) -> void:
+	if not Game.has_unlock(s, "zuschauer"):
+		return
+	var h := Highlights.state(s)
+	var c := Kit.card(root)
+	Kit.text(c, "[b]%s[/b]" % Kit.col("Abgrund am Abend", "achv"), 13)
+	Kit.text(c, "Täglich um 21 Uhr am Bildschirm im Safe Room. Ins Programm kommt, wer spektakulär kämpft: besondere Kills, viele Kills, Bosse. Bisher %d-mal dabei, %d-mal die Szene des Tages." % [int(h.featured), int(h.top)], 12, "muted")
+	var inv = Invitations.pending(s)
+	if inv != null:
+		Kit.text(c, "Einladung: [b]%s[/b] – im Safe Room am Bildschirm annehmen (noch %s)." % [Kit.esc(Invitations.format_name(inv.format)), ViewHelpers.format_time(maxi(0, int(inv.until) - int(s.turn)))], 12, "accent")
+	var names := []
+	for id in Invitations.formats():
+		var f: Dictionary = Invitations.formats()[id]
+		var ok: bool = int(s.viewers.follower) >= int(f.minFollower)
+		names.append(("%s ab %s Follower" % [Invitations.format_name(id), J.de(int(f.minFollower))]) + ("" if ok else " (noch nicht)"))
+	Kit.text(c, "Einladungen: " + Kit.esc(" · ".join(names)), 12, "muted")
+
+
 ## Ziele: Aufträge, Sponsoren, Viertel der Etage und Party.
 static func goals_tab(gv: GameView, root: VBoxContainer) -> void:
 	var s := gv.s
@@ -276,6 +295,7 @@ static func goals_tab(gv: GameView, root: VBoxContainer) -> void:
 		var target = J.find(s.monsters, func(m): return m.uid == tid) if tid != null else null
 		if target != null:
 			Kit.text(c, "Ziel: %s im %s · %d Gold" % [Kit.esc(Identify.name_of(s, target, "nom")), Kit.esc(s.map.hoods[MapGen.hood_of(s.map, target.pos)].name), int(target.bounty)], 12, "accent")
+	_show_card(s, root)
 	var open := Quests.active_quests(s)
 	var done_count := Quests.quests(s).filter(func(q): return q.status == "erledigt").size()
 	Kit.section(root, "Aufträge", Kit.muted("(%d erledigt)" % done_count) if done_count else "")

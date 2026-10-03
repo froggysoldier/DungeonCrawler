@@ -526,10 +526,13 @@ static func end_turn(s: Dictionary, keep_move_dir: bool = false) -> void:
 			Traps.on_monster_step(s, m)
 	Ai.pet_turn(s)
 	Crawlers.turn(s)
-	Quests.tick(s)
+	# In der Grube wartet die Etage: keine Aufträge, die scheitern könnten
+	if not Arena.active(s):
+		Quests.tick(s)
 	if s.status != "playing":
 		return
 	_tick_time(s, 1, before)
+	Arena.check(s)
 
 
 ## Zeit vergeht: Buffs, Regeneration, Nachspawns, Einsturz.
@@ -576,7 +579,10 @@ static func _tick_time(s: Dictionary, turns: int, before: int) -> void:
 	Player.clamp_vitals(s)
 
 	Viewers.tick(s, turns)
-	ShowEvents.tick(s, turns)
+	var in_arena := Arena.active(s)
+	if not in_arena:
+		ShowEvents.tick(s, turns)
+		Highlights.tick(s)
 	Magic.tick(s, turns)
 	Extras.egg_tick(s)
 	if p.get("potionCooldown"):
@@ -585,7 +591,8 @@ static func _tick_time(s: Dictionary, turns: int, before: int) -> void:
 		p.immobile = maxi(0, p.immobile - turns)
 		if not p.immobile:
 			Log.add(s, "Du bist wieder frei.", "info")
-	Bladder.tick(s, turns)
+	if not in_arena:
+		Bladder.tick(s, turns)
 	if s.status != "playing":
 		return
 	if p.get("abilityCooldown"):
@@ -1066,6 +1073,8 @@ static func use_furniture(s: Dictionary, f: Dictionary) -> Dictionary:
 			var host: Dictionary = hosts[(room.id if room != null else 0) % hosts.size()]
 			Log.add(s, "%s: „Was darf’s sein? Essen gibt’s an der Theke, schlafen kannst du oben.“" % host.name, "dialog")
 			return _ok()
+		"bildschirm":
+			return watch_screen(s)
 		"haendler":
 			if room != null:
 				var shop := Shop.ensure_shop(s, room)
@@ -1315,6 +1324,27 @@ static func answer_talk_show(s: Dictionary, index: int) -> Dictionary:
 
 # ================================================================ Laden
 
+# ================================================================ Show
+
+## Der Bildschirm im Safe Room: läuft die Sendung, schaut man sie an.
+static func watch_screen(s: Dictionary) -> Dictionary:
+	if not Combat.is_in_safe_room(s, s.player.pos):
+		return _fail("Bildschirme gibt es nur in Safe Rooms.")
+	if not Highlights.on_air(s):
+		Log.add(s, Highlights.screen_text(s), "info")
+		return _ok()
+	s.pendingDialogs.append(Highlights.watch(s))
+	return _ok()
+
+
+static func accept_invitation(s: Dictionary) -> Dictionary:
+	return _wrap(Invitations.accept(s))
+
+
+static func decline_invitation(s: Dictionary) -> Dictionary:
+	return _wrap(Invitations.decline(s))
+
+
 ## Raum mit Laden: Safe Room oder Wanderhändler.
 static func _safe_room(s: Dictionary) -> Variant:
 	var room = current_room(s)
@@ -1374,8 +1404,10 @@ static func descend(s: Dictionary, meta: Dictionary) -> Dictionary:
 	var with_show := has_unlock(s, "zuschauer")
 	_enter_floor(s, next, meta)
 	s.pendingDialogs.append(recap)
-	if with_show:
-		s.pendingDialogs.append(TalkShow.start(s))
+	# Zwischen den Etagen lädt die Show nur ein, wer bekannt genug ist
+	var show = TalkShow.start(s) if with_show else null
+	if show != null:
+		s.pendingDialogs.append(show)
 	Crawlers.announce_population(s, true)
 	var def := Db.floor_def0(next)
 	Log.add(s, "Etage %d: %s." % [next, def.name], "system")

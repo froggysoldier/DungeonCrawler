@@ -1,6 +1,7 @@
 class_name TalkShow
 extends RefCounted
-## Rückblick und Talkshow beim Abstieg.
+## Rückblick beim Abstieg und die Gesprächsformate der Show: Talkshow,
+## Fragerunde und Diskussionsrunde (Texte in data/talkshow.json und data/show.json).
 
 const COUNTER_KEYS := ["kills", "steps", "itemsPicked", "boxesOpened", "missStreak", "hitTakenStreak", "throws", "bossKills", "damageDealt", "damageTaken", "goldEarned", "goldStolen", "poisonDamage", "mealsEaten", "potionsDrunk", "sleeps", "crits", "knockdowns", "eliteKills", "trapsFound", "trapsTriggered", "trapsDisarmed", "trapKills", "crafted"]
 
@@ -97,11 +98,11 @@ static func floor_recap(s: Dictionary) -> Dictionary:
 	return {"title": "Rückblick: Etage %d" % s.floor, "speaker": Db.world("SYSTEM_NAME"), "pages": pages}
 
 
-static func _fill(s: Dictionary, text: String) -> String:
+static func _fill(s: Dictionary, text: String, vars: Dictionary = {}) -> String:
 	var pet = s.player.pet
 	var fav = _favorite_part(s)
 	var fallen := J.arr(s, "fallen")
-	return text \
+	var out := text \
 		.replace("{name}", s.player.name) \
 		.replace("{background}", s.player.background) \
 		.replace("{haustier}", pet.name if pet != null else "dein Haustier") \
@@ -109,6 +110,9 @@ static func _fill(s: Dictionary, text: String) -> String:
 		.replace("{kills}", _fmt(s.counters.kills)) \
 		.replace("{lieblingsangriff}", ("%s-Angriffen" % Bonuses.PART_NAMES[fav]) if fav != null else "bloßen Händen") \
 		.replace("{achievements}", str(s.achievements.size()))
+	for k in vars:
+		out = out.replace("{%s}" % k, String(vars[k]))
+	return out
 
 
 static func _pick_questions(s: Dictionary) -> Array:
@@ -122,14 +126,78 @@ static func _pick_questions(s: Dictionary) -> Array:
 	return out
 
 
-static func start(s: Dictionary) -> Dictionary:
-	var questions := _pick_questions(s).map(func(q): return {
-		"id": q.id,
-		"text": _fill(s, q.text),
-		"answers": q.answers.map(func(a): return {"label": _fill(s, a.label), "tone": a.tone}),
-	})
-	s.talkShow = {"host": Db.t("talkshow", "SHOW_HOST"), "title": Db.t("talkshow", "SHOW_TITLE"), "questions": questions, "index": 0, "followerDelta": 0, "done": false}
-	return {"kind": "talkshow", "title": Db.t("talkshow", "SHOW_TITLE"), "speaker": Db.t("talkshow", "SHOW_HOST"), "pages": Db.t("talkshow", "SHOW_INTRO").map(func(p): return _fill(s, p))}
+## Show zwischen den Etagen: Talkshow für Bekannte, Fragerunde für
+## Aufsteiger, für Unbekannte gar nichts (null).
+static func start(s: Dictionary) -> Variant:
+	var f: Dictionary = Invitations.formats()
+	if int(s.viewers.follower) >= int(f.talkshow.minFollower):
+		return start_format(s, "talkshow")
+	if int(s.viewers.follower) >= int(f.fragerunde.minFollower):
+		return start_format(s, "fragerunde")
+	return null
+
+
+## Zwei Gäste für die Diskussionsrunde: andere Crawler der Etage, sonst
+## Studiogäste.
+static func _guests(s: Dictionary) -> Array:
+	var names: Array = Crawlers.crawlers(s).filter(func(c): return c.alive and not c.party).map(func(c): return c.name)
+	var extras: Array = R.shuffle(s, (Db.t("show", "GUEST_EXTRAS") as Array).duplicate())
+	var out := []
+	for i in 2:
+		if not names.is_empty():
+			var nm: String = R.pick(s, names)
+			names.erase(nm)
+			out.append(nm)
+		else:
+			out.append(J.cap(extras[i]))
+	return out
+
+
+## Eine Sendung im gewünschten Format beginnen (Fragerunde, Talkshow,
+## Diskussionsrunde). Gibt den Dialog für die Oberfläche zurück.
+static func start_format(s: Dictionary, format: String) -> Dictionary:
+	var fdef: Dictionary = Invitations.formats()[format]
+	var vars := {}
+	var raw: Array
+	var title: String
+	var host: String
+	var intro: Array
+	match format:
+		"talkshow":
+			raw = _pick_questions(s)
+			title = Db.t("talkshow", "SHOW_TITLE")
+			host = Db.t("talkshow", "SHOW_HOST")
+			intro = Db.t("talkshow", "SHOW_INTRO")
+		"fragerunde":
+			var pool: Array = Db.t("show", "FRAGERUNDE_QUESTIONS").filter(func(q): return q.get("when") == null or DataChecks.talkshow_when(q.when, s))
+			raw = R.shuffle(s, pool.duplicate()).slice(0, int(fdef.count))
+			title = fdef.name
+			host = fdef.host
+			intro = fdef.intro
+		_:
+			var topic: Dictionary = R.pick(s, Db.t("show", "DISKUSSION_TOPICS"))
+			var guests := _guests(s)
+			vars = {"gast1": guests[0], "gast2": guests[1], "thema": topic.thema}
+			raw = topic.rounds
+			title = fdef.name
+			host = fdef.host
+			intro = fdef.intro
+	var viewer_names: Array = Db.t("viewers", "VIEWER_NAMES")
+	var questions := []
+	for q in raw:
+		var qv := vars.duplicate()
+		qv.zuschauer = R.pick(s, viewer_names)
+		var answers := []
+		for a in q.answers:
+			var e: Dictionary = a.duplicate()
+			e.label = _fill(s, a.label, vars)
+			e.reaction = _fill(s, a.reaction, vars)
+			if a.get("failReaction") != null:
+				e.failReaction = _fill(s, a.failReaction, vars)
+			answers.append(e)
+		questions.append({"id": J.nn(q, "id", ""), "text": _fill(s, q.text, qv), "answers": answers})
+	s.talkShow = {"format": format, "host": host, "title": title, "roundLabel": fdef.roundLabel, "vars": vars, "questions": questions, "index": 0, "followerDelta": 0, "done": false}
+	return {"kind": "talkshow", "title": title, "speaker": host, "pages": intro.map(func(p): return _fill(s, p, vars))}
 
 
 static func answer(s: Dictionary, answer_index: int) -> Dictionary:
@@ -137,13 +205,14 @@ static func answer(s: Dictionary, answer_index: int) -> Dictionary:
 	if show == null or show.done:
 		return {"ok": false}
 	var q = show.questions[show.index] if show.index < show.questions.size() else null
-	var def = J.find(Db.t("talkshow", "SHOW_QUESTIONS"), func(x): return q != null and x.id == q.id)
-	var a = def.answers[answer_index] if def != null and answer_index >= 0 and answer_index < def.answers.size() else null
-	if q == null or def == null or a == null:
+	var a = q.answers[answer_index] if q != null and answer_index >= 0 and answer_index < q.answers.size() else null
+	if a == null:
 		return {"ok": false}
+	var format: String = J.nn(show, "format", "talkshow")
+	var fdef: Dictionary = Invitations.formats()[format]
 	var cha: float = Player.effective_stats(s).cha
 	var v: Dictionary = s.viewers
-	var scale := minf(60, 3 + v.follower * 0.04)
+	var scale := minf(60, 3 + v.follower * 0.04) * float(fdef.scale)
 	var cha_mult := maxf(0.4, 1 + (cha - 5) * 0.08)
 	var delta: int
 	var reaction: String = a.reaction
@@ -160,16 +229,21 @@ static func answer(s: Dictionary, answer_index: int) -> Dictionary:
 	v.hype = maxf(0, minf(100, v.hype + (8 if delta > 0 else -10)))
 	show.followerDelta += delta
 	show.index += 1
-	Log.add(s, "Talkshow – %s: %s (%s%s Follower)" % [_fill(s, a.label), reaction, "+" if delta >= 0 else "", _fmt(delta)], "dialog")
+	Log.add(s, "%s – %s: %s (%s%s Follower)" % [show.title, a.label, reaction, "+" if delta >= 0 else "", _fmt(delta)], "dialog")
 	var tone: String = a.tone
 	if show.index < show.questions.size():
 		return {"ok": true, "reaction": reaction, "delta": delta}
 	show.done = true
 	var total: int = show.followerDelta
-	var tpl: String = Db.t("talkshow", "SHOW_OUTRO_GOOD") if total >= 150 else (Db.t("talkshow", "SHOW_OUTRO_OK") if total >= 0 else Db.t("talkshow", "SHOW_OUTRO_BAD"))
-	var outro := _fill(s, tpl)
-	Log.add(s, "Talkshow vorbei. %s Bilanz: %s%s Follower." % [outro, "+" if total >= 0 else "", _fmt(total)], "system")
-	if total >= 150:
-		s.player.boxes.append(Items.create_box(s, "fan", "gold" if total >= 600 else "silber"))
-	Events.emit(s, {"type": "talkShow", "delta": total, "tone": tone})
+	var reward: Array = fdef.reward
+	var outro: String
+	if format == "talkshow":
+		outro = Db.t("talkshow", "SHOW_OUTRO_GOOD") if total >= int(reward[0]) else (Db.t("talkshow", "SHOW_OUTRO_OK") if total >= 0 else Db.t("talkshow", "SHOW_OUTRO_BAD"))
+	else:
+		outro = fdef.outro_good if total >= int(reward[0]) else (fdef.outro_ok if total >= 0 else fdef.outro_bad)
+	outro = _fill(s, outro, show.vars)
+	Log.add(s, "%s vorbei. %s Bilanz: %s%s Follower." % [show.title, outro, "+" if total >= 0 else "", _fmt(total)], "system")
+	if total >= int(reward[0]):
+		s.player.boxes.append(Items.create_box(s, "fan", "gold" if total >= int(reward[1]) else "silber"))
+	Events.emit(s, {"type": "talkShow", "delta": total, "tone": tone, "format": format, "won": total >= int(reward[0])})
 	return {"ok": true, "reaction": reaction, "delta": delta, "finished": true, "outro": outro}

@@ -4,7 +4,7 @@ extends RefCounted
 ## Gegenstände am Boden, Treppe, Türen, andere Crawler, Fallen und alles,
 ## was ein Safe Room bietet (Automat, Wirt, Bett, Toilette, Laden, Boxen).
 
-const FURNITURE_NAMES := {"automat": "Gratis-Automat", "wirt": "Wirt an der Theke", "bett": "Bett", "toilette": "Toilette", "schrein": "Schrein"}
+const FURNITURE_NAMES := {"automat": "Gratis-Automat", "wirt": "Wirt an der Theke", "bett": "Bett", "toilette": "Toilette", "schrein": "Schrein", "bildschirm": "Bildschirm"}
 
 
 static func _row(parent: Node, bb: String, size: int = 14) -> HBoxContainer:
@@ -161,6 +161,8 @@ static func _safe_room(gv: GameView, v: VBoxContainer, room: Dictionary) -> void
 		Kit.button(v, "Schlafen (8 Std.)", func(): gv.act(func(): return Game.sleep(s)), "SmallButton").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	if legacy or near.call("toilette"):
 		Kit.button(v, "Toilette benutzen", func(): gv.act(func(): return Game.toilet(s)), "SmallButton").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	if legacy or near.call("bildschirm") or Invitations.pending(s) != null or Highlights.on_air(s):
+		_screen(gv, v)
 	var shop = room.get("shop")
 	if shop != null and (legacy or near.call("haendler")):
 		_shop(gv, v, room, shop)
@@ -203,6 +205,22 @@ static func _shop(gv: GameView, v: VBoxContainer, room: Dictionary, shop: Dictio
 		Kit.button(h, "Feilschen", func(): gv.act(func(): return Game.haggle_offer(s, idx)), "SmallButton", o.get("haggled", false))
 	Kit.text(v, "Verkaufen: im Inventar-Tab beim Gegenstand.", 12, "muted")
 	GameTabs.quest_card(gv, v, Quests.quest_of(s, str(room.id)))
+
+
+## Der Bildschirm: Highlights ansehen, Einladungen annehmen oder absagen.
+static func _screen(gv: GameView, v: VBoxContainer) -> void:
+	var s := gv.s
+	_subhead(v, "Bildschirm")
+	if Highlights.on_air(s):
+		Kit.button(v, "Abgrund am Abend ansehen", func(): gv.act(func(): return Game.watch_screen(s)), "SmallPrimary").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	else:
+		Kit.text(v, Kit.esc(Highlights.screen_text(s)), 12, "muted")
+	var inv = Invitations.pending(s)
+	if inv != null:
+		Kit.text(v, "Einladung: [b]%s[/b] (gilt noch %s)" % [Kit.esc(Invitations.format_name(inv.format)), ViewHelpers.format_time(maxi(0, int(inv.until) - int(s.turn)))], 13)
+		var f := Kit.flow(v, 4)
+		Kit.button(f, "Teilnehmen", func(): gv.act(func(): return Game.accept_invitation(s)), "SmallPrimary")
+		Kit.button(f, "Absagen", func(): gv.act(func(): return Game.decline_invitation(s)), "SmallButton")
 
 
 ## Besondere Räume: Schrein, Nest, Wanderhändler.

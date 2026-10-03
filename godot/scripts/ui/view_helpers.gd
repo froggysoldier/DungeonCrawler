@@ -16,6 +16,12 @@ static func format_time(turns: int) -> String:
 	return "%d T %s" % [d, hm] if d > 0 else hm
 
 
+## Uhrzeit eines Zuges (für die Zeitstempel im Log).
+static func clock_at(s: Dictionary, turn: int) -> String:
+	var t := Highlights.clock_minutes(s, turn) % 1440
+	return "%02d:%02d" % [t / 60, t % 60]
+
+
 ## Bekannte Fallen neben dem Crawler (oder unter ihm).
 static func disarmable_traps(s: Dictionary) -> Array:
 	return J.arr(s, "traps").filter(func(t): return not t.get("hidden", false) and J.cheb(t.pos, s.player.pos) <= 1)

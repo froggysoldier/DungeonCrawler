@@ -5,6 +5,10 @@ extends RefCounted
 
 static func handle_lethal(s: Dictionary, cause: String) -> void:
 	var p: Dictionary = s.player
+	# In der Grube stirbt man nicht, man geht k. o.
+	if Arena.active(s):
+		Arena.knockout(s)
+		return
 	var slot = null
 	for k in p.equipment:
 		var it = p.equipment[k]

@@ -2,7 +2,7 @@ extends SceneTree
 ## Entwicklerwerkzeug: startet das Spiel, spielt kurz und speichert Bildschirmfotos.
 ##   xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus [seed]
 ## Modi: title, interview, game, dialog, walk, tabs, combat, ausruestung, truhe, select, versus,
-## talkshow, safe, floor3, fx (Angriff mit Ausfallschritt, Aufblitzen, Zerfall),
+## talkshow, safe, floor3, bildschirm (Highlights im Safe Room), grube (Gladiatorenkampf), fx (Angriff mit Ausfallschritt, Aufblitzen, Zerfall),
 ## fackeln (Raum mit Wandfackeln)
 
 var out := ""
@@ -37,7 +37,7 @@ func _initialize() -> void:
 			main.show_interview()
 			await wait(3.0)
 			await shot("interview")
-		"select", "versus", "talkshow", "safe", "floor3":
+		"select", "versus", "talkshow", "safe", "floor3", "bildschirm", "grube":
 			# Aufgezeichnete Partie nachspielen, bis das Ereignis eintritt
 			var replays: Array = J.load_json("res://tests/fixtures/replays.json")
 			var r: Dictionary = replays.filter(func(x): return x.seed == (seed if seed != 1 or mode != "floor3" else 5))[0]
@@ -51,7 +51,7 @@ func _initialize() -> void:
 					"select": hit = s.get("pendingSelection", false)
 					"versus": hit = s.get("pendingVersus") != null
 					"talkshow": hit = J.some(s.pendingDialogs, func(d): return d.get("kind") == "talkshow")
-					"safe":
+					"safe", "bildschirm", "grube":
 						var room = Game.current_room(s)
 						hit = room != null and room.kind == "safe" and not s.player.boxes.is_empty()
 					"floor3": hit = s.floor == 3 and J.some(s.monsters, func(m): return Fov.chebyshev(m.pos, s.player.pos) <= 4)
@@ -63,6 +63,20 @@ func _initialize() -> void:
 				s.pendingDialogs.clear()
 			else:
 				s.pendingDialogs = s.pendingDialogs.filter(func(d): return d.get("kind") == "talkshow")
+			if mode == "bildschirm" or mode == "grube":
+				# Publikum an, 21 Uhr, eine Szene des Tages und eine Einladung
+				s.unlocks.append("zuschauer")
+				s.viewers.follower = 7000
+				Highlights.state(s)
+				Highlights.note(s, 40, "stomp", {"gegner": "einen Kobold"})
+				while Highlights.time_of_day(s) < 1260 or Highlights.time_of_day(s) > 1300:
+					s.turn += 1
+				s.collapseAt = s.turn + 2000
+				Highlights.tick(s)
+				s.invitation = {"format": "gladiator", "until": s.turn + 300}
+				if mode == "grube":
+					s.pendingDialogs.clear()
+					Game.accept_invitation(s)
 			main.start_game(s)
 			await wait(2.5)
 			if OS.get_environment("PERF") != "":
@@ -77,6 +91,11 @@ func _initialize() -> void:
 					total += gv.map.last_draw_ms
 				print("Karte zeichnen: %.2f ms pro Bild (Mittel über 60 Bilder)" % (total / 60))
 			await shot(mode)
+			if mode == "bildschirm" or mode == "grube":
+				Modals.instance.close_all()
+				main.view.refresh()
+				await wait(0.8)
+				await shot(mode + "_karte")
 			if mode == "versus":
 				# Danach die Boss-Kammer ohne Dialog, näher herangezoomt
 				Modals.instance.close_all()

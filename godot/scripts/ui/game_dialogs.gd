@@ -8,6 +8,7 @@ const FURNITURE_TEXT := {
 	"wirt": "Wirt – Essen und ein Zimmer zum Schlafen", "bett": "Bett – acht Stunden Schlaf", "toilette": "Toilette – die Regel gilt",
 	"schrein": "Schrein – beten: Segen, Heilung oder Fluch", "schrein_leer": "Erloschener Schrein",
 	"nest": "Monsternest – bewohnt", "nest_leer": "Leeres Nest",
+	"bildschirm": "Bildschirm – täglich um 21 Uhr die Highlights, hier nimmst du Einladungen an",
 }
 
 ## Gelände und Hindernisse: Titel, Farbe, Hinweis.
@@ -402,7 +403,7 @@ static func run_talk_show(gv: GameView, title: String, intro: Array) -> Modals.J
 	var s := gv.s
 	var build := func(root: VBoxContainer, close: Callable) -> void:
 		Modals.title(root, title)
-		Modals.speaker(root, "Veronika Glanz")
+		Modals.speaker(root, String(J.nn(s.get("talkShow"), "host", "")))
 		var q_el := Modals.page(root)
 		var a_el := Kit.vbox(root, 6)
 		var f := Modals.foot(root)
@@ -435,7 +436,7 @@ static func run_talk_show(gv: GameView, title: String, intro: Array) -> Modals.J
 		fns.intro = func() -> void:
 			no_el.text = "Einleitung %d / %d" % [st.page + 1, intro.size()]
 			type.call(Kit.esc(intro[st.page]))
-			one_button.call("Weiter" if st.page < intro.size() - 1 else "Zur ersten Frage", func():
+			one_button.call("Weiter" if st.page < intro.size() - 1 else "Los geht's", func():
 				st.page += 1
 				if st.page < intro.size():
 					fns.intro.call()
@@ -447,7 +448,7 @@ static func run_talk_show(gv: GameView, title: String, intro: Array) -> Modals.J
 				close.call()
 				return
 			var q: Dictionary = show.questions[show.index]
-			no_el.text = "Frage %d von %d" % [show.index + 1, show.questions.size()]
+			no_el.text = "%s %d von %d" % [J.nn(show, "roundLabel", "Frage"), show.index + 1, show.questions.size()]
 			follower.call()
 			type.call(Kit.esc(q.text))
 			Kit.clear(a_el)

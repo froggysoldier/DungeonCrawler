@@ -13,6 +13,8 @@ func test_rueckblick_und_talkshow(t) -> void:
 	t.ok(" ".join(s.pendingDialogs[0].pages).contains("12 Gegner besiegt"), "Kills im Rückblick")
 	t.ok(not J.some(s.pendingDialogs, func(d): return d.get("kind") == "talkshow"), "noch keine Talkshow")
 	s.pendingDialogs = []
+	# Talkshow nur für Bekannte
+	s.viewers.follower = 2000
 	TH.teleport(s, TH.stairs(s))
 	Game.descend(s, {"ghosts": []})
 	t.eq(s.pendingDialogs[0].title, "Rückblick: Etage 2", "Rückblick 2")

@@ -1,0 +1,314 @@
+{
+ "CLOCK_START": 480,
+ "AIR_MINUTE": 1260,
+ "AIR_UNTIL": 1440,
+ "FEATURE_MIN": 15,
+ "RAMPAGE_KILLS": 20,
+ "MAX_SCENES": 6,
+ "HIGHLIGHTS": {
+  "title": "Abgrund am Abend",
+  "host": "Pia Prisma",
+  "intro": "Fanfare. Ein Logo aus brennenden Buchstaben dreht sich über einer Luftaufnahme des Dungeons. „Guten Abend, Galaxis! Hier ist Abgrund am Abend, und ich bin Pia Prisma. Das war Tag {tag} im Großen Abstieg.“",
+  "featured": "„Und jetzt der Crawler, über den heute alle reden: {name}!“ Auf dem Bildschirm: du. In Zeitlupe. Mit dramatischer Musik.",
+  "featured_top": "„Und die Szene des Tages – Platz eins, ganz klar: {name}!“ Das Studiopublikum steht auf. Auf dem Bildschirm: du.",
+  "not_featured": "Von dir ist heute nichts zu sehen. Die Redaktion hat sich für andere entschieden. Vielleicht morgen. Vielleicht mit mehr Stil.",
+  "dead_line": "„Und wie immer zum Schluss: unser Gedenken. Heute haben es {anzahl} Crawler nicht geschafft.“ Eine Kerze. Drei Sekunden Stille. Dann Werbung.",
+  "tip": "Tipp der Redaktion: Unsere Kameradrohnen haben im {viertel} {was} gefilmt. Sie ist jetzt auf deiner Karte eingezeichnet.",
+  "outro": "„Das war Abgrund am Abend. Schlaft gut – falls ihr könnt.“ Abspann. Danach Werbung für Zahnpasta mit Tentakelgeschmack.",
+  "missed": "Es ist 21 Uhr: Auf den Bildschirmen in den Safe Rooms läuft jetzt „Abgrund am Abend“ – bis Mitternacht in Dauerschleife.",
+  "screen_off": "Auf dem Bildschirm läuft ein Testbild. Darunter: „Abgrund am Abend – täglich um 21 Uhr“.",
+  "screen_early": "Auf dem Bildschirm läuft ein Testbild. Ab Etage 2 schaut die Galaxis zu – dann gibt es hier jeden Abend die Highlights."
+ },
+ "TIP_KINDS": {
+  "schatz": "eine Schatzkammer",
+  "schrein": "einen Schrein",
+  "nest": "ein Nest",
+  "geheim": "eine Geheimkammer"
+ },
+ "NPC_SCENES": [
+  "{name} hat mit einem Klappstuhl ein ganzes Rattennest ausgeräumt und sich danach auf den Klappstuhl gesetzt.",
+  "{name} ist rückwärts in eine Falle gelaufen, hat überlebt und sich vor der Kamera verbeugt.",
+  "{name} hat einen Elite-Gegner mit einem einzigen Tritt eine Treppe hinunterbefördert.",
+  "{name} und zwei Fremde haben einen Nachbarschaftsboss im Laufschritt erledigt. Keiner von ihnen weiß, wie.",
+  "{name} hat einen Wanderhändler so lange angefeilscht, bis der Händler geweint hat.",
+  "{name} hat drei Gegner gleichzeitig besiegt – nur mit einer Bratpfanne und sehr viel Geschrei.",
+  "{name} hat versucht, ein Monster zu zähmen. Das Monster hat zurückgezähmt. Beide sind jetzt beste Freunde.",
+  "{name} hat mit einer Brandflasche einen Raum geräumt. Leider den eigenen. Die Augenbrauen wachsen nach.",
+  "{name} ist vor einem Gegner geflohen, im Kreis gelaufen und hat ihn dabei versehentlich in eine Grube gelockt.",
+  "{name} hat eine verschlossene Tür aufgetreten, die gar nicht verschlossen war. Das Publikum feiert es trotzdem.",
+  "{name} hat sich mit einem Toaster angelegt. Der Toaster hat verloren. Knapp.",
+  "{name} hat eine komplette Party um sich geschart und hält jeden Abend eine Ansprache. Die Quoten sind gut."
+ ],
+ "PLAYER_SCENES": {
+  "kill": "{name} erledigt {gegner}. Solide Arbeit, sagt die Regie.",
+  "stomp": "{name} stampft {gegner} in den Boden. Die Zeitlupe läuft dreimal.",
+  "jump": "{name} springt mit einem Tritt auf {gegner}. Die Regie legt dramatische Musik darunter.",
+  "trap": "{name} lockt {gegner} in eine Falle. Klack. Das Studio jubelt.",
+  "bomb": "{name} sprengt {gegner}. Die Kamera wackelt noch Minuten später.",
+  "pet": "{haustier} erledigt {gegner}, während {name} applaudiert. Die Galaxis ist verliebt.",
+  "boss": "{name} besiegt {gegner}! Die Szene des Tages, sagen alle.",
+  "crit": "{name} landet einen gewaltigen Treffer gegen {gegner}. Das Geräusch wird zum Klingelton des Tages.",
+  "closecall": "{name} überlebt mit einem letzten Rest Leben. Das Publikum hält den Atem an.",
+  "drama": "{name} verliert ein Party-Mitglied. Die Regie zeigt es in Schwarz-Weiß.",
+  "meister": "{name} schafft eine Meisterleistung: {was}. So etwas sieht die Galaxis nicht alle Tage.",
+  "rampage": "{name} hat heute {kills} Gegner erledigt. Ein Schlachtfest. Die Zuschauer kommen mit dem Zählen nicht hinterher.",
+  "arena": "{name} kämpft in der Grube gegen {gegner}. {ausgang}"
+ },
+ "FORMATS": {
+  "fragerunde": {
+   "name": "Frag den Crawler",
+   "host": "Bo Bitzel",
+   "minFollower": 250,
+   "weight": 3,
+   "scale": 0.6,
+   "count": 3,
+   "roundLabel": "Zuschauerfrage",
+   "reward": [80, 400],
+   "intro": [
+    "Ein enges Studio, drei Kameras, ein Sitzsack. Bo Bitzel, ein Moderator mit zu vielen Zähnen, winkt dich herein. „Heute bei Frag den Crawler: {name}! Die Leitungen glühen, die Galaxis will alles wissen.“",
+    "„Die Regeln sind einfach: Die Zuschauer fragen, du antwortest. Gute Antworten bringen Follower. Schlechte … auch irgendwas.“"
+   ],
+   "outro_good": "„Die Leitungen brechen zusammen! {name}, du bist ein Naturtalent!“ Bo Bitzel schüttelt dir beide Hände.",
+   "outro_ok": "„Danke, {name}! Bleib dran, Galaxis!“ Der Sitzsack seufzt, als du aufstehst.",
+   "outro_bad": "„Ähm. Ja. Das war {name}.“ Bo Bitzel schaut auf die Uhr. Die Zuschauer schauen weg."
+  },
+  "talkshow": {
+   "minFollower": 1200,
+   "weight": 3,
+   "scale": 1.0,
+   "roundLabel": "Frage",
+   "reward": [150, 600]
+  },
+  "diskussion": {
+   "name": "Streitfall Abgrund",
+   "host": "Dr. Harald Hader",
+   "minFollower": 3000,
+   "weight": 2,
+   "scale": 1.3,
+   "roundLabel": "Runde",
+   "reward": [200, 800],
+   "intro": [
+    "Ein halbrunder Tisch, harte Stühle, grelles Licht. Dr. Harald Hader, Moderator mit Hornbrille und Ehrgeiz, begrüßt die Runde. „Willkommen bei Streitfall Abgrund. Heute streiten: {gast1}, {gast2} – und {name}!“",
+    "„Unser Thema: {thema}. Drei Runden, keine Gnade. Das Publikum stimmt mit der Fernbedienung ab.“"
+   ],
+   "outro_good": "„Das Publikum hat entschieden: {name} gewinnt die Runde!“ {gast1} und {gast2} klatschen. Widerwillig.",
+   "outro_ok": "„Ein Unentschieden! Wie langweilig. Danke an alle.“ Dr. Hader rückt seine Brille zurecht.",
+   "outro_bad": "„Das Publikum hat entschieden – und zwar gegen {name}.“ {gast1} grinst. Du hast gerade einen Feind gewonnen."
+  },
+  "gladiator": {
+   "name": "Die Grube – Gladiatorenabend",
+   "host": "Rumpel Krawall",
+   "minFollower": 6000,
+   "minLevel": 5,
+   "chance": 0.15,
+   "weight": 1,
+   "intro": "Ein Lichtstrahl, ein Ruck – du stehst im Sand einer runden Arena. Ränge bis unter die Decke, voll mit Zuschauern aller Arten. Rumpel Krawall brüllt ins Mikrofon: „GALAXIS! Heute in der Grube: {name} gegen {gegner}! Kampf, bis einer liegen bleibt!“",
+   "win": "Rumpel Krawall reißt deinen Arm hoch. „DER SIEGER!“ Die Ränge beben. Jemand wirft Blumen. Jemand anderes wirft einen Stuhl. Beides aus Liebe.",
+   "loss": "Alles wird schwarz. Als du aufwachst, schleifen dich zwei Sanitäter aus der Grube. „Das Publikum hat dich trotzdem gemocht“, sagt einer. „Ein bisschen.“",
+   "draw": "Ein Gong. „Die Sendezeit ist um!“, ruft Rumpel Krawall. „Unentschieden!“ Buhrufe. Der Gegner wird abgeführt, du auch.",
+   "maxTurns": 60
+  }
+ },
+ "INVITATION": {
+  "chanceFeatured": 0.75,
+  "chanceOther": 0.2,
+  "validTurns": 480,
+  "text": "EINLADUNG: {format} möchte dich als Gast. Geh in einen Safe Room und nimm über den Bildschirm teil – das Angebot gilt bis {bis} Uhr.",
+  "expired": "Die Einladung von {format} ist verfallen. Die Produktion ist beleidigt, die Zuschauer auch ein bisschen.",
+  "declined": "Du sagst {format} ab. Die Produktion notiert sich deinen Namen. Mit einem Fragezeichen."
+ },
+ "GUEST_EXTRAS": [
+  "eine Sprecherin der Sponsorenvereinigung",
+  "ein Ex-Crawler, der nur noch einen Schuh trägt",
+  "ein Dungeon-Ethiker mit sehr lautem Pullover",
+  "eine Fanclub-Präsidentin von drei Monden weiter"
+ ],
+ "FRAGERUNDE_QUESTIONS": [
+  {
+   "id": "angst",
+   "text": "{zuschauer} fragt: „Hast du eigentlich manchmal Angst da unten?“",
+   "answers": [
+    {"label": "„Jeden Tag. Ich mache trotzdem weiter.“", "tone": "ehrlich", "base": 25, "reaction": "Ein Raunen geht durch die Leitungen. Ehrlichkeit kommt an."},
+    {"label": "„Angst? Die Monster haben Angst vor mir.“", "tone": "frech", "base": 25, "risky": true, "reaction": "Die Zuschauer lieben es. Die Monster vermutlich weniger.", "failReaction": "Irgendwer schickt eine Aufnahme, wie du vor einer Ratte wegrennst. Peinlich."},
+    {"label": "„Nur vor der Toilettenregel.“", "tone": "witzig", "base": 20, "reaction": "Gelächter. Bo Bitzel muss kurz das Mikrofon weglegen."}
+   ]
+  },
+  {
+   "id": "essen",
+   "text": "{zuschauer} fragt: „Was isst man eigentlich so im Dungeon?“",
+   "answers": [
+    {"label": "„Was der Automat hergibt. Meistens Schokoriegel.“", "tone": "ehrlich", "base": 15, "reaction": "Ein Schokoriegel-Hersteller meldet sich in der Leitung. Sponsorengespräche!"},
+    {"label": "„Frag lieber nicht.“", "tone": "dramatisch", "base": 20, "reaction": "Die Leitungen werden still. Dann explodieren die Kommentare."},
+    {"label": "„Die Gegner, die nicht schnell genug weglaufen.“", "tone": "frech", "base": 25, "risky": true, "reaction": "Schockiertes Lachen. Die Galaxis kann nicht wegsehen.", "failReaction": "Ein Vegetarierverband aus dem Sternbild Kuh beschwert sich offiziell."}
+   ]
+  },
+  {
+   "id": "zuhause",
+   "text": "{zuschauer} fragt: „Vermisst du dein altes Leben als {background}?“",
+   "answers": [
+    {"label": "„Jeden Tag. Aber das hier ist jetzt mein Leben.“", "tone": "ehrlich", "base": 25, "reaction": "Die Kommentare werden ganz weich. Jemand schickt dir virtuelle Taschentücher."},
+    {"label": "„Ehrlich gesagt: Hier ist es spannender.“", "tone": "witzig", "base": 20, "reaction": "„Das ist die richtige Einstellung!“, ruft Bo Bitzel."},
+    {"label": "„Darüber rede ich nicht.“", "tone": "bescheiden", "base": 5, "reaction": "Respektvolles Schweigen. Ein paar Zuschauer finden dich geheimnisvoll."}
+   ]
+  },
+  {
+   "id": "tipp",
+   "text": "{zuschauer} fragt: „Welchen Tipp hast du für neue Crawler?“",
+   "answers": [
+    {"label": "„Immer zuerst den Safe Room suchen.“", "tone": "bescheiden", "base": 15, "reaction": "Vernünftig. Die Zuschauer nicken. Ein paar schreiben mit."},
+    {"label": "„Tritt gegen alles. Wirklich alles.“", "tone": "witzig", "base": 25, "reaction": "Der Clip geht viral. Tausende treten probehalber gegen ihre Möbel."},
+    {"label": "„Lauft. Einfach laufen. Und nicht zurückschauen.“", "tone": "dramatisch", "base": 20, "reaction": "Gänsehaut-Moment. Jemand legt Musik darunter."}
+   ]
+  },
+  {
+   "id": "lieblingsangriff",
+   "text": "{zuschauer} fragt: „Warum kämpfst du eigentlich so gern mit {lieblingsangriff}?“",
+   "answers": [
+    {"label": "„Weil es funktioniert.“", "tone": "ehrlich", "base": 15, "reaction": "Kurz und knapp. Die Kampfsportfans der Galaxis sind begeistert."},
+    {"label": "„Ich habe einen Ruf zu verlieren.“", "tone": "frech", "base": 25, "risky": true, "reaction": "Die Zuschauer jubeln. Ein Markenzeichen ist geboren.", "failReaction": "„Welchen Ruf?“, schreibt jemand. Viele Zuschauer stimmen zu."},
+    {"label": "„Das musst du die Gegner fragen.“", "tone": "witzig", "base": 20, "reaction": "Lacher. Bo Bitzel imitiert einen Gegner. Schlecht, aber mit Hingabe."}
+   ]
+  },
+  {
+   "id": "haustier",
+   "text": "{zuschauer} fragt: „Darf {haustier} mal in die Kamera schauen?“",
+   "when": "haustier",
+   "answers": [
+    {"label": "{haustier} hochheben und winken lassen", "tone": "witzig", "base": 30, "reaction": "Die Leitungen brechen zusammen. Die Galaxis hat ein neues Lieblingstier."},
+    {"label": "„{haustier} gibt keine Autogramme.“", "tone": "frech", "base": 15, "reaction": "Die Zuschauer finden das sehr professionell."},
+    {"label": "„Nur wenn ihr Leckerli schickt.“", "tone": "bescheiden", "base": 20, "reaction": "Innerhalb von Sekunden sind tausend Leckerli bestellt. Lieferung ungewiss."}
+   ]
+  },
+  {
+   "id": "system",
+   "text": "{zuschauer} fragt: „Was hältst du eigentlich von der Systemstimme?“",
+   "answers": [
+    {"label": "„Wir verstehen uns. Meistens.“", "tone": "bescheiden", "base": 15, "reaction": "Irgendwo im Hintergrund knackt ein Lautsprecher. Zufrieden, hoffentlich."},
+    {"label": "„Sie sollte mal Urlaub machen.“", "tone": "frech", "base": 30, "risky": true, "reaction": "Tosender Beifall. Die Systemstimme schweigt vielsagend.", "failReaction": "Das Licht im Studio flackert. Die Leitungen werden auffällig still."},
+    {"label": "„Ich glaube, sie mag mich.“", "tone": "witzig", "base": 20, "reaction": "„Das sagen alle“, sagt Bo Bitzel. Gelächter."}
+   ]
+  }
+ ],
+ "DISKUSSION_TOPICS": [
+  {
+   "id": "monster",
+   "thema": "Haben Monster Gefühle?",
+   "rounds": [
+    {
+     "text": "{gast1}: „Monster sind auch nur Bewohner. Wir sind in IHR Zuhause eingedrungen!“",
+     "answers": [
+      {"label": "Zustimmen: „Da ist etwas dran.“", "tone": "bescheiden", "base": 15, "reaction": "Nachdenkliches Nicken im Publikum. {gast1} lächelt dich dankbar an."},
+      {"label": "Widersprechen: „Die Ratte hat zuerst gebissen.“", "tone": "witzig", "base": 25, "reaction": "Lacher. {gast1} verschränkt die Arme."},
+      {"label": "Provozieren: „Dann lad doch eins zum Essen ein.“", "tone": "frech", "base": 35, "risky": true, "reaction": "Das Publikum johlt. {gast1} läuft rot an.", "failReaction": "Buhrufe. Das kam zu gemein rüber."}
+     ]
+    },
+    {
+     "text": "{gast2}: „Ich habe gesehen, wie {name} kämpft. Von Gefühlen keine Spur.“",
+     "answers": [
+      {"label": "„Ich kämpfe, um zu überleben. Das ist ein Gefühl.“", "tone": "ehrlich", "base": 30, "reaction": "Applaus. Dr. Hader macht sich eine Notiz und unterstreicht sie zweimal."},
+      {"label": "„Du hast offenbar die Folge verpasst, in der ich geweint habe.“", "tone": "witzig", "base": 25, "reaction": "Gelächter. {gast2} fehlen die Worte."},
+      {"label": "Aufstehen und dramatisch schweigen", "tone": "dramatisch", "base": 30, "risky": true, "reaction": "Totenstille. Dann tosender Beifall.", "failReaction": "Peinliche Stille. Jemand hustet. Du setzt dich wieder."}
+     ]
+    },
+    {
+     "text": "Dr. Hader: „Schlusswort, {name}: Würden Sie ein Monster verschonen?“",
+     "answers": [
+      {"label": "„Wenn es mich verschont – sofort.“", "tone": "ehrlich", "base": 25, "reaction": "Ein ausgewogenes Schlusswort. Das Publikum stimmt mehrheitlich für dich."},
+      {"label": "„Ich verschone grundsätzlich nur Gartenzwerge.“", "tone": "witzig", "base": 20, "reaction": "Lachen. Die Gartenzwerg-Lobby schickt ein Dankesschreiben."},
+      {"label": "„Nein. Nächste Frage.“", "tone": "frech", "base": 30, "risky": true, "reaction": "Hart, aber ehrlich. Die Kampffans stimmen geschlossen für dich.", "failReaction": "Das Publikum findet das kalt. Die Abstimmung kippt."}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "allein",
+   "thema": "Party oder allein – wer überlebt länger?",
+   "rounds": [
+    {
+     "text": "{gast1}: „Allein ist man schneller. Und muss nichts teilen.“",
+     "answers": [
+      {"label": "„Und stirbt allein. Toller Plan.“", "tone": "frech", "base": 30, "risky": true, "reaction": "Ooooh! Das Publikum johlt. {gast1} schnappt nach Luft.", "failReaction": "Das kam schlecht an. {gast1} bekommt Mitleidsapplaus."},
+      {"label": "„Jeder, wie er mag.“", "tone": "bescheiden", "base": 10, "reaction": "Diplomatisch. Langweilig, aber diplomatisch."},
+      {"label": "„Ich teile auch nichts. Aber ich habe Freunde.“", "tone": "witzig", "base": 25, "reaction": "Lacher. Dr. Hader muss kurz grinsen."}
+     ]
+    },
+    {
+     "text": "{gast2}: „Eine Party ist nur so stark wie ihr schwächstes Mitglied.“",
+     "answers": [
+      {"label": "„Deshalb passe ich auf meine Leute auf.“", "tone": "ehrlich", "base": 30, "reaction": "Applaus. Ein paar Zuschauer wünschen sich, in deiner Party zu sein."},
+      {"label": "„Dann ist meine Party sehr stark. Ich bin das schwächste Mitglied.“", "tone": "bescheiden", "base": 25, "reaction": "Rührung und Gelächter zugleich. Ein Kunststück."},
+      {"label": "„Deine Party hätte das schwächste Mitglied schon gefunden.“", "tone": "frech", "base": 35, "risky": true, "reaction": "Das Studio explodiert. {gast2} ist sprachlos.", "failReaction": "Zu viel. Das Publikum stellt sich auf die Seite von {gast2}."}
+     ]
+    },
+    {
+     "text": "Dr. Hader: „Ihr Schlusswort, {name}?“",
+     "answers": [
+      {"label": "„Zusammen kommt man weiter. Punkt.“", "tone": "ehrlich", "base": 25, "reaction": "Eine klare Haltung. Die Mehrheit stimmt für dich."},
+      {"label": "„Allein oder zu zweit – Hauptsache, die Toilette ist in der Nähe.“", "tone": "witzig", "base": 25, "reaction": "Das Publikum lacht Tränen. Thema verfehlt, Abstimmung gewonnen."},
+      {"label": "Eine flammende Rede über Zusammenhalt halten", "tone": "dramatisch", "base": 35, "risky": true, "reaction": "Stehende Ovationen. Jemand im Publikum weint.", "failReaction": "Die Rede ist zu lang. Dr. Hader unterbricht dich nach drei Minuten."}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "boxen",
+   "thema": "Sind Lootboxen gerecht?",
+   "rounds": [
+    {
+     "text": "{gast1}: „Lootboxen sind Glücksspiel. Wer Pech hat, kriegt Socken.“",
+     "answers": [
+      {"label": "„Ich habe schon tolle Sachen gefunden.“", "tone": "ehrlich", "base": 15, "reaction": "Ein paar Zuschauer nicken. Die Sponsoren lächeln."},
+      {"label": "„Socken sind unterschätzt.“", "tone": "witzig", "base": 25, "reaction": "Gelächter. Ein Sockenhersteller bucht spontan Werbung."},
+      {"label": "„Wer Pech hat, sollte besser kämpfen.“", "tone": "frech", "base": 30, "risky": true, "reaction": "Die Leistungsfans jubeln. {gast1} schnaubt.", "failReaction": "Das Publikum findet das herzlos. Buhrufe."}
+     ]
+    },
+    {
+     "text": "{gast2}: „Ohne Boxen hätte niemand hier unten eine Chance!“",
+     "answers": [
+      {"label": "„Stimmt. Danke an alle Fans für die Fan-Boxen!“", "tone": "bescheiden", "base": 30, "reaction": "Die Fans flippen aus. Die nächste Fan-Box ist schon unterwegs. Gefühlt."},
+      {"label": "„Ohne Boxen hätte ich mehr Platz im Rucksack.“", "tone": "witzig", "base": 20, "reaction": "Lacher. Dr. Hader notiert: humorvoll, aber undankbar."},
+      {"label": "„Die Chance kommt nicht aus der Box, sondern aus dem Kopf.“", "tone": "dramatisch", "base": 30, "risky": true, "reaction": "Ein Satz für die Ewigkeit. Er wird auf Tassen gedruckt.", "failReaction": "Das Publikum findet das kitschig. Ein paar lachen dich aus."}
+     ]
+    },
+    {
+     "text": "Dr. Hader: „Abschließend, {name}: Was war das Beste, das Sie je aus einer Box gezogen haben?“",
+     "answers": [
+      {"label": "„Eine zweite Chance.“", "tone": "dramatisch", "base": 25, "reaction": "Bedeutungsvolles Schweigen. Dann Applaus."},
+      {"label": "„Gold. Viel Gold.“", "tone": "ehrlich", "base": 15, "reaction": "Ehrlich und gierig. Das Publikum respektiert es."},
+      {"label": "„Den Mut, diese Frage nicht zu beantworten.“", "tone": "frech", "base": 30, "risky": true, "reaction": "Das Studio lacht. Du gewinnst die Abstimmung mit Abstand.", "failReaction": "Das Publikum fühlt sich veralbert. Die Abstimmung geht knapp verloren."}
+     ]
+    }
+   ]
+  },
+  {
+   "id": "show",
+   "thema": "Ist die Show zu brutal?",
+   "rounds": [
+    {
+     "text": "{gast1}: „Die Show zeigt zu viel Gewalt. Meine Kinder schauen zu!“",
+     "answers": [
+      {"label": "„Dann schalten Sie doch um.“", "tone": "frech", "base": 30, "risky": true, "reaction": "Das Publikum jubelt. {gast1} ist empört.", "failReaction": "Die Elternverbände der Galaxis rufen zum Boykott auf. Kurz."},
+      {"label": "„Ich hätte mir das auch nicht ausgesucht.“", "tone": "ehrlich", "base": 30, "reaction": "Ein ehrlicher Moment. Das Studio wird still, dann klatscht es."},
+      {"label": "„Ich gebe mir Mühe, kinderfreundlich zu treten.“", "tone": "witzig", "base": 25, "reaction": "Gelächter. Selbst {gast1} muss schmunzeln."}
+     ]
+    },
+    {
+     "text": "{gast2}: „Ohne Gewalt würde niemand zuschauen. Seien wir ehrlich.“",
+     "answers": [
+      {"label": "„Die Leute schauen wegen der Geschichten.“", "tone": "ehrlich", "base": 25, "reaction": "Nachdenkliches Raunen. Dr. Hader nickt anerkennend."},
+      {"label": "„Und wegen meines Charmes.“", "tone": "frech", "base": 30, "risky": true, "reaction": "Das Publikum lacht und stimmt zu. Charme hat gewonnen.", "failReaction": "Das Publikum lacht – über dich, nicht mit dir."},
+      {"label": "Zur Kamera drehen und winken", "tone": "witzig", "base": 20, "reaction": "Die Zuschauer winken zurück. Milliarden kleiner Hände."}
+     ]
+    },
+    {
+     "text": "Dr. Hader: „Ihr Schlusswort, {name}?“",
+     "answers": [
+      {"label": "„Ich will einfach nur überleben. Der Rest ist euer Problem.“", "tone": "dramatisch", "base": 30, "risky": true, "reaction": "Ein Schlusswort wie ein Faustschlag. Die Abstimmung ist eindeutig.", "failReaction": "Zu bitter. Das Publikum möchte lieber unterhalten werden."},
+      {"label": "„Danke fürs Zuschauen. Wirklich.“", "tone": "bescheiden", "base": 20, "reaction": "Warmer Applaus. Die Fans fühlen sich gesehen."},
+      {"label": "„Nächste Woche: noch mehr Tritte.“", "tone": "witzig", "base": 25, "reaction": "Das Publikum johlt. Die Quote steigt."}
+     ]
+    }
+   ]
+  }
+ ]
+}

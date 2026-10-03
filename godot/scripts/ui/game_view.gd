@@ -537,11 +537,13 @@ func act(fn: Callable) -> bool:
 		return false
 	var before := anim.snapshot(s)
 	var floor: int = s.floor
+	var map_before: Dictionary = s.map
 	if inspected != null:
 		inspected = null
 		_tip.visible = false
 	var res: Dictionary = fn.call()
-	if s.floor != floor:
+	# Neue Etage oder Ausflug in die Grube: nichts zwischen zwei Karten animieren
+	if s.floor != floor or not is_same(s.map, map_before):
 		anim.reset()
 	else:
 		anim.after(s, before, Fx.drain_fx(s))
@@ -994,6 +996,14 @@ func refresh_top() -> void:
 	show.tooltip_text = "Staffel %d" % s.season
 	show.mouse_filter = Control.MOUSE_FILTER_PASS
 	_pill_bb("Etage [b]%d[/b] · %s" % [s.floor, Kit.esc(def.name if def else "")])
+	_pill(Highlights.clock_text(s), "text", "Pill", 400, "Uhrzeit im Dungeon. Ab Etage 2 laufen jeden Abend um 21 Uhr die Highlights auf den Bildschirmen der Safe Rooms.")
+	if Arena.active(s):
+		_pill("Die Grube", "danger", "PillWarn", 700, "Gladiatorenkampf: Wer liegen bleibt, verliert – sterben kannst du hier nicht.")
+	elif Game.has_unlock(s, "zuschauer") and Highlights.on_air(s):
+		_pill("Jetzt live: Abgrund am Abend", "accent", "PillTimer", 700, "Am Bildschirm in einem Safe Room anschauen (bis Mitternacht)")
+	var inv = Invitations.pending(s)
+	if inv != null:
+		_pill("Einladung: " + Invitations.format_name(inv.format), "achv", "PillTimer", 700, "Im Safe Room am Bildschirm annehmen oder absagen. Gilt noch %s." % ViewHelpers.format_time(maxi(0, int(inv.until) - int(s.turn))))
 	_pill("Einsturz in %s" % ViewHelpers.format_time(left), "text" if left > 120 else "danger", "PillWarn" if left <= 120 else "PillTimer", 700, "Zeit bis zum Einsturz der Etage")
 	var rush := Progression.rush_bonus(s)
 	if rush >= 0.1:
@@ -1244,7 +1254,7 @@ func _log_line(l: Dictionary, n: int) -> String:
 		body = "[i]%s[/i]" % body
 	if n > 1:
 		body += " [color=#8a8f9c](%d×)[/color]" % n
-	return "[font_size=11][color=#555b69][b]%s[/b][/color][/font_size]  [color=%s]%s[/color]" % [ViewHelpers.format_time(l.turn), color, body]
+	return "[font_size=11][color=#555b69][b]%s[/b][/color][/font_size]  [color=%s]%s[/color]" % [ViewHelpers.clock_at(s, int(l.turn)), color, body]
 
 
 ## Neue Log-Zeilen werden angehängt und Zeichen für Zeichen getippt.

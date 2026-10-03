@@ -1454,7 +1454,7 @@
    "name": "Primetime",
    "tier": "silber",
    "box": "fan",
-   "description": "Sei zu Gast in der Talkshow zwischen den Etagen.",
+   "description": "Sei zum ersten Mal Gast in einer Show.",
    "comment": "Das Sofa ist bequemer als alles, worauf du in letzter Zeit gesessen hast. Genieß es. Es ist gemietet.",
    "category": "show"
   },
@@ -1474,6 +1474,96 @@
    "box": null,
    "description": "Verliere in einer Talkshow Follower.",
    "comment": "Das Internet vergisst nicht. Das galaktische Internet noch weniger.",
+   "category": "show"
+  },
+  {
+   "id": "highlight_1",
+   "name": "Zur besten Sendezeit",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Komm in die Highlight-Sendung „Abgrund am Abend“.",
+   "comment": "Die ganze Galaxis hat dich gesehen. Zur besten Sendezeit. Zwischen zwei Werbeblöcken für Tentakelzahnpasta.",
+   "category": "show"
+  },
+  {
+   "id": "highlight_5",
+   "name": "Stammgast im Abendprogramm",
+   "tier": "gold",
+   "box": "fan",
+   "description": "Komm fünfmal in die Highlights.",
+   "comment": "Die Redaktion hat inzwischen einen eigenen Ordner für dich. Er ist dick.",
+   "category": "show"
+  },
+  {
+   "id": "highlight_top",
+   "name": "Szene des Tages",
+   "tier": "gold",
+   "box": "fan",
+   "description": "Hol dir Platz eins in den Highlights.",
+   "comment": "Platz eins. Die Szene läuft jetzt in Dauerschleife auf drei Sonnensystemen.",
+   "category": "show"
+  },
+  {
+   "id": "highlight_geschaut_3",
+   "name": "Couchkartoffel",
+   "tier": "bronze",
+   "box": null,
+   "description": "Schau dir dreimal die Highlights im Safe Room an.",
+   "comment": "Draußen tobt der Dungeon. Du schaust fern. Die Systemstimme versteht das. Ein bisschen.",
+   "category": "show"
+  },
+  {
+   "id": "show_selbst",
+   "name": "Ich bin im Fernsehen!",
+   "tier": "silber",
+   "box": "fan",
+   "description": "Schau dir eine Sendung an, in der du selbst vorkommst.",
+   "comment": "Du winkst dem Bildschirm zu. Dein Ich auf dem Bildschirm winkt nicht zurück. Es kämpft gerade.",
+   "category": "show"
+  },
+  {
+   "id": "show_fragerunde",
+   "name": "Frag mich was",
+   "tier": "bronze",
+   "box": null,
+   "description": "Sei Gast bei „Frag den Crawler“.",
+   "comment": "Die Galaxis wollte alles wissen. Du hast fast alles erzählt.",
+   "category": "show"
+  },
+  {
+   "id": "show_diskussion",
+   "name": "Streitkultur",
+   "tier": "silber",
+   "box": "schmuck",
+   "description": "Gewinne eine Diskussionsrunde bei „Streitfall Abgrund“.",
+   "comment": "Du hast eine Debatte gewonnen. Mit Argumenten. Teilweise.",
+   "category": "show"
+  },
+  {
+   "id": "show_gladiator",
+   "name": "Brot und Spiele",
+   "tier": "gold",
+   "box": "brawler",
+   "description": "Gewinne einen Gladiatorenkampf in der Grube.",
+   "comment": "Die Ränge toben. Jemand hat ein Banner mit deinem Namen gemalt. Falsch geschrieben, aber mit Liebe.",
+   "category": "show"
+  },
+  {
+   "id": "show_gladiator_verloren",
+   "name": "Ehrenvoll im Sand",
+   "tier": "bronze",
+   "box": null,
+   "description": "Verliere einen Gladiatorenkampf in der Grube – und überlebe es.",
+   "comment": "Verloren, aber nicht tot. In der Grube zählt das schon als halber Sieg.",
+   "category": "show"
+  },
+  {
+   "id": "show_absage",
+   "name": "Kein Kommentar",
+   "tier": "bronze",
+   "box": null,
+   "description": "Sage eine Einladung ab.",
+   "comment": "Die Produktion ist beleidigt. Die Zuschauer finden dich geheimnisvoll.",
    "category": "show"
   },
   {

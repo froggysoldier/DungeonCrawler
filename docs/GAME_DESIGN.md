@@ -311,6 +311,7 @@ Für gefühlt alles, was ein Achievement wert ist, gibt es eines – insgesamt
 - Fan-Boxen bei 100 / 250 / 500 / 1.000 / 2.500 / 5.000 / 10.000 … Followern.
 - Große Momente bringen manchmal Geschenke aus dem Publikum.
 - Zuschauer-Kommentare im Log (Zuschauer xX_Glorbnak_Xx: „DRAUFGESTAMPFT HAHAHA“).
+- Highlight-Sendung jeden Abend um 21 Uhr und Einladungen zu Shows: siehe 3.19.
 
 ### 3.11 Rassen & Klassen (ab Etage 3)
 - Man wird in die Gilde geholt und wählt **Rasse** und **Klasse**. Der
@@ -432,16 +433,52 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
 - **Bevölkerung:** Die Systemstimme zählt regelmäßig durch, wie viele Crawler
   noch leben. Die Zahl sinkt im Lauf jeder Etage und beim Einsturz.
 
-### 3.19 Rückblick und Talkshow
+### 3.19 Rückblick, Highlights und Shows
 - Beim Abstieg zeigt die Systemstimme einen **Rückblick** auf die Etage:
   Kämpfe, Fallen, Handwerk, Achievements, erkannte Muster, Party, Gefallene,
   Follower und verbleibende Crawler.
-- Sobald das Publikum zuschaut, ist man danach Gast in der **Talkshow**
-  „Glanz und Gloria“. Die Fragen richten sich nach dem Run (Haustier, Party,
-  gefallene Mitglieder, Kampfstil, Bomben …). Antworten haben einen Ton
-  (ehrlich, witzig, frech, bescheiden, dramatisch). Riskante Antworten hängen
-  vom Charisma ab und können Follower kosten. Eine gute Sendung bringt eine
-  Fan-Box.
+- **Uhrzeit:** Der Dungeon hat jetzt eine Uhr (Spielbeginn Tag 1, 8 Uhr; ein
+  Zug sind 3 Minuten). Sie steht oben in der Leiste, das Log zeigt Uhrzeiten.
+- **Highlight-Sendung „Abgrund am Abend“** (ab Etage 2, `scripts/engine/highlights.gd`,
+  Texte in `data/show.json`): Den Tag über merkt sich die Redaktion die
+  spektakulärsten Szenen – besondere Kills (Stampfen, Sprung, Falle, Bombe,
+  Haustier, Elite), Bosse, knappe Rettungen, Meisterleistungen, gefallene
+  Party-Mitglieder und ab 20 Kills am Tag das „Schlachtfest“. Jeden Abend um
+  **21 Uhr** läuft die Sendung bis Mitternacht auf dem **Bildschirm in jedem
+  Safe Room**: Szenen anderer Crawler, die eigenen besten Szenen (ab einer
+  Wertung von 15), manchmal die Szene des Tages, das Gedenken an die
+  Gestorbenen und ein **Tipp der Redaktion**, der einen unbekannten
+  besonderen Raum (Schatzkammer, Schrein, Nest, Geheimkammer) auf die Karte
+  zeichnet. Wer um 21 Uhr in einem Safe Room ist, sieht sie sofort; sonst
+  bis Mitternacht am Bildschirm. Wer vorkommt, gewinnt Follower und Hype –
+  auch wenn er selbst nicht zuschaut.
+- **Einladungen** (`scripts/engine/invitations.gd`): Nach einer Sendung, in
+  der man vorkam, lädt eine Show mit 75 % ein (sonst mit 20 %), wenn man
+  bekannt genug ist. Angenommen oder abgesagt wird am Bildschirm im Safe
+  Room; eine Einladung gilt 24 Stunden.
+
+  | Format | ab Followern | Ablauf |
+  |---|---|---|
+  | Frag den Crawler (Fragerunde) | 250 | drei Zuschauerfragen, kleinere Wirkung |
+  | Glanz und Gloria (Talkshow) | 1.200 | Fragen nach dem Run, wie bisher |
+  | Streitfall Abgrund (Diskussionsrunde) | 3.000 | Thema, zwei Gäste (andere Crawler oder Studiogäste), drei Runden, größere Wirkung |
+  | Die Grube (Gladiatorenkampf) | 6.000 und Stufe 5, selten (15 %) | echter Kampf in einer eigenen Arena gegen einen Elite-Gegner der Etage (Stufe +1) |
+
+- Alle Gesprächsformate: Antworten haben einen Ton (ehrlich, witzig, frech,
+  bescheiden, dramatisch); riskante Antworten hängen von Charisma und Hype
+  ab und können Follower kosten. Eine gute Sendung bringt eine Fan-Box
+  (Silber, sehr gut Gold).
+- **Die Grube:** Die Etage wartet währenddessen (Gegner, Crawler, Fallen,
+  Haustier bleiben, wo sie sind; keine Blase, keine Einlagen, keine
+  Aufträge). Sterben kann man dort nicht: Bei null Lebenspunkten ist man
+  k. o. und wird mit mindestens einem Viertel der Lebenspunkte
+  hinausgeschleift. Sieg: Preisgeld (40 Gold je Etage), eine Schläger-Box
+  und viele Follower. Nach 60 Zügen ertönt der Gong (unentschieden).
+- **Zwischen den Etagen** gibt es nur noch für Bekannte eine Show: ab 1.200
+  Followern die Talkshow, ab 250 die Fragerunde, sonst nur den Rückblick.
+- Neue Achievements: Zur besten Sendezeit, Stammgast im Abendprogramm,
+  Szene des Tages, Couchkartoffel, Ich bin im Fernsehen!, Frag mich was,
+  Streitkultur, Brot und Spiele, Ehrenvoll im Sand, Kein Kommentar.
 
 ### 3.20 Sponsoren
 - Elf erfundene Sponsoren (Kristallhaus Vornex, Brennstoffwerke Pyrrax,

@@ -45,6 +45,7 @@ static func check(s: Dictionary, e: Dictionary) -> void:
 		var first_note := " ERSTMALIG IN DEINER KARRIERE – Box-Stufe erhöht!" if first and tiers.find(tier) > tiers.find(a.tier) else ""
 		if meister:
 			first_note += " MEISTERLEISTUNG!"
+			Highlights.note(s, 50, "meister", {"was": a.name})
 		var tier_name: String = Db.world("BOX_TIER_NAMES")[tier]
 		var box_name: String = Db.world("BOX_TYPE_NAMES")[a.box]
 		Log.add(s, "Belohnung: %s %s.%s" % [tier_name, box_name, first_note], "loot")

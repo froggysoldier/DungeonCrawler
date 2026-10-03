@@ -105,11 +105,13 @@ static func on_event(s: Dictionary, e: Dictionary) -> void:
 				pts += 4
 				kind = "bomb"
 			add_spectacle(s, pts, kind)
+			Highlights.on_kill(s, m, pts, kind)
 		"trapTriggered":
 			add_spectacle(s, 4 if e.onPlayer else 3, "trap")
 		"crawlerDied":
 			if e.party:
 				add_spectacle(s, 10, "drama")
+				Highlights.note(s, 12, "drama")
 		"rammed":
 			add_spectacle(s, 7 if e.kill else 4, "stomp")
 		"partyJoined":
@@ -124,6 +126,7 @@ static func on_event(s: Dictionary, e: Dictionary) -> void:
 			if s.player.hp <= Player.max_hp(s) * 0.2 and s.turn - (-999 if last == null else int(last)) > 20:
 				s.viewers.lastCloseCall = s.turn
 				add_spectacle(s, 8, "closecall")
+				Highlights.note(s, 10, "closecall")
 		"explosion":
 			add_spectacle(s, 5, "closecall")
 		"robbed":

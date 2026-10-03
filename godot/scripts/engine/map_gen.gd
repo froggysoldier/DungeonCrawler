@@ -528,14 +528,14 @@ static func _pick_empty(s: Dictionary) -> Variant:
 
 
 ## Safe Rooms einrichten: Automat, Wirt, Händler (erst ab der Etage mit
-## Handel), Bett, Toilette.
+## Handel), Bett, Toilette und der Bildschirm für die Highlights.
 static func _furnish(s: Dictionary, m: Dictionary, r: Dictionary) -> void:
 	var kinds := ["automat"]
 	if r.get("safeVariant") == "restaurant":
 		kinds.append("wirt")
 	if int(s.floor) >= Game.unlock_floor("handel"):
 		kinds.append("haendler")
-	kinds.append_array(["bett", "toilette"])
+	kinds.append_array(["bett", "toilette", "bildschirm"])
 	var door_within := func(x: int, y: int, d: int) -> bool:
 		for dy in range(-d, d + 1):
 			for dx in range(-d, d + 1):
