@@ -201,6 +201,7 @@ func test_grube_sieg(t) -> void:
 	# Gegner direkt neben den Crawler stellen und schwächen
 	m.pos = {"x": s.player.pos.x + 1, "y": s.player.pos.y}
 	m.hp = 1
+	m.dmg = [0, 0]
 	m.abilities = []
 	for i in 60:
 		if not Arena.active(s):

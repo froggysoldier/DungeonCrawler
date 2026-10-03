@@ -62,8 +62,8 @@ static func shape(s: Dictionary, m: Dictionary) -> void:
 	var w: int = m.width
 	var h: int = m.height
 	# Zwei waagerechte und ein senkrechter Kanal, je zwei Felder breit
-	var rows := [R.int_(s, 9, 17), R.int_(s, 33, 41)]
-	var col := R.int_(s, 20, 50)
+	var rows := [R.int_(s, h * 9 / 52, h * 17 / 52), R.int_(s, h * 33 / 52, h * 41 / 52)]
+	var col := R.int_(s, w * 20 / 72, w * 50 / 72)
 	for y0 in rows:
 		for y in [y0, y0 + 1]:
 			for x in range(1, w - 1):
@@ -80,7 +80,15 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, occupied: Di
 	var cands: Array = m.rooms.filter(func(r):
 		if r.kind != "normal" or r.get("feature") != null or r.get("sealed") or r.get("antechamberOf") != null or r.w * r.h < 16:
 			return false
-		return not MapGen.room_has_tile(m, r, "stairs"))
+		if MapGen.room_has_tile(m, r, "stairs"):
+			return false
+		# Genug trockener Boden für Händler und Bewohner
+		var dry := 0
+		for y in range(r.y, r.y + r.h):
+			for x in range(r.x, r.x + r.w):
+				if m.tiles[MapGen.idx(m, x, y)] == "floor":
+					dry += 1
+		return dry >= 14)
 	if cands.is_empty():
 		return
 	J.sort(cands, func(a, b): return MapGen.dist(MapGen.center(a), mid) - MapGen.dist(MapGen.center(b), mid))
@@ -94,6 +102,8 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, occupied: Di
 		var r: Dictionary = town[i]
 		var kind: String = types[i]
 		r.siedlung = true
+		# Ein Revier wird zur Siedlung: hier kommt kein Nachschub mehr
+		r.erase("revier")
 		r.feature = "markt"
 		r.shopType = kind
 		r.name = MARKET_NAMES[kind][0]

@@ -62,9 +62,29 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   Profi-Schläger).
 
 ### 3.2 Welt & Karte
-- Etage = 72×52 Kacheln, vier **Viertel** (Nachbarschaften) + zentrales Gewölbe.
+- Etage = 84×60 Kacheln, vier **Viertel** (Nachbarschaften) + zentrales Gewölbe.
+- **Haupt- und Nebengänge:** Zwei Felder breite Hauptgänge bilden einen Ring
+  um das Gewölbe und zwei Achsen, die die Etage in die vier Viertel teilen;
+  jedes Viertel hat zusätzlich ein eigenes Gangkreuz. Schmale Nebengänge
+  führen von jedem Raum zum nächsten Hauptgang, viele Räume haben einen
+  zweiten Zugang zu einem Nachbarraum. So gibt es Schleifen und mehrere Wege
+  statt eines einzigen Tunnels. Kurze Sackgassen enden in kleinen **Nischen**.
+- **Safe Rooms:** nur drei je Etage, je einer in den drei anderen Vierteln,
+  nie im Start-Viertel.
+- **Reviere:** Je Viertel zwei (ab Etage 2 drei) Räume, in denen eine einzige
+  Monsterart lebt, 3–5 Tiere (nahe am Start 2–3 der untersten Stufe). Nur
+  dort kommt Nachschub, und zwar immer dieselbe Art. Die übrigen Räume sind
+  meist leer, ab und zu streift ein Einzelgänger herum (auf Etage 1 öfter).
+- **Toiletten** stehen nicht nur in Safe Rooms, sondern auch in manchen
+  Räumen und Nischen. Man benutzt sie, wenn man direkt daneben steht.
+- **Andere Crawler:** zwei auf Etage 1, vier auf Etage 2, sechs auf Etage 3,
+  keiner im Umkreis von 25 Feldern um den Start.
 - Räume mit Namen und Beschreibungen (Heizungskeller, Partykeller, Luftschutzbunker …).
-- Sichtfeld (Fog of War). **Vor dem Tutorial keine Karte** – man sieht nur, was gerade in Sicht ist.
+- Sichtfeld (Fog of War). Die Karte (mit kleiner Übersichtskarte) merkt sich von Anfang an, wo man war.
+- **Gegenstände aus der Entfernung:** Bis zwei Felder weit erkennt man, was
+  am Boden liegt. Weiter weg zeigt der Tooltip nur „Da liegt etwas. Zu weit
+  weg, um es zu erkennen.“ Steht man nah dran und kennt den Gegenstand nicht
+  (Stufe zu niedrig), steht dort, dass man ihn nicht kennt.
 - **Einsturz-Timer**: 5 Tage (2400 Züge). Warnungen bei 24 h, 6 h, 1 h.
 - Treppenhäuser: eins hinter dem Borough-Boss, zwei in abgelegenen Räumen.
 - Boss-Kammern und Arena sind **Sackgassen mit genau einem Zugang**.
@@ -72,12 +92,19 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   Tooltip) und einen **Vorraum** mit 2–3 normalen Wachen: Man läuft nie
   unvermittelt hinein. Beim Betreten verriegelt sich die Tür, bis der Boss
   fällt; ein **Versus-Bildschirm** zeigt Crawler gegen Boss.
-- **Ruhiger Start:** Im Umkreis von etwa 18 Feldern um den Startraum gibt es
-  keine Rudel, nur Einzelgänger. Elite-Gegner tauchen auf Etage 1 erst weit
+- **Ruhiger Start:** Im Umkreis von etwa 22 Feldern um den Startraum gibt es
+  keine Reviere, nur Einzelgänger. Elite-Gegner tauchen auf Etage 1 erst weit
   vom Start auf (auf den tieferen Etagen etwas früher). Fernkämpfer auf
   Etage 1 (Irrlicht, Grauer Späher) machen etwas weniger Schaden.
-- **Bodenfunde:** In normalen Räumen liegt nur Handwerksmaterial (Schrott,
-  Steine, Flaschen …). Echte Beute liegt nur im Vorraum der Boss-Kammern.
+- **Bodenfunde:** Gegenstände liegen nicht einfach herum. Beute gibt es im
+  Vorraum der Boss-Kammern, in Schatz- und Geheimkammern, in Kisten und bei
+  Monstern.
+- **Waffe in der Hand:** Vor der Gilde hat man nur eine Hand frei; Kleinkram
+  nimmt einem die Waffe nicht mehr weg. In der Gilde wird eine Waffe aus der
+  Hand angelegt statt eingepackt.
+- **Wertepunkte:** Bis zur Klassen- und Rassenwahl auf Etage 3 verteilen
+  sich die drei Punkte pro Stufe von selbst gleichmäßig; danach verteilt man
+  sie frei.
 - **Gilden und Safe Rooms** haben Mauern und **Türen**. Geschlossene Türen
   versperren Weg und Sicht und müssen erst geöffnet werden (ein Zug, nie
   schräg); man kann sie wieder schließen. Monster öffnen sie nicht.

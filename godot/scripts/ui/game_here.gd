@@ -106,7 +106,7 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 	if room != null and room.kind == "safe":
 		any = true
 		_safe_room(gv, v, room)
-	elif room != null and room.get("feature") != null:
+	elif room != null and (room.get("feature") != null or not J.arr(room, "furniture").is_empty()):
 		any = _feature_room(gv, v, room) or any
 	if any:
 		root.add_child(v)
@@ -240,6 +240,11 @@ static func _feature_room(gv: GameView, v: VBoxContainer, room: Dictionary) -> b
 			"schrein_leer":
 				any = true
 				Kit.text(v, "Der Schrein ist erloschen.", 12, "muted")
+			"toilette":
+				any = true
+				Kit.section(v, "Toilette")
+				Kit.text(v, "Eine einsame Toilette. Die Regel gilt hier genauso.", 12, "muted")
+				Kit.button(v, "Toilette benutzen", func(): gv.act(func(): return Game.toilet(s)), "SmallButton").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 			"haendler":
 				if room.get("shop") != null:
 					any = true

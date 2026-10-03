@@ -64,7 +64,8 @@ static func new_game(opts: Dictionary) -> Dictionary:
 		},
 		"monsters": [],
 		"items": [],
-		"unlocks": [],
+		# Die Karte merkt sich von Anfang an, wo man schon war
+		"unlocks": ["minimap"],
 		"achievements": [],
 		"counters": {
 			"kills": 0, "killsByDef": {}, "steps": 0, "itemsPicked": 0, "boxesOpened": 0, "missStreak": 0,
@@ -617,25 +618,27 @@ static func _tick_time(s: Dictionary, turns: int, before: int) -> void:
 		Log.add(s, "Die Decke kommt herunter. Die ganze Etage stürzt ein – und du mit ihr.", "gefahr")
 
 
+## Nachschub kommt nur in den Revieren, und zwar immer dieselbe Art.
 static func _respawn(s: Dictionary) -> void:
 	var vis := visible_tiles(s)
 	for hood in s.map.hoods:
 		# Ohne Boss kommt im Viertel nur halb so oft etwas nach
 		if not hood.bossAlive and int(s.lastSpawnTurn / 30) % 2 == 1:
 			continue
-		var count: int = s.monsters.filter(func(m): return m.hood == hood.id and m.rank == "normal").size()
-		if count >= 14:
-			continue
-		var rooms: Array = s.map.rooms.filter(func(r): return r.hood == hood.id and r.kind == "normal" and not r.get("siedlung"))
+		var rooms: Array = s.map.rooms.filter(func(r): return r.hood == hood.id and r.get("revier") != null)
 		if rooms.is_empty():
 			continue
 		var room: Dictionary = R.pick(s, rooms)
+		var inside: int = s.monsters.filter(func(m): return m.rank == "normal" and MapGen.room_of(s.map, m.pos) != null and MapGen.room_of(s.map, m.pos).id == room.id).size()
+		if inside >= 6:
+			continue
 		var p := J.pos(R.int_(s, room.x, room.x + room.w - 1), R.int_(s, room.y, room.y + room.h - 1))
 		if vis.has(MapGen.idx(s.map, p.x, p.y)) or Ai.occupied(s, p) or MapGen.tile_at(s.map, p.x, p.y) != "floor":
 			continue
-		var level := Monsters.respawn_level(s)
+		var def = Db.monster(room.revier.def)
+		var level := Monsters.clamp_level(def, Monsters.respawn_level(s))
 		# Elite-Nachzügler erst, wenn der Crawler ein paar Stufen hat
-		s.monsters.append(Monsters.spawn_for_floor(s, s.floor, level, p, hood.id, R.chance(s, 0.05) and int(s.player.level) >= 3))
+		s.monsters.append(Monsters.spawn_monster(s, def, level, p, hood.id, R.chance(s, 0.05) and int(s.player.level) >= 3))
 
 
 static func _kick_from_safe_room(s: Dictionary) -> void:
@@ -745,10 +748,17 @@ static func _run_tutorial(s: Dictionary) -> void:
 	var guide: Dictionary = Db.world("DEFAULT_GUIDE")
 	var former: bool = s.guideName != guide.name
 	s.pendingDialogs.append({"title": "Gilde der Einweisung", "speaker": s.guideName, "pages": Rules.tutorial_pages(s.guideName, guide.description, former)})
-	s.unlocks.append_array(["inventar", "stats", "minimap", "skills"])
+	for u in ["inventar", "stats", "minimap", "skills"]:
+		if not s.unlocks.has(u):
+			s.unlocks.append(u)
 	var p: Dictionary = s.player
 	if p.hand != null:
-		Inventory.add_to_inventory(s, p.hand)
+		# Eine Waffe in der Hand wird angelegt, nicht weggepackt
+		if p.hand.get("slot") == "waffe" and p.equipment.get("waffe") == null:
+			p.equipment.waffe = p.hand
+			Log.add(s, "Du legst %s als Waffe an." % Identify.item_name(s, p.hand), "info")
+		else:
+			Inventory.add_to_inventory(s, p.hand)
 		p.hand = null
 	Inventory.add_to_inventory(s, Items.create_item(s, "kleiner_heiltrank", 2))
 	Magic.learn_spell(s, "heilen", true)
@@ -779,6 +789,9 @@ static func pickup(s: Dictionary, uid: Variant = null) -> Dictionary:
 			_reveal_hood(s, int(J.nn(it, "hood", 0)))
 			continue
 		if not has_unlock(s, "inventar") and it.kind != "gold":
+			# Ohne Inventar nur eine Hand frei: die Waffe nicht für Kleinkram hergeben
+			if p.hand != null and p.hand.get("slot") == "waffe" and it.get("slot") != "waffe":
+				return _fail("Du hältst schon %s. Ohne Rucksack hast du keine Hand frei – finde erst die Gilde." % Identify.item_name(s, p.hand))
 			if p.hand != null:
 				s.items.append({"pos": J.pcopy(p.pos), "item": p.hand})
 				Log.add(s, "Du legst %s ab." % p.hand.name, "info")
@@ -1171,8 +1184,10 @@ static func cast(s: Dictionary, spell_id: String, opts: Dictionary = {}) -> Dict
 
 static func toilet(s: Dictionary) -> Dictionary:
 	var room = current_room(s)
-	if room == null or room.kind != "safe":
-		return _fail("Hier gibt es keine Toilette. Die gibt es nur in Safe Rooms. Und die Regel gilt.")
+	var near: bool = room != null and J.some(J.arr(room, "furniture"), func(f): return f.kind == "toilette" and J.cheb(f.pos, s.player.pos) <= 1)
+	var legacy_safe: bool = room != null and room.kind == "safe" and J.arr(room, "furniture").is_empty()
+	if not near and not legacy_safe:
+		return _fail("Hier gibt es keine Toilette. Stell dich neben eine – in Safe Rooms und in manchen Räumen gibt es welche. Und die Regel gilt.")
 	var res := Bladder.use_toilet(s)
 	if not res.ok:
 		return _fail(res.get("message", "Geht nicht."))
@@ -1376,6 +1391,8 @@ static func sell_item(s: Dictionary, uid: String) -> Dictionary:
 static func allocate_stat(s: Dictionary, key: String) -> Dictionary:
 	if not has_unlock(s, "stats"):
 		return _fail("Werte sind noch nicht freigeschaltet.")
+	if s.player.get("klass") == null:
+		return _fail("Punkte frei verteilen kannst du erst nach der Klassen- und Rassenwahl auf Etage 3. Bis dahin verteilen sie sich von selbst.")
 	if s.player.statPoints <= 0:
 		return _fail("Keine Punkte übrig.")
 	s.player.statPoints -= 1

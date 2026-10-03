@@ -82,14 +82,15 @@ func test_unfall_ruft_wutelementar(t) -> void:
 	t.eq(s.player.blase, 0, "Blase leer")
 
 
-func test_toilette_nur_im_safe_room(t) -> void:
+func test_toilette_nur_an_einer_toilette(t) -> void:
 	var s := _make()
 	s.player.blase = 70
-	t.ok(not Game.toilet(s).ok, "draußen nicht")
+	t.ok(not Game.toilet(s).ok, "ohne Toilette nicht")
 	var safe = TH.room(s, "safe")
-	s.player.pos = {"x": safe.x + 1, "y": safe.y + 1}
-	Game.move_step(s, {"x": safe.x + 2, "y": safe.y + 1})
-	t.ok(Game.toilet(s).ok, "im Safe Room")
+	var f = J.find(safe.furniture, func(x): return x.kind == "toilette")
+	s.monsters = []
+	s.player.pos = MapGen.free_beside(s.map, f.pos)
+	t.ok(Game.toilet(s).ok, "neben der Toilette im Safe Room")
 	t.lt(s.player.blase, 1, "erleichtert")
 
 

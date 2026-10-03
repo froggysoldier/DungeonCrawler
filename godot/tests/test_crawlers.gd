@@ -28,7 +28,7 @@ func _neighbor(s: Dictionary, personality: String) -> Dictionary:
 
 func test_bevoelkerung_sinkt(t) -> void:
 	var s := TH.make(3100, {"beruf": 1})
-	t.ge(Crawlers.crawlers(s).size(), 4, "Crawler auf der Etage")
+	t.ge(Crawlers.crawlers(s).size(), 2, "Crawler auf der Etage")
 	var start: int = Crawlers.population(s).alive
 	_tutorial(s)
 	for i in 300:

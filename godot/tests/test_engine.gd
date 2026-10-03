@@ -54,7 +54,7 @@ func test_karten_zusammenhaengend(t) -> void:
 		t.eq(bad, 0, "Seed %d: alles erreichbar" % seed)
 		var kinds: Array = s.map.rooms.map(func(r): return r.kind)
 		t.ge(kinds.count("guild"), 1, "Gilde")
-		t.ge(kinds.count("safe"), 4, "Safe Rooms")
+		t.eq(kinds.count("safe"), 3, "Safe Rooms")
 		t.eq(kinds.count("boss"), 4, "Boss-Kammern")
 		t.ge(s.map.tiles.count("stairs"), 2, "Treppen")
 		t.eq(s.monsters.filter(func(m): return m.rank == "nachbarschaftsboss").size(), 4, "Nachbarschaftsbosse")

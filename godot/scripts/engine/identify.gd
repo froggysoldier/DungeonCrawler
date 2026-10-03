@@ -177,6 +177,24 @@ static func item_insight(s: Dictionary, it: Dictionary) -> int:
 	return 4
 
 
+## Bis zu dieser Entfernung (Felder) erkennt man, was am Boden liegt.
+const ITEM_SEE_RANGE := 2
+
+
+## Was der Crawler über einen Gegenstand am Boden sagen kann:
+## "fern" (zu weit weg), "unbekannt" (nah, aber nie gesehen oder zu
+## schwierig), "erkannt". text ist die fertige Beschreibung.
+static func item_at_distance(s: Dictionary, it: Dictionary, pos: Dictionary) -> Dictionary:
+	if J.cheb(pos, s.player.pos) > ITEM_SEE_RANGE:
+		return {"state": "fern", "text": "Da liegt etwas. Zu weit weg, um es zu erkennen."}
+	var insight := item_insight(s, it)
+	if insight >= 2:
+		return {"state": "unbekannt", "text": "%s – das kennst du nicht." % item_name(s, it)}
+	if insight == 1:
+		return {"state": "unbekannt", "text": "%s – du erkennst es, aber nicht genau." % item_name(s, it)}
+	return {"state": "erkannt", "text": item_name(s, it)}
+
+
 ## Name eines Gegenstands, wie der Crawler ihn kennt.
 static func item_name(s: Dictionary, it: Dictionary) -> String:
 	var insight := item_insight(s, it)

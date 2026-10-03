@@ -138,7 +138,7 @@ func test_superkeks(t) -> void:
 	var spot = null
 	for d in [[2, 0], [-2, 0], [0, 2], [0, -2], [1, 1], [-1, -1], [1, -1], [-1, 1]]:
 		var q := {"x": pp.x + d[0], "y": pp.y + d[1]}
-		if MapGen.is_walkable(s.map, q.x, q.y):
+		if MapGen.is_walkable(s.map, q.x, q.y) and Fov.has_line_of_sight(s.map, pp, q):
 			spot = q
 			break
 	var target := Monsters.spawn_monster(s, Db.monster("ghul"), 3, spot, 0)

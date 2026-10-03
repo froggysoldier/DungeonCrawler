@@ -257,8 +257,12 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, items: Array
 				var holders: Array = m.rooms.filter(func(q): return q.kind == "normal" and q.get("feature") == null and q.get("antechamberOf") == null and q.hood == r.hood)
 				if holders.is_empty():
 					holders = m.rooms.filter(func(q): return q.kind == "normal" and q.get("feature") == null)
-				var holder = R.pick(s, holders) if not holders.is_empty() else null
-				var kp = MapGen._random_floor_in(s, m, holder, occupied) if holder != null else null
+				# Erster Raum mit trockenem Boden (manche stehen ganz unter Wasser)
+				var kp = null
+				for holder in R.shuffle(s, holders.duplicate()):
+					kp = MapGen._random_floor_in(s, m, holder, occupied)
+					if kp != null:
+						break
 				if kp != null:
 					var key := Items.create_item(s, "schluessel")
 					key.opens = r.id
@@ -273,7 +277,7 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, items: Array
 	items.assign(items.filter(func(e): return e.pos != null))
 	# Etage 1: Nest und andere Fallen-Räume nicht gleich neben dem Start
 	var min_dist := 24 if floor == 1 else 12
-	var cands: Array = R.shuffle(s, _candidates(m).filter(func(r): return r.w * r.h >= 20 and MapGen.dist(MapGen.center(r), start) > min_dist))
+	var cands: Array = R.shuffle(s, _candidates(m).filter(func(r): return r.w * r.h >= 20 and r.get("revier") == null and MapGen.dist(MapGen.center(r), start) > min_dist))
 	# Monsternest: ein Rudel schwacher Monster um ein Nest
 	if not cands.is_empty():
 		var r: Dictionary = cands.pop_front()

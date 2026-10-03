@@ -124,24 +124,17 @@ static func populate(s: Dictionary, start: Dictionary) -> void:
 				break
 		c.pos = spot if spot != null else J.pcopy(start)
 	s.crawlers = keep.duplicate()
-	var want: int = 3 + s.floor
+	# Wenige andere Crawler, und keiner gleich am Start
+	var want: int = 2 * int(s.floor)
 	var rooms: Array = s.map.rooms.filter(func(r): return r.kind == "normal")
 	var tries := 0
 	while tries < 200 and s.crawlers.size() - keep.size() < want and not rooms.is_empty():
 		tries += 1
 		var r: Dictionary = R.pick(s, rooms)
 		var p := J.pos(R.int_(s, r.x, r.x + r.w - 1), R.int_(s, r.y, r.y + r.h - 1))
-		if J.cheb(p, start) < 8 or MapGen.tile_at(s.map, p.x, p.y) != "floor" or _blocked(s, p):
+		if J.cheb(p, start) < 25 or MapGen.tile_at(s.map, p.x, p.y) != "floor" or _blocked(s, p):
 			continue
 		s.crawlers.append(make_crawler(s, p))
-	# Auf Etage 1 wartet einer ganz in der Nähe
-	if s.floor == 1:
-		var sorted: Array = J.sort(s.map.rooms.filter(func(r): return r.kind == "normal"), func(a, b): return J.cheb({"x": a.x, "y": a.y}, start) - J.cheb({"x": b.x, "y": b.y}, start))
-		if sorted.size() > 1:
-			var near: Dictionary = sorted[1]
-			var p := J.pos(near.x + floori(near.w / 2.0), near.y + floori(near.h / 2.0))
-			if not _blocked(s, p):
-				s.crawlers.append(make_crawler(s, p, "freundlich"))
 
 
 # ================================================================ Gespräche

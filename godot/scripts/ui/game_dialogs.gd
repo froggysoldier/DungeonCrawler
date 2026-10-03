@@ -86,9 +86,15 @@ static func tooltip_for(gv: GameView, t: Variant, detail: bool = false) -> Varia
 	if not items.is_empty():
 		var lines: Array = []
 		for e in items:
+			var seen := Identify.item_at_distance(s, e.item, tp)
+			if seen.state == "fern":
+				var far := Kit.muted(Kit.esc(seen.text))
+				if not lines.has(far):
+					lines.append(far)
+				continue
 			var look := Sprites.item_sprite(e.item)
-			var line := Kit.img(look[0], look[1], 0.5) + " " + Kit.col(Kit.esc(Identify.item_name(s, e.item)), GameTabs.rarity_color(e.item.rarity))
-			if detail:
+			var line := Kit.img(look[0], look[1], 0.5) + " " + Kit.col(Kit.esc(seen.text), GameTabs.rarity_color(e.item.rarity))
+			if detail and seen.state == "erkannt":
 				var d := Identify.describe_item(s, e.item)
 				var extra: Array = []
 				if not d.bonuses.is_empty():

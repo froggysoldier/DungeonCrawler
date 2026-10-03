@@ -116,12 +116,33 @@ static func gain_xp(s: Dictionary, amount: float) -> int:
 	while p.xp >= xp_to_next(p.level):
 		p.xp -= xp_to_next(p.level)
 		p.level += 1
-		p.statPoints += 3
+		var note: String
+		if p.get("klass") == null:
+			# Vor der Klassenwahl verteilen sich die Punkte von selbst gleichmäßig
+			var got := auto_stats(s, 3)
+			note = ", ".join(got.map(func(k): return "+1 " + Bonuses.STAT_NAMES[k]))
+			Log.add(s, "LEVEL %d! %s (%s – frei verteilen kannst du ab der Klassenwahl)" % [p.level, R.pick(s, Db.world("LEVEL_UP_QUIPS")), note], "system")
+		else:
+			p.statPoints += 3
+			note = "+3 Stat-Punkte zum Verteilen."
+			Log.add(s, "LEVEL %d! %s (+3 Stat-Punkte)" % [p.level, R.pick(s, Db.world("LEVEL_UP_QUIPS"))], "system")
 		p.hp = mini(max_hp(s), p.hp + ceili(max_hp(s) / 2.0))
-		Log.add(s, "LEVEL %d! %s (+3 Stat-Punkte)" % [p.level, R.pick(s, Db.world("LEVEL_UP_QUIPS"))], "system")
-		Log.toast(s, "Level %d!" % p.level, "+3 Stat-Punkte zum Verteilen.", "level")
+		Log.toast(s, "Level %d!" % p.level, note, "level")
 		Events.emit(s, {"type": "levelUp", "level": p.level})
 	return gained
+
+
+## Punkte reihum auf die Werte verteilen (vor der Klassenwahl).
+static func auto_stats(s: Dictionary, n: int) -> Array:
+	var p: Dictionary = s.player
+	var keys: Array = Bonuses.STAT_NAMES.keys()
+	var out := []
+	for i in n:
+		var k: String = keys[int(J.num(p, "autoStat")) % keys.size()]
+		p.autoStat = int(J.num(p, "autoStat")) + 1
+		p.stats[k] += 1
+		out.append(k)
+	return out
 
 
 ## Erster Heilgegenstand im Rucksack (Trank, Essen, Pflaster) oder null.
