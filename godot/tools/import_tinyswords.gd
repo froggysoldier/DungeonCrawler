@@ -20,7 +20,9 @@ func _init() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT + "ui"))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT + "terrain"))
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT + "fx"))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT + "units"))
 	_ui()
+	_units()
 	_terrain()
 	_fx()
 	print("%d Bilder nach %s" % [made, OUT])
@@ -211,6 +213,47 @@ func _ui() -> void:
 	var bar := _assemble(_load(f + "Bars/BigBar_Base.png"), cells, [[0, 64]])
 	_save(_half(bar), "ui/bar")
 	_save(_half(_white(_load(f + "Bars/BigBar_Fill.png"))), "ui/bar_fill")
+
+
+# ================================================================ Figuren
+
+## Rote Teamfarbe der Einheiten -> Magenta-Stufen (PixelArt.TINT_KEYS), damit
+## Kleidung und Kapuze die Farbe der Monsterart annehmen.
+const TEAM := {"693d5b": 1, "924159": 1, "ab6282": 2, "b65555": 2, "e76161": 3, "f76666": 3}
+
+
+## Ein Bild aus einem Einheiten-Bogen (192er Felder) als 96 x 96 mit den Füßen
+## auf Zeile 89, ohne den eingebauten Schatten, Teamfarbe tönbar.
+func _unit(rel: String, frame: int) -> Image:
+	var sheet := _load(rel)
+	var fr := sheet.get_region(Rect2i(frame * 192, 0, 192, 192))
+	var bottom := 0
+	for y in 192:
+		for x in 192:
+			if fr.get_pixel(x, y).a > 0.99:
+				bottom = y
+	var out := Image.create(96, 96, false, Image.FORMAT_RGBA8)
+	var keys: Array = PixelArt.TINT_KEYS.map(func(k): return Color(k))
+	for y in 96:
+		for x in 96:
+			var sy := y + bottom - 89
+			if sy < 0 or sy >= 192:
+				continue
+			var c := fr.get_pixel(x + 48, sy)
+			if c.a < 0.99:
+				continue
+			var k = TEAM.get(c.to_html(false))
+			out.set_pixel(x, y, keys[k] if k != null else c)
+	return out
+
+
+func _units() -> void:
+	var g := UPD + "Factions/Goblins/Troops/"
+	_save(_unit(g + "Torch/Red/Torch_Red.png", 0), "units/goblin")
+	_save(_unit(g + "TNT/Red/TNT_Red.png", 0), "units/goblin_tnt")
+	var p := FREE + "Units/Red Units/Pawn/"
+	_save(_unit(p + "Pawn_Idle.png", 0), "units/pawn")
+	_save(_unit(p + "Pawn_Run.png", 2), "units/pawn_2")
 
 
 # ================================================================ Gelände

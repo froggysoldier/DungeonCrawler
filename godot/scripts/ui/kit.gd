@@ -289,7 +289,8 @@ static func img(name: String, tint: Variant = null, scale: float = 1.0) -> Strin
 		if src == null:
 			return ""
 		var im := src.get_image()
-		im.resize(maxi(1, roundi(im.get_width() * scale)), maxi(1, roundi(im.get_height() * scale)), Image.INTERPOLATE_NEAREST)
+		var logical := Vector2(PixelArt.size_of(name))
+		im.resize(maxi(1, roundi(logical.x * scale)), maxi(1, roundi(logical.y * scale)), Image.INTERPOLATE_NEAREST)
 		var tex := ImageTexture.create_from_image(im)
 		tex.take_over_path(path)
 		_bb_images[path] = tex

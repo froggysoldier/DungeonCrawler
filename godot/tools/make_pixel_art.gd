@@ -9,6 +9,9 @@ extends SceneTree
 ## --force. --preview schreibt zusätzlich vergrößerte Vorschaubilder.
 
 const Defs := preload("res://tools/pixel_defs.gd")
+## Figuren im Tiny-Swords-Stil (feiner, 96 x 96, zwei Bildpixel je Kunstpixel).
+const TsFig := preload("res://tools/ts_figures.gd")
+const TsRender := preload("res://tools/ts_render.gd")
 const T := PixelArt.TILE
 const COLS := 16
 
@@ -27,6 +30,8 @@ var errors := PackedStringArray()
 var _big: Array = []
 ## sheet -> Array von [name, Image]
 var sheets := {}
+## Bildpixel je Kunstpixel, nur für feine Figuren (Name -> 2).
+var res := {}
 
 
 func _initialize() -> void:
@@ -73,12 +78,12 @@ func _initialize() -> void:
 			var sub: Image = list[i][1]
 			var at := Vector2i((i % COLS) * T, (i / COLS) * T)
 			img.blit_rect(sub, Rect2i(Vector2i.ZERO, sub.get_size()), at)
-			index[list[i][0]] = {"sheet": sheet_name, "x": at.x, "y": at.y, "w": sub.get_width(), "h": sub.get_height()}
+			index[list[i][0]] = _entry(list[i][0], sheet_name, at, sub)
 		for bi in big.size():
 			var sub: Image = big[bi][2]
 			var at: Vector2i = places[bi]
 			img.blit_rect(sub, Rect2i(Vector2i.ZERO, sub.get_size()), at)
-			index[big[bi][1]] = {"sheet": sheet_name, "x": at.x, "y": at.y, "w": sub.get_width(), "h": sub.get_height()}
+			index[big[bi][1]] = _entry(big[bi][1], sheet_name, at, sub)
 		img.save_png(out.path_join(sheet_name + ".png"))
 		if preview != "":
 			DirAccess.make_dir_recursive_absolute(preview)
@@ -88,6 +93,21 @@ func _initialize() -> void:
 	f.close()
 	print("%d Bilder in %d Bögen nach %s geschrieben." % [index.size(), sheets.size(), out])
 	quit()
+
+
+func _entry(name: String, sheet_name: String, at: Vector2i, sub: Image) -> Dictionary:
+	var e := {"sheet": sheet_name, "x": at.x, "y": at.y, "w": sub.get_width(), "h": sub.get_height()}
+	if res.has(name):
+		e.res = res[name]
+	return e
+
+
+## Feine Figur aus tools/ts_figures.gd (mit zweitem Bild, falls vorhanden).
+func _add_ts(sheet_name: String, prefix: String, name: String, frames: int) -> void:
+	for f in frames:
+		var full := prefix + name + ("_2" if f == 1 else "")
+		res[full] = 2
+		_add(sheet_name, full, TsFig.image(name, f))
 
 
 func _add(sheet_name: String, name: String, img: Image) -> void:
@@ -207,11 +227,20 @@ func sprite(name: String, rows: Array, outline: bool = true, eyes: bool = false)
 
 func _build_all() -> void:
 	for n in Defs.CREATURES:
+		var base: String = n.trim_suffix("_2")
+		if TsFig.CREATURES.has(base) or TsFig.UNITS.has(base):
+			continue
 		_add("kreaturen", "kreatur/" + n, sprite(n, Defs.CREATURES[n], true, true))
+	for n in TsFig.CREATURES.keys() + TsFig.UNITS.keys():
+		_add_ts("kreaturen", "kreatur/", n, TsFig.frames(n))
 	for n in Defs.OVERLAYS:
 		_add("kreaturen", "aufsatz/" + n, sprite(n, Defs.OVERLAYS[n]))
 	for n in Defs.BOSSES:
+		if TsFig.BOSSES.has(n):
+			continue
 		_add("bosse", "boss/" + n, _bottom(sprite(n, Defs.BOSSES[n], true, true), 2))
+	for n in TsFig.BOSSES:
+		_add_ts("bosse", "boss/", n, TsFig.frames(n))
 	for n in Defs.MOUNTS:
 		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n], true, true))
 	for n in Defs.HEROES:

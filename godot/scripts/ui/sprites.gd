@@ -7,7 +7,7 @@ extends RefCounted
 const BY_DEF := {
 	"kellerratte": "ratte", "rattenmensch": "ratte", "rattenschamane": "ratte", "knochenratte": "ratte", "koenig_kanalratte": "ratte", "rattenkaiser": "ratte",
 	"riesenkakerlake": "kakerlake",
-	"kobold": "kobold", "kobold_schleuder": "kobold", "elster_goblin": "kobold", "kobold_bombe": "kobold", "schmuggler": "kobold", "wechselbalg": "kobold",
+	"kobold": "kobold", "kobold_schleuder": "kobold", "elster_goblin": "kobold", "kobold_bombe": "kobold_tnt", "schmuggler": "kobold", "wechselbalg": "kobold",
 	"schleim": "schleim", "klaerschlamm": "schleim", "kommandant_schlamm": "schleim",
 	"wolpertinger": "hase",
 	"poltergeist": "geist", "nachtmahr": "geist",
@@ -113,7 +113,7 @@ static func draw_portrait(ci: CanvasItem, name: String, tint: Variant, foot: Vec
 	PixelArt.draw_foot(ci, "aufsatz/schatten", foot + Vector2(0, 6 * scale), scale)
 	PixelArt.draw_foot(ci, name, foot, scale, tint, flip)
 	var img := PixelArt.image(name)
-	var top: int = img.get_used_rect().position.y if img else 0
+	var top: int = img.get_used_rect().position.y / PixelArt.res(name) if img else 0
 	var origin := foot - Vector2(sz.x * scale / 2.0, sz.y * scale)
 	if opts.get("crown", false) and not name.begins_with("boss/"):
 		var ks := PixelArt.size_of("aufsatz/krone")

@@ -288,7 +288,7 @@ func _frame(name: String, key: String, moving: bool, idle: bool = true) -> Strin
 func _figure(ci: CanvasItem, key: String, name: String, x: float, y: float, tint: Variant, flip: bool, mod: Color = Color.WHITE, moving: bool = false, idle: bool = true) -> void:
 	var n := _frame(name, key, moving, idle)
 	if anim and anim.flashing(key, frame_anim.get("now", -1.0)):
-		PixelArt.draw_texture(ci, PixelArt.silhouette(n), Vector2(x, y), px, flip, Color(1, 1, 1, mod.a))
+		PixelArt.draw_texture(ci, PixelArt.silhouette(n), Vector2(x, y), px, flip, Color(1, 1, 1, mod.a), PixelArt.res(n))
 		return
 	_spr(ci, n, x, y, tint, flip, mod)
 
@@ -849,7 +849,7 @@ static var _tops := {}
 static func sprite_top(name: String) -> int:
 	if not _tops.has(name):
 		var img := PixelArt.image(name)
-		_tops[name] = img.get_used_rect().position.y if img else 0
+		_tops[name] = img.get_used_rect().position.y / PixelArt.res(name) if img else 0
 	return _tops[name]
 
 
@@ -1058,19 +1058,23 @@ func _draw_burst(ci: CanvasItem, b: Dictionary) -> void:
 	var sx := _sx(b.at.x) - (sz.x - TILE) / 2 * px
 	var sy := _sy(b.at.y) - (sz.y - TILE + 2) * px
 	var k: float = b.k
+	var r := PixelArt.res(name)
 	if k < 0.1:
-		PixelArt.draw_texture(ci, PixelArt.silhouette(name), Vector2(sx, sy), px)
+		PixelArt.draw_texture(ci, PixelArt.silhouette(name), Vector2(sx, sy), px, false, Color.WHITE, r)
 		return
 	var t := (k - 0.1) / 0.9
 	var alpha := 1.0 - t * t
 	var pix := PixelArt.pixels(name, b.color)
 	for i in pix.size():
-		var q: Vector2i = pix[i][0]
+		var qi: Vector2i = pix[i][0]
 		var c: Color = pix[i][1]
-		var h := Tiles.hash(q.x, q.y, 77)
+		var h := Tiles.hash(qi.x, qi.y, 77)
+		# Feine Figuren: Bildpixel in Kunstpixeln (halbe Größe)
+		var q := Vector2(qi) / r
 		var dx := (q.x - sz.x / 2.0 + 0.5) * (0.5 + h) * t * 1.4
 		var dy := (q.y - sz.y * 0.56) * (0.3 + h * 0.5) * t + 20.0 * t * t
-		ci.draw_rect(Rect2(sx + roundf(q.x + dx) * px, sy + roundf(q.y + dy) * px, px, px), Color(c, c.a * alpha))
+		var ps := float(px) / r
+		ci.draw_rect(Rect2(sx + roundf((q.x + dx) * r) * ps, sy + roundf((q.y + dy) * r) * ps, ps, ps), Color(c, c.a * alpha))
 
 
 ## Bildfolgen aus dem Tiny-Swords-Pack: Bildgröße und Anzahl je Effekt.

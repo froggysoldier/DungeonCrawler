@@ -3,71 +3,71 @@
   "h": 18,
   "sheet": "kreaturen",
   "w": 14,
-  "x": 64,
-  "y": 96
+  "x": 160,
+  "y": 0
  },
  "aufsatz/krone": {
   "h": 12,
   "sheet": "kreaturen",
   "w": 18,
-  "x": 0,
-  "y": 96
+  "x": 96,
+  "y": 0
  },
  "aufsatz/leuchten": {
   "h": 64,
   "sheet": "kreaturen",
   "w": 64,
-  "x": 64,
-  "y": 128
+  "x": 160,
+  "y": 896
  },
  "aufsatz/leuchten_klein": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 384,
-  "y": 96
+  "x": 480,
+  "y": 0
  },
  "aufsatz/ring": {
   "h": 14,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 352,
-  "y": 96
+  "x": 448,
+  "y": 0
  },
  "aufsatz/ring_gross": {
   "h": 18,
   "sheet": "kreaturen",
   "w": 40,
-  "x": 0,
-  "y": 128
+  "x": 96,
+  "y": 896
  },
  "aufsatz/schatten": {
   "h": 10,
   "sheet": "kreaturen",
   "w": 28,
-  "x": 288,
-  "y": 96
+  "x": 384,
+  "y": 0
  },
  "aufsatz/schatten_klein": {
   "h": 6,
   "sheet": "kreaturen",
   "w": 20,
-  "x": 320,
-  "y": 96
+  "x": 416,
+  "y": 0
  },
  "aufsatz/schlaf": {
   "h": 16,
   "sheet": "kreaturen",
   "w": 14,
-  "x": 32,
-  "y": 96
+  "x": 128,
+  "y": 0
  },
  "aufsatz/schloss": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 480,
-  "y": 64
+  "x": 64,
+  "y": 0
  },
  "ausruestung/breit/arme": {
   "h": 32,
@@ -826,137 +826,156 @@
   "y": 32
  },
  "boss/abschleppwurm": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 96,
-  "y": 0
+  "w": 96,
+  "x": 192,
+  "y": 192
  },
  "boss/der_hausmeister": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 160,
-  "y": 0
+  "w": 96,
+  "x": 384,
+  "y": 192
  },
  "boss/die_sammlerin": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 128,
-  "y": 0
+  "w": 96,
+  "x": 288,
+  "y": 192
  },
  "boss/hausverwalter": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 416,
-  "y": 0
+  "w": 96,
+  "x": 0,
+  "y": 288
  },
  "boss/heizungsbestie": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 384,
-  "y": 0
+  "w": 96,
+  "x": 96,
+  "y": 288
  },
  "boss/kammerjaeger": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
+  "w": 96,
   "x": 288,
   "y": 0
  },
  "boss/kanalkoenigin": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 448,
-  "y": 0
+  "w": 96,
+  "x": 192,
+  "y": 288
  },
  "boss/kesselkoenigin": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 256,
-  "y": 0
- },
- "boss/koenig_kanalratte": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
+  "w": 96,
   "x": 192,
   "y": 0
  },
- "boss/kommandant_schlamm": {
-  "h": 32,
+ "boss/koenig_kanalratte": {
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 480,
+  "w": 96,
+  "x": 96,
   "y": 0
  },
- "boss/mottenmutter": {
-  "h": 32,
+ "boss/kommandant_schlamm": {
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 320,
+  "w": 96,
+  "x": 288,
+  "y": 288
+ },
+ "boss/mottenmutter": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 384,
   "y": 0
  },
  "boss/muttis_mixer": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 224,
-  "y": 0
+  "w": 96,
+  "x": 0,
+  "y": 96
  },
  "boss/nixe": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 32,
-  "y": 32
+  "w": 96,
+  "x": 96,
+  "y": 96
  },
  "boss/oelschlick": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 64,
-  "y": 0
+  "w": 96,
+  "x": 192,
+  "y": 96
  },
  "boss/parkwaechter": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 0,
-  "y": 0
+  "w": 96,
+  "x": 288,
+  "y": 96
  },
  "boss/pfandbaron": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 352,
-  "y": 0
+  "w": 96,
+  "x": 384,
+  "y": 96
  },
  "boss/rattenkaiser": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
-  "x": 64,
-  "y": 32
- },
- "boss/rostkoenigin": {
-  "h": 32,
-  "sheet": "bosse",
-  "w": 32,
-  "x": 32,
+  "w": 96,
+  "x": 0,
   "y": 0
  },
- "boss/schwarzmarkt_oger": {
-  "h": 32,
+ "boss/rostkoenigin": {
+  "h": 96,
+  "res": 2,
   "sheet": "bosse",
-  "w": 32,
+  "w": 96,
   "x": 0,
-  "y": 32
+  "y": 192
+ },
+ "boss/schwarzmarkt_oger": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 96,
+  "y": 192
  },
  "ding/bombe": {
   "h": 32,
@@ -1631,333 +1650,386 @@
   "y": 0
  },
  "kreatur/aal": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 32,
-  "y": 0
+  "w": 96,
+  "x": 288,
+  "y": 128
  },
  "kreatur/alien": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 320,
-  "y": 0
+  "w": 96,
+  "x": 384,
+  "y": 128
  },
  "kreatur/drache": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 160,
-  "y": 64
+  "w": 96,
+  "x": 0,
+  "y": 224
  },
  "kreatur/drohne": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 160,
-  "y": 32
+  "w": 96,
+  "x": 96,
+  "y": 224
  },
  "kreatur/drohne_2": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 288,
-  "y": 64
+  "w": 96,
+  "x": 192,
+  "y": 224
  },
  "kreatur/egel": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 64,
-  "y": 0
+  "w": 96,
+  "x": 288,
+  "y": 224
  },
  "kreatur/elementar": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 320,
-  "y": 32
+  "w": 96,
+  "x": 384,
+  "y": 224
  },
  "kreatur/fisch": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
+  "w": 96,
+  "x": 0,
+  "y": 320
+ },
+ "kreatur/fledermaus": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 96,
+  "y": 320
+ },
+ "kreatur/fledermaus_2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 320
+ },
+ "kreatur/geist": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
   "x": 384,
   "y": 32
  },
- "kreatur/fledermaus": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 0,
-  "y": 32
- },
- "kreatur/fledermaus_2": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 192,
-  "y": 64
- },
- "kreatur/geist": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 288,
-  "y": 0
- },
  "kreatur/geist_2": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 352,
-  "y": 64
+  "w": 96,
+  "x": 0,
+  "y": 128
  },
  "kreatur/gnom": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 448,
-  "y": 0
+  "w": 96,
+  "x": 288,
+  "y": 320
  },
  "kreatur/hase": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 256,
-  "y": 0
+  "w": 96,
+  "x": 384,
+  "y": 320
  },
  "kreatur/haustier": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 32,
-  "y": 64
+  "w": 96,
+  "x": 0,
+  "y": 416
  },
  "kreatur/held": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 64,
-  "y": 64
+  "x": 0,
+  "y": 0
  },
  "kreatur/held_2": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 416,
-  "y": 64
+  "x": 32,
+  "y": 0
  },
  "kreatur/hexe": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 416,
-  "y": 32
+  "w": 96,
+  "x": 96,
+  "y": 416
  },
  "kreatur/hund": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
+  "w": 96,
   "x": 192,
-  "y": 32
+  "y": 416
  },
  "kreatur/irrlicht": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 64,
-  "y": 32
+  "w": 96,
+  "x": 288,
+  "y": 416
  },
  "kreatur/irrlicht_2": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 320,
-  "y": 64
+  "w": 96,
+  "x": 384,
+  "y": 416
  },
  "kreatur/kakerlake": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 160,
-  "y": 0
+  "w": 96,
+  "x": 0,
+  "y": 512
  },
  "kreatur/katze": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
+  "w": 96,
   "x": 96,
-  "y": 64
+  "y": 512
  },
  "kreatur/kobold": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
+  "w": 96,
   "x": 192,
-  "y": 0
+  "y": 800
+ },
+ "kreatur/kobold_tnt": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 800
  },
  "kreatur/krebs": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 0,
-  "y": 0
+  "w": 96,
+  "x": 192,
+  "y": 512
  },
  "kreatur/kroete": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 32,
-  "y": 32
+  "w": 96,
+  "x": 288,
+  "y": 512
  },
  "kreatur/kroko": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 352,
-  "y": 32
+  "w": 96,
+  "x": 384,
+  "y": 512
  },
  "kreatur/maschine": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 128,
-  "y": 32
+  "w": 96,
+  "x": 0,
+  "y": 608
  },
  "kreatur/mensch": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
+  "w": 96,
+  "x": 384,
+  "y": 800
+ },
+ "kreatur/mensch_2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 0,
+  "y": 896
+ },
+ "kreatur/motte": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 96,
+  "y": 608
+ },
+ "kreatur/motte_2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 608
+ },
+ "kreatur/pilz": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 96,
+  "y": 128
+ },
+ "kreatur/qualle": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 608
+ },
+ "kreatur/raptor": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 384,
+  "y": 608
+ },
+ "kreatur/ratte": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 0,
+  "y": 32
+ },
+ "kreatur/sack": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 0,
+  "y": 704
+ },
+ "kreatur/schleim": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 96,
+  "y": 32
+ },
+ "kreatur/schleim_2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 32
+ },
+ "kreatur/skelett": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 96,
+  "y": 704
+ },
+ "kreatur/spinne": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 128
+ },
+ "kreatur/tentakel": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 704
+ },
+ "kreatur/troll": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
   "x": 288,
   "y": 32
  },
- "kreatur/mensch_2": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 448,
-  "y": 64
- },
- "kreatur/motte": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 480,
-  "y": 32
- },
- "kreatur/motte_2": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 224,
-  "y": 64
- },
- "kreatur/pilz": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 448,
-  "y": 32
- },
- "kreatur/qualle": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 96,
-  "y": 0
- },
- "kreatur/raptor": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 128,
-  "y": 64
- },
- "kreatur/ratte": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 128,
-  "y": 0
- },
- "kreatur/sack": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 352,
-  "y": 0
- },
- "kreatur/schleim": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 224,
-  "y": 0
- },
- "kreatur/schleim_2": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 384,
-  "y": 64
- },
- "kreatur/skelett": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 256,
-  "y": 32
- },
- "kreatur/spinne": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 480,
-  "y": 0
- },
- "kreatur/tentakel": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 96,
-  "y": 32
- },
- "kreatur/troll": {
-  "h": 32,
-  "sheet": "kreaturen",
-  "w": 32,
-  "x": 224,
-  "y": 32
- },
  "kreatur/vogel": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 0,
-  "y": 64
+  "w": 96,
+  "x": 288,
+  "y": 704
  },
  "kreatur/vogel_2": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 256,
-  "y": 64
+  "w": 96,
+  "x": 384,
+  "y": 704
  },
  "kreatur/wurm": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 384,
-  "y": 0
+  "w": 96,
+  "x": 0,
+  "y": 800
  },
  "kreatur/zombie": {
-  "h": 32,
+  "h": 96,
+  "res": 2,
   "sheet": "kreaturen",
-  "w": 32,
-  "x": 416,
-  "y": 0
+  "w": 96,
+  "x": 96,
+  "y": 800
  },
  "moebel/automat": {
   "h": 32,
@@ -2082,43 +2154,43 @@
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 160,
-  "y": 96
+  "x": 256,
+  "y": 0
  },
  "reittier/einkaufswagen": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 96,
-  "y": 96
+  "x": 192,
+  "y": 0
  },
  "reittier/kampfeber": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 256,
-  "y": 96
+  "x": 352,
+  "y": 0
  },
  "reittier/kellerpony": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 192,
-  "y": 96
+  "x": 288,
+  "y": 0
  },
  "reittier/rasentraktor": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 128,
-  "y": 96
+  "x": 224,
+  "y": 0
  },
  "reittier/sattelschnecke": {
   "h": 32,
   "sheet": "kreaturen",
   "w": 32,
-  "x": 224,
-  "y": 96
+  "x": 320,
+  "y": 0
  },
  "treppe": {
   "h": 32,

@@ -158,10 +158,21 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
   (Kopfzeile, Reiter) geschnitztes Holz, Abschnittsüberschriften gelbe Bänder.
   Balken haben einen Holzrahmen mit Rinne wie die Balken des Packs.
 
+- Monster und Bosse: fein gezeichnet wie die Einheiten des Packs (96 × 96
+  Bildpixel, zwei je Kunstpixel, 48 Kunstpixel groß, die Füße auf der Kachel,
+  größer als eine Kachel). Kobolde sind die Goblins des Packs (Fackel, Dynamit
+  für den Bombenkobold), Menschen und andere Crawler der Arbeiter; ihre
+  Teamfarbe ist tönbar. Alle übrigen 32 Kreaturen und 19 Bosse sind aus Formen
+  gebaut (`tools/ts_figures.gd`) und werden von `tools/ts_render.gd` im Stil
+  des Packs gezeichnet: dicker Nachtblau-Umriss außen, feine Linien zwischen
+  den Teilen, jede Form mit Licht oben links und Schatten unten rechts.
+  Im Index steht dafür `"res": 2`; `PixelArt.size_of` gibt Kunstpixel zurück.
+  Vorschau: `godot --headless --path godot -s res://tools/shot_ts.gd -- bild.png [namen]`.
+
 `tools/import_tinyswords.gd` holt die Teile aus `asset-pack/`, setzt die
 Bögen mit Lücken zu 9-Slices zusammen, färbt um und verkleinert Knöpfe auf
-halbe Größe (Umrisse bleiben erhalten). Was das Pack nicht hat (Monster,
-Gegenstände, Möbel, Böden), zeichnen die eigenen Vorlagen im selben Stil:
+halbe Größe (Umrisse bleiben erhalten). Was das Pack nicht hat (Gegenstände,
+Möbel, Böden, die Spielfigur), zeichnen die eigenen Vorlagen im selben Stil:
 Nachtblau-Kontur, Rampe zu Creme, Palette des Packs.
 
 **Lizenz:** Tiny Swords von Pixel Frog (pixelfrog-assets.itch.io). Nutzung

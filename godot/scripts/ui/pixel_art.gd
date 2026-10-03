@@ -85,14 +85,24 @@ static func entry(name: String) -> Dictionary:
 	var e = _index.get(name)
 	if e == null:
 		return {}
-	return {"sheet": e.sheet, "rect": Rect2i(int(e.x), int(e.y), int(e.w), int(e.h))}
+	return {"sheet": e.sheet, "rect": Rect2i(int(e.x), int(e.y), int(e.w), int(e.h)), "res": int(e.get("res", 1))}
 
 
+## Bildpixel je Kunstpixel: 1 für die 32er-Grafik, 2 für Figuren im
+## Tiny-Swords-Stil (feiner gezeichnet, gleich groß auf dem Bildschirm).
+static func res(name: String) -> int:
+	if _runtime.has(name):
+		return 1
+	var e := entry(name)
+	return e.get("res", 1) if not e.is_empty() else 1
+
+
+## Größe in Kunstpixeln (bei feinen Figuren die halbe Bildgröße).
 static func size_of(name: String) -> Vector2i:
 	if _runtime.has(name):
 		return (_runtime[name] as Image).get_size()
 	var e := entry(name)
-	return e.rect.size if not e.is_empty() else Vector2i.ZERO
+	return e.rect.size / int(e.res) if not e.is_empty() else Vector2i.ZERO
 
 
 ## Einzelbild als Image (für Rahmen und Werkzeuge).
@@ -211,14 +221,15 @@ static func pixels(name: String, tint: Variant = null) -> Array:
 ## Zeichnet ein Bild mit linker oberer Ecke bei pos (Bildschirmpixel), skaliert
 ## um den ganzzahligen Faktor scale. flip spiegelt waagerecht.
 static func draw(ci: CanvasItem, name: String, pos: Vector2, scale: int, tint: Variant = null, flip: bool = false, modulate: Color = Color.WHITE) -> void:
-	draw_texture(ci, texture(name, tint), pos, scale, flip, modulate)
+	draw_texture(ci, texture(name, tint), pos, scale, flip, modulate, res(name))
 
 
-## Eine fertige Textur ganzzahlig vergrößert zeichnen (auch gespiegelt).
-static func draw_texture(ci: CanvasItem, tex: Texture2D, pos: Vector2, scale: int, flip: bool = false, modulate: Color = Color.WHITE) -> void:
+## Eine fertige Textur ganzzahlig vergrößert zeichnen (auch gespiegelt);
+## res: Bildpixel je Kunstpixel.
+static func draw_texture(ci: CanvasItem, tex: Texture2D, pos: Vector2, scale: int, flip: bool = false, modulate: Color = Color.WHITE, res: int = 1) -> void:
 	if tex == null:
 		return
-	var sz := Vector2(tex.get_size()) * scale
+	var sz := Vector2(tex.get_size()) * scale / float(res)
 	if not flip:
 		ci.draw_texture_rect(tex, Rect2(pos.round(), sz), false, modulate)
 		return

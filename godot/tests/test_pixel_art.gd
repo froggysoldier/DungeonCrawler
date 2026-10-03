@@ -120,6 +120,20 @@ func test_gegenstaende_und_plaetze_haben_bilder(t) -> void:
 	t.eq(_missing(names), [], "Bilder für Gegenstände")
 
 
+func test_feine_figuren(t) -> void:
+	# Kreaturen und Bosse im Tiny-Swords-Stil: doppelt so fein, 48 Kunstpixel groß
+	for n in ["kreatur/ratte", "kreatur/kobold", "kreatur/mensch", "boss/rattenkaiser"]:
+		t.eq(PixelArt.res(n), 2, "%s fein gezeichnet" % n)
+		t.eq(PixelArt.size_of(n), Vector2i(48, 48), "%s in Kunstpixeln" % n)
+		t.eq(PixelArt.texture(n).get_size(), Vector2(96, 96), "%s als Bild" % n)
+	t.eq(PixelArt.res("ding/trank"), 1, "Gegenstände im groben Raster")
+	# Teamfarbe der Pack-Figuren ist tönbar
+	var a := PixelArt.texture("kreatur/kobold", "#c03030").get_image()
+	var b := PixelArt.texture("kreatur/kobold", "#3030c0").get_image()
+	t.ok(a.get_data() != b.get_data(), "Kapuze in der Farbe der Monsterart")
+	t.eq(Sprites.sprite_name("kobold_bombe"), "kreatur/kobold_tnt", "Bombenkobold mit Dynamit")
+
+
 func test_bilder_in_der_oberflaeche(t) -> void:
 	# Im Fließtext: [img] findet die getönte, vergrößerte Textur
 	var bb := Kit.img("ding/slot_waffe", "#5aa0ff", 2)
@@ -133,7 +147,7 @@ func test_bilder_in_der_oberflaeche(t) -> void:
 	t.eq(Kit.img("ding/gibt_es_nicht"), "", "unbekanntes Bild")
 	# Als Control: Größe ist das vergrößerte Bild oder das vorgegebene Feld
 	var ic := Kit.icon(null, "kreatur/ratte", "#b08a6a", 3)
-	t.eq(ic.custom_minimum_size, Vector2(96, 96), "Figur dreifach")
+	t.eq(ic.custom_minimum_size, Vector2(PixelArt.size_of("kreatur/ratte") * 3), "Figur dreifach")
 	t.ok(Kit.img("ding/trank", null, 0.5).begins_with("[img=16x16]"), "im Text auch verkleinert")
 	ic.free()
 	var slot := Kit.icon(null, "ding/slot_ring", null, 2, Vector2(40, 36), true)
