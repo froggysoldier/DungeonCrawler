@@ -3,7 +3,8 @@ extends Control
 ## Kleine Übersichtskarte aller bekannten Felder: Räume nach Art eingefärbt,
 ## Treppe und Crawler hervorgehoben.
 
-const ROOM_COLORS := {"safe": "#c9973a", "guild": "#4f7fc9", "boss": "#b0413a", "arena": "#9a6a3a", "start": "#6b6f7a"}
+## Farben aus der Tiny-Swords-Palette (Sand, Fels, Wasser).
+const ROOM_COLORS := {"safe": "#dcaa46", "guild": "#4697ac", "boss": "#b65555", "arena": "#b48355", "start": "#8c9a9d"}
 
 var s: Dictionary
 
@@ -65,36 +66,36 @@ func _draw() -> void:
 							edge = true
 				if not edge:
 					continue
-				col = Color("#3a3e4a")
+				col = Color("#4c6b70")
 			elif tile == "stairs":
-				col = Color("#ffcc33")
+				col = Color("#f1d867")
 			elif tile == "door" or tile == "dooropen":
-				col = Color("#a0703a")
+				col = Color("#b48355")
 			elif tile == Dungeon.WATER:
-				col = Color("#3a6f9a")
+				col = Color("#47aba9")
 			elif tile == Dungeon.MUD:
-				col = Color("#5e4a32")
+				col = Color("#866353")
 			elif tile == Kanalstadt.CANAL:
-				col = Color("#1f4a66")
+				col = Color("#3e8698")
 			elif tile == Kanalstadt.BRIDGE:
-				col = Color("#8a6a44")
+				col = Color("#c8a876")
 			elif tile == Tiefgarage.OIL:
-				col = Color("#2a2a34")
+				col = Color("#2a2f45")
 			elif Tiefgarage.is_wreck(tile):
-				col = Color("#8a4a3a")
+				col = Color("#8d4848")
 			else:
 				var ri: int = m.roomAt[i]
 				if ri >= 0:
-					col = Color(ROOM_COLORS.get(m.rooms[ri].kind, "#8a8f9b"))
+					col = Color(ROOM_COLORS.get(m.rooms[ri].kind, "#c9b48e"))
 				else:
-					col = Color("#6a6f7a")
+					col = Color("#9a8a72")
 			draw_rect(Rect2(ox + x * cell, oy + y * cell, cs, cs), col)
 	var si := tl.find("stairs")
 	if si >= 0 and explored[si]:
 		var sx := ox + (si % mw) * cell + cell / 2
 		var sy := oy + (si / mw) * cell + cell / 2
 		var r := maxf(3, floorf(cell * 1.6))
-		draw_rect(Rect2(floorf(sx - r), floorf(sy - r), r * 2, r * 2), Color("#ffcc33"), false, 2.0)
+		draw_rect(Rect2(floorf(sx - r), floorf(sy - r), r * 2, r * 2), Color("#f1d867"), false, 2.0)
 	var px: float = ox + s.player.pos.x * cell + cell / 2
 	var py: float = oy + s.player.pos.y * cell + cell / 2
 	var g := maxf(4, floorf(cell * 2.4))

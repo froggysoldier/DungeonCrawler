@@ -67,15 +67,15 @@ func test_kacheln_vollstaendig(t) -> void:
 	for mat in Tiles.MATERIALS:
 		for v in 4:
 			names.append("boden/%s%d" % [mat, v])
-	for fl in [1, 2, 3]:
-		for v in 4:
-			names.append("wand/%d_oben%d" % [fl, v])
-			names.append("wand/%d_front%d" % [fl, v])
 	for open in [false, true]:
 		for hor in [false, true]:
 			for boss in [false, true]:
 				names.append(MapView.door_name(open, hor, boss))
-	t.eq(_missing(names), [], "Böden, Wände, Türen")
+	t.eq(_missing(names), [], "Böden, Türen")
+	for fl in [1, 2, 3]:
+		var sheet := MapView.wall_sheet(fl)
+		t.not_null(sheet, "Klippen-Block Etage %d" % fl)
+		t.eq(sheet.get_size(), Vector2(256, 384), "4 x 6 Felder zu 64 Pixeln")
 
 
 func test_toenen_ersetzt_alle_schluessel(t) -> void:

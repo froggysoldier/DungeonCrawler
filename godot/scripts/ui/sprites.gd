@@ -136,7 +136,7 @@ static func draw_hero(ci: CanvasItem, foot: Vector2, scale: int, flip: bool = fa
 const GEAR_BEHIND := ["ruecken"]
 const GEAR_BODY := ["beine", "fuesse", "brust", "guertel", "hals", "schultern", "arme", "haende"]
 const GEAR_TOP := ["gesicht", "kopf", "waffe"]
-const OUTLINE := Color("#181425")
+const OUTLINE := Color("#161c2e")
 ## Ab dieser Zeile machen die Füße im Laufbild einen Schritt (WALK_STEP Pixel) nach außen.
 const WALK_ROW := 27
 const WALK_STEP := 2

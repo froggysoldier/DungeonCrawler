@@ -442,10 +442,13 @@ func _draw_static(ci: CanvasItem) -> void:
 			if mat == null:
 				mat = Tiles.room_material(room)
 				materials[ri] = mat
-			if tile == Dungeon.WATER or tile == Dungeon.MUD or tile == Kanalstadt.CANAL or tile == Tiefgarage.OIL:
-				_spr(ci, "boden/%s%d" % [tile, floori(Tiles.hash(x, y) * 4)], sx, sy)
-				if (tile == Dungeon.WATER or tile == Kanalstadt.CANAL) and vis.has(i):
+			if tile == Dungeon.WATER or tile == Kanalstadt.CANAL:
+				# Wasser aus dem Tiny-Swords-Pack; die Gischt bewegt sich nur, wo man hinsieht
+				_water(ci, x, y, sx, sy, -1 if vis.has(i) else 0)
+				if vis.has(i):
 					_animated.append(["water", x, y])
+			elif tile == Dungeon.MUD or tile == Tiefgarage.OIL:
+				_spr(ci, "boden/%s%d" % [tile, floori(Tiles.hash(x, y) * 4)], sx, sy)
 			elif tile == Kanalstadt.BRIDGE:
 				# Kanal links oder rechts: Brücke führt nach oben und unten
 				var across: bool = MapGen.tile_at(m, x - 1, y) == Kanalstadt.CANAL or MapGen.tile_at(m, x + 1, y) == Kanalstadt.CANAL
@@ -503,41 +506,120 @@ func _draw_static(ci: CanvasItem) -> void:
 				if tile == "door" and Dungeon.lock_at(s, J.pos(x, y)) != null:
 					_spr(ci, "aufsatz/schloss", sx, sy)
 
-	# --- Wände: Krone von oben, Vorderseite zum Raum hin, helle Kanten
-	var th := Tiles.wall_theme(s.floor)
-	var lip := _col(th.lip, 0.6)
-	var fl := clampi(s.floor, 1, 3)
+	# --- Wände im Tiny-Swords-Stil: Fels von oben, zum Raum hin die Felswand
+	var sheet := wall_sheet(s.floor)
 	for y in range(y0, y1):
 		for x in range(x0, x1):
 			var i := y * mw + x
-			if tl[i] != "wall" or not (vis.has(i) or (memory and explored[i])):
+			if tl[i] != "wall" or not (vis.has(i) or (memory and explored[i])) or not _edge_wall(x, y):
 				continue
-			var edge := false
-			for dy in range(-1, 2):
-				for dx in range(-1, 2):
-					var nx := x + dx
-					var ny := y + dy
-					if nx >= 0 and ny >= 0 and nx < mw and ny < mh and tl[ny * mw + nx] != "wall":
-						edge = true
-			if not edge:
-				continue
-			var face := not _wall(x, y + 1)
-			var v := floori(Tiles.hash(x, y, 3) * 4)
 			var sx := x * T
 			var sy := y * T
-			_spr(ci, "wand/%d_%s%d" % [fl, "front" if face else "oben", v], sx, sy)
-			if face and _torch_at(x, y):
+			# Unter den Ausbuchtungen des Randes liegt der Boden des Nachbarn
+			for d in [[0, 1], [0, -1], [-1, 0], [1, 0]]:
+				var nx: int = x + d[0]
+				var ny: int = y + d[1]
+				if MapGen.in_bounds(m, nx, ny) and tl[ny * mw + nx] != "wall":
+					var nri: int = room_at[ny * mw + nx]
+					var nmat = materials.get(nri)
+					if nmat == null:
+						nmat = Tiles.room_material(m.rooms[nri] if nri >= 0 else null)
+						materials[nri] = nmat
+					_spr(ci, "boden/%s%d" % [nmat, floori(Tiles.hash(nx, ny) * 4)], sx, sy)
+					break
+			var cell := wall_cell(x, y)
+			ci.draw_texture_rect_region(sheet, Rect2(sx, sy, T, T), Rect2(cell.x * 64, cell.y * 64, 64, 64))
+			if cell.y == 4 and _torch_at(x, y):
 				if vis.has(i) or vis.has(i + mw):
 					_animated.append(["torch", x, y])
 				else:
 					_spr(ci, "moebel/fackel", sx, sy)
-			var cap_h := 8 if face else TILE
-			if not _wall(x, y - 1):
-				_rect(ci, sx, sy, 0, 0, TILE, 1, lip)
-			if not _wall(x - 1, y):
-				_rect(ci, sx, sy, 0, 0, 1, cap_h, lip)
-			if not _wall(x + 1, y):
-				_rect(ci, sx, sy, TILE - 1, 0, 1, cap_h, lip)
+
+
+const FOAM_FRAMES := 16
+static var _terrain := {}
+
+
+static func _ts(name: String) -> Texture2D:
+	if not _terrain.has(name):
+		_terrain[name] = load("res://assets/tinyswords/terrain/%s.png" % name)
+	return _terrain[name]
+
+
+static func _is_water(t: String) -> bool:
+	return t == Dungeon.WATER or t == Kanalstadt.CANAL
+
+
+## Wasserfläche mit Gischt an jedem Ufer (auch an Wänden). frame < 0: nur
+## das Wasser (die Gischt zeichnet die lebende Ebene); foam_only: nur Gischt.
+func _water(ci: CanvasItem, x: int, y: int, sx: float, sy: float, frame: int, foam_only: bool = false) -> void:
+	var T := tile_px
+	var m: Dictionary = s.map
+	if not foam_only:
+		var canal := MapGen.tile_at(m, x, y) == Kanalstadt.CANAL
+		ci.draw_texture_rect(_ts("water"), Rect2(sx, sy, T, T), false, Color(0.66, 0.84, 0.7) if canal else Color(0.8, 0.9, 0.88))
+	if frame < 0:
+		return
+	var foam := _ts("foam")
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			if (dx == 0 and dy == 0) or not MapGen.in_bounds(m, x + dx, y + dy) or _is_water(MapGen.tile_at(m, x + dx, y + dy)):
+				continue
+			# Der Teil des Gischtrings um das Ufer-Feld, der auf dieses Feld fällt
+			ci.draw_texture_rect_region(foam, Rect2(sx, sy, T, T), Rect2(frame * 192 + (1 - dx) * 64, (1 - dy) * 64, 64, 64))
+
+
+static var _wall_sheets := {}
+
+
+## Klippen-Block aus dem Tiny-Swords-Tileset, umgefärbt je Etage (siehe
+## tools/import_tinyswords.gd).
+static func wall_sheet(floor_no: int) -> Texture2D:
+	var fl := clampi(floor_no, 1, 3)
+	if not _wall_sheets.has(fl):
+		_wall_sheets[fl] = load("res://assets/tinyswords/terrain/wall_%d.png" % fl)
+	return _wall_sheets[fl]
+
+
+## Wand mit Boden daneben (nur die werden gezeichnet; tiefer Fels bleibt dunkel).
+func _edge_wall(x: int, y: int) -> bool:
+	if _wall(x, y) == false or not MapGen.in_bounds(s.map, x, y):
+		return false
+	for dy in range(-1, 2):
+		for dx in range(-1, 2):
+			if not _wall(x + dx, y + dy):
+				return true
+	return false
+
+
+## Felswand: Wand mit Boden direkt darunter.
+func _face(x: int, y: int) -> bool:
+	return _edge_wall(x, y) and not _wall(x, y + 1)
+
+
+func _rock_top(x: int, y: int) -> bool:
+	return _edge_wall(x, y) and _wall(x, y + 1)
+
+
+## Feld im Klippen-Block: Spalte 0 links, 1 Mitte, 2 rechts, 3 einzeln;
+## Reihe 0 oben, 1 Mitte, 2 unten, 3 einzeln, 4 Felswand.
+func wall_cell(x: int, y: int) -> Vector2i:
+	if _face(x, y):
+		return Vector2i(_col_of(_face(x - 1, y), _face(x + 1, y)), 4)
+	var top_edge := not _rock_top(x, y - 1)
+	var bottom_edge := not _rock_top(x, y + 1)
+	var row := 3 if top_edge and bottom_edge else (0 if top_edge else (2 if bottom_edge else 1))
+	return Vector2i(_col_of(_rock_top(x - 1, y), _rock_top(x + 1, y)), row)
+
+
+static func _col_of(left: bool, right: bool) -> int:
+	if left and right:
+		return 1
+	if right:
+		return 0
+	if left:
+		return 2
+	return 3
 
 
 ## Einzelne Flecken, Risse und Pfützen – selten, an zufälliger Stelle.
@@ -579,12 +661,7 @@ func _draw_live() -> void:
 				_glow(ci, sx + T / 2, sy + T / 2, "#ff3c28", 0.45 + 0.3 * sin(time / 400.0))
 				_spr(ci, door_name(a[3], a[4], true), sx, sy)
 			"water":
-				# Lichtreflexe wandern langsam über das Wasser
-				var wp: float = Tiles.hash(a[1], a[2], 13)
-				var t := fmod(time / 2600.0 + wp, 1.0)
-				var al := 0.35 * sin(t * PI)
-				_rect(ci, sx, sy, 4 + floori(t * 18), 8 + floori(wp * 12), 5, 1, Color(0.8, 0.95, 1.0, al))
-				_rect(ci, sx, sy, 20 - floori(t * 12), 20 + floori(wp * 6), 3, 1, Color(0.8, 0.95, 1.0, al * 0.7))
+				_water(ci, a[1], a[2], sx, sy, int(time / 110.0) % FOAM_FRAMES, true)
 			"torch":
 				var ph: float = Tiles.hash(a[1], a[2], 12) * 1000.0
 				_glow(ci, sx + T / 2, sy + 10 * px, "#ff9a3c", 0.38 + 0.12 * sin((time + ph) / 90.0) + 0.06 * sin((time + ph) / 37.0))
@@ -968,6 +1045,8 @@ func _draw_dynamic_body() -> void:
 
 	# --- Spieler
 	_draw_player(ci, _sx(ppos.x), _sy(ppos.y), time)
+	for e in frame_anim.get("fx", []):
+		_draw_fx(ci, e)
 	for k in frame_anim.get("sparkles", []):
 		_draw_sparkles(ci, _sx(ppos.x), _sy(ppos.y), k)
 
@@ -992,6 +1071,30 @@ func _draw_burst(ci: CanvasItem, b: Dictionary) -> void:
 		var dx := (q.x - sz.x / 2.0 + 0.5) * (0.5 + h) * t * 1.4
 		var dy := (q.y - sz.y * 0.56) * (0.3 + h * 0.5) * t + 20.0 * t * t
 		ci.draw_rect(Rect2(sx + roundf(q.x + dx) * px, sy + roundf(q.y + dy) * px, px, px), Color(c, c.a * alpha))
+
+
+## Bildfolgen aus dem Tiny-Swords-Pack: Bildgröße und Anzahl je Effekt.
+const FX := {
+	"staub": {"tex": "dust_01", "size": 64, "frames": 8, "scale": 1.0},
+	"explosion": {"tex": "explosion_01", "size": 192, "frames": 8, "scale": 1.0},
+	"feuer": {"tex": "fire_01", "size": 64, "frames": 8, "scale": 1.0},
+}
+static var _fx_tex := {}
+
+
+func _draw_fx(ci: CanvasItem, e: Dictionary) -> void:
+	var d: Dictionary = FX.get(e.kind, {})
+	if d.is_empty():
+		return
+	if not _fx_tex.has(d.tex):
+		_fx_tex[d.tex] = load("res://assets/tinyswords/fx/%s.png" % d.tex)
+	var tex: Texture2D = _fx_tex[d.tex]
+	var n: int = mini(int(e.k * d.frames), d.frames - 1)
+	# Im Pack ist eine Kachel 64 Pixel groß
+	var sz: float = d.size * tile_px / 64.0 * d.scale
+	var cx := _sx(e.at.x) + tile_px / 2.0
+	var cy := _sy(e.at.y) + tile_px / 2.0
+	ci.draw_texture_rect_region(tex, Rect2(cx - sz / 2, cy - sz / 2, sz, sz), Rect2(n * d.size, 0, d.size, d.size))
 
 
 ## Stufenaufstieg: goldene Funken steigen in Säulen um die Spielfigur auf.

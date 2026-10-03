@@ -29,8 +29,8 @@ static func card_screen(root: Control, width: float = 760.0) -> VBoxContainer:
 	return v
 
 
-## Hintergrund in Pixel-Grafik: dunkler Kellerboden, gestuftes Leuchten und
-## eine Reihe Kreaturen am unteren Rand.
+## Hintergrund im Tiny-Swords-Stil: dunkler Kellerboden, gestuftes Leuchten,
+## unten ein Felsrand aus dem Pack, auf dem eine Reihe Kreaturen läuft.
 class Backdrop:
 	extends Control
 
@@ -56,7 +56,15 @@ class Backdrop:
 		# Gestuftes Leuchten oben (Gold) und unten rechts (Rosa)
 		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w / 2 - 32 * 14, -32 * 14 - h * 0.1), 14, null, false, Color(UiTheme.ACCENT, 0.12))
 		PixelArt.draw(self, "aufsatz/leuchten", Vector2(w - 32 * 11, h - 32 * 8), 11, null, false, Color(UiTheme.ACCENT_2, 0.07))
-		# Kreaturen am unteren Rand: eine dunkle Parade, die langsam nach links zieht
+		# Felsrand aus dem Tiny-Swords-Tileset: Oberseite, darunter die Felswand
+		var sheet := MapView.wall_sheet(1)
+		var ts := 64
+		var cols := int(ceilf(w / ts))
+		for c in cols:
+			var col := 1 if c > 0 and c < cols - 1 else (0 if c == 0 else 2)
+			draw_texture_rect_region(sheet, Rect2(c * ts, h - 2 * ts, ts, ts), Rect2(col * 64, 2 * 64, 64, 64), Color(0.62, 0.6, 0.68))
+			draw_texture_rect_region(sheet, Rect2(c * ts, h - ts, ts, ts), Rect2(col * 64, 4 * 64, 64, 64), Color(0.5, 0.5, 0.58))
+		# Kreaturen auf dem Felsrand: eine Parade, die langsam nach links zieht
 		var sc := 3
 		var step := PixelArt.TILE * sc + 12
 		var ms := Time.get_ticks_msec()
@@ -73,15 +81,16 @@ class Backdrop:
 				name = alt
 			var bob := sc * 2 if (ms / 260 + i) % 2 == 1 else 0
 			var x := roundf((i * step - shift + step / 2.0) / sc) * sc
-			var foot := Vector2(x, h - 8 - bob)
-			PixelArt.draw_foot(self, name, foot, sc, TINTS[i % TINTS.size()], true, Color(0.35, 0.33, 0.4, 0.55))
+			var foot := Vector2(x, h - ts - 18 - bob)
+			PixelArt.draw_foot(self, "aufsatz/schatten", foot + Vector2(0, 6 * sc), sc)
+			PixelArt.draw_foot(self, name, foot, sc, TINTS[i % TINTS.size()], true, Color(0.8, 0.78, 0.85, 0.9))
 
 
 static func logo(parent: Node, text: String, size: int = 60) -> Label:
 	var l := Kit.label(parent, text, size, UiTheme.ACCENT)
 	l.add_theme_font_override("font", UiFonts.pixel(700))
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.add_theme_color_override("font_shadow_color", Color("#b0306e"))
+	l.add_theme_color_override("font_shadow_color", UiTheme.OUTLINE)
 	l.add_theme_constant_override("shadow_offset_x", 4)
 	l.add_theme_constant_override("shadow_offset_y", 4)
 	return l

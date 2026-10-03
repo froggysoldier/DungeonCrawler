@@ -244,11 +244,8 @@ func confirm(t: String, text: String, yes: String, no: String = "Abbrechen") -> 
 func toast(t: String, text: String, kind: String) -> void:
 	var p := PanelContainer.new()
 	p.theme_type_variation = "Toast"
-	var sb: PixelBox = UiTheme.get_theme().get_stylebox("panel", "Toast").duplicate()
-	sb.border_color = UiTheme.LINE_2
 	var edge := {"achievement": UiTheme.ACHV, "skill": UiTheme.INFO, "warnung": UiTheme.DANGER}
 	var accent: Color = edge.get(kind, UiTheme.ACCENT)
-	p.add_theme_stylebox_override("panel", sb)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 2)
@@ -257,7 +254,7 @@ func toast(t: String, text: String, kind: String) -> void:
 	Kit.text(v, Kit.esc(text), 13, "muted")
 	_toasts.add_child(p)
 	# Farbiger linker Rand
-	p.draw.connect(func(): p.draw_rect(Rect2(0, 6, 4, p.size.y - 12), accent))
+	p.draw.connect(func(): p.draw_rect(Rect2(6, 10, 4, p.size.y - 20), accent))
 	while _toasts.get_child_count() > 5:
 		var old := _toasts.get_child(0)
 		_toasts.remove_child(old)
@@ -282,3 +279,10 @@ func close_all() -> void:
 		_back.visible = false
 		job.closed.emit(null)
 
+
+
+## Alle Meldungen oben rechts sofort entfernen (beim Bildschirmwechsel).
+func clear_toasts() -> void:
+	for c in _toasts.get_children():
+		_toasts.remove_child(c)
+		c.queue_free()

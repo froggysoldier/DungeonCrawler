@@ -126,25 +126,31 @@ static func label(parent: Node, t: String, size: int = 14, color: Variant = null
 	return _add(parent, l)
 
 
-## Abschnittsüberschrift in Goldschrift mit feiner Linie.
+## Abschnittsüberschrift auf einem Band (Tiny Swords), rechts eine feine Linie.
 static func section(parent: Node, title: String, extra_bb: String = "") -> HBoxContainer:
 	var wrap := VBoxContainer.new()
 	wrap.add_theme_constant_override("separation", 0)
 	_add(parent, wrap)
-	spacer(wrap, 10)
+	spacer(wrap, 8)
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 8)
 	wrap.add_child(h)
+	var rib := PanelContainer.new()
+	rib.theme_type_variation = "Ribbon"
+	rib.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rib.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(rib)
 	var l := Label.new()
 	l.text = title.to_upper()
 	l.add_theme_font_size_override("font_size", 16)
 	l.add_theme_font_override("font", UiFonts.pixel(700, 1))
-	l.add_theme_color_override("font_color", UiTheme.ACCENT)
+	l.add_theme_color_override("font_color", UiTheme.OUTLINE)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	h.add_child(l)
+	rib.add_child(l)
 	if extra_bb != "":
 		var rt := text(h, extra_bb, 12)
 		rt.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		rt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		rt.autowrap_mode = TextServer.AUTOWRAP_OFF
 	var line := Rule.new()
 	line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -230,7 +236,7 @@ static func rbutton(parent: Node, bb: String, cb: Callable, variant: String = "B
 static func keycap(key: String) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sb := UiTheme.box(Color("#0e1015"), Color("#3a3f4d"), 4, 1, Vector4(4, 0, 4, 0))
+	var sb := UiTheme.box(Color("#e6d7b0"), UiTheme.OUTLINE, 4, 1, Vector4(4, 0, 4, 0))
 	sb.border_width_bottom = 4
 	p.add_theme_stylebox_override("panel", sb)
 	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -238,7 +244,7 @@ static func keycap(key: String) -> PanelContainer:
 	l.text = key
 	l.add_theme_font_size_override("font_size", 14)
 	l.add_theme_font_override("font", UiFonts.pixel(700))
-	l.add_theme_color_override("font_color", Color("#b9bdc8"))
+	l.add_theme_color_override("font_color", UiTheme.OUTLINE)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.custom_minimum_size = Vector2(9, 0)
 	p.add_child(l)
@@ -329,14 +335,24 @@ class Bar:
 			queue_redraw()
 
 	func _draw() -> void:
-		# Pixel-Balken: dunkler Rahmen, Füllung mit heller Oberkante und dunkler Unterkante
+		# Balken wie im Tiny-Swords-Pack: Marine-Umriss, Holzrahmen, dunkle
+		# Rinne, Füllung mit heller Oberkante und dunkler Unterkante
 		var u := 2.0
 		var w := floorf(size.x / u) * u
 		var h := floorf(size.y / u) * u
-		draw_rect(Rect2(u, 0, w - 2 * u, h), Color("#07080b"))
-		draw_rect(Rect2(0, u, w, h - 2 * u), Color("#07080b"))
-		draw_rect(Rect2(u, u, w - 2 * u, h - 2 * u), Color("#161922"))
-		var fw := floorf((w - 2 * u) * clampf(frac, 0.0, 1.0) / u) * u
+		var ol := UiTheme.OUTLINE
+		draw_rect(Rect2(u, 0, w - 2 * u, h), ol)
+		draw_rect(Rect2(0, u, w, h - 2 * u), ol)
+		var frame := h >= 8 * u
+		var b := u if frame else 0.0
+		if frame:
+			draw_rect(Rect2(u, u, w - 2 * u, h - 2 * u), Color("#b08158"))
+			draw_rect(Rect2(u, u, w - 2 * u, u), Color("#dfa166"))
+			draw_rect(Rect2(u, h - 2 * u, w - 2 * u, u), Color("#82564e"))
+		var inner := Rect2(u + b, u + b, w - 2 * (u + b), h - 2 * (u + b))
+		draw_rect(inner, Color("#3b2f38"))
+		draw_rect(Rect2(inner.position, Vector2(inner.size.x, u)), Color("#2a222b"))
+		var fw := floorf(inner.size.x * clampf(frac, 0.0, 1.0) / u) * u
 		if fw > 0:
 			var a := 1.0
 			if pulse:
@@ -347,17 +363,18 @@ class Bar:
 				var x0 := floorf(fw * i / steps / u) * u
 				var x1 := floorf(fw * (i + 1) / steps / u) * u
 				if x1 > x0:
-					draw_rect(Rect2(u + x0, u, x1 - x0, h - 2 * u), Color(c0.lerp(c1, float(i) / (steps - 1)), a))
-			draw_rect(Rect2(u, u, fw, u), Color(1, 1, 1, 0.22 * a))
-			if h >= 6 * u:
-				draw_rect(Rect2(u, h - 2 * u, fw, u), Color(0, 0, 0, 0.22 * a))
+					draw_rect(Rect2(inner.position.x + x0, inner.position.y, x1 - x0, inner.size.y), Color(c0.lerp(c1, float(i) / (steps - 1)), a))
+			draw_rect(Rect2(inner.position, Vector2(fw, u)), Color(1, 1, 1, 0.3 * a))
+			if inner.size.y >= 4 * u:
+				draw_rect(Rect2(inner.position.x, inner.end.y - u, fw, u), Color(0, 0, 0, 0.25 * a))
+			draw_rect(Rect2(inner.position.x + fw - u, inner.position.y, u, inner.size.y), Color(0, 0, 0, 0.2 * a))
 		if label == "":
 			return
 		var f := UiFonts.pixel(700) if font_size >= 16 else UiFonts.get_font(700)
 		var fs := font_size
 		var y := roundf((h + f.get_ascent(fs) - f.get_descent(fs)) / 2.0)
-		draw_string(f, Vector2(10, y + 2), label, HORIZONTAL_ALIGNMENT_LEFT, w - 12, fs, Color(0, 0, 0, 0.9))
-		draw_string(f, Vector2(8, y), label, HORIZONTAL_ALIGNMENT_LEFT, w - 12, fs, UiTheme.TEXT)
+		draw_string(f, Vector2(10, y + 2), label, HORIZONTAL_ALIGNMENT_LEFT, w - 14, fs, Color(UiTheme.OUTLINE, 0.95))
+		draw_string(f, Vector2(9, y), label, HORIZONTAL_ALIGNMENT_LEFT, w - 14, fs, UiTheme.TEXT)
 
 
 static func bar(parent: Node, frac: float, t: String, c0: String, c1: String, height: float = 20, pulse: bool = false) -> Bar:

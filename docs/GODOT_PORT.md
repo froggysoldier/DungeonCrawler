@@ -24,6 +24,7 @@ godot/
   scripts/ui/            Oberfläche
   scenes/main.*          Einstieg: Titel, Interview, Spiel, Endbildschirm
   assets/pixel/          Pixel-Bögen (PNG) und index.json mit der Lage jedes Bildes
+  assets/tinyswords/     Teile aus dem Tiny-Swords-Pack (Pixel Frog): Oberfläche, Wände, Wasser, Effekte
   assets/fonts/          Montserrat und Pixelify Sans (beide SIL Open Font License)
   tests/                 Testlauf, Tests, Replay-Bot und Aufnahmen (fixtures)
   tools/                 Werkzeuge: Bildschirmfotos, Aufnahmen, Balance-Simulation
@@ -34,7 +35,7 @@ godot/
 | Datei | Inhalt |
 |---|---|
 | `pixel_art.gd` | Pixel-Bögen laden, Monsterfarben tönen, ganzzahlig vergrößert zeichnen |
-| `pixel_box.gd` | Rahmen im Pixel-Stil für alle Flächen und Knöpfe (abgestufte Ecken, harter Schatten) |
+| `pixel_box.gd` | Einfache Pixel-Rahmen (Leisten, Tastenkappen, Fokus); Knöpfe und Karten nutzen die 9-Slices aus `assets/tinyswords/ui` |
 | `tiles.gd` | Bodenmaterial je Raum, Mauerfarben je Etage, fester Zufall je Kachel |
 | `map_view.gd` | Karte: statische Ebene (nur bei Änderungen neu), belebte Ebene, Nebel und Licht mit Dithering (Shader), Figuren, Effekte |
 | `sprites.gd` | Welche Figur zu welcher Monsterart gehört, große Porträts |
@@ -63,7 +64,7 @@ Die Bilder liegen in `assets/pixel` als PNG-Bögen:
 | `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur (alte Einzelfigur), Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
 | `helden.png` | Spielfigur je Rasse (`held/<id>`, mit Kopfmaske `held/<id>_kopf`) und Ausrüstung je Körperbau (`ausruestung/<bau>/<platz>`) |
 | `bosse.png` | Eigene Figuren der 15 Bosse |
-| `kacheln.png` | Böden (9 Materialien × 4 Varianten), Wände (3 Etagen × 4 Varianten, Krone und Vorderseite), Türen, Treppe |
+| `kacheln.png` | Böden (9 Materialien × 4 Varianten), Türen, Treppe |
 | `dinge.png` | Gegenstände am Boden, Symbole der 15 Ausrüstungsplätze (`slot_…`), Fallen, Geschosse |
 | `einrichtung.png` | Automat, Bett, Toilette, Theke, Kisten, Fässer, Regale, Gerümpel, Eimer, Flecken |
 
@@ -135,6 +136,38 @@ Box-Stufe, springt auf (`ding/truhe_offen`, mit dem Box-Klang), strahlt und
 sprüht Funken; danach erscheinen die Gegenstände (`GameDialogs.Chest`). Beim
 Öffnen mehrerer Boxen zeigt die Truhe die beste Stufe.
 
+## Stil: Tiny Swords
+
+Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
+(Rohdateien in `asset-pack/`). Kennzeichen des Stils, an die sich alles hält:
+
+- Kontur in Nachtblau `#161c2e` statt Schwarz, Schatten laufen zum Nachtblau,
+  Licht zu warmem Creme (`PixelArt.ramp`). Gedämpfte, leicht entsättigte
+  Farben: Schiefer, Sand, Gold, Teal (`PixelArt.PALETTE`).
+- Wände sind die Klippen des Tilesets: oben die Felsfläche mit gewelltem Rand,
+  zum Raum hin die Felswand aus Steinblöcken. Je Etage umgefärbt (Etage 1
+  Erdbraun und Teal, Etage 2 Betongrau, Etage 3 Moos).
+  `MapView.wall_cell` wählt das Feld im Klippen-Block (4 Spalten × 6 Reihen).
+- Wasser und Kanäle: flaches Teal mit animierter Gischt an jedem Ufer.
+- Effekte aus dem Pack: Staubwolke beim Besiegen, Explosion bei Bomben,
+  Feuer bei Feuergeschossen (`MapView.FX`).
+- Oberfläche: Knöpfe sind die 9-Slice-Knöpfe des Packs, für helle Schrift
+  dunkel umgefärbt (Schiefer normal, gelber Rand bei Hover und Auswahl, Gold
+  für Hauptaktionen, Rot für Gefahr, Grau für deaktiviert). Karten, Dialoge,
+  Hinweise und Meldungen sind das Schieferpapier mit Goldecken, Schilder
+  (Kopfzeile, Reiter) geschnitztes Holz, Abschnittsüberschriften gelbe Bänder.
+  Balken haben einen Holzrahmen mit Rinne wie die Balken des Packs.
+
+`tools/import_tinyswords.gd` holt die Teile aus `asset-pack/`, setzt die
+Bögen mit Lücken zu 9-Slices zusammen, färbt um und verkleinert Knöpfe auf
+halbe Größe (Umrisse bleiben erhalten). Was das Pack nicht hat (Monster,
+Gegenstände, Möbel, Böden), zeichnen die eigenen Vorlagen im selben Stil:
+Nachtblau-Kontur, Rampe zu Creme, Palette des Packs.
+
+**Lizenz:** Tiny Swords von Pixel Frog (pixelfrog-assets.itch.io). Nutzung
+in eigenen Spielen erlaubt; das Pack selbst darf nicht weiterverteilt oder
+verkauft werden. Siehe `assets/tinyswords/LIZENZ.md`.
+
 **Schriften:** Fließtext in Montserrat, Überschriften, Knöpfe, Reiter und die
 Karte in Pixelify Sans. Pixelify ist bei Größen in Zehnerschritten ganz
 scharf (ein Schriftpixel = 1/10 der Größe).
@@ -152,6 +185,8 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | `xvfb-run godot --path godot -s res://tools/shot_ui.gd -- ordner modus` | Bildschirmfoto: `title`, `interview`, `game`, `dialog`, `walk`, `tabs`, `combat`, `ausruestung` (Inventar, Crawler-Reiter und Tooltip mit Ausrüstung und Haustier), `truhe` (Box öffnen in vier Bildern, Stufe mit `TIER=…`), `select`, `versus`, `talkshow`, `safe`, `floor3` (mit `PERF=1` auch Zeichenzeit der Karte), `bildschirm` (Highlights im Safe Room mit Einladung), `grube` (Gladiatorenkampf), `fx` (Angriff in sechs Bildern, mit `BOSS=id` gegen einen Boss), `fackeln` |
 | `xvfb-run godot --path godot -s res://tools/shot_sprites.gd -- bild.png [vergrößerung]` | Alle Monster in ihrer echten Farbe, dazu Spielfigur, Reittiere, Gegenstände, Fallen |
 | `godot --headless --path godot -s res://tools/make_pixel_art.gd -- --force [--preview ordner]` | Pixel-Bögen aus den Vorlagen neu erzeugen (überschreibt Änderungen aus Pixel-Editoren) |
+| `godot --headless --path godot -s res://tools/import_tinyswords.gd` | Teile aus dem Tiny-Swords-Pack (`asset-pack/`) nach `assets/tinyswords` holen, zusammensetzen und umfärben |
+| `xvfb-run godot --path godot -s res://tools/shot_map.gd -- bild.png [seed] [zoom] [etage] [alles]` | Nur die Karte; `alles` deckt die ganze Karte ohne Nebel und Dunkelheit auf (zum Begutachten der Grafik) |
 
 ## Tests
 
@@ -202,6 +237,7 @@ scharf (ein Schriftpixel = 1/10 der Größe).
 | 5 – Abschluss | Titel, Interview, Speichern und Laden, Export Web, Windows, Linux | erledigt |
 | 6 – Eigenständig | Alle Tests in GDScript, Aufnahmen und Testlauf ohne Node, Godot als einzige Quelle | erledigt |
 | 7 – Pixel-Stil | Pixel-Bögen mit Generator, Karte ganzzahlig und gedithert, Pixel-Rahmen und Pixel-Schrift in der Oberfläche | erledigt |
+| 8 – Tiny Swords | Palette, Knöpfe, Papier, Bänder und Balken aus dem Pack, Klippenwände je Etage, Wasser mit Gischt, Effekte | erledigt |
 
 ## Export
 

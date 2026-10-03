@@ -239,10 +239,6 @@ func _build_all() -> void:
 	for mat in FLOORS:
 		for v in 4:
 			_add("kacheln", "boden/%s%d" % [mat, v], _floor(mat, v))
-	for fl in [1, 2, 3]:
-		for v in 4:
-			_add("kacheln", "wand/%d_oben%d" % [fl, v], _wall(fl, v, false))
-			_add("kacheln", "wand/%d_front%d" % [fl, v], _wall(fl, v, true))
 	for boss in [false, true]:
 		for hor in [true, false]:
 			for open in [false, true]:
@@ -802,74 +798,8 @@ func _floor(mat: String, v: int) -> Image:
 	return img
 
 
-# ================================================================ Wände, Türen, Treppe (32 × 32)
-
-func _wall(fl: int, v: int, face: bool) -> Image:
-	_rng = Rng.new(300 + fl * 13 + v * 7 + (1 if face else 0))
-	var th := Tiles.wall_theme(fl)
-	var cap := Color(th.cap)
-	var stone := Color(th.capStone)
-	var img := Image.create(T, T, false, Image.FORMAT_RGBA8)
-	img.fill(cap)
-	# Mauerkrone von oben: große Platten mit Fugen
-	var seam := _ri(10, 21)
-	var cut_l := _ri(12, 20)
-	var cut_r := _ri(8, 14)
-	for yy in T:
-		for xx in T:
-			var c := _jit(stone, 0.05, _r())
-			var on_seam := xx == seam or (yy == cut_l and xx < seam) or (yy == cut_r and xx > seam)
-			if on_seam:
-				c = cap
-			elif xx == seam + 1 or (yy == cut_l + 1 and xx < seam) or (yy == cut_r + 1 and xx > seam) or yy == 0 or xx == 0:
-				c = stone.lightened(0.1)
-			img.set_pixel(xx, yy, c)
-	if not face:
-		return img
-	var top := 10
-	var mortar := Color(th.mortar)
-	var fc := Color(th.face)
-	for yy in range(top, T):
-		for xx in T:
-			img.set_pixel(xx, yy, _jit(mortar, 0.04, _r()))
-	# Kante der Krone
-	for xx in T:
-		img.set_pixel(xx, top - 2, Color(th.lip))
-		img.set_pixel(xx, top - 1, Color(th.lip).darkened(0.25))
-	# Ziegel 16 × 6 im Verband, 1 Pixel Fuge
-	var r := 0
-	var y := top
-	while y < T - 2:
-		var off := 8 if r % 2 == 1 else 0
-		for b in 3:
-			var x0 := b * 16 - off
-			var col := _jit(fc, 0.1, _r())
-			for yy in range(y, mini(T - 2, y + 5)):
-				for xx in range(maxi(0, x0), mini(T, x0 + 15)):
-					var c := _jit(col, 0.04, _r())
-					if yy == y:
-						c = col.lightened(0.14)
-					elif yy == y + 4:
-						c = col.darkened(0.14)
-					img.set_pixel(xx, yy, c)
-		y += 6
-		r += 1
-	# Schatten unten, wo die Wand auf den Boden trifft
-	for xx in T:
-		img.set_pixel(xx, T - 2, mortar.darkened(0.2))
-		img.set_pixel(xx, T - 1, mortar.darkened(0.35))
-	if th.has("moss"):
-		var moss := Color(th.moss)
-		for i in 8:
-			var mx := _ri(0, T - 3)
-			var my := _ri(top + 2, T - 4)
-			img.set_pixel(mx, my, moss)
-			img.set_pixel(mx + 1, my, moss.darkened(0.2))
-			if _r() < 0.5:
-				img.set_pixel(mx, my + 1, moss.darkened(0.3))
-				img.set_pixel(mx + 2, my, moss.lightened(0.1))
-	return img
-
+# ================================================================ Türen, Treppe (32 × 32)
+# Wände kommen aus dem Tiny-Swords-Pack (tools/import_tinyswords.gd).
 
 func _door(open: bool, horizontal: bool, boss: bool) -> Image:
 	var img := Image.create(T, T, false, Image.FORMAT_RGBA8)

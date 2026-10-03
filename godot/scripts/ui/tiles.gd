@@ -1,24 +1,14 @@
 class_name Tiles
 extends Node
-## Hilfen für die Kacheln der Karte: Bodenmaterial je Raum, Mauerfarben je
-## Etage und ein fester Zufall je Kachel. Die Bilder selbst liegen als
+## Hilfen für die Kacheln der Karte: Bodenmaterial je Raum und ein fester
+## Zufall je Kachel. Die Bilder selbst liegen als
 ## Pixel-Bögen in res://assets/pixel (siehe PixelArt).
 
 signal ready_changed
 
 const MATERIALS := ["pflaster", "dielen", "fliesen", "beton", "ziegelboden", "teppich", "marmor", "blutstein", "arena"]
 
-const WALL_THEMES := {
-	1: {"cap": "#191511", "capStone": "#29231c", "face": "#7b6c5a", "mortar": "#2b241c", "lip": "#a8977f"},
-	2: {"cap": "#14161a", "capStone": "#232830", "face": "#6c737e", "mortar": "#22262c", "lip": "#9aa3ae"},
-	3: {"cap": "#101512", "capStone": "#1d2821", "face": "#5d6d5e", "mortar": "#1b231d", "lip": "#8fa08e", "moss": "#4f7a3a"},
-}
-
 var is_ready := false
-
-
-static func wall_theme(floor: int) -> Dictionary:
-	return WALL_THEMES[clampi(floor, 1, 3)]
 
 
 # ---------------------------------------------------------------- Zufall je Kachel

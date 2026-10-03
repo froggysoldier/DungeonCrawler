@@ -26,7 +26,7 @@ kämpft.
 | Tod | Alle vier Konzepte (siehe Abschnitt 6) |
 | Namen | Eigene Namen (Show, Guide, Bosse …), damit eine spätere Veröffentlichung möglich bleibt |
 | Etagen | Themen dürfen sich am Buch orientieren, aber keine Spoiler |
-| Oberfläche | Klickbare Karte in Pixel-Grafik (einheitlich 32 × 32 je Kachel und Figur), daneben Panels + Textlog; Gegenstände, Ausrüstungsplätze, Gegner und Haustier auch dort als Pixel-Bilder; die Spielfigur trägt ihre Ausrüstung sichtbar (Farbe = Seltenheit); jede Rasse hat eigenen Körperbau, Kopf und Anbauten |
+| Oberfläche | Klickbare Karte in Pixel-Grafik (einheitlich 32 × 32 je Kachel und Figur), daneben Panels + Textlog; Gegenstände, Ausrüstungsplätze, Gegner und Haustier auch dort als Pixel-Bilder; die Spielfigur trägt ihre Ausrüstung sichtbar (Farbe = Seltenheit); jede Rasse hat eigenen Körperbau, Kopf und Anbauten. Stil nach dem Asset-Pack Tiny Swords (Pixel Frog): Nachtblau-Konturen, gedämpfte Palette, Klippenwände, Wasser mit Gischt, Knöpfe, Papier und Bänder aus dem Pack |
 | Erster Meilenstein | Etage 1 komplett spielbar |
 | Zweiter Meilenstein | Mehr Inhalte, Web-Link, Etage 2 (Publikum) und 3 (Rassen/Klassen) |
 
@@ -763,6 +763,7 @@ godot/
   data/            Inhalte: Monster, Items, Skills, Achievements, Interview, Welttexte
   scripts/ui/      Pixel-Karte, Panels, Dialoge
   assets/pixel/    Pixel-Bögen (PNG), in jedem Pixel-Editor bearbeitbar
+  assets/tinyswords/ Teile aus dem Tiny-Swords-Pack (Oberfläche, Wände, Wasser, Effekte)
   tests/           Engine-, Replay- und Oberflächentests (./test.sh)
   tools/           Balance-Simulation, Aufnahmen, Pixel-Generator, Bildschirmfotos
 ```

@@ -19,6 +19,8 @@ var _flashes: Dictionary = {}
 var _bursts: Array = []
 var _shake: Dictionary = {}
 var _sparkles: Array = []
+## Effekte aus dem Tiny-Swords-Pack (Staub, Explosion, Feuer).
+var _fx: Array = []
 var _shots: Array = []
 var _floaters: Array = []
 var _cam: Variant = null
@@ -81,6 +83,8 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 				var b := Vector2(f.to.x, f.to.y)
 				var dur := maxf(120.0, a.distance_to(b) * 45)
 				_shots.append({"from": a, "to": b, "start": now + delay, "dur": dur, "style": f.style})
+				if f.style in ["bombe", "feuer"]:
+					_fx.append({"at": b, "kind": "explosion" if f.style == "bombe" else "feuer", "start": now + delay + dur, "dur": 640.0})
 				arrival["%d,%d" % [f.to.x, f.to.y]] = now + delay + dur
 				delay += 60
 			"strike":
@@ -103,6 +107,7 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 				var tile := "%d,%d" % [f.at.x, f.at.y]
 				var t0: float = maxf(now + delay, arrival.get(tile, 0.0)) + 60
 				_bursts.append({"at": Vector2(f.at.x, f.at.y), "defId": f.defId, "color": f.get("color"), "rank": f.get("rank", "normal"), "start": t0, "dur": BURST_MS})
+				_fx.append({"at": Vector2(f.at.x, f.at.y), "kind": "staub", "start": t0, "dur": BURST_MS})
 			_:
 				var tile := "%d,%d" % [f.at.x, f.at.y]
 				var n: int = per_tile.get(tile, 0)
@@ -164,6 +169,20 @@ func bursts(now: float = -1.0) -> Array:
 			var e: Dictionary = b.duplicate()
 			e.k = (now - b.start) / b.dur
 			out.append(e)
+	return out
+
+
+## Laufende Effekte: at, kind und Fortschritt k (0 bis 1).
+func fx(now: float = -1.0) -> Array:
+	if now < 0:
+		now = now_ms()
+	_fx = _fx.filter(func(e): return now < e.start + e.dur)
+	var out: Array = []
+	for e in _fx:
+		if now >= e.start:
+			var c: Dictionary = e.duplicate()
+			c.k = (now - e.start) / e.dur
+			out.append(c)
 	return out
 
 
@@ -232,6 +251,7 @@ func reset() -> void:
 	_flashes.clear()
 	_bursts.clear()
 	_sparkles.clear()
+	_fx.clear()
 	_shake = {}
 	_cam = null
 
@@ -271,4 +291,4 @@ func frame(s: Dictionary, now: float = -1.0) -> Dictionary:
 			continue
 		var k: float = (now - f.start) / f.dur
 		floaters.append({"x": f.at.x, "y": f.at.y - 0.2 - k * 0.9, "text": f.text, "color": f.color, "alpha": 1.0 if k < 0.7 else 1 - (k - 0.7) / 0.3})
-	return {"cam": _cam, "projectiles": projectiles, "floaters": floaters, "bursts": bursts(now), "sparkles": sparkles(now), "shake": shake(now), "time": now, "now": now}
+	return {"cam": _cam, "projectiles": projectiles, "floaters": floaters, "bursts": bursts(now), "sparkles": sparkles(now), "fx": fx(now), "shake": shake(now), "time": now, "now": now}

@@ -10,15 +10,18 @@ extends RefCounted
 const TILE := 32
 const DIR := "res://assets/pixel"
 
-## Palette der Vorlagen (Zeichen in den Definitionen von tools/make_pixel_art.gd).
+## Palette der Vorlagen (Zeichen in den Definitionen von tools/make_pixel_art.gd),
+## abgestimmt auf den Stil von Tiny Swords (Pixel Frog): Kontur in dunklem
+## Nachtblau statt Schwarz, gedämpfte, leicht entsättigte Farben, Pergament-
+## und Holztöne, Türkis statt reinem Blau.
 const PALETTE := {
-	"k": "#181425", "K": "#262b44", "n": "#3a4466", "N": "#5a6988", "g": "#8b9bb4", "G": "#c0cbdc", "w": "#ffffff",
-	"r": "#a22633", "R": "#e43b44", "o": "#f77622", "y": "#feae34", "Y": "#fee761",
-	"l": "#63c74d", "L": "#3e8948", "e": "#265c42", "E": "#193c3e",
-	"b": "#124e89", "B": "#0099db", "c": "#2ce8f5",
-	"p": "#68386c", "P": "#b55088", "f": "#f6757a",
-	"s": "#e8b796", "S": "#c28569", "u": "#be4a2f", "U": "#d77643", "d": "#733e39", "D": "#3e2731",
-	"h": "#ead4aa", "H": "#e4a672", "x": "#ff0044",
+	"k": "#161c2e", "K": "#2a2f45", "n": "#404e75", "N": "#5e6f86", "g": "#8c9a9d", "G": "#c8cdbf", "w": "#f6f2e1",
+	"r": "#8d4848", "R": "#d65f5c", "o": "#d9945f", "y": "#dcaa46", "Y": "#f1d867",
+	"l": "#9bb94e", "L": "#5da067", "e": "#385655", "E": "#28393f",
+	"b": "#485884", "B": "#4697ac", "c": "#8cc3c4",
+	"p": "#693d5b", "P": "#ab6e9c", "f": "#e0877e",
+	"s": "#ecc89c", "S": "#cf9c71", "u": "#b4634e", "U": "#cf8a5a", "d": "#866353", "D": "#4d3f45",
+	"h": "#efe1ab", "H": "#d5b583", "x": "#e76161",
 }
 
 ## Magenta-Stufen für tönbare Stellen: Schatten, dunkel, Grundfarbe, hell, Glanz.
@@ -114,19 +117,19 @@ static func _shift_hue(h: float, target: float, amount: float) -> float:
 	return fposmod(h + clampf(d, -amount, amount), 1.0)
 
 
-## Farbrampe aus einer Grundfarbe: Schatten und Dunkel kühler, Licht wärmer.
+## Farbrampe aus einer Grundfarbe im Stil von Tiny Swords: die Mitte ist die
+## Grundfarbe selbst, Schatten (etwas entsättigt) gehen zum Nachtblau der
+## Kontur, Licht zu warmem Creme.
 static func ramp(base: Color) -> Array:
-	var h := base.h
-	var s := base.s
-	var v := base.v
-	var warm := 0.13
-	var cool := 0.68
+	var b := base
+	var navy := Color("#161c2e")
+	var cream := Color("#fff4d0")
 	return [
-		Color.from_hsv(_shift_hue(h, cool, 0.05), minf(1.0, s * 1.1 + 0.1), v * 0.36),
-		Color.from_hsv(_shift_hue(h, cool, 0.03), minf(1.0, s * 1.05 + 0.05), v * 0.62),
-		base,
-		Color.from_hsv(_shift_hue(h, warm, 0.03), s * 0.85, minf(1.0, v * 1.22 + 0.06)),
-		Color.from_hsv(_shift_hue(h, warm, 0.05), s * 0.6, minf(1.0, v * 1.45 + 0.14)),
+		b.lerp(navy, 0.62),
+		b.lerp(navy, 0.32),
+		b,
+		b.lerp(cream, 0.28),
+		b.lerp(cream, 0.55),
 	]
 
 
