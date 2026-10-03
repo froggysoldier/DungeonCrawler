@@ -650,7 +650,7 @@ static func _cat_button(gv: GameView, root: Node, id: String, label: String, cou
 static func _achv_card(root: Node, a: Dictionary, locked: bool, tiers: Dictionary) -> void:
 	var v := Kit.card(root, "Item", 2)
 	var color = tiers.get(a.get("tier", "")) if not locked and a.get("tier") != null else UiTheme.HEX.achv
-	Kit.text(v, "[b]%s[/b]" % Kit.col(Kit.esc(a.name), color if color != null else UiTheme.HEX.achv))
+	Kit.text(v, "[b]%s[/b]%s" % [Kit.col(Kit.esc(a.name), color if color != null else UiTheme.HEX.achv), (" " + Kit.small(Kit.col("MEISTERLEISTUNG", "accent"))) if a.get("meister", false) else ""])
 	Kit.text(v, Kit.esc(a.description), 12)
 	if not locked:
 		Kit.text(v, "[i]%s[/i]" % Kit.esc(a.comment), 12, "muted")

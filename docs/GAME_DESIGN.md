@@ -251,6 +251,16 @@ Für gefühlt alles, was ein Achievement wert ist, gibt es eines – insgesamt
   geblendet ist, Doppelaufstieg, Jackpot, einen Laden leer kaufen.
 - **Entdeckte Muster (dynamisch):** Der Beobachter vergibt Achievements für
   Kombinationen, die tatsächlich passieren, in Stufen I–V (1, 5, 15, 40, 100).
+- **Box-Stufe je Etage:** Achievements, Muster, Sponsoren, Fans, Aufträge,
+  Talkshow und Bosse geben auf Etage 1 höchstens Silber, ab Etage 2
+  höchstens Gold. Nur **Meisterleistungen** gehen eine Stufe darüber (Etage 1
+  Gold, ab Etage 2 Platin) und enthalten auch eine Seltenheitsstufe mehr:
+  Einzelkämpfer (Bezirksboss ganz allein), Nur die Knöchel (Bezirksboss nur
+  mit Fäusten), Gewaltfreier Abstieg (Etage 2 ohne einen Kill erreichen),
+  Ohne Netz (Etage nach drei Vierteln der Zeit ohne Trank und Schlaf
+  verlassen), Geisterhaft (Nachbarschaftsboss besiegen, ohne von ihm
+  getroffen zu werden), Adamskostüm (Boss ohne Ausrüstung und Waffe) und
+  Blitzsäuberung (alle vier Nachbarschaftsbosse im ersten Drittel der Zeit).
 - **Boxen gibt es ab Silber.** Bronze-Erfolge – darunter die erste Stufe
   jeder Achievement-Familie, „Neu im Bestiarium“ und „Routine“ sowie Muster
   mit niedriger Wertung – bringen nur Aufmerksamkeit beim Publikum. Seltene

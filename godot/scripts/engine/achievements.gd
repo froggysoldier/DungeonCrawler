@@ -36,10 +36,15 @@ static func check(s: Dictionary, e: Dictionary) -> void:
 			Log.toast(s, "Achievement: %s" % a.name, a.description, "achievement")
 			continue
 		var first: bool = not s.firstEver.has(a.id)
-		var tier: String = _upgrade(a.tier) if first else a.tier
+		var meister: bool = a.get("meister", false)
+		var bx := Items.create_box(s, a.box, _upgrade(a.tier) if first else a.tier, meister)
+		s.player.boxes.append(bx)
+		var tier: String = bx.box.tier
 		Fx.sound(s, {"kind": "achievement", "tier": tier})
-		s.player.boxes.append(Items.create_box(s, a.box, tier))
-		var first_note := " ERSTMALIG IN DEINER KARRIERE – Box-Stufe erhöht!" if first else ""
+		var tiers: Array = Db.world("BOX_TIERS")
+		var first_note := " ERSTMALIG IN DEINER KARRIERE – Box-Stufe erhöht!" if first and tiers.find(tier) > tiers.find(a.tier) else ""
+		if meister:
+			first_note += " MEISTERLEISTUNG!"
 		var tier_name: String = Db.world("BOX_TIER_NAMES")[tier]
 		var box_name: String = Db.world("BOX_TYPE_NAMES")[a.box]
 		Log.add(s, "Belohnung: %s %s.%s" % [tier_name, box_name, first_note], "loot")

@@ -147,6 +147,7 @@ static func _attack_player(s: Dictionary, m: Dictionary, ranged: bool) -> void:
 		Skills.train_skill(s, "bighit", Skills.learn_factor(s, m.level))
 	if defense.reduktion:
 		Observer.train_defense(s, source, "abhaertung")
+	m.hitPlayer = true
 	p.hp -= dmg
 	Fx.float_text(s, p.pos, "-%d" % dmg, Fx.COLORS.gegenSpieler)
 	Fx.hit(s, p.pos, dmg >= Player.max_hp(s, b) * 0.15)

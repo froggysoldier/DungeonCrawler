@@ -370,7 +370,10 @@ static func _grant_pattern(s: Dictionary, fs: Array, stage: int, score: float, c
 		box = Db.t("facets", "PART_BOX")[String(t).substr(2)]
 	else:
 		box = "abenteurer"
-	s.player.boxes.append(Items.create_box(s, box, tier))
+	var bx := Items.create_box(s, box, tier)
+	s.player.boxes.append(bx)
+	first = first and tier == bx.box.tier
+	tier = bx.box.tier
 	s.dynAchievements.append({"id": id, "name": name, "description": description, "comment": comment, "tier": tier, "box": box, "turn": s.turn, "floor": s.floor})
 	Fx.sound(s, {"kind": "achievement", "tier": tier})
 	var tier_name: String = Db.world("BOX_TIER_NAMES")[tier]

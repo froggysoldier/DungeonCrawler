@@ -13,8 +13,8 @@ func test_klaenge_werden_angemeldet(t) -> void:
 	s.monsters = []
 	Game.move_step(s, {"x": safe.x + 2, "y": safe.y + 1})
 	Fx.drain_sfx(s)
-	var box := Items.create_box(s, "abenteurer", "gold")
+	var box := Items.create_box(s, "abenteurer", "silber")
 	s.player.boxes.append(box)
 	t.ok(Game.open_box(s, box.uid).ok, "Box offen")
 	var b = J.find(Fx.drain_sfx(s), func(x): return x.kind == "box")
-	t.eq(b.tier if b != null else null, "gold", "Box-Klang")
+	t.eq(b.tier if b != null else null, "silber", "Box-Klang")

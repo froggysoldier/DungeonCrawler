@@ -216,6 +216,7 @@ static func _resolve(s: Dictionary, m: Dictionary) -> void:
 	var dmg := maxi(1, J.rnd(Player.armor_damage(raw, J.num(b, "ruestung") / 2.0)))
 	if Mounts.mount_absorbs(s, dmg, who):
 		return
+	m.hitPlayer = true
 	p.hp -= dmg
 	s.counters.damageTaken += dmg
 	Fx.float_text(s, p.pos, "-%d" % dmg, Fx.COLORS.gegenSpieler)

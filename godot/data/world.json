@@ -18,7 +18,8 @@
     1,
     5
    ],
-   "rarityCap": "selten"
+   "rarityCap": "selten",
+   "boxTierCap": "silber"
   },
   {
    "floor": 2,
@@ -89,7 +90,8 @@
     "hp": 2.6,
     "dmg": 2.6,
     "xp": 2.5
-   }
+   },
+   "boxTierCap": "gold"
   },
   {
    "floor": 3,
@@ -176,7 +178,8 @@
     "hp": 5.0,
     "dmg": 5.0,
     "xp": 4.0
-   }
+   },
+   "boxTierCap": "gold"
   }
  ],
  "LAST_PLAYABLE_FLOOR": 3,

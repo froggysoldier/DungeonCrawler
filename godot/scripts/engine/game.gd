@@ -193,6 +193,8 @@ static func _enter_floor(s: Dictionary, floor: int, meta: Dictionary) -> void:
 	s.floorStartTurn = s.turn
 	s.collapseAt = s.turn + def.duration
 	s.lastSpawnTurn = s.turn
+	# Stand zu Beginn der Etage (für Meisterleistungen wie „Ohne Netz“)
+	s.floorStart = {"potions": int(s.counters.potionsDrunk), "sleeps": int(s.counters.sleeps), "kills": int(s.counters.kills)}
 	# Einlagen gelten nur auf ihrer Etage
 	s.erase("showEvent")
 	s.erase("nextShowEvent")
@@ -989,7 +991,7 @@ static func open_box(s: Dictionary, uid: String) -> Dictionary:
 	if box == null or box.get("box") == null:
 		return _fail("Box nicht gefunden.")
 	p.boxes = p.boxes.filter(func(b): return b.uid != uid)
-	var contents := Items.roll_box_contents(s, box.box.type, box.box.tier, int(J.nn(box.box, "floor", s.floor)))
+	var contents := Items.roll_box_contents(s, box.box.type, box.box.tier, int(J.nn(box.box, "floor", s.floor)), bool(J.nn(box.box, "special", false)))
 	for it in contents:
 		Inventory.give_item(s, it)
 	s.counters.boxesOpened += 1

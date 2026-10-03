@@ -73,14 +73,27 @@ static func create_item(s: Dictionary, base_id: String, menge: int = 1) -> Dicti
 	})
 
 
-static func create_box(s: Dictionary, type: String, tier: String) -> Dictionary:
+## Box-Stufe höchstens bis zur Obergrenze der Etage (world.json
+## FLOORS[].boxTierCap); Meisterleistungen (special) eine Stufe darüber.
+static func cap_box_tier(s: Dictionary, tier: String, special: bool = false) -> String:
+	var cap = Db.floor_def0(int(s.floor)).get("boxTierCap")
+	if cap == null:
+		return tier
+	var tiers: Array = Db.world("BOX_TIERS")
+	var max_idx := mini(tiers.size() - 1, tiers.find(cap) + (1 if special else 0))
+	return tiers[mini(tiers.find(tier), max_idx)]
+
+
+## special: Box aus einer Meisterleistung (höhere Stufe und Seltenheit erlaubt).
+static func create_box(s: Dictionary, type: String, tier: String, special: bool = false) -> Dictionary:
+	tier = cap_box_tier(s, tier, special)
 	return {
 		"uid": uid(s),
 		"baseId": "box_%s_%s" % [type, tier],
 		"name": "%s %s" % [Db.world("BOX_TIER_NAMES")[tier], Db.world("BOX_TYPE_NAMES")[type]],
 		"kind": "box",
 		"rarity": _tier_to_rarity(tier),
-		"box": {"type": type, "tier": tier, "floor": int(s.floor)},
+		"box": {"type": type, "tier": tier, "floor": int(s.floor), "special": special},
 		"flavor": "Kann nur in einem Safe Room geöffnet werden.",
 		"wert": 0,
 	}
@@ -162,18 +175,18 @@ static func cap_rarity(s: Dictionary, rarity: String, boss: bool = false, floor:
 
 ## Öffnet eine Box und erzeugt ihren Inhalt.
 ## floor: Etage, auf der die Box verdient wurde (für die Seltenheitsgrenze).
-static func roll_box_contents(s: Dictionary, type: String, tier: String, floor: int = -1) -> Array:
+static func roll_box_contents(s: Dictionary, type: String, tier: String, floor: int = -1, special: bool = false) -> Array:
 	var cfg: Dictionary = Db.world("BOX_CONTENTS")[tier]
 	var out := []
 	var count := R.int_(s, cfg.items[0], cfg.items[1])
-	var max_rarity: String = cap_rarity(s, cfg.rarities[cfg.rarities.size() - 1][0], type == "boss", floor)
+	var max_rarity: String = cap_rarity(s, cfg.rarities[cfg.rarities.size() - 1][0], type == "boss" or special, floor)
 	for i in count:
 		if R.chance(s, cfg.uniqueChance):
 			var u = _roll_unique(s, max_rarity)
 			if u != null:
 				out.append(u)
 				continue
-		var rarity: String = cap_rarity(s, R.weighted(s, cfg.rarities), type == "boss", floor)
+		var rarity: String = cap_rarity(s, R.weighted(s, cfg.rarities), type == "boss" or special, floor)
 		out.append(_roll_themed_item(s, type, rarity))
 	out.append(create_gold(s, R.int_(s, cfg.gold[0], cfg.gold[1])))
 	var tier_idx: int = Db.world("BOX_TIERS").find(tier)

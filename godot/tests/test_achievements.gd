@@ -143,3 +143,55 @@ func test_boxen_erst_ab_silber(t) -> void:
 		if a.tier == "bronze" and a.get("box") != null:
 			bad.append(a.id)
 	t.eq(bad, [], "Bronze-Achievements ohne Box")
+
+
+func test_boxstufe_je_etage(t) -> void:
+	var s := _make()
+	s.floor = 1
+	t.eq(Items.create_box(s, "abenteurer", "gold").box.tier, "silber", "Etage 1: höchstens Silber")
+	t.eq(Items.create_box(s, "abenteurer", "platin", true).box.tier, "gold", "Meisterleistung auf Etage 1: Gold")
+	t.eq(Items.create_box(s, "abenteurer", "bronze").box.tier, "bronze", "darunter unverändert")
+	s.floor = 2
+	t.eq(Items.create_box(s, "abenteurer", "platin").box.tier, "gold", "Etage 2: höchstens Gold")
+	t.eq(Items.create_box(s, "abenteurer", "platin", true).box.tier, "platin", "Meisterleistung ab Etage 2: Platin")
+
+
+func _boss_beside(s: Dictionary, rank: String) -> Dictionary:
+	var bd = J.find(Db.t("monsters", "HOOD_BOSSES"), func(b): return b.rank == rank)
+	var m := Monsters.spawn_boss(s, bd, TH.free_neighbor(s, s.player.pos), 0, -1, 1)
+	s.monsters.append(m)
+	return m
+
+
+func test_meister_einzelkaempfer_und_faustrecht(t) -> void:
+	var s := _make()
+	TH.ready(s)
+	s.player.pet = null
+	var m := _boss_beside(s, "boroughboss")
+	m.hitBy = ["faust"]
+	var boxes: int = s.player.boxes.size()
+	Combat.kill_monster(s, m, {"part": "faust", "move": "normal"})
+	t.has(s.achievements, "meister_einzelkaempfer", "allein")
+	t.has(s.achievements, "meister_faustrecht", "nur Fäuste")
+	var gold: Array = s.player.boxes.slice(boxes).filter(func(b): return b.box.tier == "gold" and b.box.special)
+	t.ge(gold.size(), 2, "Gold-Boxen auf Etage 1, nur durch Meisterleistung")
+
+
+func test_meister_unberuehrbar(t) -> void:
+	var s := _make()
+	TH.ready(s)
+	var hit := _boss_beside(s, "nachbarschaftsboss")
+	hit.hitPlayer = true
+	Combat.kill_monster(s, hit, {"part": "faust", "move": "normal"})
+	t.lacks(s.achievements, "meister_unberuehrbar", "getroffen: nein")
+	var clean := _boss_beside(s, "nachbarschaftsboss")
+	Combat.kill_monster(s, clean, {"part": "faust", "move": "normal"})
+	t.has(s.achievements, "meister_unberuehrbar", "nie getroffen: ja")
+
+
+func test_meister_gewaltfrei(t) -> void:
+	var s := _make()
+	TH.ready(s)
+	s.counters.kills = 0
+	Events.emit(s, {"type": "descend", "floor": 2})
+	t.has(s.achievements, "meister_gewaltfrei", "ohne Kill auf Etage 2")

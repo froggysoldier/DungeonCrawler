@@ -36,9 +36,10 @@ static func add_spectacle(s: Dictionary, points: float, kind: String) -> void:
 	var thresholds: Array = Db.t("viewers", "FAN_THRESHOLDS")
 	while v.nextFanBox < thresholds.size() and v.follower >= thresholds[v.nextFanBox][0]:
 		var threshold = thresholds[v.nextFanBox][0]
-		var tier: String = thresholds[v.nextFanBox][1]
 		v.nextFanBox += 1
-		s.player.boxes.append(Items.create_box(s, "fan", tier))
+		var bx := Items.create_box(s, "fan", thresholds[v.nextFanBox - 1][1])
+		s.player.boxes.append(bx)
+		var tier: String = bx.box.tier
 		var tier_name: String = Db.world("BOX_TIER_NAMES")[tier]
 		Log.add(s, "%s Follower! Die Fans schicken dir eine %s Fan-Box." % [J.s(threshold), tier_name], "loot")
 		Log.toast(s, "%s Follower!" % J.s(threshold), "%s Fan-Box erhalten" % tier_name, "loot")

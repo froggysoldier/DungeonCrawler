@@ -42,6 +42,36 @@ static func _kill(e: Dictionary) -> Variant:
 	return e.monster if e.type == "kill" else null
 
 
+## Ganz allein: keine Party, kein Haustier auf den Beinen, nicht beritten,
+## und der letzte Treffer kam von dir.
+static func _alone(s: Dictionary, e: Dictionary) -> bool:
+	var pet = s.player.get("pet")
+	return Crawlers.party(s).is_empty() and (pet == null or not pet.alive) and not s.player.get("riding", false) and not e.get("byPet") and not e.get("byAlly")
+
+
+## Nichts angelegt außer Unterwäsche, keine Waffe in der Hand.
+static func _naked(s: Dictionary) -> bool:
+	for slot in s.player.equipment:
+		if slot != "unterwaesche" and s.player.equipment[slot] != null:
+			return false
+	return Player.current_weapon(s) == null
+
+
+## Etage nach mindestens drei Vierteln der Zeit verlassen, ohne Trank und ohne Schlaf.
+static func _no_safety_net(s: Dictionary) -> bool:
+	var st = s.get("floorStart")
+	if st == null:
+		return false
+	var dur := float(Db.floor_def0(int(s.floor)).duration)
+	return s.turn - s.floorStartTurn >= dur * 0.75 and s.counters.potionsDrunk == int(st.potions) and s.counters.sleeps == int(st.sleeps)
+
+
+## Alle Nachbarschaftsbosse der Etage tot, bevor ein Drittel der Zeit um ist.
+static func _all_hood_bosses_fast(s: Dictionary) -> bool:
+	var dur := float(Db.floor_def0(int(s.floor)).duration)
+	return s.turn - s.floorStartTurn <= dur / 3.0 and J.every(s.map.hoods, func(h): return not h.bossAlive)
+
+
 static func _kill_of(e: Dictionary, id: String) -> bool:
 	var m = _kill(e)
 	return m != null and m.defId == id
@@ -212,6 +242,14 @@ static func _build() -> void:
 	_add("fruehaufsteher", ["descend"], func(e, s): return s.turn - s.floorStartTurn <= 480)
 	_add("last_minute", ["descend"], func(e, s): return s.collapseAt - s.turn <= 20)
 	_add("absteiger", ["descend"], func(e, s): return true)
+	# ------------------------------------------------ Meisterleistungen (Box über der Etagengrenze)
+	_add("meister_einzelkaempfer", K, func(e, s): return e.monster.rank == "boroughboss" and _alone(s, e))
+	_add("meister_faustrecht", K, func(e, s): return e.monster.rank == "boroughboss" and not e.get("byPet") and not e.get("byAlly") and J.arr(e.monster, "hitBy") == ["faust"])
+	_add("meister_gewaltfrei", ["descend"], func(e, s): return int(e.floor) == 2 and s.counters.kills == 0)
+	_add("meister_ohne_netz", ["descend"], func(e, s): return _no_safety_net(s))
+	_add("meister_unberuehrbar", K, func(e, s): return e.monster.rank == "nachbarschaftsboss" and not e.monster.get("hitPlayer", false))
+	_add("meister_adamskostuem", K, func(e, s): return (e.monster.rank == "nachbarschaftsboss" or e.monster.rank == "boroughboss") and _naked(s))
+	_add("meister_blitzsaeuberung", K, func(e, s): return e.monster.rank == "nachbarschaftsboss" and _all_hood_bosses_fast(s))
 	# ------------------------------------------------ Bestiarium, Bosse, Technik, Beute, Fortschritt
 	_add("spinnen", K, func(e, s): return _kill_of(e, "kellerspinne") and _killed(s, ["kellerspinne"]) == 5)
 	_add("fledermaus", K, func(e, s): return FLYERS.has(e.monster.defId) and _killed(s, FLYERS) == 10)

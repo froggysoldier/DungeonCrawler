@@ -92,8 +92,9 @@ static func signals_of(e: Dictionary) -> Array:
 
 
 static func _give_reward(s: Dictionary, def: Dictionary, st: Dictionary) -> void:
-	var tier: String = TIERS[mini(TIERS.size() - 1, st.completed)]
-	s.player.boxes.append(Items.create_box(s, def.box, tier))
+	var bx := Items.create_box(s, def.box, TIERS[mini(TIERS.size() - 1, st.completed)])
+	s.player.boxes.append(bx)
+	var tier: String = bx.box.tier
 	st.completed += 1
 	st.favor = mini(100, st.favor + 15)
 	var tier_name: String = Db.world("BOX_TIER_NAMES")[tier]

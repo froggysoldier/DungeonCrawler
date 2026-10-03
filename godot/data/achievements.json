@@ -6299,6 +6299,76 @@
    "tier": "silber",
    "box": "abenteurer",
    "category": "bestiarium"
+  },
+  {
+   "id": "meister_einzelkaempfer",
+   "name": "Einzelkämpfer",
+   "tier": "platin",
+   "box": "boss",
+   "description": "Besiege einen Bezirksboss ganz allein – ohne Party, ohne Haustier, ohne Reittier.",
+   "comment": "Kein Haustier, kein Kumpel, kein Pony. Nur du und ein Bezirksboss. Die Regie hat vergessen, die Werbung zu schalten.",
+   "category": "momente",
+   "meister": true
+  },
+  {
+   "id": "meister_faustrecht",
+   "name": "Nur die Knöchel",
+   "tier": "platin",
+   "box": "brawler",
+   "description": "Besiege einen Bezirksboss ausschließlich mit bloßen Fäusten.",
+   "comment": "Keine Waffe, kein Tritt, keine Ausreden. Die Knöchel tun weh, die Quoten sind explodiert.",
+   "category": "momente",
+   "meister": true
+  },
+  {
+   "id": "meister_gewaltfrei",
+   "name": "Gewaltfreier Abstieg",
+   "tier": "platin",
+   "box": "ueberlebens",
+   "description": "Erreiche Etage 2, ohne ein einziges Wesen getötet zu haben.",
+   "comment": "Ein ganzes Stockwerk voller Monster, und alle leben noch. Die Systemstimme weiß nicht, ob sie beeindruckt oder beleidigt sein soll.",
+   "category": "momente",
+   "meister": true
+  },
+  {
+   "id": "meister_ohne_netz",
+   "name": "Ohne Netz",
+   "tier": "platin",
+   "box": "ueberlebens",
+   "description": "Verlasse eine Etage nach mindestens drei Vierteln der Zeit, ohne einen Trank getrunken und ohne geschlafen zu haben.",
+   "comment": "Kein Trank, kein Bett, keine Pause. Du hast die Etage einfach durchgezogen. Die Zuschauer sind müder als du.",
+   "category": "momente",
+   "meister": true
+  },
+  {
+   "id": "meister_unberuehrbar",
+   "name": "Geisterhaft",
+   "tier": "platin",
+   "box": "boss",
+   "description": "Besiege einen Nachbarschaftsboss, ohne ein einziges Mal von ihm getroffen zu werden.",
+   "comment": "Er hat geschlagen, gestampft, geschrien. Getroffen hat er nur die Luft. Die Luft hat sich beschwert.",
+   "category": "momente",
+   "meister": true
+  },
+  {
+   "id": "meister_adamskostuem",
+   "name": "Adamskostüm",
+   "tier": "platin",
+   "box": "kleidung",
+   "description": "Besiege einen Boss ohne jede Ausrüstung – nur in Unterwäsche, ohne Waffe.",
+   "comment": "Der Boss hatte Rüstung, Waffen und einen Plan. Du hattest eine Unterhose. Die Unterhose hat gewonnen.",
+   "category": "momente",
+   "meister": true
+  },
+  {
+   "id": "meister_blitzsaeuberung",
+   "name": "Blitzsäuberung",
+   "tier": "platin",
+   "box": "boss",
+   "description": "Besiege alle vier Nachbarschaftsbosse einer Etage, bevor ein Drittel der Zeit vorbei ist.",
+   "comment": "Vier Viertel, vier Bosse, kaum Zeit für eine Kaffeepause. Die Bewohner der Etage überlegen, einen Antrag auf Schutz zu stellen.",
+   "category": "momente",
+   "meister": true
   }
  ]
 }
