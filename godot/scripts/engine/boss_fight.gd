@@ -212,7 +212,8 @@ static func _resolve(s: Dictionary, m: Dictionary) -> void:
 		return
 	var b := Player.total_bonuses(s)
 	var raw := J.rnd(R.int_(s, m.dmg[0], m.dmg[1]) * float(sp.mult))
-	var dmg := maxi(1, raw - floori(J.num(b, "ruestung") / 2.0))
+	# Angekündigte Angriffe: Rüstung zählt nur halb (man hätte ausweichen können)
+	var dmg := maxi(1, J.rnd(Player.armor_damage(raw, J.num(b, "ruestung") / 2.0)))
 	if Mounts.mount_absorbs(s, dmg, who):
 		return
 	p.hp -= dmg

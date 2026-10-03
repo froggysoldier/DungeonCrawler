@@ -908,11 +908,21 @@ static func _slot_for(s: Dictionary, it: Dictionary) -> Variant:
 	var eq: Dictionary = s.player.equipment
 	if not it.get("slot"):
 		return null
-	if it.slot == "ring":
-		return "ring1" if eq.get("ring1") == null else ("ring2" if eq.get("ring2") == null else "ring1")
-	if it.slot == "fussring":
-		return "fussring1" if eq.get("fussring1") == null else ("fussring2" if eq.get("fussring2") == null else "fussring1")
+	if it.slot == "ring" or it.slot == "fussring":
+		# Erst ein freier Platz, sonst wird der schwächere der beiden ersetzt
+		var a: String = it.slot + "1"
+		var b: String = it.slot + "2"
+		if eq.get(a) == null:
+			return a
+		if eq.get(b) == null:
+			return b
+		return b if item_rank(eq[b]) < item_rank(eq[a]) else a
 	return it.slot
+
+
+## Grobe Güte eines Gegenstands: Seltenheit zuerst, dann Wert.
+static func item_rank(it: Dictionary) -> float:
+	return Db.t("items", "RARITY_ORDER").find(it.get("rarity", "gewoehnlich")) * 1000.0 + float(J.nn(it, "wert", 0))
 
 
 static func equip(s: Dictionary, uid: String) -> Dictionary:

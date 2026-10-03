@@ -47,7 +47,10 @@ static func check(s: Dictionary, e: Dictionary) -> void:
 		Log.toast(s, "Achievement: %s" % a.name, "%s Belohnung: %s %s" % [a.description, tier_name, box_name], "achievement")
 
 
+## Erstmals in der Karriere: eine Box-Stufe mehr, aber höchstens bis Gold.
 static func _upgrade(t: String) -> String:
 	var tiers: Array = Db.world("BOX_TIERS")
 	var i := tiers.find(t)
-	return tiers[mini(tiers.size() - 1, i + 1)]
+	if i >= tiers.find("gold"):
+		return t
+	return tiers[i + 1]

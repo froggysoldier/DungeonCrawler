@@ -75,7 +75,11 @@ func test_ohne_box_nur_ruhm(t) -> void:
 	s.stats["tueren.geoeffnet"] = 10
 	Events.emit(s, {"type": "moved"})
 	t.has(s.achievements, "fam_tueren_10")
-	t.eq(s.player.boxes.size(), boxes + 1, "eine Box")
+	t.eq(s.player.boxes.size(), boxes, "Bronze: keine Box")
+	s.stats["tueren.geoeffnet"] = 30
+	Events.emit(s, {"type": "moved"})
+	t.has(s.achievements, "fam_tueren_30")
+	t.eq(s.player.boxes.size(), boxes + 1, "ab Silber eine Box")
 
 
 func test_konter_kills(t) -> void:
@@ -131,3 +135,11 @@ func test_fruehe_etage(t) -> void:
 	s.player.level = 3
 	Events.emit(s, {"type": "descend", "floor": 2})
 	t.has(s.achievements, "mo_etage2_frueh")
+
+
+func test_boxen_erst_ab_silber(t) -> void:
+	var bad := []
+	for a in Db.t("achievements", "ACHIEVEMENTS"):
+		if a.tier == "bronze" and a.get("box") != null:
+			bad.append(a.id)
+	t.eq(bad, [], "Bronze-Achievements ohne Box")

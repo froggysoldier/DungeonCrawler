@@ -76,11 +76,23 @@ static func max_ausdauer(s: Dictionary, b: Variant = null) -> int:
 	return int(maxf(4, s.player.maxAusdauerBase + st.ges + floorf(st.kon / 2.0) + J.num(b, "maxAusdauer")))
 
 
+## Rüstung mit abnehmender Wirkung: roh² / (roh + Rüstung). Wenig Rüstung
+## wirkt fast wie ein Abzug, viel Rüstung macht Treffer klein, aber nie null.
+static func armor_damage(raw: float, armor: float) -> float:
+	if raw <= 0:
+		return 0.0
+	return raw * raw / (raw + maxf(0.0, armor))
+
+
+## Mehr als die Hälfte aller Angriffe weicht niemand aus.
+const MAX_AUSWEICHEN := 50.0
+
+
 static func ausweichen(s: Dictionary, b: Variant = null) -> float:
 	if b == null:
 		b = total_bonuses(s)
 	var st := effective_stats(s, b)
-	return maxf(0, (st.ges - 5) * 1.5 + 5 + J.num(b, "ausweichen"))
+	return clampf((st.ges - 5) * 1.5 + 5 + J.num(b, "ausweichen"), 0, MAX_AUSWEICHEN)
 
 
 static func lichtradius(s: Dictionary, b: Variant = null) -> int:

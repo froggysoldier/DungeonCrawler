@@ -34,6 +34,8 @@ func _initialize() -> void:
 			"cause": s.get("deathCause") if s.get("deathCause") != null else "",
 		}
 		results.append(r)
+		if OS.get_environment("BOXES") != "":
+			_box_report(s)
 		print("%-5d %-13s %-4d %-6d %-6d %-15s %-9d %-4d %-6d %s" % [
 			r.seed, r.status, r.level, r.kills, r.turn, r.klasse, r.follower, r.ach, r.bosses, r.cause])
 	for f in [2, 3]:
@@ -41,6 +43,55 @@ func _initialize() -> void:
 		print("Etage %d erreicht: %d/%d" % [f, n, count])
 	print("Etage 3 überlebt: %d/%d" % [results.filter(func(r): return r.status == "SIEG").size(), count])
 	quit()
+
+
+## BOXES=1: Woher kamen die Achievements und Boxen dieser Partie?
+func _box_report(s: Dictionary) -> void:
+	var by := {}
+	var fam_stage := {}
+	for fam in Db.t("achievement_families", "familyTable"):
+		for i in fam.stages.size():
+			fam_stage["fam_%s_%s" % [fam.id, J.s(fam.stages[i])]] = i + 1
+	for a in Db.t("achievements", "ACHIEVEMENTS"):
+		if not s.achievements.has(a.id):
+			continue
+		var src := "einzeln"
+		if fam_stage.has(a.id):
+			src = "familie_stufe%d" % fam_stage[a.id]
+		elif String(a.id).begins_with("art_"):
+			src = "bestiarium"
+		elif String(a.id).begins_with("mo_"):
+			src = "moment"
+		var k := "%s/%s" % [src, a.tier if a.get("box") != null else "ohne_box"]
+		by[k] = int(by.get(k, 0)) + 1
+	var keys := by.keys()
+	keys.sort()
+	print("   Boxen-Herkunft: " + ", ".join(keys.map(func(k): return "%s=%d" % [k, by[k]])))
+	var bon := Player.total_bonuses(s)
+	print("   Werte: HP %d, Rüstung %s, Ausweichen %d %%, Ausrüstung %s" % [Player.max_hp(s, bon), J.s(J.num(bon, "ruestung")), J.rnd(Player.ausweichen(s, bon)), s.player.equipment.values().filter(func(x): return x != null).map(func(x): return x.rarity)])
+	print("   Wartezüge nach Stelle: %s" % J.nn(s, "_waits", {}))
+	var cs := {}
+	for k in s.counters:
+		if typeof(s.counters[k]) in [TYPE_INT, TYPE_FLOAT] and s.counters[k] != 0:
+			cs[k] = s.counters[k]
+	print("   Zähler: %s" % cs)
+	var freq := {}
+	for l in s.log:
+		var key := " ".join(String(l.text).split(" ").slice(0, 4))
+		freq[key] = int(freq.get(key, 0)) + 1
+	var top := freq.keys()
+	top.sort_custom(func(a, b): return freq[a] > freq[b])
+	print("   Häufigste Meldungen (%d Einträge): %s" % [s.log.size(), ", ".join(top.slice(0, 12).map(func(k): return "%s ×%d" % [k, freq[k]]))])
+	print("   Zähler: Schritte %d, Schlafen %d, Boxen geöffnet %d, Kills %d" % [s.counters.steps, s.counters.sleeps, s.counters.boxesOpened, s.counters.kills])
+	print("   Gold %d, Boxen ungeöffnet %d, Tränke im Rucksack %d" % [s.player.gold, s.player.boxes.size(), s.player.inventory.filter(func(i): return i.kind == "verbrauch").reduce(func(a, i): return a + int(J.nn(i, "menge", 1)), 0)])
+
+
+## Warten mit Zählung (Fehlersuche: wo verliert der Bot seine Zeit?)
+func _wait(s: Dictionary, tag: String) -> Dictionary:
+	if s.get("_waits") == null:
+		s._waits = {}
+	s._waits[tag] = int(s._waits.get(tag, 0)) + 1
+	return Game.wait(s)
 
 
 func _center(r: Dictionary) -> Dictionary:
@@ -104,7 +155,7 @@ func _fight(s: Dictionary) -> bool:
 		# Scheitert der Angriff (etwa ohne Ausdauer), lieber warten als stehen bleiben
 		if Combat.technique_blocker(s, adj, t) == null and Game.attack(s, adj.uid, t).ok:
 			return true
-	Game.wait(s)
+	_wait(s, "L135")
 	return true
 
 
@@ -118,6 +169,18 @@ const RARITY_RANK := {"gewoehnlich": 0, "ungewoehnlich": 1, "selten": 2, "episch
 
 
 ## Ist it besser als das, was im Platz steckt? (Seltenheit, dann Wert)
+## Was gerade auf dem Platz liegt; bei Ringen und Fußringen der schwächere
+## der beiden Plätze (ein leerer Platz zählt als nichts).
+func _current_in(p: Dictionary, slot: String) -> Variant:
+	if slot != "ring" and slot != "fussring":
+		return p.equipment.get(slot)
+	var a = p.equipment.get(slot + "1")
+	var b = p.equipment.get(slot + "2")
+	if a == null or b == null:
+		return null
+	return b if Game.item_rank(b) < Game.item_rank(a) else a
+
+
 func _better(it: Dictionary, cur: Variant) -> bool:
 	if cur == null:
 		return true
@@ -143,7 +206,7 @@ func _maintain(s: Dictionary) -> void:
 		if not Game.allocate_stat(s, key).ok:
 			break
 	for it in p.inventory.duplicate():
-		if it.kind == "ausruestung" and it.get("slot") != null and _better(it, p.equipment.get(it.slot)):
+		if it.kind == "ausruestung" and it.get("slot") != null and _better(it, _current_in(p, it.slot)):
 			Game.equip(s, it.uid)
 		elif it.kind == "buch" and it.get("spell") != null and not Magic.knows_spell(s, it.spell):
 			Game.use_item(s, it.uid)
@@ -161,7 +224,7 @@ func _survive(s: Dictionary) -> bool:
 				return true
 	# Brennen: am Boden wälzen (Warten löscht), wenn niemand daneben steht
 	if Conditions.player_has(s, "brennen") and not J.some(s.monsters, func(m): return J.cheb(m.pos, p.pos) <= 1):
-		return Game.wait(s).ok
+		return _wait(s, "L192").ok
 	if Conditions.player_has(s, "blutung"):
 		var band = _find_item(s, func(i): return i.kind == "verbrauch" and i.get("effekt") != null and i.effekt.get("bandage"))
 		if band != null and Game.use_item(s, band.uid).ok:
@@ -188,22 +251,27 @@ func _survive(s: Dictionary) -> bool:
 ## Zum nächsten Safe Room und schlafen, wenn es sich lohnt. true = Zug verbraucht.
 func _rest(s: Dictionary, threshold: float) -> bool:
 	var p: Dictionary = s.player
-	if p.hp >= Player.max_hp(s) * threshold or Game.time_left(s) < 400:
+	# Auch zum Safe Room, wenn sich Boxen stapeln (wie ein Mensch es täte)
+	var hurt: bool = p.hp < Player.max_hp(s) * threshold
+	var boxes: bool = p.boxes.size() >= 15 and Game.has_unlock(s, "inventar")
+	if (not hurt and not boxes) or Game.time_left(s) < 400:
 		return false
 	var safe = _nearest_room(s, "safe")
 	if safe == null:
 		return false
 	if not Combat.is_in_safe_room(s, p.pos):
-		if J.cheb(_center(safe), p.pos) > 40 and p.hp >= Player.max_hp(s) * 0.45:
+		if J.cheb(_center(safe), p.pos) > (40 if hurt else 20) and p.hp >= Player.max_hp(s) * 0.45:
 			return false
-		return _go_to(s, _center(safe)) or Game.wait(s).ok
+		return _go_to(s, _center(safe)) or _wait(s, "L230").ok
 	for b in p.boxes.duplicate():
 		Game.open_box(s, b.uid)
 	var room = Game.current_room(s)
 	if room != null and not room.get("freebieTaken", false):
 		Game.take_freebie(s)
 	_maintain(s)
-	return Game.sleep(s).ok or Game.wait(s).ok
+	if not hurt:
+		return false
+	return Game.sleep(s).ok or _wait(s, "L239").ok
 
 
 ## Zur Toilette im nächsten Safe Room. true = Zug verbraucht.
@@ -267,7 +335,7 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 				continue
 			var g = _nearest_room(s, "guild")
 			if not _go_to(s, _center(g)):
-				Game.wait(s)
+				_wait(s, "L303")
 			continue
 		# Wer uns beschießt oder verfolgt, wird zuerst angegangen (Schützen nicht ignorieren)
 		if phase != "guild":
@@ -309,7 +377,7 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 				if tried >= 3:
 					break
 			if not moved:
-				Game.wait(s)
+				_wait(s, "L345")
 			continue
 		# Treppe: die nächste bevorzugen
 		var stairs: Array = []
@@ -322,5 +390,5 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 			Game.descend(s, {"ghosts": []})
 			continue
 		if stairs.is_empty() or not _go_to(s, stairs[0]):
-			Game.wait(s)
+			_wait(s, "L358")
 	return s

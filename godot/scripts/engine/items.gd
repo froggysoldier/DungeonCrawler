@@ -165,12 +165,14 @@ static func roll_box_contents(s: Dictionary, type: String, tier: String) -> Arra
 	out.append(create_gold(s, R.int_(s, cfg.gold[0], cfg.gold[1])))
 	var tier_idx: int = Db.world("BOX_TIERS").find(tier)
 	var half := floori(tier_idx / 2.0)
-	if type == "ueberlebens" or type == "abenteurer":
-		out.append(create_item(s, "heiltrank" if tier_idx >= 1 else "kleiner_heiltrank", 1 + half))
+	# Zugaben sind Glückssache, damit sich Tränke nicht zu Hunderten stapeln:
+	# Überlebens-Boxen fast immer, Abenteurer-Boxen jede zweite
+	if (type == "ueberlebens" and R.chance(s, 0.85)) or (type == "abenteurer" and R.chance(s, 0.5)):
+		out.append(create_item(s, "heiltrank" if tier_idx >= 1 else "kleiner_heiltrank", 1 + floori(tier_idx / 3.0)))
 	if type == "wurf":
 		out.append(create_item(s, "ziegel" if tier_idx >= 2 else "stein", 5 + tier_idx * 3))
-	if type == "ueberlebens":
-		out.append(create_item(s, "gegengift", 1 + half))
+	if type == "ueberlebens" and R.chance(s, 0.5):
+		out.append(create_item(s, "gegengift", 1 + floori(tier_idx / 3.0)))
 	if type == "ueberlebens" or type == "wurf":
 		if R.chance(s, 0.5):
 			out.append(create_item(s, "fallenteile", 1 + half))
@@ -187,10 +189,10 @@ static func roll_box_contents(s: Dictionary, type: String, tier: String) -> Arra
 	# Zauberbücher: selten in einfachen Boxen, häufiger in guten
 	if (type == "abenteurer" or type == "fan" or type == "boss") and R.chance(s, 0.12 + tier_idx * 0.1):
 		out.append(Magic.random_tome(s, Db.t("items", "RARITY_ORDER")[mini(4, tier_idx + 1)]))
-	if tier_idx >= 1 and R.chance(s, 0.3):
-		out.append(create_item(s, "kleiner_manatrank", 1 + half))
-	if type == "brawler":
-		out.append(create_item(s, "energydrink", 1 + half))
+	if tier_idx >= 1 and R.chance(s, 0.2):
+		out.append(create_item(s, "kleiner_manatrank", 1 + floori(tier_idx / 3.0)))
+	if type == "brawler" and R.chance(s, 0.6):
+		out.append(create_item(s, "energydrink", 1 + floori(tier_idx / 3.0)))
 	return out
 
 

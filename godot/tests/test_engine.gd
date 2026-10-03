@@ -186,6 +186,7 @@ func test_treppen_bis_etage_3(t) -> void:
 func test_tod_hinterlaesst_geist(t) -> void:
 	var meta := Meta.empty_meta()
 	var s := Game.new_game({"name": "Erna", "answers": [0, 0, 0, 0, 0], "seed": 5, "meta": meta})
+	var first_tier: String = s.player.boxes[0].box.tier if not s.player.boxes.is_empty() else ""
 	s.status = "dead"
 	s.deathCause = "Test"
 	Meta.record_run_end(meta, s)
@@ -195,7 +196,10 @@ func test_tod_hinterlaesst_geist(t) -> void:
 	var s2 := Game.new_game({"name": "Nachfolger", "answers": [0, 0, 0, 0, 0], "seed": 6, "meta": meta})
 	t.eq(s2.season, 2, "nächste Staffel")
 	t.ok(J.some(s2.monsters, func(m): return m.rank == "geist" and m.get("ghostOf") == "Erna"), "Geist spawnt")
-	t.eq(s2.player.boxes[0].box.tier, "bronze", "nicht mehr erstmalig")
+	# Dasselbe Start-Achievement gibt beim zweiten Mal eine Box-Stufe weniger
+	var tiers: Array = Db.world("BOX_TIERS")
+	t.ok(first_tier != "", "Start-Box beim ersten Mal")
+	t.eq(tiers.find(s2.player.boxes[0].box.tier), tiers.find(first_tier) - 1, "nicht mehr erstmalig")
 
 
 func test_vertrag_macht_guide(t) -> void:

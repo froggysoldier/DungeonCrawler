@@ -125,6 +125,11 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   Arme (schwächen die Angriffe des Gegners), Beine (Gegner humpelt, fällt
   leichter um).
 - **Deckung:** bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung.
+- **Rüstung und Ausweichen:** Rüstung wirkt mit abnehmendem Ertrag
+  (Schaden = roh² / (roh + Rüstung)): wenig Rüstung zieht fast so viel ab wie
+  ihr Wert, viel Rüstung macht Treffer klein, aber nie wirkungslos. Gegen
+  angekündigte Boss-Angriffe zählt sie nur halb. Ausweichen ist auf 50 %
+  begrenzt.
 - **Zustände:** Blutung, Brennen, Gift, Furcht und Blindheit (siehe 3.24).
 - **Stufen-Abstand:** Gegner weit über dir sind schwerer zu treffen und treffen
   dich leichter (bis zu 20 Prozentpunkte), bei viel schwächeren ist es umgekehrt.
@@ -246,7 +251,14 @@ Für gefühlt alles, was ein Achievement wert ist, gibt es eines – insgesamt
   geblendet ist, Doppelaufstieg, Jackpot, einen Laden leer kaufen.
 - **Entdeckte Muster (dynamisch):** Der Beobachter vergibt Achievements für
   Kombinationen, die tatsächlich passieren, in Stufen I–V (1, 5, 15, 40, 100).
-- Kleine Erfolge bringen keine Box, nur Aufmerksamkeit beim Publikum.
+- **Boxen gibt es ab Silber.** Bronze-Erfolge – darunter die erste Stufe
+  jeder Achievement-Familie, „Neu im Bestiarium“ und „Routine“ sowie Muster
+  mit niedriger Wertung – bringen nur Aufmerksamkeit beim Publikum. Seltene
+  Kunststücke (hohe Musterwertung) bringen schon auf Stufe I eine Box. Der
+  Bonus „erstmals in deiner Karriere“ hebt eine Box höchstens bis Gold.
+  Heiltränke, Gegengift und Manatränke liegen nur noch mit einer gewissen
+  Wahrscheinlichkeit als Zugabe bei. Sind beide Ring- oder Fußringplätze
+  belegt, ersetzt ein neuer Ring den schwächeren.
 - Der Erfolge-Tab ist nach 13 Kategorien geordnet, zeigt den Fortschritt je
   Kategorie und die nächsten erreichbaren Ziele.
 - Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen.

@@ -140,7 +140,7 @@ static func _attack_player(s: Dictionary, m: Dictionary, ranged: bool) -> void:
 		Events.emit(s, {"type": "dodged", "source": m.name, "facets": source})
 		return
 	var pain := minf(0.25, Player.skill_level(s, "schmerzresistenz") * 0.015)
-	var dmg := maxi(1, J.rnd((raw - floorf(J.num(b, "ruestung"))) * (1 - defense.reduktion / 100.0) * (1 - pain)))
+	var dmg := maxi(1, J.rnd(Player.armor_damage(raw, J.num(b, "ruestung")) * (1 - defense.reduktion / 100.0) * (1 - pain)))
 	if Mounts.mount_absorbs(s, dmg, Identify.name_of_cap(s, m)):
 		return
 	if dmg >= Player.max_hp(s, b) * 0.15:

@@ -342,8 +342,23 @@ static func _grant_pattern(s: Dictionary, fs: Array, stage: int, score: float, c
 	var description := " · ".join(details)
 	var comment: String = J.replace1(J.replace1(R.pick(s, Db.t("facets", "PATTERN_COMMENTS")), "{zahl}", str(count)), "{was}", d.name)
 	var first: bool = not s.firstEver.has(id)
+	s.achievements.append(id)
+	if s.get("dynAchievements") == null:
+		s.dynAchievements = []
+	# Boxen gibt es ab Silber: Muster mit niedriger Wertung (Bronze) sind nur
+	# eine Notiz der Systemstimme, seltene Kunststücke bringen sofort eine Box
 	var tiers: Array = Db.world("BOX_TIERS")
-	var tier_idx := maxi(0, mini(tiers.size() - 1, floori(score / 2.2) + (1 if first else 0) - 1))
+	var base_idx := maxi(0, mini(tiers.size() - 1, floori(score / 2.2) - 1))
+	if base_idx == 0:
+		s.dynAchievements.append({"id": id, "name": name, "description": description, "comment": comment, "tier": null, "box": null, "turn": s.turn, "floor": s.floor})
+		Fx.sound(s, {"kind": "achievement", "tier": "bronze"})
+		Log.add(s, "DIE SYSTEMSTIMME HAT ETWAS BEMERKT: %s – %s" % [name, description], "achievement")
+		Log.add(s, comment, "achievement")
+		Log.add(s, "Belohnung: Das Publikum nimmt Notiz von dir.", "loot")
+		Viewers.add_spectacle(s, 2, "achievement")
+		Log.toast(s, name, description, "achievement")
+		return
+	var tier_idx := base_idx + 1 if first and base_idx < tiers.find("gold") else base_idx
 	var tier: String = tiers[tier_idx]
 	var t = _first(fs, "t:")
 	var box: String
@@ -356,9 +371,6 @@ static func _grant_pattern(s: Dictionary, fs: Array, stage: int, score: float, c
 	else:
 		box = "abenteurer"
 	s.player.boxes.append(Items.create_box(s, box, tier))
-	s.achievements.append(id)
-	if s.get("dynAchievements") == null:
-		s.dynAchievements = []
 	s.dynAchievements.append({"id": id, "name": name, "description": description, "comment": comment, "tier": tier, "box": box, "turn": s.turn, "floor": s.floor})
 	Fx.sound(s, {"kind": "achievement", "tier": tier})
 	var tier_name: String = Db.world("BOX_TIER_NAMES")[tier]
