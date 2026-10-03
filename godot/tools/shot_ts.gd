@@ -3,7 +3,7 @@ extends SceneTree
 ##   godot --headless --path godot -s res://tools/shot_ts.gd -- bild.png [name,name,...]
 
 const F := preload("res://tools/ts_figures.gd")
-const R := preload("res://tools/ts_render.gd")
+const R := preload("res://scripts/ui/ts_render.gd")
 const TINTS := ["#8a9a5a", "#b08a6a", "#4ad8b0", "#9a6ad0", "#c8a0a0", "#6aa04a", "#7a6a8a", "#c8503a"]
 
 

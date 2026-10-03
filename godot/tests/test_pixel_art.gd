@@ -172,23 +172,21 @@ func _diff_rows(a: Image, b: Image) -> Array:
 
 
 func test_ausruestung_an_der_figur(t) -> void:
-	for body in ["normal", "klein", "gross", "breit"]:
-		for slot in Sprites.GEAR_BEHIND + Sprites.GEAR_BODY + Sprites.GEAR_TOP:
-			t.ok(PixelArt.has("ausruestung/%s/%s" % [body, slot]), "%s: %s" % [body, slot])
 	for slot in Sprites.GEAR_BEHIND + Sprites.GEAR_BODY + Sprites.GEAR_TOP:
 		t.has(GameTabs.EQUIP_ORDER, slot, "%s ist ein Ausrüstungsplatz" % slot)
 	var plain := Sprites.hero_name({})
 	t.ok(PixelArt.has(plain) and PixelArt.has(plain + "_2"), "schlichte Figur mit Laufbild")
-	t.eq(PixelArt.size_of(plain), Vector2i(PixelArt.TILE, PixelArt.TILE), "so groß wie eine Kachel")
+	t.eq(PixelArt.size_of(plain), Vector2i(48, 48), "so groß wie die anderen feinen Figuren")
+	t.eq(PixelArt.res(plain), 2, "fein gezeichnet")
 	t.eq(Sprites.hero_name({"equipment": {"ring1": _gear("ring", "episch")}}), plain, "Ringe sieht man nicht")
 	var base := PixelArt.image(plain)
 	# Der Helm verändert nur den Kopf, die Stiefel nur die Füße
 	var helm := PixelArt.image(Sprites.hero_name({"equipment": {"kopf": _gear("kopf", "selten")}}))
 	var rows := _diff_rows(base, helm)
-	t.ok(not rows.is_empty() and rows.max() < 16, "Helm nur am Kopf")
+	t.ok(not rows.is_empty() and rows.max() < 50, "Helm nur am Kopf")
 	var boots := PixelArt.image(Sprites.hero_name({"equipment": {"fuesse": _gear("fuesse", "selten")}}))
 	rows = _diff_rows(base, boots)
-	t.ok(not rows.is_empty() and rows.min() >= 24, "Stiefel nur an den Füßen")
+	t.ok(not rows.is_empty() and rows.min() >= 76, "Stiefel nur an den Füßen")
 	# Die Waffe ragt über die Hand hinaus und hat oben einen Umriss
 	var eq := {"kopf": _gear("kopf", "selten"), "waffe": _gear("waffe", "episch"), "fuesse": _gear("fuesse", "gewoehnlich")}
 	var n := Sprites.hero_name({"equipment": eq})
@@ -215,8 +213,8 @@ func test_ausruestung_an_der_figur(t) -> void:
 	var dwarf := PixelArt.image(Sprites.hero_name({"race": "zwerg"}))
 	var vest := PixelArt.image(Sprites.hero_name({"race": "zwerg", "equipment": {"brust": _gear("brust", "episch")}}))
 	var beard_same := true
-	for y in range(18, 24):
-		if vest.get_pixel(15, y) != dwarf.get_pixel(15, y):
+	for y in range(64, 75):
+		if vest.get_pixel(48, y) != dwarf.get_pixel(48, y):
 			beard_same = false
 	t.ok(beard_same, "Bart über der Weste")
 	t.ok(not _diff_rows(dwarf, vest).is_empty(), "Weste neben dem Bart")
@@ -253,7 +251,6 @@ func test_rassen_an_der_figur(t) -> void:
 	var names := {}
 	for r in Db.t("races", "RACES"):
 		t.ok(Sprites.RACE_LOOKS.has(r.id), "%s hat Aussehen" % r.id)
-		t.ok(PixelArt.has("held/" + r.id) and PixelArt.has("held/%s_kopf" % r.id), "%s hat eine Figur" % r.id)
 		var n := Sprites.hero_name({"race": r.id})
 		t.ok(PixelArt.has(n + "_2"), "%s mit Laufbild" % r.id)
 		names[n] = true
@@ -266,8 +263,8 @@ func test_rassen_an_der_figur(t) -> void:
 	t.gt(box.call("troll").size.y, box.call("mensch").size.y, "Trolle sind größer")
 	t.gt(box.call("zwerg").size.x, box.call("mensch").size.x, "Zwerge sind breiter")
 	t.lt(box.call("zwerg").size.y, box.call("mensch").size.y, "und kleiner")
-	t.ge(box.call("echsenmensch").end.x, PixelArt.TILE - 2, "Echsenschwanz ragt hinaus")
-	t.le(box.call("kellerfee").position.x, 0, "Feenflügel ragen hinaus")
+	t.gt(box.call("echsenmensch").end.x, box.call("mensch").end.x + 10, "Echsenschwanz ragt hinaus")
+	t.lt(box.call("kellerfee").position.x, box.call("mensch").position.x - 10, "Feenflügel ragen hinaus")
 	var elf := PixelArt.image(Sprites.hero_name({"race": "elf"}))
 	var skin := Color(Sprites.RACE_LOOKS.elf.skin).to_html(false)
 	var found := false

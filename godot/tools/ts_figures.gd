@@ -1,10 +1,10 @@
 extends RefCounted
 ## Figuren der Kreaturen und Bosse im Stil von Tiny Swords, als Formen für
-## tools/ts_render.gd (96 x 96, Füße auf Zeile 89, Licht von oben links).
+## TsRender (scripts/ui/ts_render.gd, 96 x 96, Füße auf Zeile 89, Licht von oben links).
 ## Jede Figur ist eine Funktion des Bildes f (0 oder 1, zweites Bild für
 ## Flattern, Schweben und Laufen). "T" ist die Farbe der Monsterart.
 
-const R := preload("res://tools/ts_render.gd")
+const R := preload("res://scripts/ui/ts_render.gd")
 
 ## Name -> Anzahl Bilder (1 oder 2). Kreaturen unter kreatur/, Bosse unter boss/.
 const CREATURES := {

@@ -1,3 +1,4 @@
+class_name TsRender
 extends RefCounted
 ## Zeichnet Figuren im Stil von Tiny Swords (Pixel Frog) aus einfachen Formen:
 ## runde, gedrungene Körper, außen ein dicker Umriss in Nachtblau, innen feine
@@ -128,75 +129,91 @@ static func render(shapes: Array) -> Image:
 	owner.resize(n * n)
 	owner.fill(-1)
 	var bodies: Array = shapes.filter(func(s): return s[0] in ["e", "r", "p", "l"])
+	# Je Form vorab: Töne, Flags, Rahmen (Licht), Farbe
+	var tones: Array = []
+	var flags: Array = []
+	var frames: Array = []
+	var cols: Array = []
 	for si in bodies.size():
 		var s: Array = bodies[si]
-		var fr := _frame(s).grow(1)
+		tones.append(_tones(_color_arg(s)))
+		flags.append(_flags(s))
+		frames.append(_frame(s))
+		cols.append(_color_arg(s))
+		var fr: Rect2 = frames[si].grow(1)
 		for y in range(maxi(0, floori(fr.position.y)), mini(n, ceili(fr.end.y) + 1)):
 			for x in range(maxi(0, floori(fr.position.x)), mini(n, ceili(fr.end.x) + 1)):
 				if _inside(s, x + 0.5, y + 0.5):
 					owner[y * n + x] = si
 	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
 	# Flächen mit drei Tönen
-	for y in n:
-		for x in n:
-			var si := owner[y * n + x]
-			if si < 0:
-				continue
-			var s: Array = bodies[si]
-			var tones := _tones(_color_arg(s))
-			var tone := 1
-			if not _flags(s).contains("f"):
-				var fr := _frame(s)
-				var c := fr.get_center()
-				var nrm := Vector2((x + 0.5 - c.x) / maxf(1.0, fr.size.x / 2.0), (y + 0.5 - c.y) / maxf(1.0, fr.size.y / 2.0))
-				var lit := nrm.dot(LIGHT)
-				if lit > 0.42:
-					tone = 2
-				elif lit < -0.38 or nrm.y > 0.62:
-					tone = 0
-			img.set_pixel(x, y, tones[tone])
+	for si in bodies.size():
+		var fr: Rect2 = frames[si]
+		var c := fr.get_center()
+		var hw := maxf(1.0, fr.size.x / 2.0)
+		var hh := maxf(1.0, fr.size.y / 2.0)
+		var flat: bool = String(flags[si]).contains("f")
+		var tn: Array = tones[si]
+		var g: Rect2 = fr.grow(1)
+		for y in range(maxi(0, floori(g.position.y)), mini(n, ceili(g.end.y) + 1)):
+			for x in range(maxi(0, floori(g.position.x)), mini(n, ceili(g.end.x) + 1)):
+				if owner[y * n + x] != si:
+					continue
+				var tone := 1
+				if not flat:
+					var nx := (x + 0.5 - c.x) / hw
+					var ny := (y + 0.5 - c.y) / hh
+					var lit := nx * LIGHT.x + ny * LIGHT.y
+					if lit > 0.42:
+						tone = 2
+					elif lit < -0.38 or ny > 0.62:
+						tone = 0
+				img.set_pixel(x, y, tn[tone])
 	# Feine Linien, wo eine Form über einer anderen liegt
 	var out := img.duplicate()
+	var navy := NAVY
 	for y in n:
 		for x in n:
 			var si := owner[y * n + x]
-			if si < 0 or _flags(bodies[si]).contains("n"):
+			if si < 0 or String(flags[si]).contains("n"):
 				continue
-			for d in [[1, 0], [-1, 0], [0, 1], [0, -1]]:
-				var nx: int = x + d[0]
-				var ny: int = y + d[1]
+			for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+				var nx: int = x + d.x
+				var ny: int = y + d.y
 				if nx < 0 or ny < 0 or nx >= n or ny >= n:
 					continue
 				var o := owner[ny * n + nx]
-				if o >= 0 and o < si and _color_arg(bodies[o]) != _color_arg(bodies[si]):
-					out.set_pixel(x, y, NAVY)
+				if o >= 0 and o < si and cols[o] != cols[si]:
+					out.set_pixel(x, y, navy)
 					break
 	# Dicker Umriss außen: ein Ring über Ecken, ein zweiter über Kanten
-	var solid := func(x: int, y: int) -> bool:
-		return x >= 0 and y >= 0 and x < n and y < n and owner[y * n + x] >= 0 and not _flags(bodies[owner[y * n + x]]).contains("o")
+	var solid := PackedByteArray()
+	solid.resize(n * n)
+	for i in n * n:
+		var o := owner[i]
+		if o >= 0 and not String(flags[o]).contains("o"):
+			solid[i] = 1
 	var ring := PackedByteArray()
 	ring.resize(n * n)
 	for y in n:
 		for x in n:
 			if owner[y * n + x] >= 0:
 				continue
-			for dy in range(-1, 2):
-				for dx in range(-1, 2):
-					if solid.call(x + dx, y + dy):
-						ring[y * n + x] = 1
-	for y in n:
-		for x in n:
-			if owner[y * n + x] >= 0:
-				continue
-			var hit := ring[y * n + x] == 1
-			if not hit:
-				for d in [[1, 0], [-1, 0], [0, 1], [0, -1]]:
-					var nx: int = x + d[0]
-					var ny: int = y + d[1]
-					if nx >= 0 and ny >= 0 and nx < n and ny < n and ring[ny * n + nx] == 1:
+			var hit := false
+			for dy in range(maxi(0, y - 1), mini(n, y + 2)):
+				for dx in range(maxi(0, x - 1), mini(n, x + 2)):
+					if solid[dy * n + dx] == 1:
 						hit = true
 			if hit:
-				out.set_pixel(x, y, NAVY)
+				ring[y * n + x] = 1
+				out.set_pixel(x, y, navy)
+	for y in n:
+		for x in n:
+			var i := y * n + x
+			if owner[i] >= 0 or ring[i] == 1:
+				continue
+			if (x > 0 and ring[i - 1] == 1) or (x < n - 1 and ring[i + 1] == 1) or (y > 0 and ring[i - n] == 1) or (y < n - 1 and ring[i + n] == 1):
+				out.set_pixel(x, y, navy)
 	# Details
 	for s in shapes:
 		match s[0]:

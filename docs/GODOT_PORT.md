@@ -62,7 +62,6 @@ Die Bilder liegen in `assets/pixel` als PNG-Bögen:
 | Bogen | Inhalt |
 |---|---|
 | `kreaturen.png` | Kreaturen (mit zweiten Bildern), Spielfigur (alte Einzelfigur), Haustier-Arten, Reittiere, Krone, Fragezeichen, Schlaf, Schatten, Ringe, Leuchten |
-| `helden.png` | Spielfigur je Rasse (`held/<id>`, mit Kopfmaske `held/<id>_kopf`) und Ausrüstung je Körperbau (`ausruestung/<bau>/<platz>`) |
 | `bosse.png` | Eigene Figuren der 15 Bosse |
 | `kacheln.png` | Böden (9 Materialien × 4 Varianten), Türen, Treppe |
 | `dinge.png` | Gegenstände am Boden, Symbole der 15 Ausrüstungsplätze (`slot_…`), Fallen, Geschosse |
@@ -168,11 +167,17 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
   den Teilen, jede Form mit Licht oben links und Schatten unten rechts.
   Im Index steht dafür `"res": 2`; `PixelArt.size_of` gibt Kunstpixel zurück.
   Vorschau: `godot --headless --path godot -s res://tools/shot_ts.gd -- bild.png [namen]`.
+- Spielfigur: `HeroLook` baut sie zur Laufzeit aus Formen, mit dem Körperbau
+  der Rasse (normal, klein, gross, breit), ihren Merkmalen (Ohren, Hörner,
+  Schwanz, Flügel, Bart …) und der sichtbaren Ausrüstung in der Farbe ihrer
+  Seltenheit; `TsRender` zeichnet sie (etwa 20 ms, einmal je Ausrüstung), das
+  Laufbild entsteht daraus durch Verschieben der Beine. Vorschau aller Rassen:
+  `godot --headless --path godot -s res://tools/shot_heroes.gd -- bild.png`.
 
 `tools/import_tinyswords.gd` holt die Teile aus `asset-pack/`, setzt die
 Bögen mit Lücken zu 9-Slices zusammen, färbt um und verkleinert Knöpfe auf
 halbe Größe (Umrisse bleiben erhalten). Was das Pack nicht hat (Gegenstände,
-Möbel, Böden, die Spielfigur), zeichnen die eigenen Vorlagen im selben Stil:
+Möbel, Böden), zeichnen die eigenen Vorlagen im selben Stil:
 Nachtblau-Kontur, Rampe zu Creme, Palette des Packs.
 
 **Lizenz:** Tiny Swords von Pixel Frog (pixelfrog-assets.itch.io). Nutzung

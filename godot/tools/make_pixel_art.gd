@@ -11,7 +11,6 @@ extends SceneTree
 const Defs := preload("res://tools/pixel_defs.gd")
 ## Figuren im Tiny-Swords-Stil (feiner, 96 x 96, zwei Bildpixel je Kunstpixel).
 const TsFig := preload("res://tools/ts_figures.gd")
-const TsRender := preload("res://tools/ts_render.gd")
 const T := PixelArt.TILE
 const COLS := 16
 
@@ -243,10 +242,7 @@ func _build_all() -> void:
 		_add_ts("bosse", "boss/", n, TsFig.frames(n))
 	for n in Defs.MOUNTS:
 		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n], true, true))
-	for n in Defs.HEROES:
-		_add("helden", "held/" + n, sprite(n, Defs.HEROES[n], false, true))
-	for n in Defs.GEAR:
-		_add("helden", "ausruestung/" + n, sprite(n, Defs.GEAR[n], false))
+	# Spielfigur und Ausrüstung zeichnet HeroLook zur Laufzeit (Tiny-Swords-Stil)
 	_add("kreaturen", "aufsatz/schatten", _shadow(28, 10))
 	_add("kreaturen", "aufsatz/schatten_klein", _shadow(20, 6))
 	_add("kreaturen", "aufsatz/ring", _ring(32, 14))

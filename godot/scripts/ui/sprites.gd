@@ -130,19 +130,34 @@ static func draw_hero(ci: CanvasItem, foot: Vector2, scale: int, flip: bool = fa
 
 # ---------------------------------------------------------------- Spielfigur
 
-## Ausrüstung an der Figur in Zeichenreihenfolge: GEAR_BEHIND hinter der Figur,
-## GEAR_BODY über dem Körper (darüber liegt noch einmal der Kopf mit Bart,
-## Haaren und Kragen), GEAR_TOP ganz oben.
+## Sichtbare Ausrüstung an der Figur (HeroLook zeichnet sie): GEAR_BEHIND
+## hinter der Figur, GEAR_BODY am Körper, GEAR_TOP über dem Kopf.
 const GEAR_BEHIND := ["ruecken"]
 const GEAR_BODY := ["beine", "fuesse", "brust", "guertel", "hals", "schultern", "arme", "haende"]
 const GEAR_TOP := ["gesicht", "kopf", "waffe"]
 const OUTLINE := Color("#161c2e")
-## Ab dieser Zeile machen die Füße im Laufbild einen Schritt (WALK_STEP Pixel) nach außen.
-const WALK_ROW := 27
-const WALK_STEP := 2
+## Ab dieser Bildzeile bewegen sich im Laufbild nur die Beine (um WALK_STEP nach außen).
+const WALK_ROW := HeroLook.WALK_ROW
+const WALK_STEP := 3
+
+
+## Laufbild: unterhalb von WALK_ROW rückt alles von der Mitte weg.
+static func _walk_frame(img: Image) -> Image:
+	var w := img.get_width()
+	var out := img.duplicate() as Image
+	out.fill_rect(Rect2i(0, WALK_ROW, w, img.get_height() - WALK_ROW), Color(0, 0, 0, 0))
+	for y in range(WALK_ROW, img.get_height()):
+		for x in w:
+			var c := img.get_pixel(x, y)
+			if c.a < 0.5:
+				continue
+			var nx := x + (-WALK_STEP if x < w / 2 else WALK_STEP)
+			if nx >= 0 and nx < w:
+				out.set_pixel(nx, y, c)
+	return out
 
 ## Hautfarbe und Körperbau je Rasse (normal, klein, gross, breit). Kopf, Haare
-## und Anbauten jeder Rasse liegen als held/<id> in helden.png.
+## und Anbauten jeder Rasse zeichnet HeroLook.
 const RACE_LOOKS := {
 	"mensch": {"skin": "#e8b796", "body": "normal"},
 	"elf": {"skin": "#f4e2d0", "body": "normal"},
@@ -172,91 +187,23 @@ const RACE_LOOKS := {
 
 
 ## Bildname der Spielfigur mit Rasse und angelegter Ausrüstung. Sie wird einmal
-## zusammengesetzt (samt Laufbild „_2“) und unter einem Namen aus Rasse, Plätzen
-## und Farben abgelegt.
+## im Tiny-Swords-Stil gezeichnet (samt Laufbild „_2“) und unter einem Namen
+## aus Rasse, Plätzen und Farben abgelegt.
 static func hero_name(p: Dictionary) -> String:
 	var eq: Dictionary = J.nn(p, "equipment", {})
 	var race := String(p.get("race")) if p.get("race") != null else "mensch"
 	if not RACE_LOOKS.has(race):
 		race = "mensch"
-	var body: String = RACE_LOOKS[race].body
 	var parts: Array = [race]
+	var colors := {}
 	for slot in GEAR_BEHIND + GEAR_BODY + GEAR_TOP:
-		if eq.get(slot) != null and PixelArt.has("ausruestung/%s/%s" % [body, slot]):
-			parts.append("%s=%s" % [slot, item_color(eq[slot])])
+		if eq.get(slot) != null:
+			colors[slot] = item_color(eq[slot])
+			parts.append("%s=%s" % [slot, colors[slot]])
 	var name := "kreatur/held@" + ",".join(parts)
 	if not PixelArt.has(name):
-		var img := _compose_hero(eq, race)
-		PixelArt.register(name, _outlined(img))
-		PixelArt.register(name + "_2", _outlined(_walk_frame(img)))
+		var look: Dictionary = RACE_LOOKS[race]
+		var img := TsRender.render(HeroLook.shapes(race, look.body, look.skin, colors, 0))
+		PixelArt.register(name, img, 2)
+		PixelArt.register(name + "_2", _walk_frame(img), 2)
 	return name
-
-
-## Figur ohne Umriss: Umhang, Rasse, Körperausrüstung, Kopf, Helm/Brille/Waffe.
-static func _compose_hero(eq: Dictionary, race: String) -> Image:
-	var body: String = RACE_LOOKS[race].body
-	var full := PixelArt.texture("held/" + race, RACE_LOOKS[race].skin).get_image()
-	var img := Image.create(full.get_width(), full.get_height(), false, Image.FORMAT_RGBA8)
-	for slot in GEAR_BEHIND:
-		_gear(img, eq, body, slot)
-	_copy(img, full, full)
-	for slot in GEAR_BODY:
-		_gear(img, eq, body, slot)
-	# Der Kopf (Bart, Haare, Kragen) liegt über Weste und Schultern
-	var head := PixelArt.image("held/%s_kopf" % race)
-	if head != null:
-		_copy(img, full, head)
-	for slot in GEAR_TOP:
-		_gear(img, eq, body, slot)
-	return img
-
-
-## Pixel aus src übernehmen, wo mask sichtbar ist.
-static func _copy(img: Image, src: Image, mask: Image) -> void:
-	for y in mini(img.get_height(), mask.get_height()):
-		for x in mini(img.get_width(), mask.get_width()):
-			if mask.get_pixel(x, y).a > 0.5:
-				img.set_pixel(x, y, src.get_pixel(x, y))
-
-
-static func _gear(img: Image, eq: Dictionary, body: String, slot: String) -> void:
-	var it = eq.get(slot)
-	var n := "ausruestung/%s/%s" % [body, slot]
-	if it == null or not PixelArt.has(n):
-		return
-	var src := PixelArt.texture(n, item_color(it)).get_image()
-	_copy(img, src, src)
-
-
-## Laufbild: die Füße machen einen Schritt nach außen.
-static func _walk_frame(img: Image) -> Image:
-	var w := img.get_width()
-	var out := Image.create(w, img.get_height(), false, Image.FORMAT_RGBA8)
-	for y in img.get_height():
-		for x in w:
-			var c := img.get_pixel(x, y)
-			if c.a < 0.5:
-				continue
-			var nx := x
-			if y >= WALK_ROW:
-				nx += -WALK_STEP if x < w / 2 else WALK_STEP
-			if nx >= 0 and nx < w:
-				out.set_pixel(nx, y, c)
-	return out
-
-
-## Dunkler Umriss um die ganze Figur (4er-Nachbarschaft).
-static func _outlined(img: Image) -> Image:
-	var out := img.duplicate() as Image
-	var w := img.get_width()
-	var h := img.get_height()
-	for y in h:
-		for x in w:
-			if img.get_pixel(x, y).a > 0.5:
-				continue
-			for d in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
-				var q: Vector2i = Vector2i(x, y) + d
-				if q.x >= 0 and q.y >= 0 and q.x < w and q.y < h and img.get_pixelv(q).a > 0.5:
-					out.set_pixel(x, y, OUTLINE)
-					break
-	return out

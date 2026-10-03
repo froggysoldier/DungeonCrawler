@@ -33,6 +33,7 @@ static var _images: Dictionary = {}
 static var _tinted: Dictionary = {}
 ## Zur Laufzeit zusammengesetzte Bilder (Spielfigur mit Ausrüstung): Name -> Image.
 static var _runtime: Dictionary = {}
+static var _runtime_res: Dictionary = {}
 
 
 static func _load() -> void:
@@ -52,8 +53,9 @@ static func has(name: String) -> bool:
 
 ## Ein zur Laufzeit gebautes Bild unter einem Namen bereitstellen; danach geht
 ## es wie jedes Bild aus den Bögen (Tönen, Silhouette, Zeichnen).
-static func register(name: String, img: Image) -> void:
+static func register(name: String, img: Image, res: int = 1) -> void:
 	_runtime[name] = img
+	_runtime_res[name] = res
 
 
 static func names(prefix: String = "") -> Array:
@@ -92,7 +94,7 @@ static func entry(name: String) -> Dictionary:
 ## Tiny-Swords-Stil (feiner gezeichnet, gleich groß auf dem Bildschirm).
 static func res(name: String) -> int:
 	if _runtime.has(name):
-		return 1
+		return _runtime_res.get(name, 1)
 	var e := entry(name)
 	return e.get("res", 1) if not e.is_empty() else 1
 
@@ -100,7 +102,7 @@ static func res(name: String) -> int:
 ## Größe in Kunstpixeln (bei feinen Figuren die halbe Bildgröße).
 static func size_of(name: String) -> Vector2i:
 	if _runtime.has(name):
-		return (_runtime[name] as Image).get_size()
+		return (_runtime[name] as Image).get_size() / int(_runtime_res.get(name, 1))
 	var e := entry(name)
 	return e.rect.size / int(e.res) if not e.is_empty() else Vector2i.ZERO
 
@@ -252,4 +254,5 @@ static func reset() -> void:
 	_images = {}
 	_tinted = {}
 	_runtime = {}
+	_runtime_res = {}
 	_pixel_lists = {}
