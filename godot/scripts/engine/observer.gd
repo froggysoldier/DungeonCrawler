@@ -358,8 +358,7 @@ static func _grant_pattern(s: Dictionary, fs: Array, stage: int, score: float, c
 		Viewers.add_spectacle(s, 2, "achievement")
 		Log.toast(s, name, description, "achievement")
 		return
-	var tier_idx := base_idx + 1 if first and base_idx < tiers.find("gold") else base_idx
-	var tier: String = tiers[tier_idx]
+	var tier: String = tiers[base_idx]
 	var t = _first(fs, "t:")
 	var box: String
 	if d.iDef != null and d.iDef.get("box") != null:
@@ -370,9 +369,9 @@ static func _grant_pattern(s: Dictionary, fs: Array, stage: int, score: float, c
 		box = Db.t("facets", "PART_BOX")[String(t).substr(2)]
 	else:
 		box = "abenteurer"
-	var bx := Items.create_box(s, box, tier)
+	var bx := Items.create_box(s, box, tier, false, first)
 	s.player.boxes.append(bx)
-	first = first and tier == bx.box.tier
+	first = first and tiers.find(bx.box.tier) > base_idx
 	tier = bx.box.tier
 	s.dynAchievements.append({"id": id, "name": name, "description": description, "comment": comment, "tier": tier, "box": box, "turn": s.turn, "floor": s.floor})
 	Fx.sound(s, {"kind": "achievement", "tier": tier})

@@ -1120,7 +1120,7 @@
    "id": "legendaer",
    "name": "Legendär!",
    "tier": "gold",
-   "box": "abenteurer",
+   "box": "schmuck",
    "description": "Finde einen legendären Gegenstand.",
    "comment": "Orange! Es ist orange! Alle Gamer der Galaxis kreischen gerade.",
    "category": "beute"
@@ -1129,7 +1129,7 @@
    "id": "himmlisch",
    "name": "Himmlische Fügung",
    "tier": "legendaer",
-   "box": "abenteurer",
+   "box": "schmuck",
    "description": "Finde einen himmlischen Gegenstand.",
    "comment": "Es gibt davon nur eine Handvoll in der Geschichte der Show. Und du hast eins. Die Systemstimme ist neidisch.",
    "category": "beute"
@@ -1138,7 +1138,7 @@
    "id": "gold100",
    "name": "Dagobert-Syndrom",
    "tier": "silber",
-   "box": "fan",
+   "box": "schmuck",
    "description": "Besitze 100 Gold auf einmal.",
    "comment": "Hundert Goldstücke. Du könntest darin baden. Bitte nicht.",
    "category": "wirtschaft"
@@ -1147,7 +1147,7 @@
    "id": "gold500",
    "name": "Kapitalist",
    "tier": "gold",
-   "box": "fan",
+   "box": "schmuck",
    "description": "Verdiene insgesamt 500 Gold.",
    "comment": "Die Wirtschaft ist zusammengebrochen. Deine nicht.",
    "category": "wirtschaft"
@@ -1984,7 +1984,7 @@
    "id": "mo_goldbad",
    "name": "Goldbad",
    "tier": "gold",
-   "box": "abenteurer",
+   "box": "schmuck",
    "description": "Besitze 2.000 Gold auf einmal.",
    "comment": "Du könntest darin baden. Bitte tu es nicht. Die Zuschauer haben schon genug gesehen.",
    "category": "wirtschaft"
@@ -1993,7 +1993,7 @@
    "id": "mo_feilschen_max",
    "name": "Halsabschneider",
    "tier": "silber",
-   "box": "abenteurer",
+   "box": "schmuck",
    "description": "Handle mindestens 25 % Rabatt heraus.",
    "comment": "Hinter der Theke wird leise geweint. Du hast kein Mitleid.",
    "category": "wirtschaft"
@@ -2011,7 +2011,7 @@
    "id": "mo_ausverkauf",
    "name": "Alles muss raus",
    "tier": "gold",
-   "box": "abenteurer",
+   "box": "schmuck",
    "description": "Kaufe einen Laden komplett leer.",
    "comment": "Das Regal ist leer, die Kasse ist voll. Der Laden macht heute früher zu.",
    "category": "wirtschaft"
@@ -2020,7 +2020,7 @@
    "id": "mo_jackpot",
    "name": "Drei goldene Kronen",
    "tier": "gold",
-   "box": "fan",
+   "box": "schmuck",
    "description": "Knacke den Jackpot eines Rubbelloses.",
    "comment": "Die Chancen standen schlecht. Die Systemstimme prüft gerade, ob du geschummelt hast.",
    "category": "wirtschaft"
@@ -3408,7 +3408,7 @@
    "description": "Finde einen epischen Gegenstand.",
    "comment": "Glänzende Dinge! Deine Elstergene melden sich.",
    "tier": "silber",
-   "box": "waffen",
+   "box": "schmuck",
    "category": "beute"
   },
   {
@@ -3417,7 +3417,7 @@
    "description": "Finde 5 epische Gegenstände.",
    "comment": "Glänzende Dinge! Deine Elstergene melden sich.",
    "tier": "gold",
-   "box": "waffen",
+   "box": "schmuck",
    "category": "beute"
   },
   {
@@ -3435,7 +3435,7 @@
    "description": "Gib 500 Gold in Läden aus.",
    "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
    "tier": "silber",
-   "box": "abenteurer",
+   "box": "schmuck",
    "category": "wirtschaft"
   },
   {
@@ -3444,7 +3444,7 @@
    "description": "Gib 2.000 Gold in Läden aus.",
    "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
    "tier": "gold",
-   "box": "abenteurer",
+   "box": "schmuck",
    "category": "wirtschaft"
   },
   {
@@ -3462,7 +3462,7 @@
    "description": "Verkaufe 50 Gegenstände.",
    "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
    "tier": "silber",
-   "box": "abenteurer",
+   "box": "schmuck",
    "category": "wirtschaft"
   },
   {
@@ -3471,7 +3471,7 @@
    "description": "Verkaufe 150 Gegenstände.",
    "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
    "tier": "gold",
-   "box": "abenteurer",
+   "box": "schmuck",
    "category": "wirtschaft"
   },
   {
@@ -3507,7 +3507,7 @@
    "description": "Gewinne 15 Preisverhandlungen.",
    "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
    "tier": "silber",
-   "box": "abenteurer",
+   "box": "schmuck",
    "category": "wirtschaft"
   },
   {
@@ -3516,7 +3516,7 @@
    "description": "Gewinne 40 Preisverhandlungen.",
    "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
    "tier": "gold",
-   "box": "abenteurer",
+   "box": "schmuck",
    "category": "wirtschaft"
   },
   {
@@ -3543,7 +3543,7 @@
    "description": "Verdiene insgesamt 1.500 Gold.",
    "comment": "Die Wirtschaft des Dungeons dankt für deine Mitarbeit.",
    "tier": "silber",
-   "box": "abenteurer",
+   "box": "schmuck",
    "category": "wirtschaft"
   },
   {
@@ -3552,7 +3552,7 @@
    "description": "Verdiene insgesamt 5.000 Gold.",
    "comment": "Geld stinkt nicht. Im Gegensatz zu allem anderen hier unten.",
    "tier": "gold",
-   "box": "abenteurer",
+   "box": "schmuck",
    "category": "wirtschaft"
   },
   {

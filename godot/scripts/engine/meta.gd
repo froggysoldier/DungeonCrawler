@@ -63,8 +63,9 @@ static func migrate(s: Dictionary) -> Dictionary:
 	for k in ["goldEarned", "goldStolen", "poisonDamage", "mealsEaten", "potionsDrunk", "sleeps", "crits", "knockdowns", "eliteKills", "trapsFound", "trapsTriggered", "trapsDisarmed", "trapKills", "crafted"]:
 		if s.counters.get(k) == null:
 			s.counters[k] = 0
-	if s.floor >= 2 and not s.unlocks.has("zuschauer"):
+	if s.floor >= Game.unlock_floor("zuschauer") and not s.unlocks.has("zuschauer"):
 		s.unlocks.append("zuschauer")
+	Game.unlock_floor_systems(s, int(s.floor))
 	if s.player.get("klass") and s.player.get("classSkills") == null:
 		s.player.classSkills = Classes.class_skills_of(s.player.get("race"), s.player.klass)
 	if s.get("stats") == null:

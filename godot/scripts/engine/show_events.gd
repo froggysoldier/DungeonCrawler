@@ -66,7 +66,8 @@ static func tick(s: Dictionary, turns: int) -> void:
 		return
 	if s.turn < int(s.nextShowEvent) or Combat.is_in_safe_room(s, s.player.pos):
 		return
-	start(s, R.pick(s, defs()).id)
+	# Die Schnäppchenstunde nur dort, wo es schon Händler gibt
+	start(s, R.pick(s, defs().filter(func(d): return d.get("price") == null or Game.has_unlock(s, "handel"))).id)
 
 
 ## Eine Einlage starten (auch für Tests).

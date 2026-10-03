@@ -227,6 +227,23 @@ static func has_unlock(s: Dictionary, u: String) -> bool:
 	return s.unlocks.has(u)
 
 
+## Ab welcher Etage ein System dazukommt (world.json UNLOCK_FLOORS):
+## Zuschauer ab Etage 2, Klassen, Rassen, Handel und Aufträge ab Etage 3.
+static func unlock_floor(u: String) -> int:
+	return int(J.nn(Db.world("UNLOCK_FLOORS"), u, 1))
+
+
+## Schaltet Handel und Aufträge frei, sobald die Etage erreicht ist.
+## Gibt die neu freigeschalteten Systeme zurück.
+static func unlock_floor_systems(s: Dictionary, floor: int) -> Array:
+	var neu := []
+	for u in ["handel", "auftraege"]:
+		if floor >= unlock_floor(u) and not has_unlock(s, u):
+			s.unlocks.append(u)
+			neu.append(u)
+	return neu
+
+
 static func visible_tiles(s: Dictionary) -> Dictionary:
 	return Fov.compute(s.map, s.player.pos, Player.lichtradius(s))
 
@@ -675,10 +692,11 @@ static func _on_enter_room(s: Dictionary, room: Dictionary) -> void:
 		_run_tutorial(s)
 	if room.kind == "safe":
 		Mounts.dismount_for_safe_room(s)
-		var shop := Shop.ensure_shop(s, room)
-		if not room.get("questOffered") and has_unlock(s, "inventar") and Quests.quest_of(s, str(room.id)) == null:
+		if has_unlock(s, "handel"):
+			Shop.ensure_shop(s, room)
+		if not room.get("questOffered") and has_unlock(s, "auftraege") and Quests.quest_of(s, str(room.id)) == null:
 			room.questOffered = true
-			var keeper: String = String(shop.keeper).split(",")[0]
+			var keeper: String = String(Shop.ensure_shop(s, room).keeper).split(",")[0]
 			var q = Quests.offer_quest(s, {"kind": "laden", "ref": str(room.id), "name": keeper})
 			if q != null:
 				Log.add(s, "%s hat einen Auftrag für dich: %s" % [keeper, q.text], "dialog")
@@ -1305,21 +1323,21 @@ static func _safe_room(s: Dictionary) -> Variant:
 
 static func buy_offer(s: Dictionary, index: int) -> Dictionary:
 	var room = _safe_room(s)
-	if room == null:
+	if room == null or not has_unlock(s, "handel"):
 		return _fail("Hier gibt es keinen Laden.")
 	return _wrap(Shop.buy(s, room, index))
 
 
 static func haggle_offer(s: Dictionary, index: int) -> Dictionary:
 	var room = _safe_room(s)
-	if room == null:
+	if room == null or not has_unlock(s, "handel"):
 		return _fail("Hier gibt es keinen Laden.")
 	return _wrap(Shop.haggle(s, room, index))
 
 
 static func sell_item(s: Dictionary, uid: String) -> Dictionary:
-	if _safe_room(s) == null:
-		return _fail("Verkaufen kannst du nur bei einem Händler.")
+	if _safe_room(s) == null or not has_unlock(s, "handel"):
+		return _fail("Verkaufen kannst du nur bei einem Händler (ab Etage %d)." % unlock_floor("handel"))
 	return _wrap(Shop.sell(s, uid))
 
 
@@ -1362,16 +1380,19 @@ static func descend(s: Dictionary, meta: Dictionary) -> Dictionary:
 	var def := Db.floor_def0(next)
 	Log.add(s, "Etage %d: %s." % [next, def.name], "system")
 	var pages := [def.intro]
-	if next == 2 and not has_unlock(s, "zuschauer"):
+	if next >= unlock_floor("zuschauer") and not has_unlock(s, "zuschauer"):
 		s.unlocks.append("zuschauer")
 		pages.append("NEU: DAS PUBLIKUM! Ab sofort schaut dir die ganze Galaxis live zu. Spektakuläre Aktionen – Stampfer, Sprungtritte, Bosskills, knappe Rettungen, Achievements – bringen Hype und Follower.")
 		pages.append("Mehr Follower bedeuten Fan-Boxen (bei 100, 250, 500, 1000 … Followern) und ab und zu Geschenke aus dem Publikum. Charisma hilft. Langeweile nicht. Die Zuschauer schalten nicht gerne bei jemandem ein, der nur wartet.")
 		Log.add(s, "FREIGESCHALTET: Zuschauer, Follower und Fan-Boxen.", "system")
-	if next == 3 and not has_unlock(s, "klasse"):
+	if next >= unlock_floor("klasse") and not has_unlock(s, "klasse"):
 		s.pendingSelection = true
 		pages.append("Kaum hast du die Treppe verlassen, zieht dich ein Lichtstrahl zurück in die Gilde der Einweisung. %s wartet schon. „Es ist so weit. Etage 3. Zeit, dich zu entscheiden, was du sein willst.“" % s.guideName)
 		pages.append("„Du darfst deine RASSE wählen – oder Mensch bleiben. Einige Rassen hast du dir durch dein Verhalten erst freigeschaltet. Und die Systemstimme hat dir eine persönliche KLASSENLISTE erstellt – basierend darauf, wie du bisher gekämpft hast. Die drei Empfehlungen oben passen am besten zu dir.“")
 		pages.append("„Jede Klasse bringt eine besondere Fähigkeit mit. Überleg gut. Das kannst du nicht rückgängig machen.“")
+	if not unlock_floor_systems(s, next).is_empty():
+		pages.append("NEU: HANDEL UND AUFTRÄGE! Ab dieser Etage haben die Läden in den Safe Rooms geöffnet, und in der Siedlung stehen Marktstände. Händler kaufen deine Beute und lassen mit sich feilschen. Ladenbesitzer und andere Crawler haben jetzt Aufträge für dich – mit Belohnung.")
+		Log.add(s, "FREIGESCHALTET: Handel und Aufträge.", "system")
 	s.pendingDialogs.append({"title": "Etage %d: %s" % [next, def.name], "speaker": Db.world("SYSTEM_NAME"), "pages": pages})
 	return _ok()
 

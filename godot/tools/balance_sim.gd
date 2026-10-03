@@ -47,8 +47,27 @@ func _initialize() -> void:
 	quit()
 
 
+## Neue Boxen nach Etage und Stufe zählen (BOXES=1).
+func _tally_boxes(s: Dictionary) -> void:
+	if s.get("_boxSeen") == null:
+		s._boxSeen = {}
+		s._boxTally = {}
+	for b in s.player.boxes:
+		if s._boxSeen.has(b.uid):
+			continue
+		s._boxSeen[b.uid] = true
+		var k := "E%d %s%s" % [int(s.floor), b.box.tier, " (Meister)" if b.box.get("special") else ""]
+		if OS.get_environment("BOXES") == "2":
+			k += " " + String(b.box.type)
+		s._boxTally[k] = int(s._boxTally.get(k, 0)) + 1
+
+
 ## BOXES=1: Woher kamen die Achievements und Boxen dieser Partie?
 func _box_report(s: Dictionary) -> void:
+	_tally_boxes(s)
+	var tk: Array = s._boxTally.keys()
+	tk.sort()
+	print("   Boxen je Etage: " + ", ".join(tk.map(func(k): return "%s=%d" % [k, s._boxTally[k]])))
 	var by := {}
 	var fam_stage := {}
 	for fam in Db.t("achievement_families", "familyTable"):
@@ -279,7 +298,7 @@ func _rest(s: Dictionary, threshold: float) -> bool:
 ## Zur Toilette im nächsten Safe Room. true = Zug verbraucht.
 func _toilet(s: Dictionary) -> bool:
 	var safe = _nearest_room(s, "safe")
-	if safe == null or Game.time_left(s) < 400:
+	if safe == null or Game.time_left(s) < 60:
 		return false
 	if Combat.is_in_safe_room(s, s.player.pos):
 		return Game.toilet(s).ok
@@ -297,6 +316,8 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 	while s.status == "playing" and guard < 18000:
 		guard += 1
 		var p: Dictionary = s.player
+		if OS.get_environment("BOXES") != "":
+			_tally_boxes(s)
 		if OS.get_environment("SEED") != "" and s.turn % 200 == 0 and s.turn != int(J.num(s, "_dbgTurn")):
 			s._dbgTurn = s.turn
 			var rr = Game.current_room(s)

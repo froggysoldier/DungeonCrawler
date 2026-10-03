@@ -301,8 +301,9 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, items: Array
 		r.feature = "schrein"
 		r.furniture = [{"kind": "schrein", "pos": spot}]
 		r.description += " Zwischen dem Gerümpel steht ein kleiner Schrein mit einer flackernden Kerze. Jemand hat Opfergaben hingelegt."
-	# Wanderhändler (in der Kanalstadt gibt es dafür die Märkte der Siedlung)
-	if not cands.is_empty() and floor != Kanalstadt.FLOOR_NO:
+	# Wanderhändler: erst ab der Etage mit Handel (in der Kanalstadt gibt es
+	# dafür die Märkte der Siedlung)
+	if not cands.is_empty() and floor != Kanalstadt.FLOOR_NO and floor >= Game.unlock_floor("handel"):
 		var r: Dictionary = cands.pop_front()
 		var spot = _free_spot(s, m, r, occupied)
 		if spot != null:

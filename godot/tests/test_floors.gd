@@ -137,3 +137,17 @@ func test_nachschub_waechst_mit_der_zeit(t) -> void:
 		late = maxi(late, lv)
 		t.le(lv, s.player.level + 1, "nie mehr als eine Stufe über dem Crawler")
 	t.gt(late, early, "kurz vor dem Einsturz stärkerer Nachschub")
+
+
+func test_etage_3_bringt_handel_und_auftraege(t) -> void:
+	var s := TH.make(4404)
+	_to_floor(s, 2)
+	t.ok(not Game.has_unlock(s, "handel"), "Etage 2: noch kein Handel")
+	t.ok(not Game.has_unlock(s, "auftraege"), "Etage 2: noch keine Aufträge")
+	t.ok(not J.some(s.map.rooms, func(r): return J.some(J.arr(r, "furniture"), func(f): return f.kind == "haendler")), "Etage 2: keine Händler")
+	_to_floor(s, 3)
+	t.ok(s.pendingSelection, "Klasse und Rasse wählen")
+	t.has(s.unlocks, "handel")
+	t.has(s.unlocks, "auftraege")
+	t.ok(J.some(s.map.rooms, func(r): return J.some(J.arr(r, "furniture"), func(f): return f.kind == "haendler")), "Etage 3: Händler")
+	t.ok(J.some(s.pendingDialogs, func(d): return J.some(d.pages, func(p): return String(p).contains("HANDEL UND AUFTRÄGE"))), "Dialog")

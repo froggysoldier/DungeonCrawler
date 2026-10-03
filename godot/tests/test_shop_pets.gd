@@ -29,8 +29,26 @@ func _beside(s: Dictionary, id: String) -> Dictionary:
 	return m
 
 
+func test_laden_erst_ab_etage_3(t) -> void:
+	var s := _make()
+	t.eq(Game.unlock_floor("handel"), 3, "Handel ab Etage 3")
+	t.eq(Game.unlock_floor("auftraege"), 3, "Aufträge ab Etage 3")
+	var room := _enter_safe(s)
+	t.eq(room.get("shop"), null, "Etage 1: kein Laden")
+	t.ok(not J.some(J.arr(room, "furniture"), func(f): return f.kind == "haendler"), "kein Händler im Safe Room")
+	t.ok(not J.some(s.map.rooms, func(r): return r.get("feature") == "markt"), "kein Wanderhändler")
+	t.eq(room.get("questOffered"), null, "kein Auftrag")
+	t.ok(not Game.buy_offer(s, 0).ok, "kaufen geht nicht")
+	var junk := Items.create_item(s, "bauhelm")
+	s.player.inventory.append(junk)
+	t.ok(not Game.sell_item(s, junk.uid).ok, "verkaufen geht nicht")
+	t.eq(Game.unlock_floor_systems(s, 2), [], "Etage 2: noch nichts")
+	t.eq(Game.unlock_floor_systems(s, 3), ["handel", "auftraege"], "Etage 3: Handel und Aufträge")
+
+
 func test_laden(t) -> void:
 	var s := _make()
+	s.unlocks.append("handel")
 	var room := _enter_safe(s)
 	t.gt(room.shop.offers.size(), 5, "Angebote")
 	s.player.gold = 1000
@@ -49,6 +67,7 @@ func test_laden(t) -> void:
 
 func test_verkaufen_nur_im_safe_room(t) -> void:
 	var s := _make()
+	s.unlocks.append("handel")
 	var junk := Items.create_item(s, "bauhelm")
 	s.player.inventory.append(junk)
 	t.ok(not Game.sell_item(s, junk.uid).ok, "draußen nicht")

@@ -1,8 +1,8 @@
 class_name Achievements
 extends RefCounted
 ## Prüft alle Achievements gegen ein Ereignis.
-## Wer ein Achievement als Erster (über alle eigenen Staffeln) erreicht, bekommt
-## eine Box-Stufe mehr.
+## Wer ein Achievement zum ersten Mal (über alle eigenen Staffeln) erreicht,
+## hat ab Etage 2 eine doppelt so hohe Chance, dass aus Silber Gold wird.
 
 
 static func check(s: Dictionary, e: Dictionary) -> void:
@@ -37,7 +37,7 @@ static func check(s: Dictionary, e: Dictionary) -> void:
 			continue
 		var first: bool = not s.firstEver.has(a.id)
 		var meister: bool = a.get("meister", false)
-		var bx := Items.create_box(s, a.box, _upgrade(a.tier) if first else a.tier, meister)
+		var bx := Items.create_box(s, a.box, a.tier, meister, first)
 		s.player.boxes.append(bx)
 		var tier: String = bx.box.tier
 		Fx.sound(s, {"kind": "achievement", "tier": tier})
@@ -50,12 +50,3 @@ static func check(s: Dictionary, e: Dictionary) -> void:
 		Log.add(s, "Belohnung: %s %s.%s" % [tier_name, box_name, first_note], "loot")
 		Viewers.add_spectacle(s, 4 + Db.world("BOX_TIERS").find(tier) * 4, "achievement")
 		Log.toast(s, "Achievement: %s" % a.name, "%s Belohnung: %s %s" % [a.description, tier_name, box_name], "achievement")
-
-
-## Erstmals in der Karriere: eine Box-Stufe mehr, aber höchstens bis Gold.
-static func _upgrade(t: String) -> String:
-	var tiers: Array = Db.world("BOX_TIERS")
-	var i := tiers.find(t)
-	if i >= tiers.find("gold"):
-		return t
-	return tiers[i + 1]

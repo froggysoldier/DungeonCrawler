@@ -4,14 +4,6 @@ extends RefCounted
 
 const START_ONLY := ["bademantel", "schlafanzug", "anzug", "arbeitsjacke", "sportshirt", "hausschuhe", "eigener_ehering", "uniformjacke", "kasack", "kochjacke", "schlafanzughose"]
 const RARITY_VALUE := {"gewoehnlich": 1, "ungewoehnlich": 2, "selten": 4, "episch": 8, "legendaer": 20, "himmlisch": 60}
-const BOX_SLOTS := {
-	"waffen": ["waffe", "haende"],
-	"schuh": ["fuesse", "fussring"],
-	"kleidung": ["kopf", "gesicht", "brust", "schultern", "arme", "beine", "unterwaesche", "guertel", "ruecken"],
-	"schmuck": ["ring", "hals", "fussring"],
-	"brawler": ["haende", "arme", "fuesse", "kopf"],
-	"wurf": ["arme", "haende", "schultern"],
-}
 const MATERIAL_EXTRA := ["stein", "ziegel", "flasche", "dose", "schraubenmutter"]
 
 static var _boss_loot := {}
@@ -85,7 +77,12 @@ static func cap_box_tier(s: Dictionary, tier: String, special: bool = false) -> 
 
 
 ## special: Box aus einer Meisterleistung (höhere Stufe und Seltenheit erlaubt).
-static func create_box(s: Dictionary, type: String, tier: String, special: bool = false) -> Dictionary:
+## Tiefer unten wird aus Silber manchmal Gold (world.json FLOORS[].goldChance),
+## beim ersten Mal in der Karriere (first) doppelt so oft.
+static func create_box(s: Dictionary, type: String, tier: String, special: bool = false, first: bool = false) -> Dictionary:
+	var gold_chance := float(J.nn(Db.floor_def0(int(s.floor)), "goldChance", 0.0)) * (2.0 if first else 1.0)
+	if tier == "silber" and gold_chance > 0 and R.chance(s, gold_chance):
+		tier = "gold"
 	tier = cap_box_tier(s, tier, special)
 	return {
 		"uid": uid(s),
@@ -152,15 +149,6 @@ static func generate_equipment(s: Dictionary, rarity: String, slots: Variant = n
 	return item
 
 
-static func _roll_unique(s: Dictionary, max_rarity: String) -> Variant:
-	var order: Array = Db.t("items", "RARITY_ORDER")
-	var max_idx := order.find(max_rarity)
-	var pool: Array = Db.t("items", "UNIQUE_ITEMS").filter(func(u): return order.find(u.rarity) <= max_idx)
-	if pool.is_empty():
-		return null
-	return create_item(s, R.pick(s, pool).id)
-
-
 ## Seltenheit höchstens bis zur Obergrenze der Etage (world.json
 ## FLOORS[].rarityCap), Boss-Boxen eine Stufe darüber. So wächst die
 ## Ausrüstung mit dem Abstieg statt schon auf Etage 1 legendär zu sein.
@@ -173,59 +161,76 @@ static func cap_rarity(s: Dictionary, rarity: String, boss: bool = false, floor:
 	return order[mini(order.find(rarity), max_idx)]
 
 
-## Öffnet eine Box und erzeugt ihren Inhalt.
+## Öffnet eine Box und erzeugt ihren Inhalt. Was drin ist, hängt vom Boxtyp
+## ab (world.json BOX_THEMES): Waffen-Boxen bringen Waffen, Wurf-Boxen Wurfzeug,
+## Überlebens-Boxen Heil- und Gegenmittel usw. Ab Gold liegt immer ein
+## magischer Gegenstand dabei (Unikat mit Sonderwirkung oder Zauberbuch).
 ## floor: Etage, auf der die Box verdient wurde (für die Seltenheitsgrenze).
 static func roll_box_contents(s: Dictionary, type: String, tier: String, floor: int = -1, special: bool = false) -> Array:
 	var cfg: Dictionary = Db.world("BOX_CONTENTS")[tier]
 	var out := []
 	var count := R.int_(s, cfg.items[0], cfg.items[1])
-	var max_rarity: String = cap_rarity(s, cfg.rarities[cfg.rarities.size() - 1][0], type == "boss" or special, floor)
-	for i in count:
-		if R.chance(s, cfg.uniqueChance):
-			var u = _roll_unique(s, max_rarity)
-			if u != null:
-				out.append(u)
-				continue
-		var rarity: String = cap_rarity(s, R.weighted(s, cfg.rarities), type == "boss" or special, floor)
-		out.append(_roll_themed_item(s, type, rarity))
-	out.append(create_gold(s, R.int_(s, cfg.gold[0], cfg.gold[1])))
+	var boss := type == "boss" or special
+	var max_rarity: String = cap_rarity(s, cfg.rarities[cfg.rarities.size() - 1][0], boss, floor)
 	var tier_idx: int = Db.world("BOX_TIERS").find(tier)
 	var half := floori(tier_idx / 2.0)
-	# Zugaben sind Glückssache, damit sich Tränke nicht zu Hunderten stapeln:
-	# Überlebens-Boxen fast immer, Abenteurer-Boxen jede zweite
-	if (type == "ueberlebens" and R.chance(s, 0.85)) or (type == "abenteurer" and R.chance(s, 0.5)):
+	for i in count:
+		if (i == 0 and tier_idx >= 2) or R.chance(s, cfg.uniqueChance):
+			out.append(roll_magic_item(s, type, max_rarity))
+			continue
+		var rarity: String = cap_rarity(s, R.weighted(s, cfg.rarities), boss, floor)
+		out.append(_roll_themed_item(s, type, rarity))
+	out.append(create_gold(s, R.int_(s, cfg.gold[0], cfg.gold[1])))
+	# Zugaben sind Glückssache, damit sich Tränke nicht zu Hunderten stapeln
+	if (type == "ueberlebens" or type == "abenteurer") and R.chance(s, 0.5):
 		out.append(create_item(s, "heiltrank" if tier_idx >= 1 else "kleiner_heiltrank", 1 + floori(tier_idx / 3.0)))
 	if type == "wurf":
 		out.append(create_item(s, "ziegel" if tier_idx >= 2 else "stein", 5 + tier_idx * 3))
-	if type == "ueberlebens" and R.chance(s, 0.5):
-		out.append(create_item(s, "gegengift", 1 + floori(tier_idx / 3.0)))
 	if type == "ueberlebens" or type == "wurf":
 		if R.chance(s, 0.5):
 			out.append(create_item(s, "fallenteile", 1 + half))
 		if R.chance(s, 0.4):
 			out.append(create_item(s, "schwarzpulver", 1 + half))
-	if type == "wurf" and tier_idx >= 1:
-		out.append(create_item(s, "brandflasche" if R.chance(s, 0.5) else "nagelbombe", tier_idx))
 	if tier_idx >= 2 and R.chance(s, 0.1):
 		out.append(create_item(s, "klappwerkbank"))
 	# Reittiere: selten, in guten Boxen häufiger
 	if (type == "abenteurer" or type == "fan" or type == "boss" or type == "haustier") and tier_idx >= 1 and R.chance(s, 0.05 + tier_idx * 0.04):
 		var pool := ["zuendschluessel_traktor", "pfeife_eber", "pfeife_schnecke"] if tier_idx >= 3 else ["zuendschluessel_wagen", "pfeife_pony", "zuendschluessel_bobbycar"]
 		out.append(create_item(s, R.pick(s, pool)))
-	# Zauberbücher: selten in einfachen Boxen, häufiger in guten
-	if (type == "abenteurer" or type == "fan" or type == "boss") and R.chance(s, 0.12 + tier_idx * 0.1):
+	# Zauberbücher: selten in einfachen Boxen (ab Gold kommen sie als
+	# magischer Gegenstand)
+	if (type == "abenteurer" or type == "fan" or type == "boss") and tier_idx < 2 and R.chance(s, 0.12 + tier_idx * 0.1):
 		out.append(Magic.random_tome(s, Db.t("items", "RARITY_ORDER")[mini(4, tier_idx + 1)]))
 	if tier_idx >= 1 and R.chance(s, 0.2):
 		out.append(create_item(s, "kleiner_manatrank", 1 + floori(tier_idx / 3.0)))
-	if type == "brawler" and R.chance(s, 0.6):
-		out.append(create_item(s, "energydrink", 1 + floori(tier_idx / 3.0)))
 	return out
+
+
+static func box_theme(type: String) -> Dictionary:
+	return J.nn(Db.world("BOX_THEMES"), type, {})
+
+
+## Magischer Gegenstand passend zum Boxtyp: ein Unikat mit Sonderwirkung aus
+## der Liste des Typs (höchstens max_rarity) oder ein Zauberbuch.
+static func roll_magic_item(s: Dictionary, type: String, max_rarity: String) -> Dictionary:
+	var theme := box_theme(type)
+	if R.chance(s, float(theme.get("tome", 0.0))):
+		return Magic.random_tome(s, max_rarity)
+	var order: Array = Db.t("items", "RARITY_ORDER")
+	var allowed = theme.get("magic", "alle")
+	var pool: Array = Db.t("items", "UNIQUE_ITEMS").filter(func(u):
+		return order.find(u.rarity) <= order.find(max_rarity) and (allowed is String or allowed.has(u.id)))
+	if not pool.is_empty():
+		return create_item(s, R.pick(s, pool).id)
+	if type == "haustier":
+		return create_item(s, "ei_drache")
+	return Magic.random_tome(s, max_rarity)
 
 
 static func _roll_themed_item(s: Dictionary, type: String, rarity: String) -> Dictionary:
 	var order: Array = Db.t("items", "RARITY_ORDER")
+	var r := order.find(rarity)
 	if type == "haustier":
-		var r := order.find(rarity)
 		if r >= 4 and R.chance(s, 0.4):
 			return create_item(s, "superkeks")
 		if r >= 2 and R.chance(s, 0.3):
@@ -240,9 +245,12 @@ static func _roll_themed_item(s: Dictionary, type: String, rarity: String) -> Di
 				id = "halsband_leder"
 			return create_item(s, id)
 		return create_item(s, "leckerli", r + 1) if R.chance(s, 0.6) else generate_equipment(s, rarity, ["hals"])
-	if type == "ueberlebens" and R.chance(s, 0.4):
-		return create_item(s, "heiltrank", 1 + order.find(rarity))
-	return generate_equipment(s, rarity, BOX_SLOTS.get(type))
+	var theme := box_theme(type)
+	var cons: Dictionary = J.nn(theme, "consumables", {})
+	if not cons.is_empty() and R.chance(s, float(cons.share)):
+		var c: Array = R.weighted(s, cons.pool.map(func(e): return [e, e[1]]))
+		return create_item(s, c[0], int(c[2]) + floori(r / 2.0))
+	return generate_equipment(s, rarity, theme.get("slots"))
 
 
 ## Zufälliger Bodenfund (Steine, Flaschen, Kleinkram).
@@ -267,16 +275,19 @@ static func roll_material(s: Dictionary) -> Dictionary:
 	return create_item(s, R.weighted(s, pool))
 
 
-## Mob-Drops: meist nichts, manchmal Gold oder Kleinkram.
+## Mob-Drops: meist nichts, manchmal Gold oder Kleinkram, selten (5 %)
+## ein Ausrüstungsteil.
 static func roll_mob_drop(s: Dictionary, level: int, elite: bool) -> Array:
 	var out := []
 	if R.chance(s, 1.0 if elite else 0.35):
 		out.append(create_gold(s, J.rnd(R.int_(s, 1, 3 + level * 2) * (3 if elite else 1) * ShowEvents.gold_factor(s))))
-	if R.chance(s, 0.6 if elite else 0.12):
-		if elite:
-			out.append(generate_equipment(s, "selten" if R.chance(s, 0.3) else "ungewoehnlich"))
-		else:
-			out.append(roll_ground_item(s))
+	if elite and R.chance(s, 0.6):
+		out.append(generate_equipment(s, cap_rarity(s, "selten" if R.chance(s, 0.3) else "ungewoehnlich")))
+	elif not elite and R.chance(s, 0.05):
+		# Seltener Fund: normale Monster lassen ab und zu ein Ausrüstungsteil fallen
+		out.append(generate_equipment(s, cap_rarity(s, R.weighted(s, [["gewoehnlich", 55], ["ungewoehnlich", 35], ["selten", 10]]))))
+	elif not elite and R.chance(s, 0.12):
+		out.append(roll_ground_item(s))
 	if R.chance(s, 0.05):
 		out.append(create_item(s, "kleiner_heiltrank"))
 	if R.chance(s, 0.03):

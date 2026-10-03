@@ -35,8 +35,10 @@ func test_besondere_raeume_entstehen(t) -> void:
 			t.ok(J.some(s.items, func(e): return e.item.kind == "schluessel" and int(e.item.opens) == treasure.id), "Schlüssel liegt (%d)" % seed)
 			t.ok(s.map.locks.values().has(treasure.id), "Tür verschlossen (%d)" % seed)
 			t.ok(treasure.get("sealed", false), "ummauert (%d)" % seed)
-	for f in ["schatz", "geheim", "nest", "schrein", "markt", "hinterhalt"]:
+	for f in ["schatz", "geheim", "nest", "schrein", "hinterhalt"]:
 		t.ge(int(seen.get(f, 0)), 3, "%s kommt vor" % f)
+	# Handel gibt es erst ab Etage 3 (dort auf den Märkten der Siedlung)
+	t.eq(int(seen.get("markt", 0)), 0, "Etage 1: kein Wanderhändler")
 
 
 func test_alles_bleibt_erreichbar(t) -> void:
@@ -257,22 +259,24 @@ func test_hinterhalt(t) -> void:
 
 
 func test_wanderhaendler(t) -> void:
-	for seed in range(1, 8):
-		var s := TH.make(seed, {"beruf": 1})
-		var room = _room_of_feature(s, "markt")
-		if room == null:
-			continue
-		TH.ready(s)
-		var f: Dictionary = room.furniture[0]
-		s.player.pos = MapGen._random_floor_in(s, s.map, room, {"%d,%d" % [f.pos.x, f.pos.y]: true})
-		s.monsters = []
-		Game.after_move(s)
-		t.not_null(room.get("shop"), "Laden da")
-		s.player.gold = 5000
-		t.ok(Game.buy_offer(s, 0).ok, "kaufen")
-		t.lt(s.player.gold, 5000, "bezahlt")
+	# Märkte gibt es erst auf Etage 3, wenn der Handel freigeschaltet ist
+	var s := TH.make(3, {"beruf": 1})
+	while s.floor < 3:
+		TH.teleport(s, TH.stairs(s))
+		Game.descend(s, {"ghosts": []})
+	t.has(s.unlocks, "handel")
+	var room = _room_of_feature(s, "markt")
+	t.not_null(room, "Markt auf Etage 3")
+	if room == null:
 		return
-	t.ok(false, "kein Händler gefunden")
+	var f: Dictionary = room.furniture[0]
+	s.player.pos = MapGen._random_floor_in(s, s.map, room, {"%d,%d" % [f.pos.x, f.pos.y]: true})
+	s.monsters = []
+	Game.after_move(s)
+	t.not_null(room.get("shop"), "Laden da")
+	s.player.gold = 5000
+	t.ok(Game.buy_offer(s, 0).ok, "kaufen")
+	t.lt(s.player.gold, 5000, "bezahlt")
 
 
 func test_haendlertypen(t) -> void:

@@ -177,7 +177,7 @@ static func talk_to(s: Dictionary, uid: String) -> Dictionary:
 	if c.personality == "feindselig" and not Combat.is_in_safe_room(s, s.player.pos):
 		_turn_hostile(s, c)
 		return {"ok": true}
-	if first and not c.party and c.personality != "feindselig" and s.unlocks.has("inventar") and Quests.quest_of(s, c.uid) == null and R.chance(s, 0.6):
+	if first and not c.party and c.personality != "feindselig" and s.unlocks.has("auftraege") and Quests.quest_of(s, c.uid) == null and R.chance(s, 0.6):
 		var q = Quests.offer_quest(s, {"kind": "crawler", "ref": c.uid, "name": c.name})
 		if q != null:
 			Log.add(s, "%s hat ein Anliegen: %s" % [c.name, q.text], "dialog")

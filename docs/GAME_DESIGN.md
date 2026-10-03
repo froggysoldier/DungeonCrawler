@@ -107,8 +107,12 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
 | Start | Nichts. Fäuste, Füße, ein Gegenstand in der Hand. | |
 | Tutorial-Gilde gefunden | Inventar, Werte, Skills-Übersicht, Kartengedächtnis, 2 Heiltränke | |
 | Etage 2 | Publikum: Zuschauer, Follower, Hype, Fan-Boxen, Geschenke | |
-| Etage 3 | Rassen- & Klassenwahl, Klassenfähigkeiten | |
+| Etage 3 | Rassen- & Klassenwahl, Klassenfähigkeiten, **Handel** (Läden in den Safe Rooms, Märkte der Siedlung) und **Aufträge** | |
 | Etage 9+ | NPC-Verträge | Engine-Hook vorhanden |
+
+Die Etagen stehen in `world.json` unter `UNLOCK_FLOORS`. Auf Etage 1 und 2
+gibt es also weder Läden noch Wanderhändler noch Aufträge; Gold sammelt man
+für den Wirt im Restaurant und für Etage 3.
 
 ### 3.4 Kampf: Technik = Körperteil × Ausführung
 - **Körperteil/Mittel:** Faust, Tritt, Knie, Ellbogen, Kopfstoß, Waffe, Wurf
@@ -212,12 +216,12 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
 - Keine Gewalt; Mobs, die angreifen, werden weggebeamt. Monster betreten
   Safe Rooms nie, auch nicht auf der Flucht oder Verfolgung.
 - **Eingerichtet:** Jeder Safe Room hat einen **Gratis-Automaten** (1 Gegenstand
-  pro Crawler; meist nützlich, manchmal ein Scherzartikel), einen Händler,
-  ein Bett und eine Toilette. **Restaurants** haben zusätzlich einen Wirt mit
+  pro Crawler; meist nützlich, manchmal ein Scherzartikel), ab Etage 3
+  einen Händler, ein Bett und eine Toilette. **Restaurants** haben zusätzlich einen Wirt mit
   Buff-Essen und Zimmer. Möbel benutzt man, indem man hineinläuft.
 - Nur hier: **Lootboxen öffnen** und **schlafen** (8 h, heilt, Haustier kehrt zurück).
 - **Toilette:** Erleichtern darf man sich nur hier (siehe Blase).
-- **Laden** mit wechselnder Besitzerin oder wechselndem Besitzer: kaufen,
+- **Laden** (ab Etage 3) mit wechselnder Besitzerin oder wechselndem Besitzer: kaufen,
   verkaufen (40 % des Werts) und **feilschen** – einmal pro Angebot, Chance
   mit Charisma und Laune; Erfolg bis 25 % Rabatt, Misserfolg +10 % und
   schlechtere Laune.
@@ -253,7 +257,10 @@ Für gefühlt alles, was ein Achievement wert ist, gibt es eines – insgesamt
   Kombinationen, die tatsächlich passieren, in Stufen I–V (1, 5, 15, 40, 100).
 - **Box-Stufe je Etage:** Achievements, Muster, Sponsoren, Fans, Aufträge,
   Talkshow und Bosse geben auf Etage 1 höchstens Silber, ab Etage 2
-  höchstens Gold. Nur **Meisterleistungen** gehen eine Stufe darüber (Etage 1
+  höchstens Gold. Aus einer Silberbox wird auf Etage 2 mit 10 %, auf Etage 3
+  mit 25 % eine Goldbox (`FLOORS[].goldChance`), beim ersten Mal in der
+  Karriere doppelt so oft. Platin gibt es auf Etage 1 bis 3 nur über
+  Meisterleistungen. Nur **Meisterleistungen** gehen eine Stufe darüber (Etage 1
   Gold, ab Etage 2 Platin) und enthalten auch eine Seltenheitsstufe mehr:
   Einzelkämpfer (Bezirksboss ganz allein), Nur die Knöchel (Bezirksboss nur
   mit Fäusten), Gewaltfreier Abstieg (Etage 2 ohne einen Kill erreichen),
@@ -264,15 +271,38 @@ Für gefühlt alles, was ein Achievement wert ist, gibt es eines – insgesamt
 - **Boxen gibt es ab Silber.** Bronze-Erfolge – darunter die erste Stufe
   jeder Achievement-Familie, „Neu im Bestiarium“ und „Routine“ sowie Muster
   mit niedriger Wertung – bringen nur Aufmerksamkeit beim Publikum. Seltene
-  Kunststücke (hohe Musterwertung) bringen schon auf Stufe I eine Box. Der
-  Bonus „erstmals in deiner Karriere“ hebt eine Box höchstens bis Gold.
+  Kunststücke (hohe Musterwertung) bringen schon auf Stufe I eine Box.
   Heiltränke, Gegengift und Manatränke liegen nur noch mit einer gewissen
   Wahrscheinlichkeit als Zugabe bei. Sind beide Ring- oder Fußringplätze
   belegt, ersetzt ein neuer Ring den schwächeren.
 - Der Erfolge-Tab ist nach 13 Kategorien geordnet, zeigt den Fortschritt je
   Kategorie und die nächsten erreichbaren Ziele.
-- Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen.
-- **Wer ein Achievement zum ersten Mal in seiner Karriere schafft, bekommt eine Box-Stufe mehr.**
+- Boxen in 6 Stufen (Bronze → Himmlisch) und 11 Themen. **Der Inhalt passt
+  zum Thema** (`world.json` `BOX_THEMES`):
+
+  | Box | Inhalt |
+  |---|---|
+  | Waffen | Waffen und Handschuhe |
+  | Schuh | Schuhe und Fußringe |
+  | Kleidung | Kopf, Gesicht, Brust, Schultern, Arme, Beine, Unterwäsche, Gürtel, Rücken |
+  | Schmuck | Ringe, Ketten, Fußringe |
+  | Schläger | Handschuhe, Arm-, Bein-, Fuß- und Kopfschutz; dazu Energydrinks, Wutpillen, Ausdauertränke |
+  | Wurf | zur Hälfte Wurfsterne, Dartpfeile, Bowlingkugeln, Brandflaschen, Nagelbomben; sonst Handschuhe, Arme, Schultern, Gürtel; dazu Steine oder Ziegel |
+  | Überlebens | zur Hälfte Heiltränke, Gegengift, Verband, Kühlpack, Augentropfen; sonst Kopf, Gesicht, Brust, Gürtel, Rücken |
+  | Haustier | Leckerli, Halsbänder, Eier, Superkekse |
+  | Fan | beliebige Ausrüstung, Rubbellose, Glückskekse |
+  | Abenteurer, Boss | beliebige Ausrüstung, Zauberbücher, manchmal Reittiere |
+
+- **Ab Gold liegt immer ein magischer Gegenstand bei:** ein Unikat mit
+  Sonderwirkung aus der Liste des Boxtyps (etwa Faust der Gerechtigkeit in
+  der Waffen-Box, Stampfstiefel in der Schuh-Box, Gasmaske in der
+  Überlebens-Box) oder – bei Abenteurer-, Boss- und Fan-Boxen – ein
+  Zauberbuch. Auch er hält die Seltenheitsgrenze der Etage ein.
+- Gold-, Feilsch- und Verkaufserfolge sowie das Finden epischer und
+  legendärer Gegenstände bringen Schmuck-Boxen.
+- **Mob-Drops:** Normale Monster lassen mit 5 % ein Ausrüstungsteil fallen
+  (meist gewöhnlich oder ungewöhnlich, höchstens die Etagengrenze), Elite-
+  Monster mit 60 %.
 
 ### 3.10 Publikum (ab Etage 2)
 - Spektakel (Stampf-Kills, Sprungtritte, Bosse, Achievements, knappe
@@ -427,8 +457,8 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
   Gunst – bei 0 ist das Sponsoring vorbei.
 
 ### 3.21 Aufträge
-- Andere Crawler (manchmal beim ersten Gespräch) und jeder Laden bieten
-  Aufträge an: **Jagd** (Gegner einer Art), **Finden** (verlorenes Andenken
+- **Ab Etage 3.** Andere Crawler (manchmal beim ersten Gespräch) und jeder
+  Laden bieten Aufträge an: **Jagd** (Gegner einer Art), **Finden** (verlorenes Andenken
   in einem anderen Viertel), **Liefern** (Tränke, Essen, Lappen …),
   **Retten** (eingeschlossener Crawler, von Monstern bewacht), **Boss**,
   **Nest ausräumen** und **Schatzkammer öffnen**.
@@ -439,7 +469,8 @@ Eigenschaften“. Auch der Kampflog verwendet nur die Namen, die man kennt.
   Freundschaftsrabatt. Aufträge scheitern, wenn der Auftraggeber stirbt oder
   die Etage verlassen wird. Bis zu fünf offene Aufträge.
 
-- **Wanderhändler** (Sonderraum) haben ein eigenes Sortiment: Waffenhändler,
+- **Wanderhändler** (Sonderraum, erst ab der Etage mit Handel; in der
+  Kanalstadt übernehmen das die Märkte der Siedlung) haben ein eigenes Sortiment: Waffenhändler,
   Wanderapotheke (mit Zauberbüchern), Schrotthändler (Handwerksmaterial,
   Klappwerkbank) oder Kuriositätenhändler (Tattoos, Talismane, Eier). Sie
   sind etwas teurer als die Läden in den Safe Rooms; auch Feilschen rechnet
@@ -593,7 +624,7 @@ Nach dem Tutorial ruft die Regie etwa alle 220–340 Züge eine Einlage aus (die
 | Doppelte Erfahrung | +100 % Erfahrung |
 | Goldrausch | Monster lassen dreimal so viel Gold fallen |
 | Licht aus! | Sichtweite −2, dafür +50 % Erfahrung |
-| Schnäppchenstunde | Händlerpreise −30 % |
+| Schnäppchenstunde | Händlerpreise −30 % (nur ab Etage 3, wenn es Händler gibt) |
 | Erste Hilfe | +2 HP-Regeneration |
 | Kritische Stunde | +15 % Krit-Chance |
 | Kopfgeld | Der stärkste Nicht-Boss der Etage wird markiert (auf der Karte „Kopfgeld“). Wer ihn erledigt, erhält 40 × Etage + 10 × Stufe Gold. Erledigt ihn jemand anderes oder läuft die Zeit ab, verfällt es. |

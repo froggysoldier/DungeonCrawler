@@ -119,7 +119,7 @@ static func item_body(gv: GameView, v: Node, it: Dictionary, with_actions: bool,
 			Kit.button(f, "Als Nächstes werfen", func(): gv.act(func(): return Game.choose_throwable(s, bid)), "SmallButton")
 	Kit.button(f, "Ablegen", func(): gv.act(func(): return Game.drop_item(s, uid)), "SmallButton")
 	var room = Game.current_room(s)
-	if from == "inv" and room != null and room.kind == "safe" and it.kind != "box" and it.get("questId") == null:
+	if from == "inv" and room != null and room.kind == "safe" and Game.has_unlock(s, "handel") and it.kind != "box" and it.get("questId") == null:
 		Kit.button(f, "Verkaufen (%d G)" % Shop.sell_price(it, s), func(): gv.act(func(): return Game.sell_item(s, uid)), "SmallButton")
 	n = f.get_child_count()
 	if n > 0:
@@ -279,8 +279,10 @@ static func goals_tab(gv: GameView, root: VBoxContainer) -> void:
 	var open := Quests.active_quests(s)
 	var done_count := Quests.quests(s).filter(func(q): return q.status == "erledigt").size()
 	Kit.section(root, "Aufträge", Kit.muted("(%d erledigt)" % done_count) if done_count else "")
-	if open.is_empty():
-		Kit.text(root, "Keine offenen Aufträge. Andere Crawler vergeben welche – sprich sie an.", 12, "muted")
+	if not Game.has_unlock(s, "auftraege"):
+		Kit.text(root, "Aufträge gibt es ab Etage %d." % Game.unlock_floor("auftraege"), 12, "muted")
+	elif open.is_empty():
+		Kit.text(root, "Keine offenen Aufträge. Ladenbesitzer und andere Crawler vergeben welche – sprich sie an.", 12, "muted")
 	for q in open:
 		var v := Kit.card(root)
 		var ready := Quests.can_turn_in(s, q)
