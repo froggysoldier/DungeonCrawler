@@ -45,7 +45,18 @@ static func level_diff_factor(diff: int) -> float:
 
 static func kill_xp(s: Dictionary, m: Dictionary) -> Dictionary:
 	var diff := int(m.level) - int(s.player.level)
-	return {"xp": maxi(1, J.rnd(m.xp * level_diff_factor(diff))), "diff": diff, "challenge": challenge_of(diff)}
+	var rush := rush_bonus(s)
+	return {"xp": maxi(1, J.rnd(m.xp * level_diff_factor(diff) * (1.0 + rush))), "diff": diff, "challenge": challenge_of(diff), "rush": rush}
+
+
+## Endspurt: Ab der Hälfte der Etagenzeit gibt jeder Kill mehr Erfahrung,
+## bis zum Einsturz fast doppelt so viel. Das Publikum liebt die letzten
+## Stunden – und wer die Zeit nutzt, kommt unten stärker an.
+static func rush_bonus(s: Dictionary) -> float:
+	var def := Db.floor_def0(int(s.floor))
+	var dur := float(def.duration)
+	var elapsed := clampf(1.0 - float(maxi(0, int(s.collapseAt) - int(s.turn))) / dur, 0.0, 1.0)
+	return maxf(0.0, (elapsed - 0.5) * 2.0)
 
 
 static func level_gap_hit(attacker_level: int, defender_level: int) -> float:

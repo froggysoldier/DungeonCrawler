@@ -80,7 +80,7 @@ static func create_box(s: Dictionary, type: String, tier: String) -> Dictionary:
 		"name": "%s %s" % [Db.world("BOX_TIER_NAMES")[tier], Db.world("BOX_TYPE_NAMES")[type]],
 		"kind": "box",
 		"rarity": _tier_to_rarity(tier),
-		"box": {"type": type, "tier": tier},
+		"box": {"type": type, "tier": tier, "floor": int(s.floor)},
 		"flavor": "Kann nur in einem Safe Room geöffnet werden.",
 		"wert": 0,
 	}
@@ -148,19 +148,32 @@ static func _roll_unique(s: Dictionary, max_rarity: String) -> Variant:
 	return create_item(s, R.pick(s, pool).id)
 
 
+## Seltenheit höchstens bis zur Obergrenze der Etage (world.json
+## FLOORS[].rarityCap), Boss-Boxen eine Stufe darüber. So wächst die
+## Ausrüstung mit dem Abstieg statt schon auf Etage 1 legendär zu sein.
+static func cap_rarity(s: Dictionary, rarity: String, boss: bool = false, floor: int = -1) -> String:
+	var cap = Db.floor_def0(int(s.floor) if floor < 0 else floor).get("rarityCap")
+	if cap == null:
+		return rarity
+	var order: Array = Db.t("items", "RARITY_ORDER")
+	var max_idx := mini(order.size() - 1, order.find(cap) + (1 if boss else 0))
+	return order[mini(order.find(rarity), max_idx)]
+
+
 ## Öffnet eine Box und erzeugt ihren Inhalt.
-static func roll_box_contents(s: Dictionary, type: String, tier: String) -> Array:
+## floor: Etage, auf der die Box verdient wurde (für die Seltenheitsgrenze).
+static func roll_box_contents(s: Dictionary, type: String, tier: String, floor: int = -1) -> Array:
 	var cfg: Dictionary = Db.world("BOX_CONTENTS")[tier]
 	var out := []
 	var count := R.int_(s, cfg.items[0], cfg.items[1])
-	var max_rarity: String = cfg.rarities[cfg.rarities.size() - 1][0]
+	var max_rarity: String = cap_rarity(s, cfg.rarities[cfg.rarities.size() - 1][0], type == "boss", floor)
 	for i in count:
 		if R.chance(s, cfg.uniqueChance):
 			var u = _roll_unique(s, max_rarity)
 			if u != null:
 				out.append(u)
 				continue
-		var rarity: String = R.weighted(s, cfg.rarities)
+		var rarity: String = cap_rarity(s, R.weighted(s, cfg.rarities), type == "boss", floor)
 		out.append(_roll_themed_item(s, type, rarity))
 	out.append(create_gold(s, R.int_(s, cfg.gold[0], cfg.gold[1])))
 	var tier_idx: int = Db.world("BOX_TIERS").find(tier)

@@ -491,6 +491,8 @@ static func kill_monster(s: Dictionary, m: Dictionary, t: Variant, by_pet: Varia
 			note = " (%s – der Gegner war schwächer als du)" % Progression.CHALLENGES[reward.challenge].hint
 		elif reward.diff >= 2:
 			note = " (%s – ein stärkerer Gegner)" % Progression.CHALLENGES[reward.challenge].hint
+		if reward.rush >= 0.1:
+			note += " (Endspurt +%d %%)" % J.rnd(reward.rush * 100)
 		Log.add(s, "+%d XP%s" % [xp, note], "info")
 
 	for drop in Items.roll_mob_drop(s, m.level, m.rank == "elite"):

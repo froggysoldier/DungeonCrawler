@@ -63,9 +63,11 @@ func test_gruendliche_crawler(t) -> void:
 	t.ge(_avg(all, 0), 4.0, "Etage 1 ab")
 	t.le(_avg(all, 0), 6.0, "Etage 1 bis")
 	t.ge(_avg(all, 1), 6.5, "Etage 2 ab")
-	t.le(_avg(all, 1), 9.0, "Etage 2 bis")
+	# Tiefere Etagen geben mehr Erfahrung (FLOORS[].mobScale.xp): wer gründlich
+	# ist, steigt dort schneller auf
+	t.le(_avg(all, 1), 10.5, "Etage 2 bis")
 	t.ge(_avg(all, 2), 9.5, "Etage 3 ab")
-	t.le(_avg(all, 2), 13.0, "Etage 3 bis")
+	t.le(_avg(all, 2), 14.5, "Etage 3 bis")
 
 
 func test_vorsichtige_crawler(t) -> void:
@@ -74,3 +76,18 @@ func test_vorsichtige_crawler(t) -> void:
 	t.le(_avg(all, 0), 4.5, "Etage 1 bis")
 	t.ge(_avg(all, 2), 7.0, "Etage 3 ab")
 	t.le(_avg(all, 2), 11.0, "Etage 3 bis")
+
+
+func test_endspurt(t) -> void:
+	var s := Game.new_game({"name": "A", "answers": {"beruf": 1}, "seed": 5, "meta": Meta.empty_meta()})
+	var dur: int = Db.floor_def0(1).duration
+	s.turn = s.floorStartTurn + int(dur * 0.3)
+	t.eq(Progression.rush_bonus(s), 0.0, "erste Hälfte ohne Bonus")
+	s.turn = s.floorStartTurn + int(dur * 0.75)
+	t.ok(absf(Progression.rush_bonus(s) - 0.5) < 0.02, "drei Viertel: +50 %")
+	var m = J.find(s.monsters, func(x): return x.rank == "normal")
+	s.player.level = m.level
+	s.turn = s.floorStartTurn
+	var early: int = Progression.kill_xp(s, m).xp
+	s.turn = s.floorStartTurn + int(dur * 0.95)
+	t.gt(Progression.kill_xp(s, m).xp, early, "kurz vor dem Einsturz mehr Erfahrung")

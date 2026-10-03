@@ -179,8 +179,9 @@ static func _make_pet(species: String, name: String) -> Dictionary:
 
 
 static func _enter_floor(s: Dictionary, floor: int, meta: Dictionary) -> void:
-	var gen := MapGen.generate_floor(s, floor, meta.ghosts)
+	# Die Etage gilt schon beim Erzeugen (Stärke der Monster hängt daran)
 	s.floor = floor
+	var gen := MapGen.generate_floor(s, floor, meta.ghosts)
 	s.map = gen.map
 	s.monsters = gen.monsters
 	s.items = gen.items
@@ -593,7 +594,8 @@ static func _tick_time(s: Dictionary, turns: int, before: int) -> void:
 static func _respawn(s: Dictionary) -> void:
 	var vis := visible_tiles(s)
 	for hood in s.map.hoods:
-		if not hood.bossAlive:
+		# Ohne Boss kommt im Viertel nur halb so oft etwas nach
+		if not hood.bossAlive and int(s.lastSpawnTurn / 30) % 2 == 1:
 			continue
 		var count: int = s.monsters.filter(func(m): return m.hood == hood.id and m.rank == "normal").size()
 		if count >= 14:
@@ -605,7 +607,7 @@ static func _respawn(s: Dictionary) -> void:
 		var p := J.pos(R.int_(s, room.x, room.x + room.w - 1), R.int_(s, room.y, room.y + room.h - 1))
 		if vis.has(MapGen.idx(s.map, p.x, p.y)) or Ai.occupied(s, p) or MapGen.tile_at(s.map, p.x, p.y) != "floor":
 			continue
-		var level := Monsters.roll_level(s)
+		var level := Monsters.respawn_level(s)
 		# Elite-Nachzügler erst, wenn der Crawler ein paar Stufen hat
 		s.monsters.append(Monsters.spawn_for_floor(s, s.floor, level, p, hood.id, R.chance(s, 0.05) and int(s.player.level) >= 3))
 
@@ -987,7 +989,7 @@ static func open_box(s: Dictionary, uid: String) -> Dictionary:
 	if box == null or box.get("box") == null:
 		return _fail("Box nicht gefunden.")
 	p.boxes = p.boxes.filter(func(b): return b.uid != uid)
-	var contents := Items.roll_box_contents(s, box.box.type, box.box.tier)
+	var contents := Items.roll_box_contents(s, box.box.type, box.box.tier, int(J.nn(box.box, "floor", s.floor)))
 	for it in contents:
 		Inventory.give_item(s, it)
 	s.counters.boxesOpened += 1

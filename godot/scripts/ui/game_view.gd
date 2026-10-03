@@ -959,6 +959,11 @@ func ask_descend() -> void:
 			def = f
 	var boxes: int = s.player.boxes.size()
 	var text := "Auf Etage %d%s hinabsteigen? Es gibt kein Zurück.%s" % [next, (" („%s“)" % def.name) if def != null else "", (" Du hast noch %d ungeöffnete Box(en) – die bleiben dir erhalten." % boxes) if boxes else ""]
+	# Wer früh geht, kommt unten schwächer an: Hinweis ab mehr als 30 % Restzeit
+	var dur := float(Db.floor_def0(s.floor).duration)
+	var rest := float(Game.time_left(s))
+	if def != null and rest > dur * 0.3:
+		text += "\n\nNoch %s bis zum Einsturz. Unten ist alles deutlich stärker – wer hier die Zeit nutzt, steigt weiter auf und kommt besser vorbereitet an." % ViewHelpers.format_time(int(rest))
 	var ok = await modals().confirm("Treppenhaus", text, "Hinabsteigen").closed
 	if ok:
 		act(func(): return Game.descend(s, meta))
@@ -990,6 +995,9 @@ func refresh_top() -> void:
 	show.mouse_filter = Control.MOUSE_FILTER_PASS
 	_pill_bb("Etage [b]%d[/b] · %s" % [s.floor, Kit.esc(def.name if def else "")])
 	_pill("Einsturz in %s" % ViewHelpers.format_time(left), "text" if left > 120 else "danger", "PillWarn" if left <= 120 else "PillTimer", 700, "Zeit bis zum Einsturz der Etage")
+	var rush := Progression.rush_bonus(s)
+	if rush >= 0.1:
+		_pill("Endspurt +%d %% XP" % J.rnd(rush * 100), "accent", "PillTimer", 700, "Je näher der Einsturz, desto mehr Erfahrung pro Kill")
 	var ev = ShowEvents.active_def(s)
 	if ev != null:
 		_pill("Einlage: " + ShowEvents.label(s), "achv", "PillTimer", 700, ev.text)

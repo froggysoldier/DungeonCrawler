@@ -11,8 +11,15 @@ static func _mid(s: Dictionary) -> String:
 static func spawn_monster(s: Dictionary, def: Dictionary, level: int, pos: Dictionary, hood: int, elite: bool = false) -> Dictionary:
 	var lv := level + (1 if elite else 0)
 	var extra: int = lv - def.levels[0]
-	var hp_mul := 1.8 if elite else 1.0
-	var dmg_mul := 1.3 if elite else 1.0
+	# Jede Etage hat einen eigenen Stärkefaktor für normale Monster (world.json
+	# FLOORS[].mobScale): tiefer unten mehr HP, mehr Schaden, mehr Erfahrung
+	var sc: Dictionary = J.nn(Db.floor_def0(int(s.floor)), "mobScale", {})
+	# Elite-Aufschlag: auf Etage 1 voll, tiefer unten kleiner (der Etagenfaktor
+	# macht ohnehin schon alles stärker)
+	var scaled: bool = sc.has("hp")
+	var hp_mul: float = ((1.4 if scaled else 1.8) if elite else 1.0) * float(sc.get("hp", 1.0))
+	var dmg_mul: float = ((1.15 if scaled else 1.3) if elite else 1.0) * float(sc.get("dmg", 1.0))
+	var xp_mul: float = float(sc.get("xp", 1.0))
 	var max_hp := J.rnd((def.hp + def.hpPerLevel * extra) * hp_mul)
 	return Items.compact({
 		"uid": _mid(s),
@@ -33,7 +40,7 @@ static func spawn_monster(s: Dictionary, def: Dictionary, level: int, pos: Dicti
 		"size": def.size,
 		"behavior": def.behavior,
 		"range": def.get("range"),
-		"xp": J.rnd((def.xp + extra * 4) * (2.5 if elite else 1.0)),
+		"xp": J.rnd((def.xp + extra * 4) * (2.5 if elite else 1.0) * xp_mul),
 		"pos": J.pcopy(pos),
 		"hood": hood,
 		"rank": "elite" if elite else "normal",
@@ -48,7 +55,10 @@ static func spawn_boss(s: Dictionary, def: Dictionary, pos: Dictionary, hood: in
 	# Bosse, die tiefer als auf ihrer ersten Etage auftauchen, werden stärker.
 	var level_bonus: int = maxi(0, floor - int(def.floors.min())) * 2
 	var scale := 1 + level_bonus * 0.25
-	var max_hp := J.rnd(def.hp * scale)
+	# Etagenfaktor für Bosse (world.json FLOORS[].bossScale)
+	var bs: Dictionary = J.nn(Db.floor_def0(floor), "bossScale", {})
+	var max_hp := J.rnd(def.hp * scale * float(bs.get("hp", 1.0)))
+	var dmul: float = scale * float(bs.get("dmg", 1.0))
 	return Items.compact({
 		"uid": _mid(s),
 		"defId": def.id,
@@ -58,14 +68,14 @@ static func spawn_boss(s: Dictionary, def: Dictionary, pos: Dictionary, hood: in
 		"level": def.level + level_bonus,
 		"hp": max_hp,
 		"maxHp": max_hp,
-		"dmg": [J.rnd(def.dmg[0] * scale), J.rnd(def.dmg[1] * scale)],
+		"dmg": [J.rnd(def.dmg[0] * dmul), J.rnd(def.dmg[1] * dmul)],
 		"treffer": def.treffer,
 		"ruestung": def.ruestung,
 		"ausweichen": def.ausweichen,
 		"size": def.size,
 		"behavior": "ranged" if def.get("range") else "boss",
 		"range": def.get("range"),
-		"xp": J.rnd(def.xp * scale),
+		"xp": J.rnd(def.xp * scale * float(bs.get("xp", 1.0))),
 		"pos": J.pcopy(pos),
 		"hood": hood,
 		"rank": def.rank,
@@ -127,6 +137,21 @@ static func roll_level(s: Dictionary) -> int:
 	var lv: Array = Db.floor_def0(s.floor).mobLevel
 	var hi: int = clampi(int(s.player.level) + 2, int(lv[0]), int(lv[1]))
 	return R.int_(s, int(lv[0]), hi)
+
+
+## Stufe für Nachspawns: je näher der Einsturz, desto stärker. Zu Beginn der
+## Etage untere Hälfte des Bereichs, gegen Ende bis zur Obergrenze – aber nie
+## mehr als eine Stufe über dem Crawler. Wer die Zeit nutzt, findet so bis
+## zuletzt Gegner, an denen er wächst.
+static func respawn_level(s: Dictionary) -> int:
+	var lv: Array = Db.floor_def0(s.floor).mobLevel
+	var lo0: int = int(lv[0])
+	var span: int = int(lv[1]) - lo0
+	var dur := float(Db.floor_def0(s.floor).duration)
+	var elapsed := clampf(1.0 - float(Game.time_left(s)) / dur, 0.0, 1.0)
+	var hi: int = mini(lo0 + J.rnd(span * (0.4 + 0.6 * elapsed)), int(s.player.level) + 1)
+	var lo: int = mini(lo0 + floori(span * elapsed * 0.5), hi)
+	return R.int_(s, maxi(lo0, lo), maxi(lo0, hi))
 
 
 static func clamp_level(def: Dictionary, level: int) -> int:

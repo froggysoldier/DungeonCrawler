@@ -34,6 +34,8 @@ func _initialize() -> void:
 			"cause": s.get("deathCause") if s.get("deathCause") != null else "",
 		}
 		results.append(r)
+		if OS.get_environment("ARRIVALS") != "":
+			print("   Ankunft: %s" % " | ".join(J.arr(s, "_arrivals")))
 		if OS.get_environment("BOXES") != "":
 			_box_report(s)
 		print("%-5d %-13s %-4d %-6d %-6d %-15s %-9d %-4d %-6d %s" % [
@@ -306,6 +308,19 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 			floor_no = s.floor
 			phase = "clear"
 			s.pendingDialogs = []
+			# Ankunft auf der neuen Etage festhalten (Stufe, HP, Rüstung)
+			if s.get("_arrivals") == null:
+				s._arrivals = []
+			var ab := Player.total_bonuses(s)
+			s._arrivals.append("E%d: Lv %d, HP %d, Rüstung %s" % [s.floor, p.level, Player.max_hp(s, ab), J.s(J.num(ab, "ruestung"))])
+			# SNAPDIR=pfad: Crawler bei Ankunft speichern (für tools/calib_sim.gd)
+			if OS.get_environment("SNAPDIR") != "":
+				var tag := OS.get_environment("LEAVE") if OS.get_environment("LEAVE") != "" else "auto"
+				var f := FileAccess.open("%s/snap_%s_%d_E%d.json" % [OS.get_environment("SNAPDIR"), tag, s.seed, s.floor], FileAccess.WRITE)
+				f.store_string(JSON.stringify({"player": s.player, "unlocks": s.unlocks, "floor": s.floor, "leave": tag, "seed": s.seed}))
+				f.close()
+		if OS.get_environment("STOPAT") != "" and s.floor >= int(OS.get_environment("STOPAT")):
+			break
 		if s.pendingSelection:
 			Classes.choose(s, "mensch", Classes.class_options(s)[0].klass.id)
 			continue
@@ -352,14 +367,23 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 					continue
 			# Normale Mobs in der Nähe jagen, ab Stufe 5 auch Nachbarschaftsbosse
 			var targets: Array = s.monsters.filter(func(m):
+				# Bosse nur, wenn mindestens gleich stark und kaum verletzt
 				if m.rank == "nachbarschaftsboss":
-					return p.level >= 5 and m.level <= p.level + 3
+					return p.level >= 5 and m.level <= p.level and p.hp >= Player.max_hp(s) * 0.8
 				if m.rank == "elite":
 					return m.level <= p.level - 1
 				return m.rank == "normal" and m.level <= p.level + 1)
 			J.sort(targets, func(a, b): return J.cheb(a.pos, p.pos) - J.cheb(b.pos, p.pos))
-			if targets.is_empty() or Game.time_left(s) < 700:
+			# LEAVE=0.7: erst gehen, wenn 70 % der Etagenzeit vorbei sind
+			# (ohne LEAVE: wenn nichts mehr zu tun ist oder die Zeit knapp wird)
+			var leave := float(OS.get_environment("LEAVE")) if OS.get_environment("LEAVE") != "" else 0.0
+			var used := 1.0 - float(Game.time_left(s)) / float(Db.floor_def0(s.floor).duration)
+			var go: bool = (used >= leave or Game.time_left(s) < 150) if leave > 0 else (targets.is_empty() or Game.time_left(s) < 700)
+			if go:
 				phase = "stairs"
+				continue
+			if targets.is_empty():
+				_wait(s, "keine_ziele")
 				continue
 			# Das nächste erreichbare Ziel (Monster in verschlossenen Kammern übergehen)
 			var moved := false

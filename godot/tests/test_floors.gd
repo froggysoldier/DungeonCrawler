@@ -92,3 +92,48 @@ func test_alte_spielstaende(t) -> void:
 	var m := Meta.migrate(s)
 	t.eq(m.viewers.follower, 0, "Follower ergänzt")
 	t.eq(m.pendingSelection, false, "Wahl ergänzt")
+
+
+func test_etagenfaktor_fuer_monster(t) -> void:
+	var s := TH.make(4401, {"beruf": 1})
+	var def = Db.monster("kellerratte")
+	s.floor = 1
+	var a := Monsters.spawn_monster(s, def, 2, {"x": 1, "y": 1}, 0)
+	s.floor = 2
+	var b := Monsters.spawn_monster(s, def, 2, {"x": 1, "y": 1}, 0)
+	t.gt(b.maxHp, a.maxHp * 3, "Etage 2: deutlich mehr HP")
+	t.gt(b.dmg[1], a.dmg[1] * 2, "Etage 2: deutlich mehr Schaden")
+	t.gt(b.xp, a.xp, "Etage 2: mehr Erfahrung")
+
+
+func test_seltenheit_waechst_mit_der_etage(t) -> void:
+	var s := TH.make(4402, {"beruf": 1})
+	s.floor = 1
+	t.eq(Items.cap_rarity(s, "legendaer"), "selten", "Etage 1: höchstens selten")
+	t.eq(Items.cap_rarity(s, "legendaer", true), "episch", "Boss-Box eine Stufe mehr")
+	t.eq(Items.cap_rarity(s, "gewoehnlich"), "gewoehnlich", "darunter unverändert")
+	# Eine Box von Etage 1 bleibt begrenzt, auch wenn man sie erst auf Etage 3 öffnet
+	var box := Items.create_box(s, "abenteurer", "himmlisch")
+	t.eq(int(box.box.floor), 1, "Box merkt sich die Etage")
+	s.floor = 3
+	var order: Array = Db.t("items", "RARITY_ORDER")
+	for i in 20:
+		for it in Items.roll_box_contents(s, "abenteurer", "himmlisch", int(box.box.floor)):
+			if it.get("slot") != null:
+				t.le(order.find(it.rarity), order.find("selten"), "Inhalt höchstens selten (%s)" % it.rarity)
+
+
+func test_nachschub_waechst_mit_der_zeit(t) -> void:
+	var s := TH.make(4403, {"beruf": 1})
+	s.player.level = 5
+	var dur: int = Db.floor_def0(1).duration
+	var early := 0
+	var late := 0
+	for i in 200:
+		s.turn = s.floorStartTurn + 10
+		early = maxi(early, Monsters.respawn_level(s))
+		s.turn = s.floorStartTurn + int(dur * 0.95)
+		var lv := Monsters.respawn_level(s)
+		late = maxi(late, lv)
+		t.le(lv, s.player.level + 1, "nie mehr als eine Stufe über dem Crawler")
+	t.gt(late, early, "kurz vor dem Einsturz stärkerer Nachschub")

@@ -598,6 +598,47 @@ Dazu: Achievement-Familien „Einlagen“ (1/5/12) und „Kopfgelder“ (1/3/8),
 - **Aktionsleiste außerhalb des Kampfes:** eine Zeile mit dem gewählten Angriff, Fähigkeit, Warten, Aufheben, Reittier und Zaubern. Körperteil und Ausführung wählt man im Kampf (oder mit 1–7, Q–R).
 - **Log:** Filter Alles, Kampf, Beute und Erfolge, Gespräche; gleiche Zeilen hintereinander werden zusammengefasst („(9×)“).
 
+### 3.31 Zeit nutzen: Schwierigkeit der nächsten Etage
+Jede Etage ist so ausgelegt, dass man sie gut schafft, wenn man die vorige
+Etage weitgehend ausgenutzt hat – und nicht, wenn man zu früh hinuntergeht.
+
+- **Stärkefaktor je Etage** (`world.json` FLOORS[].mobScale, bossScale):
+  | Etage | normale Monster (HP / Schaden / XP) | Bosse (HP / Schaden / XP) | höchste Box-Seltenheit |
+  |---|---|---|---|
+  | 1 | 1 / 1 / 1 | 1 / 1 / 1 | selten |
+  | 2 | 4,5 / 4 / 3 | 2,6 / 2,6 / 2,5 | episch |
+  | 3 | 5 / 4,5 / 3,5 | 5 / 5 / 4 | legendär |
+  Elite-Gegner bekommen auf Etage 2 und 3 nur einen kleineren Aufschlag
+  (1,4-fache HP, 1,15-facher Schaden) zusätzlich zum Etagenfaktor.
+- **Beute wächst mit dem Abstieg:** Box-Inhalte sind auf die Seltenheit der
+  Etage begrenzt, auf der die Box verdient wurde (Boss-Boxen eine Stufe
+  mehr). Auf Etage 1 gibt es also keine legendären Waffen.
+- **Endspurt:** Ab der Hälfte der Etagenzeit gibt jeder Kill mehr Erfahrung,
+  bis zum Einsturz fast doppelt so viel (bei 75 % +50 %, bei 95 % +90 %).
+  Oben in der Kopfzeile steht „Endspurt +x % XP“, im Log hinter der
+  Erfahrung. Wer bleibt, steigt so spürbar weiter auf.
+- **Der Dungeon bleibt in Bewegung:** Nachschub kommt auch in Vierteln ohne
+  Boss (halb so oft), und je näher der Einsturz, desto höher die Stufe der
+  Nachzügler (gegen Ende bis zur Obergrenze der Etage, höchstens eine Stufe
+  über dem Crawler). Wer bleibt und kämpft, steigt weiter auf.
+- **Eichung** (Werkzeug `tools/calib_sim.gd` mit Schnappschüssen des Bots bei
+  der Ankunft): verlorene HP pro Kampf gegen normale Gegner der neuen Etage,
+  ohne Tränke, am Etagenanfang und in der Mitte:
+  | genutzte Zeit der vorigen Etage | Etage 2 | Etage 3 |
+  |---|---|---|
+  | 95 % | 7 % / 10 % | 6 % / 12 % |
+  | 70 % | 9 % / 13 % | 12 % / 22 % |
+  | 50 % | 14 % / 21 % | (zu wenige Messungen) |
+  Ein Dreierpack oder eine Kette von Kämpfen ist damit gut vorbereitet
+  machbar und zu früh hinabgestiegen gefährlich; Fähigkeiten der Gegner
+  (Gift, Brand, Fernkampf, Rudel) machen es zusätzlich fordernd.
+  Nachbarschaftsbosse gewinnt ein gut vorbereiteter Crawler in etwa 55 bis
+  95 % der Fälle, wer nach der halben Zeit kommt, in etwa der Hälfte.
+  Die Messung stammt aus Schnappschüssen vor Einführung des Endspurts; wer
+  die Zeit nutzt, kommt inzwischen noch etwas stärker an.
+- Wer die Treppe nimmt, solange noch mehr als 30 % der Etagenzeit übrig sind,
+  bekommt im Treppendialog einen Hinweis.
+
 ## 4. Tod & Hardcore (alle vier Konzepte)
 
 1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben
