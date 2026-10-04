@@ -175,7 +175,12 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
     Untote mit fahler Haut.
   - Kobolde, Gnome, Trolle, Fischmenschen: die Goblins des Packs (Fackel,
     Dynamit) mit abgewandelter Hautfarbe; Mimiks sind der Fass-Goblin.
-  - Skelett: der Schädel, Wolpertinger: das Schaf.
+  - Wolpertinger: das Schaf.
+  - Aus dem Tiny RPG Character Pack (`asset-pack/Assets/Tiny RPG …`, doppelt
+    vergrößert, Namen `rpg_…`): Schleime (umgefärbt), Fledermaus, Skelette
+    (Kellermeister, Schleusenwärter), Ork und Elite-Ork (Troll-Lehrling,
+    Schwarzmarkt-Oger), Werbär (Brückentroll), Werwolf (Hunde), Totenbeschwörer
+    (Nachtmahr).
 - Übrige Kreaturen und Bosse (Tiere, Schleime, Maschinen …) gibt es im Pack
   nicht. Sie sind aus Formen gebaut (`tools/ts_figures.gd`) und werden von
   `TsRender` wie die Pack-Figuren schattiert: dicker Nachtblau-Umriss, feine

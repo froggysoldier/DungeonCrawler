@@ -243,8 +243,7 @@ const UNITS := {
 	"kobold": ["U:Factions/Goblins/Troops/Torch/Red/Torch_Red.png", 192, [0, 7], [1, 6], true],
 	"kobold_tnt": ["U:Factions/Goblins/Troops/TNT/Red/TNT_Red.png", 192, [0, 6], [1, 6], true],
 	"fass": ["U:Factions/Goblins/Troops/Barrel/Red/Barrel_Red.png", 128, [0, 1], null, true],
-	# Schädel und Schaf
-	"schaedel": ["U:Factions/Knights/Troops/Dead/Dead.png", 128, [0, 1, 3], null, false],
+	# Schaf
 	"schaf": ["U:Resources/Sheep/HappySheep_Idle.png|U:Resources/Sheep/HappySheep_Bouncing.png", 128, [0, 8], [0, 6], false],
 }
 
@@ -255,13 +254,10 @@ const SKINS := {
 	"fischmensch": ["kobold", ["2f5a7a", "3e8fb8", "8cc8e0"]],
 	"wechselbalg": ["kobold", ["5a3f78", "8a62b0", "c09ee0"]],
 	"gnom": ["kobold", ["8a5a4a", "d89a7a", "f0c8a8"]],
-	"troll": ["kobold_tnt", ["3f5a48", "6a8a5a", "9ab888"]],
-	"oger": ["kobold_tnt", ["5a4a3a", "8a7050", "b89a70"]],
 }
 const HUMAN_SKIN := ["c8a876", "efe1ab"]
 const UNDEAD := {
 	"zombie": ["mensch", ["8aa878", "b8d0a0"]],
-	"zombie_axt": ["mensch_axt", ["8aa878", "b8d0a0"]],
 }
 
 
@@ -337,9 +333,69 @@ func _units() -> void:
 	for name in SKINS:
 		var base: Array = made_frames[SKINS[name][0]]
 		_save_unit(name, base[0].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])), base[1].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])))
+	_rpg_units()
 	for name in UNDEAD:
 		var base: Array = made_frames[UNDEAD[name][0]]
 		_save_unit(name, base[0].map(func(i): return _recolor_skin(i, HUMAN_SKIN, UNDEAD[name][1])), base[1].map(func(i): return _recolor_skin(i, HUMAN_SKIN, UNDEAD[name][1])))
+
+
+# ---------------------------------------------------------------- Tiny RPG Character Pack
+
+const RPG := "asset-pack/Assets/Tiny RPG Character Asset Pack 01 v2.0 -Full 22 Characters/Tiny RPG Character Asset Pack 01 v2.0 -Full 22 Characters/Characters(100x100 split)/"
+## Figuren aus dem Tiny RPG Character Pack (100er Felder, doppelt vergrößert):
+## Name -> [Figur, Ruhe-Animation, Lauf-Animation oder "", tönbar (Schleim)].
+const RPG_UNITS := {
+	"rpg_schleim": ["Slime", "Idle", "Walk", true],
+	"rpg_fledermaus": ["Bat", "Flying", "", false, 22],
+	"rpg_skelett_schwert": ["Greatsword Skeleton", "Idle", "Walk", false],
+	"rpg_skelett_ruestung": ["Armored Skeleton", "Idle", "Walk", false],
+	"rpg_ork": ["Orc", "Idle", "Walk", false],
+	"rpg_ork_elite": ["Elite Orc", "Idle", "Walk", false],
+	"rpg_werbaer": ["Werebear", "Idle", "Walk", false],
+	"rpg_werwolf": ["Werewolf", "Idle", "Walk", false],
+	"rpg_nekromant": ["Necromancer", "Idle", "Walk", false],
+}
+
+
+func _rpg_frames(who: String, anim: String, tint: bool) -> Array:
+	var img := _load(RPG + "%s/%s/%s_%s.png" % [who, who, who, anim])
+	var out: Array = []
+	for i in img.get_width() / 100:
+		var fr := img.get_region(Rect2i(i * 100, 0, 100, 100))
+		for y in 100:
+			for x in 100:
+				var c := fr.get_pixel(x, y)
+				if c.a < 0.99:
+					fr.set_pixel(x, y, Color(0, 0, 0, 0))
+				elif tint and c.s > 0.3 and c.h > 0.15 and c.h < 0.45:
+					# Grün des Schleims -> Magenta-Stufen nach Helligkeit
+					var k := clampi(int(c.v * 5.0), 0, 4)
+					fr.set_pixel(x, y, Color(PixelArt.TINT_KEYS[k]))
+		var used := fr.get_used_rect()
+		if used.size.x == 0:
+			continue
+		var big := fr.duplicate() as Image
+		big.resize(200, 200, Image.INTERPOLATE_NEAREST)
+		out.append(big)
+	return out
+
+
+func _rpg_units() -> void:
+	for name in RPG_UNITS:
+		var u: Array = RPG_UNITS[name]
+		var idle := _rpg_frames(u[0], u[1], u[3])
+		var runs := _rpg_frames(u[0], u[2], u[3]) if u[2] != "" else []
+		# Fliegende schweben über dem Boden (fünfter Eintrag: Höhe in Bildpixeln)
+		var bottom := _bottom(idle[0]) + (int(u[4]) if u.size() > 4 else 0)
+		_save_unit(name, idle.map(func(f): return _place_big(f, bottom)), runs.map(func(f): return _place_big(f, bottom)))
+
+
+## Großes Feld (200) mittig auf die Bildfläche, Füße auf UNIT_FOOT.
+func _place_big(fr: Image, bottom: int) -> Image:
+	var out := Image.create(UNIT_SIZE, UNIT_SIZE, false, Image.FORMAT_RGBA8)
+	var src := Rect2i((fr.get_width() - UNIT_SIZE) / 2, bottom - UNIT_FOOT, UNIT_SIZE, UNIT_SIZE)
+	out.blit_rect(fr, src, Vector2i.ZERO)
+	return out
 
 
 func _save_unit(name: String, frames: Array, runs: Array) -> void:
