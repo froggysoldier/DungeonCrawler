@@ -296,6 +296,48 @@ func _place(fr: Image, bottom: int, canvas: int = UNIT_SIZE) -> Image:
 	return out
 
 
+## Messer und Schwung aus einem Bild des Arbeiters entfernen: ihre Farben
+## kommen an der Figur sonst nicht vor (Weiß schon: die Zähne). Danach fällt
+## der Umriss des Messers weg: Umriss in der Nähe entfernter Pixel, der nicht
+## höchstens zwei Pixel neben der Figur liegt (der Umriss des Packs ist zwei
+## Pixel dick).
+const KNIFE := ["daf3ee", "a0b3b6", "69777f"]
+const OUTLINE_NAVY := "161c2e"
+
+
+func _without_knife(img: Image) -> Image:
+	var out := img.duplicate() as Image
+	var w := out.get_width()
+	var h := out.get_height()
+	var removed := {}
+	for y in h:
+		for x in w:
+			if out.get_pixel(x, y).a > 0 and out.get_pixel(x, y).to_html(false) in KNIFE:
+				out.set_pixel(x, y, Color(0, 0, 0, 0))
+				removed[Vector2i(x, y)] = true
+	var near := func(x: int, y: int, r: int, test: Callable) -> bool:
+		for dy in range(-r, r + 1):
+			for dx in range(-r, r + 1):
+				var qx := x + dx
+				var qy := y + dy
+				if qx >= 0 and qy >= 0 and qx < w and qy < h and test.call(qx, qy):
+					return true
+		return false
+	var is_removed := func(qx: int, qy: int) -> bool: return removed.has(Vector2i(qx, qy))
+	var is_fill := func(qx: int, qy: int) -> bool:
+		var c := out.get_pixel(qx, qy)
+		return c.a > 0 and c.to_html(false) != OUTLINE_NAVY
+	var lone: Array = []
+	for y in h:
+		for x in w:
+			var c := out.get_pixel(x, y)
+			if c.a > 0 and c.to_html(false) == OUTLINE_NAVY and near.call(x, y, 3, is_removed) and not near.call(x, y, 2, is_fill):
+				lone.append(Vector2i(x, y))
+	for q in lone:
+		out.set_pixel(q.x, q.y, Color(0, 0, 0, 0))
+	return out
+
+
 func _recolor_skin(img: Image, from: Array, to: Array) -> Image:
 	var out := img.duplicate()
 	for y in img.get_height():
@@ -335,7 +377,11 @@ func _units() -> void:
 		if atk != null:
 			var atk_sheet := idle_sheet if atk[0] == "" else _sheet(atk[0])
 			for i in atk[2]:
-				hits.append(_place(_cell(atk_sheet, size, atk[1], i, tint), bottom, ATTACK_SIZE))
+				var hit := _cell(atk_sheet, size, atk[1], i, tint)
+				# Die Spielfigur schlägt mit dem, was sie trägt (GearLook), nicht mit dem Messer des Packs
+				if name == "spieler_pawn":
+					hit = _without_knife(hit)
+				hits.append(_place(hit, bottom, ATTACK_SIZE))
 		made_frames[name] = [frames, runs, hits]
 		_save_unit(name, frames, runs, hits)
 	for name in SKINS:

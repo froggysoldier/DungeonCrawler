@@ -189,8 +189,10 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
     (`fx/zauber_flug`, acht Bilder, in Flugrichtung gedreht) ist das Geschoss
     aller magischen Angriffe, `fx/zauber_treffer` der Aufschlag.
 - Angriffe: Jede Pack-Figur hat Angriffsbilder (`Name_angriff1 …`): Schlag,
-  Wurf, Schuss, Zauber; die Spielfigur sticht mit dem Messer, ihre
-  Ausrüstung sitzt auch dabei (Anker je Bild). Angriffsbilder liegen auf
+  Wurf, Schuss, Zauber. Die Spielfigur schlägt mit dem Arbeiter-Angriff des
+  Packs, aus dem das Messer entfernt ist (`_without_knife`): sie kämpft mit
+  dem, was sie trägt. Die Ausrüstung sitzt auch dabei (Anker je Bild, die
+  Hand ist im Angriff die äußerste Hautstelle). Angriffsbilder liegen auf
   einer größeren Fläche (192 statt 128, Tiny RPG 256 statt 192), die Füße
   gleich weit über dem unteren Rand; `map_view._figure` gleicht das aus. Der
   Animator merkt sich Beginn und Richtung jedes Angriffs (`attack_frame`,

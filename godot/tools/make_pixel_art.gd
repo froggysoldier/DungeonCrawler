@@ -135,11 +135,22 @@ static func _anchors(img: Image) -> Dictionary:
 	# Größere Bildflächen (Angriffe): Mitte und Füße liegen um d verschoben
 	var d := Vector2((img.get_width() - 128) / 2, img.get_height() - 128)
 	var body: Array = mean.call(shirt, Vector2(64, 110) + d)
+	var right: Array = hands.filter(func(q): return q.x >= 60 + d.x)
+	var left: Array = hands.filter(func(q): return q.x < 60 + d.x)
+	if d.x > 0:
+		# Angriff: die Hand ist die äußerste Hautstelle (nicht die Wange)
+		var far := func(pts: Array, sign: float) -> Array:
+			var edge := -INF
+			for q in pts:
+				edge = maxf(edge, q.x * sign)
+			return pts.filter(func(q): return q.x * sign >= edge - 8)
+		right = far.call(right, 1.0)
+		left = far.call(left, -1.0)
 	return {
 		"kopf": mean.call(face, Vector2(75, 98) + d),
 		"koerper": body,
-		"lh": mean.call(hands.filter(func(q): return q.x < 60 + d.x), Vector2(46, 110) + d),
-		"rh": mean.call(hands.filter(func(q): return q.x >= 60 + d.x), Vector2(82, 107) + d),
+		"lh": mean.call(left, Vector2(46, 110) + d),
+		"rh": mean.call(right, Vector2(82, 107) + d),
 		"lf": mean.call(feet.filter(func(q): return q.x < 64 + d.x), Vector2(58, 119) + d),
 		"rf": mean.call(feet.filter(func(q): return q.x >= 64 + d.x), Vector2(70, 118) + d),
 	}

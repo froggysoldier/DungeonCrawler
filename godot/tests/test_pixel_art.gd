@@ -274,6 +274,18 @@ func test_angriffsbilder(t) -> void:
 	var hero := Sprites.hero_name(p)
 	t.eq(PixelArt.attack_count(hero), PixelArt.attack_count(GearLook.BASE), "Held greift mit Helm an")
 	t.ok(PixelArt.image(hero + "_angriff1").get_data() != PixelArt.image(GearLook.BASE + "_angriff1").get_data(), "Helm auch im Angriff")
+	# Kein Messer aus dem Pack: dessen Klingenfarben kommen nicht vor
+	for i in range(1, PixelArt.attack_count(GearLook.BASE) + 1):
+		var img := PixelArt.image("%s_angriff%d" % [GearLook.BASE, i])
+		var blade := 0
+		for y in img.get_height():
+			for x in img.get_width():
+				if img.get_pixel(x, y).a > 0 and img.get_pixel(x, y).to_html(false) in ["daf3ee", "a0b3b6", "69777f"]:
+					blade += 1
+		t.eq(blade, 0, "Angriffsbild %d ohne Messer" % i)
+	# Die Waffe geht mit der Hand
+	var a := GearLook.anchors()
+	t.ok(a[GearLook.BASE + "_angriff1"].rh != a[GearLook.BASE + "_angriff2"].rh, "Hand bewegt sich im Angriff")
 
 
 ## Unterste Zeile mit Pixeln.
