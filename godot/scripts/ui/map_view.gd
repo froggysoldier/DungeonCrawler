@@ -1095,6 +1095,7 @@ const FX := {
 	"staub": {"tex": "dust_01", "size": 64, "frames": 8, "scale": 1.0},
 	"explosion": {"tex": "explosion_01", "size": 192, "frames": 8, "scale": 1.0},
 	"feuer": {"tex": "fire_01", "size": 64, "frames": 8, "scale": 1.0},
+	"zauber": {"tex": "zauber_treffer", "size": 32, "frames": 4, "scale": 2.0},
 }
 static var _fx_tex := {}
 
@@ -1181,7 +1182,7 @@ func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
 
 # ================================================================ Oben
 
-const PROJECTILE_COLORS := {"stein": "#c8c0b0", "pfeil": "#e0d0a0", "magie": "#c080ff", "feuer": "#ff8a2a", "schleim": "#8ce04a", "bombe": "#555555", "blitz": "#9fdcff"}
+const PROJECTILE_COLORS := {"stein": "#c8c0b0", "pfeil": "#e0d0a0", "magie": "#4fb8ff", "feuer": "#ff8a2a", "schleim": "#8ce04a", "bombe": "#555555", "blitz": "#9fdcff"}
 
 
 ## Geschosse, Zahlen, Maus, Auswahl.
@@ -1236,6 +1237,17 @@ func _draw_projectile(ci: CanvasItem, pr: Dictionary) -> void:
 			var q := Vector2(roundf(d.x * i), roundf(d.y * i))
 			var c := Color("#e8e8e8") if i >= 7 else (Color("#c05040") if i <= -7 else color)
 			ci.draw_rect(Rect2(cx + q.x * px, cy + q.y * px, px * 2, px * 2), c)
+		return
+	if style == "magie":
+		# Zauberkugel des Royal Mage: acht Bilder, in Flugrichtung gedreht
+		if not _fx_tex.has("zauber_flug"):
+			_fx_tex["zauber_flug"] = load("res://assets/tinyswords/fx/zauber_flug.png")
+		var tex: Texture2D = _fx_tex["zauber_flug"]
+		var n := int(frame_anim.get("time", 0.0) / 80.0) % 8
+		_glow(ci, cx, cy, color, 0.6, false)
+		ci.draw_set_transform(Vector2(cx, cy), pr.angle, Vector2.ONE)
+		ci.draw_texture_rect_region(tex, Rect2(-16 * px, -16 * px, 32 * px, 32 * px), Rect2(n * 32, 0, 32, 32))
+		ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		return
 	var name := "geschoss/" + style
 	if not PixelArt.has(name):

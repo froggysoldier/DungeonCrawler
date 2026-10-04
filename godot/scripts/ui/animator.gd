@@ -83,8 +83,9 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 				var b := Vector2(f.to.x, f.to.y)
 				var dur := maxf(120.0, a.distance_to(b) * 45)
 				_shots.append({"from": a, "to": b, "start": now + delay, "dur": dur, "style": f.style})
-				if f.style in ["bombe", "feuer"]:
-					_fx.append({"at": b, "kind": "explosion" if f.style == "bombe" else "feuer", "start": now + delay + dur, "dur": 640.0})
+				if f.style in ["bombe", "feuer", "magie"]:
+					var kind: String = {"bombe": "explosion", "feuer": "feuer", "magie": "zauber"}[f.style]
+					_fx.append({"at": b, "kind": kind, "start": now + delay + dur, "dur": 640.0 if kind != "zauber" else 360.0})
 				arrival["%d,%d" % [f.to.x, f.to.y]] = now + delay + dur
 				delay += 60
 			"strike":

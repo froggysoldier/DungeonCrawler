@@ -52,8 +52,8 @@ const BY_DEF := {
 const PACK_BOSSES := ["die_sammlerin", "der_hausmeister", "kesselkoenigin", "kammerjaeger", "pfandbaron", "hausverwalter", "parkwaechter", "schwarzmarkt_oger"]
 
 
-## Andere Crawler: Menschen aus dem Tiny RPG Pack, je Crawler fest gewählt.
-const CRAWLER_LOOKS := ["rpg_ritter", "rpg_templer", "rpg_soldat", "rpg_schwertkaempfer", "rpg_bogenschuetzin", "rpg_lanzenreiter", "rpg_priester", "mensch"]
+## Andere Crawler: Menschen aus dem Tiny RPG Pack und der Royal Mage, je Crawler fest gewählt.
+const CRAWLER_LOOKS := ["rpg_ritter", "rpg_templer", "rpg_soldat", "rpg_schwertkaempfer", "rpg_bogenschuetzin", "rpg_lanzenreiter", "rpg_priester", "magier", "mensch"]
 
 
 static func crawler_sprite(cr: Dictionary) -> String:

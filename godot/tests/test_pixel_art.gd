@@ -134,6 +134,12 @@ func test_feine_figuren(t) -> void:
 	t.ok(a.get_data() != b.get_data(), "Kapuze in der Farbe der Monsterart")
 	t.eq(Sprites.sprite_name("kobold_bombe"), "kreatur/kobold_tnt", "Bombenkobold mit Dynamit")
 	t.eq(Sprites.sprite_name("schmuggler"), "kreatur/rpg_ork_reiter", "Schmuggler reitet")
+	# Royal Mage: Crawler-Figur mit Laufbildern, Zauberkugel und Aufschlag als Streifen
+	t.ok("kreatur/magier" in Sprites.CRAWLER_LOOKS.map(func(n): return "kreatur/" + n), "Magier unter den Crawlern")
+	t.ok(PixelArt.has("kreatur/magier") and PixelArt.run_count("kreatur/magier") > 1, "Magier läuft")
+	for fx in ["zauber_flug", "zauber_treffer"]:
+		var tex := load("res://assets/tinyswords/fx/%s.png" % fx) as Texture2D
+		t.ok(tex != null and tex.get_height() == 32 and tex.get_width() % 32 == 0, "Streifen %s" % fx)
 	# Jede Gerätesorte hat ihre eigene Figur
 	var geraete := {}
 	for d in ["toaster_mimic", "waschmaschine_mimic", "parkautomat", "rohrgolem", "rostkaefer", "riesenkakerlake", "schimmelteppich", "pilzmensch"]:

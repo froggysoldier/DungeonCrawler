@@ -183,7 +183,11 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
     Werbär (Brückentroll), Werwolf (Hunde), Totenbeschwörer (Nachtmahr),
     Zauberer (Kanalhexe), Axtkämpfer (Abtrünniger Crawler), Ork-Reiter (Schmuggler-Kobold). Die anderen
     Crawler sind Ritter, Templer, Soldat, Schwertkämpfer, Bogenschützin,
-    Lanzenreiter, Priester oder Arbeiter, je Crawler fest (`Sprites.crawler_sprite`).
+    Lanzenreiter, Priester, Magier oder Arbeiter, je Crawler fest (`Sprites.crawler_sprite`).
+  - Royal Mage (`asset-pack/Assets/Royal Mage Sprite Sheet.png`, zweifach
+    vergrößert, Name `magier`): einer der anderen Crawler. Seine Zauberkugel
+    (`fx/zauber_flug`, acht Bilder, in Flugrichtung gedreht) ist das Geschoss
+    aller magischen Angriffe, `fx/zauber_treffer` der Aufschlag.
 - Übrige Kreaturen und Bosse (Tiere, Schleime, Geräte wie Toaster, Waschmaschine, Parkautomat und Rohrgolem …) gibt es im Pack
   nicht. Sie sind aus Formen gebaut (`tools/ts_figures.gd`) und werden von
   `TsRender` wie die Pack-Figuren schattiert: dicker Nachtblau-Umriss, feine

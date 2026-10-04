@@ -329,6 +329,7 @@ func _units() -> void:
 		var base: Array = made_frames[SKINS[name][0]]
 		_save_unit(name, base[0].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])), base[1].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])))
 	_rpg_units()
+	_royal_mage()
 
 
 # ---------------------------------------------------------------- Tiny RPG Character Pack
@@ -405,6 +406,42 @@ func _place_big(fr: Image, bottom: int) -> Image:
 	var src := Rect2i((fr.get_width() - RPG_SIZE) / 2, bottom - RPG_FOOT, RPG_SIZE, RPG_SIZE)
 	out.blit_rect(fr, src, Vector2i.ZERO)
 	return out
+
+
+## Royal Mage (32er Felder, Reihen: Ruhe, Laufen, Angriff, Treffer, Tod,
+## Zauber entsteht, Zauber fliegt, Zauber trifft). Zweifach vergrößert: die
+## Figur füllt ihr Feld weiter aus als die Tiny-RPG-Figuren, so sind beide
+## gleich groß.
+const MAGE := "asset-pack/Assets/Royal Mage Sprite Sheet.png"
+
+
+func _mage_row(row: int, scale: int) -> Array:
+	var img := _load(MAGE)
+	var out: Array = []
+	for i in 8:
+		var fr := img.get_region(Rect2i(i * 32, row * 32, 32, 32))
+		if fr.get_used_rect().size.x == 0:
+			continue
+		fr.resize(32 * scale, 32 * scale, Image.INTERPOLATE_NEAREST)
+		out.append(fr)
+	return out
+
+
+func _royal_mage() -> void:
+	var idle := _mage_row(0, 2)
+	var runs := _mage_row(1, 2)
+	var bottom := _bottom(idle[0])
+	_save_unit("magier", idle.map(func(f): return _place_big(f, bottom)), runs.map(func(f): return _place_big(f, bottom)))
+
+
+## Zauberkugel im Flug (Geschoss) und ihr Aufschlag (Effekt), je ein Streifen.
+func _royal_mage_fx() -> void:
+	for pair in [[6, "zauber_flug"], [7, "zauber_treffer"]]:
+		var frames := _mage_row(pair[0], 1)
+		var strip := Image.create(32 * frames.size(), 32, false, Image.FORMAT_RGBA8)
+		for i in frames.size():
+			strip.blit_rect(frames[i], Rect2i(0, 0, 32, 32), Vector2i(i * 32, 0))
+		_save(strip, "fx/" + pair[1])
 
 
 func _save_unit(name: String, frames: Array, runs: Array) -> void:
@@ -491,3 +528,4 @@ func _fx() -> void:
 	var p := FREE + "Particle FX/"
 	for n in ["Explosion_01", "Explosion_02", "Fire_01", "Fire_02", "Fire_03", "Dust_01", "Dust_02", "Water Splash"]:
 		_save(_load(p + n + ".png"), "fx/" + n.to_lower().replace(" ", "_"))
+	_royal_mage_fx()
