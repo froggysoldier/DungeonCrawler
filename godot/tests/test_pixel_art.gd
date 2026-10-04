@@ -134,6 +134,12 @@ func test_feine_figuren(t) -> void:
 	t.ok(a.get_data() != b.get_data(), "Kapuze in der Farbe der Monsterart")
 	t.eq(Sprites.sprite_name("kobold_bombe"), "kreatur/kobold_tnt", "Bombenkobold mit Dynamit")
 	t.eq(Sprites.sprite_name("schmuggler"), "kreatur/rpg_ork_reiter", "Schmuggler reitet")
+	# Jede Gerätesorte hat ihre eigene Figur
+	var geraete := {}
+	for d in ["toaster_mimic", "waschmaschine_mimic", "parkautomat", "rohrgolem", "rostkaefer", "riesenkakerlake", "schimmelteppich", "pilzmensch"]:
+		t.ok(PixelArt.has(Sprites.sprite_name(d)), "Figur für %s" % d)
+		geraete[Sprites.sprite_name(d)] = true
+	t.eq(geraete.size(), 8, "Geräte, Käfer und Schimmel unterscheidbar")
 
 
 func test_bilder_in_der_oberflaeche(t) -> void:

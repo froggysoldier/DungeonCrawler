@@ -184,7 +184,7 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
     Zauberer (Kanalhexe), Axtkämpfer (Abtrünniger Crawler), Ork-Reiter (Schmuggler-Kobold). Die anderen
     Crawler sind Ritter, Templer, Soldat, Schwertkämpfer, Bogenschützin,
     Lanzenreiter, Priester oder Arbeiter, je Crawler fest (`Sprites.crawler_sprite`).
-- Übrige Kreaturen und Bosse (Tiere, Schleime, Maschinen …) gibt es im Pack
+- Übrige Kreaturen und Bosse (Tiere, Schleime, Geräte wie Toaster, Waschmaschine, Parkautomat und Rohrgolem …) gibt es im Pack
   nicht. Sie sind aus Formen gebaut (`tools/ts_figures.gd`) und werden von
   `TsRender` wie die Pack-Figuren schattiert: dicker Nachtblau-Umriss, feine
   Linien zwischen den Teilen, schmale Lichtkante oben links, Schattenband

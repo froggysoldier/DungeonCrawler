@@ -31,7 +31,7 @@ const BY_DEF := {
 	"blaehkroete": "kroete",
 	"irrlicht": "irrlicht",
 	"abflusstentakel": "tentakel",
-	"toaster_mimic": "maschine", "waschmaschine_mimic": "maschine", "muttis_mixer": "maschine", "heizungsbestie": "maschine",
+	"toaster_mimic": "toaster", "waschmaschine_mimic": "waschmaschine", "muttis_mixer": "maschine", "heizungsbestie": "maschine",
 	"grey_drohne": "drohne",
 	"chupacabra": "rpg_werwolf", "ghulhund": "rpg_werwolf",
 	"wutelementar": "elementar",
@@ -40,11 +40,11 @@ const BY_DEF := {
 	"pilzmensch": "pilz",
 	"mottenmann": "motte", "mottenmutter": "motte",
 	"taubenschwarm": "vogel",
-	"rostkaefer": "kakerlake", "oelschleim": "rpg_schleim", "abgasgeist": "geist", "parkautomat": "maschine",
+	"rostkaefer": "kaefer", "oelschleim": "rpg_schleim", "abgasgeist": "geist", "parkautomat": "parkautomat",
 	"garagenkatze": "katze",
 	"rostkoenigin": "maschine", "oelschlick": "schleim", "abschleppwurm": "wurm",
 	"schlickkrebs": "krebs", "stromaal": "aal", "riesenegel": "egel", "gullyqualle": "qualle",
-	"rohrgolem": "maschine", "schimmelteppich": "pilz", "kloakenhund": "rpg_werwolf",
+	"rohrgolem": "rohrgolem", "schimmelteppich": "schimmel", "kloakenhund": "rpg_werwolf",
 	"faulgasblase": "irrlicht",
 }
 

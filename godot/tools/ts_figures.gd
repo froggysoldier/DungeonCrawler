@@ -13,6 +13,7 @@ const CREATURES := {
 	"fledermaus": 2, "hase": 1, "haustier": 1, "hund": 1, "irrlicht": 2,
 	"kakerlake": 1, "katze": 1, "krebs": 1, "kroete": 1, "kroko": 1, "maschine": 1, "motte": 2,
 	"qualle": 1, "raptor": 1, "sack": 1, "skelett": 1, "tentakel": 1, "vogel": 2, "wurm": 1,
+	"toaster": 2, "waschmaschine": 2, "parkautomat": 1, "rohrgolem": 1, "schimmel": 1, "kaefer": 1,
 }
 ## Bosse ohne passende Figur im Pack (die übrigen: Sprites.PACK_BOSSES).
 const BOSSES := {
@@ -952,4 +953,126 @@ static func _kommandant_schlamm(_f: int) -> Array:
 		["p", [38, 62, 48, 58, 58, 62, 56, 66, 48, 63, 40, 66], "D"],
 		["r", 58, 70, 8, 10, 2, "R"],
 		["d", 62, 74, 2, "y"],
+	]
+
+
+## Toaster mit Brotscheiben, die beim zweiten Bild herausspringen; Rauch.
+static func _toaster(f: int) -> Array:
+	var up := 6 if f == 1 else 0
+	return legs(34, 62, 80, 6, "K") + [
+		["r", 30, 38 - up, 14, 20, 4, "S"],
+		["r", 52, 40 - up, 14, 18, 4, "S"],
+		["r", 18, 48, 60, 36, 12, "T"],
+		["r", 26, 50, 44, 5, 2, "t", "f"],
+		["l", 80, 58, 86, 52, 4, "K"],
+		["eyeb", 38, 66, 6, "x"],
+		["eyeb", 58, 66, 6, "x"],
+		["dl", 40, 77, 56, 77, "k"],
+		["d", 26, 56, 3, "TL"],
+		["e", 34 + up, 26 - up, 5, 4, "g", "o"],
+		["e", 42 + up, 18 - up, 4, 3, "G", "o"],
+	]
+
+
+## Waschmaschine: Tür als Maul, im Glas dreht sich Wäsche.
+static func _waschmaschine(f: int) -> Array:
+	var spin := 3 if f == 1 else -3
+	return [
+		["r", 20, 22, 56, 66, 8, "T"],
+		["r", 24, 26, 48, 12, 3, "t", "f"],
+		["d", 30, 32, 2.5, "R"],
+		["d", 38, 32, 2.5, "Y"],
+		["eye", 52, 32],
+		["eye", 62, 32],
+		["e", 48, 62, 20, 20, "g"],
+		["e", 48, 62, 15, 15, "c", "n"],
+		["e", 48 + spin, 66 - spin, 7, 4, "R", "n"],
+		["e", 46 - spin, 58 + spin, 6, 3, "Y", "n"],
+		["p", [34, 52, 38, 57, 42, 52, 46, 57, 50, 52, 54, 57, 58, 52, 62, 57, 62, 50, 34, 50], "w", "f"],
+		["dl", 38, 55, 42, 54, "k"],
+	]
+
+
+## Parkautomat auf einem Pfahl, wütendes Gesicht im Anzeigefeld.
+static func _parkautomat(_f: int) -> Array:
+	return [
+		["r", 42, 60, 12, 28, 3, "N"],
+		["r", 28, 16, 40, 50, 9, "T"],
+		["r", 33, 22, 30, 18, 4, "k", "f"],
+		["dl", 37, 26, 44, 29, "R"],
+		["dl", 59, 26, 52, 29, "R"],
+		["d", 42, 32, 2.5, "R"],
+		["d", 54, 32, 2.5, "R"],
+		["dl", 42, 37, 54, 37, "R"],
+		["r", 44, 46, 8, 3, 1, "k", "f"],
+		["r", 36, 54, 24, 5, 2, "w"],
+		["d", 62, 48, 3, "Y"],
+		["e", 48, 87, 12, 3, "K"],
+	]
+
+
+## Golem aus Rohren: Glieder als Rohre mit Muffen, Kopf ein Absperrventil.
+static func _rohrgolem(_f: int) -> Array:
+	return [
+		["l", 40, 64, 36, 86, 9, "N"],
+		["l", 56, 64, 60, 86, 9, "N"],
+		["r", 31, 80, 10, 6, 2, "g"],
+		["r", 55, 80, 10, 6, 2, "g"],
+		["l", 30, 44, 20, 70, 8, "N"],
+		["l", 66, 44, 76, 70, 8, "N"],
+		["r", 16, 56, 10, 6, 2, "g"],
+		["r", 70, 56, 10, 6, 2, "g"],
+		["r", 30, 38, 36, 30, 6, "T"],
+		["dl", 34, 46, 62, 46, "t"],
+		["dl", 34, 56, 62, 56, "t"],
+		["d", 36, 42, 2, "TL"],
+		["d", 60, 42, 2, "TL"],
+		["l", 48, 30, 48, 38, 6, "N"],
+		["e", 48, 24, 12, 7, "R"],
+		["dl", 37, 24, 59, 24, "r"],
+		["d", 48, 24, 3, "g"],
+		["d", 41, 50, 2.5, "Y"],
+		["d", 55, 50, 2.5, "Y"],
+	]
+
+
+## Schimmelteppich: flacher Fleck mit Flaum und Sporen.
+static func _schimmel(_f: int) -> Array:
+	return [
+		["e", 48, 78, 34, 11, "T"],
+		["e", 30, 72, 12, 8, "T"],
+		["e", 64, 71, 14, 9, "T"],
+		["e", 47, 68, 12, 8, "TL"],
+		["d", 26, 70, 2, "w"],
+		["d", 40, 64, 2, "w"],
+		["d", 58, 66, 2.5, "w"],
+		["d", 70, 70, 2, "w"],
+		["d", 34, 80, 2, "t"],
+		["d", 62, 81, 2, "t"],
+		["d", 41, 77, 3, "k"],
+		["d", 55, 77, 3, "k"],
+		["d", 40, 76, 1, "w"],
+		["d", 54, 76, 1, "w"],
+		["d", 36, 52, 1.5, "TL"],
+		["d", 56, 48, 1.5, "TL"],
+		["d", 66, 56, 1.5, "TL"],
+	]
+
+
+## Käfer mit rundem Panzer, Mittelnaht und Fühlern.
+static func _kaefer(_f: int) -> Array:
+	return [
+		["l", 34, 72, 26, 88, 4, "K"],
+		["l", 48, 74, 48, 88, 4, "K"],
+		["l", 62, 72, 70, 88, 4, "K"],
+		["l", 40, 44, 32, 30, 2, "K"],
+		["l", 56, 44, 64, 30, 2, "K"],
+		["e", 48, 50, 10, 8, "K"],
+		["e", 48, 68, 24, 18, "T"],
+		["dl", 48, 52, 48, 86, "t"],
+		["d", 38, 62, 3, "TL"],
+		["d", 60, 70, 2, "t"],
+		["d", 36, 74, 2, "t"],
+		["d", 44, 48, 2, "R"],
+		["d", 52, 48, 2, "R"],
 	]
