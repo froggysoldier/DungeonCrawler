@@ -362,6 +362,7 @@ const RPG_UNITS := {
 	"rpg_bogenschuetzin": ["Archer", "Idle", "Walk", false],
 	"rpg_lanzenreiter": ["Lancer", "Idle", "Walk01", false],
 	"rpg_axtkaempfer": ["Armored Axeman", "Idle", "Walk", false],
+	"rpg_ork_reiter": ["Orc rider", "Idle", "Walk", false],
 }
 
 

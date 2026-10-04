@@ -133,6 +133,7 @@ func test_feine_figuren(t) -> void:
 	var b := PixelArt.texture("kreatur/kobold", "#3030c0").get_image()
 	t.ok(a.get_data() != b.get_data(), "Kapuze in der Farbe der Monsterart")
 	t.eq(Sprites.sprite_name("kobold_bombe"), "kreatur/kobold_tnt", "Bombenkobold mit Dynamit")
+	t.eq(Sprites.sprite_name("schmuggler"), "kreatur/rpg_ork_reiter", "Schmuggler reitet")
 
 
 func test_bilder_in_der_oberflaeche(t) -> void:

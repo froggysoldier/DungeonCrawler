@@ -7,8 +7,8 @@ extends RefCounted
 const BY_DEF := {
 	"kellerratte": "ratte", "rattenmensch": "ratte", "rattenschamane": "ratte", "knochenratte": "ratte", "koenig_kanalratte": "ratte", "rattenkaiser": "ratte",
 	"riesenkakerlake": "kakerlake",
-	# Goblins aus dem Pack: Fackel, Dynamit, Fass; abgewandelte Haut
-	"kobold": "kobold", "kobold_schleuder": "kobold", "elster_goblin": "kobold", "kobold_bombe": "kobold_tnt", "schmuggler": "kobold_tnt", "wechselbalg": "wechselbalg",
+	# Goblins aus dem Pack: Fackel, Dynamit, Fass; abgewandelte Haut; der Schmuggler reitet einen Eber
+	"kobold": "kobold", "kobold_schleuder": "kobold", "elster_goblin": "kobold", "kobold_bombe": "kobold_tnt", "schmuggler": "rpg_ork_reiter", "wechselbalg": "wechselbalg",
 	"gnom_buerokrat": "gnom", "heinzelmann": "gnom", "gartenzwerg": "gnom",
 	"troll_lehrling": "rpg_ork", "brueckentroll": "rpg_werbaer", "schwarzmarkt_oger": "rpg_ork_elite",
 	"fischmensch": "fischmensch",

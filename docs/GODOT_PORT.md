@@ -181,7 +181,7 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
     (umgefärbt), Fledermaus, Skelette (Ghul, Moorleiche, Kellermeister,
     Schleusenwärter), Orks (Troll-Lehrling, Morlock, Schwarzmarkt-Oger),
     Werbär (Brückentroll), Werwolf (Hunde), Totenbeschwörer (Nachtmahr),
-    Zauberer (Kanalhexe), Axtkämpfer (Abtrünniger Crawler). Die anderen
+    Zauberer (Kanalhexe), Axtkämpfer (Abtrünniger Crawler), Ork-Reiter (Schmuggler-Kobold). Die anderen
     Crawler sind Ritter, Templer, Soldat, Schwertkämpfer, Bogenschützin,
     Lanzenreiter, Priester oder Arbeiter, je Crawler fest (`Sprites.crawler_sprite`).
 - Übrige Kreaturen und Bosse (Tiere, Schleime, Maschinen …) gibt es im Pack
