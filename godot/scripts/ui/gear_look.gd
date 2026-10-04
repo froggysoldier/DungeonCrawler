@@ -221,8 +221,9 @@ static func compose(gear: Dictionary) -> Dictionary:
 		frames.append("%s_%d" % [BASE, i])
 	for i in range(1, PixelArt.run_count(BASE) + 1):
 		frames.append("%s_lauf%d" % [BASE, i])
-	for i in range(1, PixelArt.attack_count(BASE) + 1):
-		frames.append("%s_angriff%d" % [BASE, i])
+	for tag in ["angriff", "treffer"]:
+		for i in range(1, PixelArt.seq_count(BASE, tag) + 1):
+			frames.append("%s_%s%d" % [BASE, tag, i])
 	for fr in frames:
 		var base := PixelArt.image(fr)
 		# Angriffsbilder liegen auf einer größeren Fläche; die Anker gleichen das aus

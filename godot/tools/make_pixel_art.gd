@@ -176,6 +176,21 @@ func _add_ts(sheet_name: String, prefix: String, name: String, frames: int) -> v
 		var full := "%s%s_angriff%d" % [prefix, name, i + 1]
 		res[full] = 2
 		_add(sheet_name, full, _lean(base, LEAN[i][0], LEAN[i][1], LEAN[i][2]))
+	_add_flinch(sheet_name, prefix + name, base)
+
+
+## Treffer ohne eigene Bilder: die Figur weicht zurück und federt wieder vor.
+const FLINCH := [[-9.0, 0.94, 1.02], [-5.0, 0.97, 1.0]]
+
+
+func _add_flinch(sheet_name: String, full: String, base: Image) -> Dictionary:
+	var made := {}
+	for i in FLINCH.size():
+		var name := "%s_treffer%d" % [full, i + 1]
+		res[name] = 2
+		made[name] = _lean(base, FLINCH[i][0], FLINCH[i][1], FLINCH[i][2])
+		_add(sheet_name, name, made[name])
+	return made
 
 
 ## Angriffsbilder selbst gebauter Figuren: [Neigung oben in Bildpixeln,
@@ -350,6 +365,21 @@ func _build_all() -> void:
 			_add("angriffe" if hit.get_width() <= 192 else "angriffe_gross", full, hit)
 			if n == "spieler_pawn":
 				anchors[full] = _anchors(hit)
+		# Treffer: eigene Bilder, sonst weicht die Figur zurück
+		if c[3] > 0:
+			for i in c[3]:
+				var full: String = "kreatur/%s_treffer%d" % [n, i + 1]
+				res[full] = 2
+				_add("treffer", full, TsFig.unit_image(n, "treffer%d" % i))
+		else:
+			var made := _add_flinch("treffer", "kreatur/" + n, TsFig.unit_image(n, "0"))
+			if n == "spieler_pawn":
+				for k in made:
+					anchors[k] = _anchors(made[k])
+		for i in c[4]:
+			var full: String = "kreatur/%s_tod%d" % [n, i + 1]
+			res[full] = 2
+			_add("tod", full, TsFig.unit_image(n, "tod%d" % i))
 	var af := FileAccess.open("res://assets/tinyswords/anker.json", FileAccess.WRITE)
 	af.store_string(JSON.stringify(anchors, " ", true) + "\n")
 	af.close()

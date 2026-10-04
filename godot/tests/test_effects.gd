@@ -74,6 +74,22 @@ func test_animator_macht_daraus_bewegung(t) -> void:
 	t.eq(a.bursts(1000.0 + 60 + Animator.LUNGE_MS + Animator.BURST_MS + 1).size(), 0, "Zerfall endet")
 
 
+func test_treffer_und_tod_aus_dem_pack(t) -> void:
+	var a := Animator.new()
+	var s := TH.make(24)
+	var before := a.snapshot(s)
+	a.after(s, before, [{"kind": "hit", "at": J.pcopy(s.player.pos)}], 1000.0)
+	t.eq(a.hurt_frame("p", 2, 1000.0 + Animator.HURT_FRAME_MS * 1.5), 1, "Spielfigur zuckt zurück")
+	t.eq(a.hurt_frame("p", 2, 1000.0 + Animator.HURT_FRAME_MS * 2 + 1), -1, "und fängt sich")
+	# Skelett (Tiny RPG) fällt um statt zu zerfallen; die Ratte zerfällt weiter
+	a.after(s, before, [{"kind": "death", "at": {"x": 3, "y": 3}, "defId": "ghul"}, {"kind": "death", "at": {"x": 5, "y": 3}, "defId": "kellerratte"}], 2000.0)
+	var deaths: Array = a.bursts(2100.0)
+	t.eq(deaths.size(), 2, "zwei Besiegte")
+	var dust := a.fx(2100.0).filter(func(e): return e.kind == "staub")
+	t.eq(dust.size(), 1, "nur die Ratte zerfällt in Staub")
+	t.gt(a.bursts(2000.0 + Animator.BURST_MS + 50).size(), 0, "Umfallen dauert länger als Zerfallen")
+
+
 func test_schwerer_treffer_bebt(t) -> void:
 	var a := Animator.new()
 	var s := TH.make(22)

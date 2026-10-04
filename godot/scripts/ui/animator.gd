@@ -14,11 +14,16 @@ const SHAKE_MS := 180.0
 const SPARKLE_MS := 1200.0
 ## Angriffsbilder der Pack-Figuren: so lange je Bild.
 const ATTACK_FRAME_MS := 70.0
+## Treffer- und Todesbilder: so lange je Bild.
+const HURT_FRAME_MS := 80.0
+const DEATH_FRAME_MS := 90.0
 
 var _tweens: Dictionary = {}
 var _lunges: Dictionary = {}
 ## Laufende Angriffe (Schlag, Wurf, Zauber): Figur -> Beginn und Richtung.
 var _attacks: Dictionary = {}
+## Getroffene Figuren: Figur -> Beginn der Trefferbilder.
+var _hurts: Dictionary = {}
 var _flashes: Dictionary = {}
 var _bursts: Array = []
 var _shake: Dictionary = {}
@@ -108,6 +113,7 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 				var key = at_key.get(tile)
 				if key != null:
 					_flashes[key] = {"start": t0, "dur": FLASH_MS}
+					_hurts[key] = t0
 				if f.get("strong", false):
 					_shake = {"start": t0, "dur": SHAKE_MS, "amp": 2 if key == "p" else 1}
 			"levelup":
@@ -115,8 +121,12 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 			"death":
 				var tile := "%d,%d" % [f.at.x, f.at.y]
 				var t0: float = maxf(now + delay, arrival.get(tile, 0.0)) + 60
-				_bursts.append({"at": Vector2(f.at.x, f.at.y), "defId": f.defId, "color": f.get("color"), "rank": f.get("rank", "normal"), "start": t0, "dur": BURST_MS})
-				_fx.append({"at": Vector2(f.at.x, f.at.y), "kind": "staub", "start": t0, "dur": BURST_MS})
+				# Figuren mit Todesbildern fallen um, die anderen zerfallen in Staub
+				var deaths := PixelArt.seq_count(Sprites.sprite_name(String(f.defId), f.get("rank", "normal") == "geist"), "tod")
+				var dur := maxf(BURST_MS, deaths * DEATH_FRAME_MS)
+				_bursts.append({"at": Vector2(f.at.x, f.at.y), "defId": f.defId, "color": f.get("color"), "rank": f.get("rank", "normal"), "start": t0, "dur": dur})
+				if deaths == 0:
+					_fx.append({"at": Vector2(f.at.x, f.at.y), "kind": "staub", "start": t0, "dur": BURST_MS})
 			_:
 				var tile := "%d,%d" % [f.at.x, f.at.y]
 				var n: int = per_tile.get(tile, 0)
@@ -165,6 +175,19 @@ func attack_frame(key: String, frames: int, now: float = -1.0) -> int:
 	var i := floori((now - a.start) / ATTACK_FRAME_MS)
 	if i >= frames:
 		_attacks.erase(key)
+		return -1
+	return i if i >= 0 else -1
+
+
+## Welches Trefferbild (0 …) eine getroffene Figur gerade zeigt, -1 sonst.
+func hurt_frame(key: String, frames: int, now: float = -1.0) -> int:
+	if not _hurts.has(key) or frames <= 0:
+		return -1
+	if now < 0:
+		now = now_ms()
+	var i := floori((now - float(_hurts[key])) / HURT_FRAME_MS)
+	if i >= frames:
+		_hurts.erase(key)
 		return -1
 	return i if i >= 0 else -1
 
@@ -279,6 +302,7 @@ func reset() -> void:
 	_floaters.clear()
 	_lunges.clear()
 	_attacks.clear()
+	_hurts.clear()
 	_flashes.clear()
 	_bursts.clear()
 	_sparkles.clear()

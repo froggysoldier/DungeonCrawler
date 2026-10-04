@@ -76,15 +76,20 @@ static func run_count(name: String) -> int:
 	return _counts[key]
 
 
-## Anzahl der Angriffsbilder (Name_angriff1 …).
-static func attack_count(name: String) -> int:
-	var key := "a|" + name
+## Anzahl der Bilder einer Bildfolge (Name_angriff1 …, Name_treffer1 …,
+## Name_tod1 …).
+static func seq_count(name: String, tag: String) -> int:
+	var key := tag + "|" + name
 	if not _counts.has(key):
 		var n := 0
-		while has("%s_angriff%d" % [name, n + 1]):
+		while has("%s_%s%d" % [name, tag, n + 1]):
 			n += 1
 		_counts[key] = n
 	return _counts[key]
+
+
+static func attack_count(name: String) -> int:
+	return seq_count(name, "angriff")
 
 
 ## Ein zur Laufzeit gebautes Bild unter einem Namen bereitstellen; danach geht

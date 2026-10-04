@@ -251,6 +251,21 @@ const UNITS := {
 	"schaf": ["U:Resources/Sheep/HappySheep_Idle.png|U:Resources/Sheep/HappySheep_Bouncing.png", 128, [0, 8], [0, 6], false, null],
 }
 
+## Tod der Pack-Figuren: Puff, ein Schädel hüpft heraus und versinkt
+## (14 Felder zu 128, zwei Reihen). Der Schädel liegt auf den Füßen.
+const DEAD := "U:Factions/Knights/Troops/Dead/Dead.png"
+
+
+func _skull() -> Array:
+	var sheet := _sheet(DEAD)
+	var cells: Array = []
+	for row in 2:
+		for col in 7:
+			cells.append(_cell(sheet, 128, row, col, false))
+	var bottom := _bottom(cells[4])
+	return cells.map(func(c): return _place(c, bottom))
+
+
 ## Hautfarbe der Goblins (grün) und der Menschen, für Abwandlungen.
 const GOBLIN_SKIN := ["417168", "38b251", "95d562"]
 ## Abwandlungen: neuer Name -> [Figur, Hautfarben (dunkel, mittel, hell)].
@@ -353,6 +368,7 @@ func _units() -> void:
 	for f in DirAccess.get_files_at(dir):
 		DirAccess.remove_absolute(dir.path_join(f))
 	var made_frames := {}
+	var skull := _skull()
 	for name in UNITS:
 		var u: Array = UNITS[name]
 		var files := String(u[0]).split("|")
@@ -382,12 +398,14 @@ func _units() -> void:
 				if name == "spieler_pawn":
 					hit = _without_knife(hit)
 				hits.append(_place(hit, bottom, ATTACK_SIZE))
+		# Besiegte Pack-Figuren werden zum Schädel (die Spielfigur stirbt anders)
+		var deaths: Array = [] if name == "spieler_pawn" else skull
 		made_frames[name] = [frames, runs, hits]
-		_save_unit(name, frames, runs, hits)
+		_save_unit(name, frames, runs, hits, [], deaths)
 	for name in SKINS:
 		var base: Array = made_frames[SKINS[name][0]]
 		var skin := func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])
-		_save_unit(name, base[0].map(skin), base[1].map(skin), base[2].map(skin))
+		_save_unit(name, base[0].map(skin), base[1].map(skin), base[2].map(skin), [], skull)
 	_rpg_units()
 	_royal_mage()
 
@@ -398,7 +416,7 @@ const RPG := "asset-pack/Assets/Tiny RPG Character Asset Pack 01 v2.0 -Full 22 C
 ## Figuren aus dem Tiny RPG Character Pack (100er Felder, vergrößert auf eine
 ## Bildfläche von 192): Name -> [Figur, Ruhe-, Lauf- ("" ohne) und
 ## Angriffs-Animation, Vergrößerung, tönbar (Schleim), Schwebehöhe in
-## Bildpixeln]. Die Vergrößerung gleicht die Größen an: Menschen etwa so groß
+## Bildpixeln]. Treffer ("Hurt") und Tod ("Death") haben alle Figuren. Die Vergrößerung gleicht die Größen an: Menschen etwa so groß
 ## wie die Spielfigur, kleine Skelette auch, Orks und Werbär größer.
 const RPG_SIZE := 192
 const RPG_FOOT := 185
@@ -459,10 +477,14 @@ func _rpg_units() -> void:
 		var idle := _rpg_frames(u[0], u[1], scale, tint)
 		var runs := _rpg_frames(u[0], u[2], scale, tint) if u[2] != "" else []
 		var hits := _rpg_frames(u[0], u[3], scale, tint)
+		var hurts := _rpg_frames(u[0], "Hurt", scale, tint)
+		var death_file := "DEATH" if u[0] == "Necromancer" else "Death"
+		var deaths := _rpg_frames(u[0], death_file, scale, tint)
 		# Fliegende schweben über dem Boden (Höhe in Bildpixeln)
 		var bottom := _bottom(idle[0]) + (int(u[6]) if u.size() > 6 else 0)
 		var put := func(f): return _place_big(f, bottom)
-		_save_unit(name, idle.map(put), runs.map(put), hits.map(func(f): return _place_big(f, bottom, RPG_ATTACK_SIZE)))
+		var wide := func(f): return _place_big(f, bottom, RPG_ATTACK_SIZE)
+		_save_unit(name, idle.map(put), runs.map(put), hits.map(wide), hurts.map(put), deaths.map(wide))
 
 
 ## Vergrößertes Feld mittig auf die Bildfläche, Füße auf RPG_FOOT (bei
@@ -496,9 +518,12 @@ func _royal_mage() -> void:
 	var idle := _mage_row(0, 3)
 	var runs := _mage_row(1, 3)
 	var hits := _mage_row(2, 3)
+	var hurts := _mage_row(3, 3)
+	var deaths := _mage_row(4, 3)
 	var bottom := _bottom(idle[0])
 	var put := func(f): return _place_big(f, bottom)
-	_save_unit("magier", idle.map(put), runs.map(put), hits.map(func(f): return _place_big(f, bottom, RPG_ATTACK_SIZE)))
+	var wide := func(f): return _place_big(f, bottom, RPG_ATTACK_SIZE)
+	_save_unit("magier", idle.map(put), runs.map(put), hits.map(wide), hurts.map(put), deaths.map(wide))
 
 
 ## Zauberkugel im Flug (Geschoss) und ihr Aufschlag (Effekt), je ein Streifen.
@@ -511,13 +536,17 @@ func _royal_mage_fx() -> void:
 		_save(strip, "fx/" + pair[1])
 
 
-func _save_unit(name: String, frames: Array, runs: Array, hits: Array = []) -> void:
+func _save_unit(name: String, frames: Array, runs: Array, hits: Array = [], hurts: Array = [], deaths: Array = []) -> void:
 	for i in frames.size():
 		_save(frames[i], "units/%s_%d" % [name, i])
 	for i in runs.size():
 		_save(runs[i], "units/%s_lauf%d" % [name, i])
 	for i in hits.size():
 		_save(hits[i], "units/%s_angriff%d" % [name, i])
+	for i in hurts.size():
+		_save(hurts[i], "units/%s_treffer%d" % [name, i])
+	for i in deaths.size():
+		_save(deaths[i], "units/%s_tod%d" % [name, i])
 
 
 # ================================================================ Gelände

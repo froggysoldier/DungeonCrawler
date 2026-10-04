@@ -281,6 +281,9 @@ func _frame(name: String, key: String, moving: bool, idle: bool = true) -> Strin
 		var a := anim.attack_frame(key, hits, frame_anim.get("now", -1.0))
 		if a >= 0:
 			return "%s_angriff%d" % [name, a + 1]
+		var h := anim.hurt_frame(key, PixelArt.seq_count(name, "treffer"), frame_anim.get("now", -1.0))
+		if h >= 0:
+			return "%s_treffer%d" % [name, h + 1]
 	var runs := PixelArt.run_count(name)
 	if moving and runs > 0:
 		return "%s_lauf%d" % [name, int(time / 100.0) % runs + 1]
@@ -1083,6 +1086,15 @@ func _draw_burst(ci: CanvasItem, b: Dictionary) -> void:
 	var sy := _sy(b.at.y) - (sz.y - TILE + 2) * px
 	var k: float = b.k
 	var r := PixelArt.res(name)
+	# Todesbilder aus dem Pack: umfallen (Tiny RPG) oder Schädel (Tiny Swords)
+	var deaths := PixelArt.seq_count(name, "tod")
+	if deaths > 0:
+		var n := "%s_tod%d" % [name, mini(floori(k * deaths), deaths - 1) + 1]
+		var fs := PixelArt.size_of(n)
+		var flip: bool = b.at.x > _at("p", s.player.pos).x
+		var fade := 1.0 if k < 0.85 else (1.0 - k) / 0.15
+		_spr(ci, n, sx - (fs.x - sz.x) / 2.0 * px, sy - (fs.y - sz.y) * px, b.color, flip, Color(1, 1, 1, fade))
+		return
 	if k < 0.1:
 		PixelArt.draw_texture(ci, PixelArt.silhouette(name), Vector2(sx, sy), px, false, Color.WHITE, r)
 		return

@@ -269,6 +269,15 @@ func test_angriffsbilder(t) -> void:
 		t.eq(PixelArt.attack_count("kreatur/" + n), 4, "%s greift sichtbar an" % n)
 	for n in TsFig.BOSSES:
 		t.eq(PixelArt.attack_count("boss/" + n), 4, "%s greift sichtbar an" % n)
+	# Treffer: jede Figur zuckt oder weicht zurück; Tod: Pack-Figuren fallen um oder werden zum Schädel
+	for n in TsFig.units():
+		t.ge(PixelArt.seq_count("kreatur/" + n, "treffer"), 2, "%s zeigt Treffer" % n)
+		if n != "spieler_pawn":
+			t.ge(PixelArt.seq_count("kreatur/" + n, "tod"), 4, "%s stirbt sichtbar" % n)
+	for n in TsFig.CREATURES:
+		t.eq(PixelArt.seq_count("kreatur/" + n, "treffer"), 2, "%s weicht zurück" % n)
+	var p0 := {"equipment": {"kopf": {"kind": "kleidung", "rarity": "selten", "baseId": "bauhelm"}}}
+	t.eq(PixelArt.seq_count(Sprites.hero_name(p0), "treffer"), 2, "Held mit Helm weicht zurück")
 	var still := PixelArt.image("kreatur/ratte").get_used_rect()
 	var lunge := PixelArt.image("kreatur/ratte_angriff2").get_used_rect()
 	t.gt(lunge.end.x, still.end.x, "nach vorn")

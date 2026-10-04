@@ -199,6 +199,13 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
   `attack_dir`), 70 ms je Bild. Selbst gebaute Kreaturen und Bosse bekommen
   vier Angriffsbilder aus ihrer eigenen Figur (`make_pixel_art._lean`:
   ausholen, nach vorn schnellen, zurückfedern, Füße fest).
+- Treffer und Tod: Tiny-RPG-Figuren und der Magier haben eigene Treffer-
+  (`_treffer1 …`) und Todesbilder (`_tod1 …`); die Tiny-Swords-Figuren werden
+  beim Tod zum Schädel des Packs (`Factions/Knights/Troops/Dead`). Alle
+  anderen Figuren, auch die Spielfigur, weichen bei Treffern zurück
+  (`make_pixel_art._add_flinch`); selbst gebaute Kreaturen zerfallen beim Tod
+  weiter in Pixel und Staub. Der Animator spielt Treffer mit 80 ms, Tod mit
+  90 ms je Bild (`hurt_frame`, Bursts mit Todesbildern dauern länger).
 - Größen: Tiny-RPG-Menschen und der Magier dreifach, kleine Skelette, Orks
   und Werbär vierfach vergrößert, damit sie neben der Spielfigur stimmen.
 - Übrige Kreaturen und Bosse (Tiere, Schleime, Geräte wie Toaster, Waschmaschine, Parkautomat und Rohrgolem …) gibt es im Pack
