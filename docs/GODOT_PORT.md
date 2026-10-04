@@ -176,11 +176,14 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
   - Kobolde, Gnome, Trolle, Fischmenschen: die Goblins des Packs (Fackel,
     Dynamit) mit abgewandelter Hautfarbe; Mimiks sind der Fass-Goblin.
   - Wolpertinger: das Schaf.
-  - Aus dem Tiny RPG Character Pack (`asset-pack/Assets/Tiny RPG …`, doppelt
-    vergrößert, Namen `rpg_…`): Schleime (umgefärbt), Fledermaus, Skelette
-    (Kellermeister, Schleusenwärter), Ork und Elite-Ork (Troll-Lehrling,
-    Schwarzmarkt-Oger), Werbär (Brückentroll), Werwolf (Hunde), Totenbeschwörer
-    (Nachtmahr).
+  - Aus dem Tiny RPG Character Pack (`asset-pack/Assets/Tiny RPG …`, dreifach
+    vergrößert auf eine Bildfläche von 192, Namen `rpg_…`): Schleime
+    (umgefärbt), Fledermaus, Skelette (Ghul, Moorleiche, Kellermeister,
+    Schleusenwärter), Orks (Troll-Lehrling, Morlock, Schwarzmarkt-Oger),
+    Werbär (Brückentroll), Werwolf (Hunde), Totenbeschwörer (Nachtmahr),
+    Zauberer (Kanalhexe), Axtkämpfer (Abtrünniger Crawler). Die anderen
+    Crawler sind Ritter, Templer, Soldat, Schwertkämpfer, Bogenschützin,
+    Lanzenreiter, Priester oder Arbeiter, je Crawler fest (`Sprites.crawler_sprite`).
 - Übrige Kreaturen und Bosse (Tiere, Schleime, Maschinen …) gibt es im Pack
   nicht. Sie sind aus Formen gebaut (`tools/ts_figures.gd`) und werden von
   `TsRender` wie die Pack-Figuren schattiert: dicker Nachtblau-Umriss, feine

@@ -14,11 +14,11 @@ const BY_DEF := {
 	"fischmensch": "fischmensch",
 	"muellsack_mimic": "fass", "reifenstapel_mimic": "fass", "treibgut_mimic": "fass",
 	# Menschen aus dem Pack (rote Einheiten, Teamfarbe = Farbe der Art)
-	"abtruenniger_crawler": "krieger", "lumpensammler": "mensch_holz", "schleusenwaerter": "rpg_skelett_ruestung",
-	"ghul": "zombie", "moorleiche": "zombie", "morlock": "zombie",
+	"abtruenniger_crawler": "rpg_axtkaempfer", "lumpensammler": "mensch_holz", "schleusenwaerter": "rpg_skelett_ruestung",
+	"ghul": "rpg_skelett", "moorleiche": "rpg_skelett_bogen", "morlock": "rpg_ork_ruestung",
 	# Tiny RPG Character Pack: Skelette, Orks, Schleim, Fledermaus, Werwesen, Totenbeschwörer
 	"kellermeister": "rpg_skelett_schwert", "nachtmahr": "rpg_nekromant",
-	"kanalhexe": "moench", "kesselkoenigin": "moench", "pfandbaron": "mensch_messer", "hausverwalter": "moench",
+	"kanalhexe": "rpg_zauberer", "kesselkoenigin": "moench", "pfandbaron": "mensch_messer", "hausverwalter": "moench",
 	"die_sammlerin": "mensch_gold", "der_hausmeister": "mensch_hammer", "kammerjaeger": "bogen", "parkwaechter": "krieger",
 	# Schädel und Schaf aus dem Pack
 	"wolpertinger": "schaf",
@@ -50,6 +50,15 @@ const BY_DEF := {
 
 ## Bosse, die eine Figur aus dem Pack bekommen statt eines eigenen Bildes.
 const PACK_BOSSES := ["die_sammlerin", "der_hausmeister", "kesselkoenigin", "kammerjaeger", "pfandbaron", "hausverwalter", "parkwaechter", "schwarzmarkt_oger"]
+
+
+## Andere Crawler: Menschen aus dem Tiny RPG Pack, je Crawler fest gewählt.
+const CRAWLER_LOOKS := ["rpg_ritter", "rpg_templer", "rpg_soldat", "rpg_schwertkaempfer", "rpg_bogenschuetzin", "rpg_lanzenreiter", "rpg_priester", "mensch"]
+
+
+static func crawler_sprite(cr: Dictionary) -> String:
+	var key := String(J.nn(cr, "name", J.nn(cr, "uid", "")))
+	return "kreatur/" + CRAWLER_LOOKS[absi(key.hash()) % CRAWLER_LOOKS.size()]
 
 
 ## Haustier-Art: Bild und Fellfarbe.

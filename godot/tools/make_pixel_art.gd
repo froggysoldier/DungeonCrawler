@@ -60,19 +60,21 @@ func _initialize() -> void:
 		# Große Bilder zeilenweise unter die Zellen legen
 		var big: Array = _big.filter(func(b): return b[0] == sheet_name)
 		var places: Array = []
+		# Bögen mit großen Figuren sind breiter, sonst würden sie zu hoch
+		var sheet_w := COLS * T if big.is_empty() else 2048
 		var bx := 0
 		var by := rows * T
 		var shelf := 0
 		for b in big:
 			var bw := ceili(b[2].get_width() / float(T)) * T
-			if bx + bw > COLS * T:
+			if bx + bw > sheet_w:
 				bx = 0
 				by += shelf
 				shelf = 0
 			places.append(Vector2i(bx, by))
 			bx += bw
 			shelf = maxi(shelf, ceili(b[2].get_height() / float(T)) * T)
-		var img := Image.create(COLS * T, by + shelf if not big.is_empty() else rows * T, false, Image.FORMAT_RGBA8)
+		var img := Image.create(sheet_w, by + shelf if not big.is_empty() else rows * T, false, Image.FORMAT_RGBA8)
 		for i in list.size():
 			var sub: Image = list[i][1]
 			var at := Vector2i((i % COLS) * T, (i / COLS) * T)

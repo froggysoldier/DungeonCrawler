@@ -234,7 +234,6 @@ const UNITS := {
 	"mensch_hammer": ["Units/Red Units/Pawn/Pawn_Idle Hammer.png|Units/Red Units/Pawn/Pawn_Run Hammer.png", 192, [0, 8], [0, 6], true],
 	"mensch_gold": ["Units/Red Units/Pawn/Pawn_Idle Gold.png|Units/Red Units/Pawn/Pawn_Run Gold.png", 192, [0, 8], [0, 6], true],
 	"mensch_holz": ["Units/Red Units/Pawn/Pawn_Idle Wood.png|Units/Red Units/Pawn/Pawn_Run Wood.png", 192, [0, 8], [0, 6], true],
-	"mensch_axt": ["Units/Red Units/Pawn/Pawn_Idle Axe.png|Units/Red Units/Pawn/Pawn_Run Axe.png", 192, [0, 8], [0, 6], true],
 	"mensch_messer": ["Units/Red Units/Pawn/Pawn_Idle Knife.png|Units/Red Units/Pawn/Pawn_Run Knife.png", 192, [0, 8], [0, 6], true],
 	"krieger": ["Units/Red Units/Warrior/Warrior_Idle.png|Units/Red Units/Warrior/Warrior_Run.png", 192, [0, 8], [0, 6], true],
 	"bogen": ["Units/Red Units/Archer/Archer_Idle.png|Units/Red Units/Archer/Archer_Run.png", 192, [0, 6], [0, 4], true],
@@ -254,10 +253,6 @@ const SKINS := {
 	"fischmensch": ["kobold", ["2f5a7a", "3e8fb8", "8cc8e0"]],
 	"wechselbalg": ["kobold", ["5a3f78", "8a62b0", "c09ee0"]],
 	"gnom": ["kobold", ["8a5a4a", "d89a7a", "f0c8a8"]],
-}
-const HUMAN_SKIN := ["c8a876", "efe1ab"]
-const UNDEAD := {
-	"zombie": ["mensch", ["8aa878", "b8d0a0"]],
 }
 
 
@@ -334,26 +329,39 @@ func _units() -> void:
 		var base: Array = made_frames[SKINS[name][0]]
 		_save_unit(name, base[0].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])), base[1].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])))
 	_rpg_units()
-	for name in UNDEAD:
-		var base: Array = made_frames[UNDEAD[name][0]]
-		_save_unit(name, base[0].map(func(i): return _recolor_skin(i, HUMAN_SKIN, UNDEAD[name][1])), base[1].map(func(i): return _recolor_skin(i, HUMAN_SKIN, UNDEAD[name][1])))
 
 
 # ---------------------------------------------------------------- Tiny RPG Character Pack
 
 const RPG := "asset-pack/Assets/Tiny RPG Character Asset Pack 01 v2.0 -Full 22 Characters/Tiny RPG Character Asset Pack 01 v2.0 -Full 22 Characters/Characters(100x100 split)/"
-## Figuren aus dem Tiny RPG Character Pack (100er Felder, doppelt vergrößert):
-## Name -> [Figur, Ruhe-Animation, Lauf-Animation oder "", tönbar (Schleim)].
+## Figuren aus dem Tiny RPG Character Pack (100er Felder, dreifach vergrößert
+## auf eine Bildfläche von 192): Name -> [Figur, Ruhe-Animation,
+## Lauf-Animation oder "", tönbar (Schleim), Schwebehöhe in Bildpixeln].
+const RPG_SCALE := 3
+const RPG_SIZE := 192
+const RPG_FOOT := 185
 const RPG_UNITS := {
 	"rpg_schleim": ["Slime", "Idle", "Walk", true],
-	"rpg_fledermaus": ["Bat", "Flying", "", false, 22],
+	"rpg_fledermaus": ["Bat", "Flying", "", false, 33],
+	"rpg_skelett": ["Skeleton", "Idle", "Walk", false],
 	"rpg_skelett_schwert": ["Greatsword Skeleton", "Idle", "Walk", false],
 	"rpg_skelett_ruestung": ["Armored Skeleton", "Idle", "Walk", false],
+	"rpg_skelett_bogen": ["Skeleton Archer", "Idle", "Walk", false],
 	"rpg_ork": ["Orc", "Idle", "Walk", false],
+	"rpg_ork_ruestung": ["Armored Orc", "Idle", "Walk", false],
 	"rpg_ork_elite": ["Elite Orc", "Idle", "Walk", false],
 	"rpg_werbaer": ["Werebear", "Idle", "Walk", false],
 	"rpg_werwolf": ["Werewolf", "Idle", "Walk", false],
 	"rpg_nekromant": ["Necromancer", "Idle", "Walk", false],
+	"rpg_zauberer": ["Wizard", "Idle", "Walk", false],
+	"rpg_priester": ["Priest", "Idle", "Walk", false],
+	"rpg_ritter": ["Knight", "Idle", "Walk", false],
+	"rpg_templer": ["Knight Templar", "Idle", "Walk01", false],
+	"rpg_soldat": ["Soldier", "Idle", "Walk", false],
+	"rpg_schwertkaempfer": ["Swordsman", "Idle", "Walk", false],
+	"rpg_bogenschuetzin": ["Archer", "Idle", "Walk", false],
+	"rpg_lanzenreiter": ["Lancer", "Idle", "Walk01", false],
+	"rpg_axtkaempfer": ["Armored Axeman", "Idle", "Walk", false],
 }
 
 
@@ -375,7 +383,7 @@ func _rpg_frames(who: String, anim: String, tint: bool) -> Array:
 		if used.size.x == 0:
 			continue
 		var big := fr.duplicate() as Image
-		big.resize(200, 200, Image.INTERPOLATE_NEAREST)
+		big.resize(100 * RPG_SCALE, 100 * RPG_SCALE, Image.INTERPOLATE_NEAREST)
 		out.append(big)
 	return out
 
@@ -390,10 +398,10 @@ func _rpg_units() -> void:
 		_save_unit(name, idle.map(func(f): return _place_big(f, bottom)), runs.map(func(f): return _place_big(f, bottom)))
 
 
-## Großes Feld (200) mittig auf die Bildfläche, Füße auf UNIT_FOOT.
+## Vergrößertes Feld mittig auf die Bildfläche, Füße auf RPG_FOOT.
 func _place_big(fr: Image, bottom: int) -> Image:
-	var out := Image.create(UNIT_SIZE, UNIT_SIZE, false, Image.FORMAT_RGBA8)
-	var src := Rect2i((fr.get_width() - UNIT_SIZE) / 2, bottom - UNIT_FOOT, UNIT_SIZE, UNIT_SIZE)
+	var out := Image.create(RPG_SIZE, RPG_SIZE, false, Image.FORMAT_RGBA8)
+	var src := Rect2i((fr.get_width() - RPG_SIZE) / 2, bottom - RPG_FOOT, RPG_SIZE, RPG_SIZE)
 	out.blit_rect(fr, src, Vector2i.ZERO)
 	return out
 

@@ -964,9 +964,13 @@ func _draw_dynamic_body() -> void:
 		var sy := _sy(p.y)
 		var party: bool = cr.get("party", false)
 		_ground(ci, sx, sy, _col("#7fe0a0" if party else "#7cc4ff", 0.7))
-		_figure(ci, cr.uid, "kreatur/mensch", sx, sy - 2 * px, "#4f9a6a" if party else "#4a7fb0", p.x > _at("p", s.player.pos).x, Color.WHITE, anim != null and anim.moving(cr.uid))
+		var look := Sprites.crawler_sprite(cr)
+		var lsz := PixelArt.size_of(look)
+		var lx := (lsz.x - TILE) / 2
+		var ly := lsz.y - TILE
+		_figure(ci, cr.uid, look, sx - lx * px, sy - (ly + 2) * px, "#4f9a6a" if party else "#4a7fb0", p.x > _at("p", s.player.pos).x, Color.WHITE, anim != null and anim.moving(cr.uid))
 		if cr.hp < cr.maxHp:
-			_hp_bar(ci, sx, sy, sprite_top("kreatur/mensch") - 2, float(cr.hp) / cr.maxHp, "#6ee07a")
+			_hp_bar(ci, sx, sy, sprite_top(look) - 2 - ly, float(cr.hp) / cr.maxHp, "#6ee07a")
 
 	# --- Monster (nur sichtbare)
 	var ppos := _at("p", s.player.pos)
