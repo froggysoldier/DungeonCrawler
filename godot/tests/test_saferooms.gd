@@ -101,6 +101,15 @@ func test_kammer_verriegelt(t) -> void:
 			if door == null:
 				continue
 			s.monsters = s.monsters.filter(func(m): return m.get("homeRoom") == lair.id)
+			# Von außen durch die offene Tür: ein Schritt, und man steht drin, die Tür fällt zu
+			var outside := {"x": door.x * 2 - inside.x, "y": door.y * 2 - inside.y}
+			if MapGen.is_walkable(s.map, outside.x, outside.y) and Ai.monster_at(s, inside) == null:
+				s.map.tiles[MapGen.idx(s.map, door.x, door.y)] = "dooropen"
+				s.player.pos = outside
+				s.currentRoom = -2
+				t.ok(Game.move_step(s, door).ok, "durch die Tür")
+				t.eq(s.player.pos, inside, "nicht in der Tür stehen geblieben")
+				t.eq(MapGen.tile_at(s.map, door.x, door.y), "door", "Tür hinter einem zu")
 			s.player.pos = inside
 			s.currentRoom = lair.id
 			var locked = Game.locked_lair(s)

@@ -195,6 +195,16 @@ func test_treppen_bis_etage_3(t) -> void:
 	t.eq(s.status, "victory", "Sieg")
 
 
+func test_start_erklaert_und_zeigt_die_gilde(t) -> void:
+	var s := Game.new_game({"name": "Neu", "answers": {}, "seed": 31, "meta": Meta.empty_meta()})
+	t.ok(J.some(s.pendingDialogs, func(d): return d.title == "So spielst du"), "Steuerung wird erklärt")
+	var guild = J.find(s.map.rooms, func(r): return r.get("marked", false))
+	t.not_null(guild, "Gilde markiert")
+	if guild != null:
+		t.eq(guild.kind, "guild", "es ist eine Gilde")
+		t.ok(s.map.explored[MapGen.idx(s.map, guild.x, guild.y)], "auf der Karte aufgedeckt")
+
+
 func test_tod_hinterlaesst_geist(t) -> void:
 	var meta := Meta.empty_meta()
 	var s := Game.new_game({"name": "Erna", "answers": [0, 0, 0, 0, 0], "seed": 5, "meta": meta})
@@ -208,6 +218,15 @@ func test_tod_hinterlaesst_geist(t) -> void:
 	var s2 := Game.new_game({"name": "Nachfolger", "answers": [0, 0, 0, 0, 0], "seed": 6, "meta": meta})
 	t.eq(s2.season, 2, "nächste Staffel")
 	t.ok(J.some(s2.monsters, func(m): return m.rank == "geist" and m.get("ghostOf") == "Erna"), "Geist spawnt")
+	# Ein starker Toter wird kein übermächtiger Geist: Etagenstärke, schwebt durch Wände
+	meta.ghosts[0].level = 20
+	var s3 := Game.new_game({"name": "Dritte", "answers": [0, 0, 0, 0, 0], "seed": 7, "meta": meta})
+	var g = J.find(s3.monsters, func(m): return m.rank == "geist")
+	t.not_null(g, "Geist auf Etage 1")
+	if g != null:
+		t.le(g.level, 4, "Stufe höchstens Etagenstärke")
+		t.le(g.maxHp, 50, "nicht übermächtig")
+		t.ok(Abilities.has(g, "geisterhaft"), "schwebt durch Wände")
 	# Dasselbe Start-Achievement gibt beim zweiten Mal eine Box-Stufe weniger
 	var tiers: Array = Db.world("BOX_TIERS")
 	t.ok(first_tier != "", "Start-Box beim ersten Mal")

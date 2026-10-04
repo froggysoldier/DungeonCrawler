@@ -179,13 +179,18 @@ func test_feilschen_beim_wanderhaendler(t) -> void:
 		room = J.find(s.map.rooms, func(r): return r.kind == "normal")
 		room.feature = "markt"
 	var shop := Shop.ensure_shop(s, room)
-	var offer: Dictionary = shop.offers[0]
+	# Das teuerste Angebot: bei Kleinkram rundet ein Rabatt sonst auf denselben Preis
+	var pick := 0
+	for i in shop.offers.size():
+		if shop.offers[i].price > shop.offers[pick].price:
+			pick = i
+	var offer: Dictionary = shop.offers[pick]
 	var before: int = offer.price
 	# Charisma 0: Feilschen misslingt fast sicher, der Preis darf nicht sinken
 	s.player.stats.cha = 0
 	for i in shop.offers.size():
 		shop.offers[i].erase("haggled")
-	Shop.haggle(s, room, 0)
+	Shop.haggle(s, room, pick)
 	if String(s.log.back().text).contains("beleidigt"):
 		t.gt(offer.price, before, "misslungenes Feilschen macht es teurer (%d -> %d)" % [before, offer.price])
 	else:

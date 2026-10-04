@@ -398,7 +398,21 @@ static func counter_strike(s: Dictionary, m: Dictionary) -> void:
 
 
 static func drop_near(s: Dictionary, item: Dictionary, pos: Dictionary) -> void:
-	s.items.append({"pos": J.pcopy(pos), "item": item})
+	# Ein Geist kann in einer Wand sterben: dann fällt die Beute aufs nächste freie Feld
+	var at := J.pcopy(pos)
+	if not MapGen.is_walkable(s.map, at.x, at.y):
+		var best = null
+		for r in range(1, 4):
+			for dy in range(-r, r + 1):
+				for dx in range(-r, r + 1):
+					var q := J.pos(pos.x + dx, pos.y + dy)
+					if best == null and MapGen.in_bounds(s.map, q.x, q.y) and MapGen.is_walkable(s.map, q.x, q.y):
+						best = q
+			if best != null:
+				break
+		if best != null:
+			at = best
+	s.items.append({"pos": at, "item": item})
 
 
 static func _return_thrown(s: Dictionary, item: Dictionary) -> void:

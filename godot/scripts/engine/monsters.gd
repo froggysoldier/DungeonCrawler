@@ -89,9 +89,14 @@ static func spawn_boss(s: Dictionary, def: Dictionary, pos: Dictionary, hood: in
 
 
 ## Der Geist eines früheren, gestorbenen Crawlers.
+## Stark wie ein Elite-Gegner der Etage, nicht wie der Crawler auf seinem
+## Höhepunkt: höchstens Stufe 2 + 2 × Etage, dazu der Etagenfaktor.
 static func spawn_ghost(s: Dictionary, ghost: Dictionary, pos: Dictionary, hood: int) -> Dictionary:
-	var lv := maxi(2, int(ghost.level) + 1)
-	var max_hp := 20 + lv * 9
+	var floor := int(s.floor)
+	var lv := clampi(int(ghost.level), 1, 2 + floor * 2)
+	var sc: Dictionary = J.nn(Db.floor_def0(floor), "mobScale", {})
+	var max_hp := J.rnd((14 + lv * 6) * float(sc.get("hp", 1.0)))
+	var dmul := float(sc.get("dmg", 1.0))
 	var gdef: Dictionary = Db.t("monsters", "GHOST_DEF")
 	return {
 		"uid": _mid(s),
@@ -102,13 +107,14 @@ static func spawn_ghost(s: Dictionary, ghost: Dictionary, pos: Dictionary, hood:
 		"level": lv,
 		"hp": max_hp,
 		"maxHp": max_hp,
-		"dmg": [2 + lv, 4 + lv * 2],
-		"treffer": 75,
-		"ruestung": 1 + floori(lv / 3.0),
+		"dmg": [J.rnd((1 + lv / 2.0) * dmul), J.rnd((3 + lv) * dmul)],
+		"treffer": 70,
+		"ruestung": floori(lv / 3.0),
 		"ausweichen": 15,
 		"size": "mittel",
 		"behavior": "melee",
-		"xp": 40 + lv * 20,
+		"abilities": ["fliegend", "geisterhaft"],
+		"xp": J.rnd((30 + lv * 12) * float(sc.get("xp", 1.0))),
 		"pos": J.pcopy(pos),
 		"hood": hood,
 		"rank": "geist",

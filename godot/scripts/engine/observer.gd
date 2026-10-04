@@ -7,6 +7,7 @@ const ABILITY_FACET := {
 	"gift": "giftig", "explodiert": "explosiv", "diebisch": "diebisch", "rufer": "rufer",
 	"regeneriert": "regeneriert", "schnell": "schnell", "fliegend": "fliegend", "gepanzert": "gepanzert",
 	"blutig": "blutig", "brennend": "brennend", "blendend": "blendend", "furchterregend": "furchterregend",
+	"geisterhaft": "geisterhaft",
 }
 const PART_WEIGHT := {"zauber": 0.5, "falle": 1.5, "bombe": 1, "blutung": 1, "feuer": 1.5, "gift": 1, "faust": 0, "tritt": 0, "knie": 0.5, "ellbogen": 0.5, "kopf": 1, "waffe": 0, "wurf": 0.5}
 const MOVE_WEIGHT := {"normal": 0, "sprung": 1, "stampfen": 1, "anlauf": 1}

@@ -219,6 +219,11 @@
    "weight": 1.5,
    "skill": true
   },
+  "geisterhaft": {
+   "label": "Geister",
+   "weight": 1.5,
+   "skill": true
+  },
   "fernkampf": {
    "label": "Fernkämpfer",
    "weight": 0.5,

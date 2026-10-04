@@ -170,54 +170,6 @@ static func _touches(m: Dictionary, halls: Dictionary, r: Dictionary) -> bool:
 	return false
 
 
-## Sackgassen: kurze Gänge vom Hauptgang ins Gestein, am Ende eine kleine
-## Nische (eigener kleiner Raum der Art „nische“, manchmal mit Toilette).
-static func _niches(s: Dictionary, m: Dictionary, halls: Dictionary, count: int) -> void:
-	var keys: Array = halls.keys()
-	var made := 0
-	var tries := 0
-	while made < count and tries < 200:
-		tries += 1
-		var start: int = R.pick(s, keys)
-		var d: Array = R.pick(s, DIRS4)
-		var x: int = start % int(m.width)
-		var y: int = start / int(m.width)
-		var len := R.int_(s, 4, 8)
-		var path := []
-		var ok := true
-		for k in range(1, len + 1):
-			var px: int = x + d[0] * k
-			var py: int = y + d[1] * k
-			if px < 3 or py < 3 or px >= m.width - 4 or py >= m.height - 4 or halls.has(idx(m, px, py)) or m.tiles[idx(m, px, py)] != "wall" or _near_room(m, px, py):
-				ok = false
-				break
-			path.append(J.pos(px, py))
-		if not ok or path.is_empty():
-			continue
-		var end: Dictionary = path[path.size() - 1]
-		var room := {"id": m.rooms.size(), "x": end.x - (1 if d[0] < 0 else 0), "y": end.y - (1 if d[1] < 0 else 0), "w": 2, "h": 2, "kind": "nische", "hood": hood_of(m, end), "name": "Nische", "description": "Ein schmaler Gang endet hier in einer kleinen Nische. Jemand hat sie vor langer Zeit gemauert und dann vergessen."}
-		var free := true
-		for yy in range(room.y - 1, room.y + room.h + 1):
-			for xx in range(room.x - 1, room.x + room.w + 1):
-				if not in_bounds(m, xx, yy) or m.roomAt[idx(m, xx, yy)] != -1 or halls.has(idx(m, xx, yy)):
-					free = false
-		if not free:
-			continue
-		for q in path:
-			m.tiles[idx(m, q.x, q.y)] = "floor"
-		_carve_room(m, room)
-		m.rooms.append(room)
-		made += 1
-
-
-static func _near_room(m: Dictionary, x: int, y: int) -> bool:
-	for dy in range(-1, 2):
-		for dx in range(-1, 2):
-			if in_bounds(m, x + dx, y + dy) and m.roomAt[idx(m, x + dx, y + dy)] != -1:
-				return true
-	return false
-
-
 static func _carve_room(m: Dictionary, r: Dictionary) -> void:
 	for y in range(r.y, r.y + r.h):
 		for x in range(r.x, r.x + r.w):
@@ -259,7 +211,8 @@ static func _carve_corridor(m: Dictionary, a: Dictionary, b: Dictionary, forbidd
 			var ni := ny * width + nx
 			if forbidden.has(ni) and ni != start and ni != goal:
 				continue
-			var cost := 3 if m.tiles[ni] == "wall" else 1
+			# Durch Gestein nur wenig teurer: gerade Gänge statt Umwege an anderen entlang
+			var cost := 2 if m.tiles[ni] == "wall" else 1
 			var nd: int = dist_map[i] + cost
 			if not dist_map.has(ni) or nd < dist_map[ni]:
 				dist_map[ni] = nd
@@ -344,9 +297,9 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 	_hall(m, halls, ring.x0, ring.y0, ring.x0, ring.y1)
 	_hall(m, halls, ring.x1, ring.y0, ring.x1, ring.y1)
 	_hall(m, halls, cx - 1, R.int_(s, 3, 6), cx - 1, ring.y0)
-	_hall(m, halls, cx - 1, ring.y1, cx - 1, MAP_H - R.int_(s, 5, 8))
+	_hall(m, halls, cx - 1, ring.y1, cx - 1, MAP_H - R.int_(s, 4, 8))
 	_hall(m, halls, R.int_(s, 3, 6), cy - 1, ring.x0, cy - 1)
-	_hall(m, halls, ring.x1, cy - 1, MAP_W - R.int_(s, 5, 8), cy - 1)
+	_hall(m, halls, ring.x1, cy - 1, MAP_W - R.int_(s, 4, 8), cy - 1)
 	for hood in 4:
 		var left := hood == 0 or hood == 3
 		var top := hood < 2
@@ -370,19 +323,24 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 		var qy := 0 if hood < 2 else half_h
 		var placed := 0
 		var tries := 0
-		while tries < 1200 and placed < 15:
+		# Der erste Raum je Viertel ist groß: die spätere Boss-Kammer (nach dem
+		# Ummauern noch mindestens 8 × 6 Felder). Keine Nischen mehr.
+		while tries < 1500 and placed < 15:
 			tries += 1
-			var w := R.int_(s, 5, 11)
-			var h := R.int_(s, 4, 8)
+			var big := placed == 0 and tries < 500
+			var w := R.int_(s, 10, 11) if big else R.int_(s, 5, 11)
+			var h := R.int_(s, 8, 8) if big else R.int_(s, 4, 8)
 			var x := R.int_(s, qx + 1, qx + half_w - w - 2)
 			var y := R.int_(s, qy + 1, qy + half_h - h - 2)
 			var cand := {"x": x, "y": y, "w": w, "h": h}
 			if _overlaps(cand, m.rooms) or _overlaps(cand, [ring_rect]) or _touches(m, halls, cand):
 				continue
 			m.rooms.append({"id": m.rooms.size(), "x": x, "y": y, "w": w, "h": h, "kind": "normal", "hood": hood, "name": "", "description": ""})
+			if big:
+				m.rooms[-1].lairPlot = true
 			placed += 1
 	# --- Raumtypen zuweisen
-	var hood_rooms := func(h: int) -> Array: return m.rooms.filter(func(r): return r.hood == h and r.kind == "normal")
+	var hood_rooms := func(h: int) -> Array: return m.rooms.filter(func(r): return r.hood == h and r.kind == "normal" and not r.get("lairPlot", false))
 	var start_hood := R.int_(s, 0, 3)
 	var corner := J.pos(0 if start_hood == 0 or start_hood == 3 else MAP_W, 0 if start_hood < 2 else MAP_H)
 	var start_room: Dictionary = J.sort(hood_rooms.call(start_hood), func(a, b): return dist(center(a), corner) - dist(center(b), corner))[0]
@@ -403,13 +361,15 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 	# Boss-Kammern: der vom Start am weitesten entfernte große Raum je Viertel
 	var boss_rooms := []
 	for h in 4:
-		var cands: Array = hood_rooms.call(h).filter(func(r): return r.w * r.h >= 30)
-		var list: Array = cands if not cands.is_empty() else hood_rooms.call(h)
-		J.sort(list, func(a, b): return dist(center(b), center(start_room)) - dist(center(a), center(start_room)))
+		var plots: Array = m.rooms.filter(func(r): return r.hood == h and r.get("lairPlot", false))
+		var list: Array = plots if not plots.is_empty() else hood_rooms.call(h)
+		J.sort(list, func(a, b): return b.w * b.h - a.w * a.h)
 		if not list.is_empty():
 			var room: Dictionary = list[0]
 			_assign(room, "boss", "Kammer: %s" % hood_names[h], "Die Luft ist schwer. Irgendetwas Großes lebt hier – und es bewacht das ganze Viertel.")
 			boss_rooms.append(room)
+	for r in m.rooms:
+		r.erase("lairPlot")
 
 	# Safe Rooms: wenige und nicht gleich am Start – je eins in den drei
 	# anderen Vierteln, in einigem Abstand
@@ -494,8 +454,6 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 		var to := center(m.rooms[e[1]])
 		if not _carve_corridor(m, from, to, forbidden_for.call([e[0], e[1]])):
 			_carve_corridor(m, from, to, {})
-	# Sackgassen mit kleinen Nischen an den Hauptgängen
-	_niches(s, m, halls, 6)
 
 	# Gilden, Safe Rooms und Kammern: Mauern und Türen
 	for r in m.rooms:
@@ -576,12 +534,12 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 	var free_rooms: Array = m.rooms.filter(func(r): return r.kind == "normal" and r.get("antechamberOf") == null and r.get("feature") == null and not room_has_tile(m, r, "stairs"))
 	var per_hood: int = int(J.nn(def, "reviere", 2 if floor == 1 else 3))
 	for h in 4:
-		var pool: Array = R.shuffle(s, free_rooms.filter(func(r): return r.hood == h and r.w * r.h >= 16 and dist(center(r), start) >= 22))
+		var pool: Array = R.shuffle(s, free_rooms.filter(func(r): return r.hood == h and r.w * r.h >= 16 and dist(center(r), start) >= 20))
 		var chosen := []
 		for r in pool:
 			if chosen.size() >= per_hood:
 				break
-			if J.some(chosen, func(c): return dist(center(c), center(r)) < 10):
+			if J.some(chosen, func(c): return dist(center(c), center(r)) < 8):
 				continue
 			chosen.append(r)
 		for r in chosen:
@@ -649,7 +607,8 @@ static func generate_floor(s: Dictionary, floor: int, ghosts: Array) -> Dictiona
 	for r in m.rooms:
 		if not J.arr(r, "furniture").is_empty() or r.get("feature") != null or r.get("antechamberOf") != null:
 			continue
-		if (r.kind == "nische" and R.chance(s, 0.5)) or (r.kind == "normal" and r.get("revier") == null and R.chance(s, 0.2)):
+		# Ohne die alten Nischen: in etwas mehr normalen Räumen
+		if r.kind == "normal" and r.get("revier") == null and R.chance(s, 0.4):
 			_place_furniture(m, r, ["toilette"])
 			if J.arr(r, "furniture").is_empty():
 				r.erase("furniture")

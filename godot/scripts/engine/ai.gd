@@ -43,6 +43,14 @@ static func _neighbors_of(p: Dictionary) -> Array:
 
 
 static func _step_toward(s: Dictionary, m: Dictionary, goal: Dictionary) -> void:
+	# Geister schweben durch Wände und bleiben an keiner Ecke hängen
+	if Abilities.has(m, "geisterhaft"):
+		var drift: Array = _neighbors_of(m.pos) + [J.pos(m.pos.x + 1, m.pos.y + 1), J.pos(m.pos.x - 1, m.pos.y - 1), J.pos(m.pos.x + 1, m.pos.y - 1), J.pos(m.pos.x - 1, m.pos.y + 1)]
+		drift = drift.filter(func(p): return MapGen.in_bounds(s.map, p.x, p.y) and not occupied(s, p, m) and _allowed_tile(s, m, p))
+		J.sort(drift, func(a, b): return J.cheb(a, goal) - J.cheb(b, goal))
+		if not drift.is_empty() and J.cheb(drift[0], goal) < J.cheb(m.pos, goal):
+			m.pos = drift[0]
+		return
 	var path = Pathfinding.find_path(s.map, m.pos, goal, func(x, y): return _allowed_tile(s, m, J.pos(x, y)) and not occupied(s, J.pos(x, y), m), 250)
 	var next = path[0] if path != null and not path.is_empty() else null
 	if next != null and not occupied(s, next, m) and _allowed_tile(s, m, next):

@@ -68,7 +68,9 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   jedes Viertel hat zusätzlich ein eigenes Gangkreuz. Schmale Nebengänge
   führen von jedem Raum zum nächsten Hauptgang, viele Räume haben einen
   zweiten Zugang zu einem Nachbarraum. So gibt es Schleifen und mehrere Wege
-  statt eines einzigen Tunnels. Kurze Sackgassen enden in kleinen **Nischen**.
+  statt eines einzigen Tunnels. Räume sind mindestens 5 × 4 Felder groß, es
+  gibt keine Mini-Nischen mehr; Nebengänge laufen möglichst gerade durchs
+  Gestein statt an anderen Gängen entlang.
 - **Safe Rooms:** nur drei je Etage, je einer in den drei anderen Vierteln,
   nie im Start-Viertel.
 - **Reviere:** Je Viertel zwei (ab Etage 2 drei) Räume, in denen eine einzige
@@ -76,7 +78,7 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   dort kommt Nachschub, und zwar immer dieselbe Art. Die übrigen Räume sind
   meist leer, ab und zu streift ein Einzelgänger herum (auf Etage 1 öfter).
 - **Toiletten** stehen nicht nur in Safe Rooms, sondern auch in manchen
-  Räumen und Nischen. Man benutzt sie, wenn man direkt daneben steht.
+  normalen Räumen. Man benutzt sie, wenn man direkt daneben steht.
 - **Andere Crawler:** zwei auf Etage 1, vier auf Etage 2, sechs auf Etage 3,
   keiner im Umkreis von 25 Feldern um den Start.
 - Räume mit Namen und Beschreibungen (Heizungskeller, Partykeller, Luftschutzbunker …).
@@ -87,11 +89,14 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   (Stufe zu niedrig), steht dort, dass man ihn nicht kennt.
 - **Einsturz-Timer**: 5 Tage (2400 Züge). Warnungen bei 24 h, 6 h, 1 h.
 - Treppenhäuser: eins hinter dem Borough-Boss, zwei in abgelegenen Räumen.
-- Boss-Kammern und Arena sind **Sackgassen mit genau einem Zugang**.
+- Boss-Kammern und Arena sind **Sackgassen mit genau einem Zugang**. Jedes
+  Viertel bekommt zuerst einen großen Raum (10–11 × 8), der zur Boss-Kammer
+  wird: nach dem Ummauern mindestens 8 × 6 Felder.
 - **Boss-Kammern** haben rote Eisentüren (pulsierendes Glühen, Hinweis im
   Tooltip) und einen **Vorraum** mit 2–3 normalen Wachen: Man läuft nie
-  unvermittelt hinein. Beim Betreten verriegelt sich die Tür, bis der Boss
-  fällt; ein **Versus-Bildschirm** zeigt Crawler gegen Boss.
+  unvermittelt hinein. Wer die Tür durchschreitet, steht sofort drin (in der
+  Tür stehen bleiben geht nicht), die Tür fällt zu und verriegelt sich, bis
+  der Boss fällt; ein **Versus-Bildschirm** zeigt Crawler gegen Boss.
 - **Ruhiger Start:** Im Umkreis von etwa 22 Feldern um den Startraum gibt es
   keine Reviere, nur Einzelgänger. Elite-Gegner tauchen auf Etage 1 erst weit
   vom Start auf (auf den tieferen Etagen etwas früher). Fernkämpfer auf
@@ -704,7 +709,10 @@ Schrift überall: Jersey 10 (Pixelschrift im Stil von Tiny Swords).
 - **Aktionsleiste unten** außerhalb des Kampfes: eine Zeile mit dem gewählten Angriff, Fähigkeit, Warten, Aufheben, Reittier und Zaubern; im Kampf die Kampfsequenz (womit, wie, wohin, welcher Gegner).
 - **Rechtsklick auf die Karte:** Menü mit allem, was auf dem Feld geht (aufheben, angreifen, ansprechen, benutzen, Tür öffnen, Kiste zerschlagen, Wrack durchsuchen, entschärfen, hinabsteigen, hierher gehen, untersuchen). Liegt das Ziel weiter weg, läuft die Figur erst hin.
 - **Laufen:** Außerhalb des Kampfes läuft die Figur ohne Halt bis ans Ziel (Klick) oder solange die Taste gedrückt ist, in festem Takt und gleichmäßig. Anhalten nur bei Gefahr: Kampf beginnt, Schaden, neu entdeckte Falle. Gespeichert und alles neu aufgebaut wird, sobald sie steht.
+- **Start:** Nach der Begrüßung erklärt „So spielst du“ in fünf Seiten Laufen, Handeln (Rechtsklick), Kämpfen, Bildschirm und das erste Ziel. Die Gilde der Einweisung ist von Anfang an aufgedeckt, auf der Karte beschriftet und auf der Übersichtskarte umrahmt, bis das Inventar freigeschaltet ist.
 - **Tutorial:** Der Guide in der Gilde erklärt auch den Bildschirm (Reiter, Chat, Aktionsleiste, Rechtsklick, Karte, Hilfe mit H).
+- **Linke Maustaste halten:** Nach einem kurzen Moment folgt die Figur der Maus, bis man loslässt oder ein Kampf beginnt.
+- **Anziehen vom Boden:** Ausrüstung am Boden lässt sich direkt anziehen (Rechtsklick oder „Hier“); was vorher an dem Platz war, bleibt liegen. Geht auch ohne Inventar, nur Waffen nimmt man dann in die Hand.
 
 ### 3.31 Zeit nutzen: Schwierigkeit der nächsten Etage
 Jede Etage ist so ausgelegt, dass man sie gut schafft, wenn man die vorige
@@ -752,7 +760,10 @@ Etage weitgehend ausgenutzt hat – und nicht, wenn man zu früh hinuntergeht.
 1. **Permadeath + Staffeln:** Tod beendet den Run endgültig. Erhalten bleiben
    Hall of Fame, Karriere-Achievements, Bestiarium.
 2. **Der Tote wird zum Mob:** Der gestorbene Crawler spukt in späteren Staffeln
-   als Geist auf seiner Todesetage – mit seiner Ausrüstung als Beute.
+   als Geist auf seiner Todesetage – mit seiner Ausrüstung als Beute. Der Geist
+   ist so stark wie ein Elite-Gegner der Etage (Stufe höchstens 2 + 2 × Etage,
+   Etagenfaktor), nicht wie der Crawler auf seinem Höhepunkt, und schwebt durch
+   Wände, statt an Ecken hängen zu bleiben.
 3. **Vertrag als Rettung:** Wer (ab Etage 9) einen Vertrag unterschrieben hat,
    stirbt nicht, sondern wird zum Guide der nächsten Staffel (+1 auf drei Stats).
 4. **Seltene Wiederbelebung:** Die legendäre *Zweite-Chance-Klausel* rettet

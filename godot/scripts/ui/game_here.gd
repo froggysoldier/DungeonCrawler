@@ -32,6 +32,8 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 			Kit.icon(h, look[0], look[1], 1)
 			Kit.text(h, Kit.col(Kit.esc(Identify.item_name(s, e.item)), Db.t("items", "RARITY_COLORS")[e.item.rarity]), 14).size_flags_vertical = Control.SIZE_SHRINK_CENTER
 			Kit.button(h, "Aufheben", func(): gv.act(func(): return Game.pickup(s, uid)), "SmallButton")
+			if e.item.kind == "ausruestung" and (e.item.get("slot") != "waffe" or Game.has_unlock(s, "inventar")):
+				Kit.button(h, "Anlegen" if e.item.get("slot") == "waffe" else "Anziehen", func(): gv.act(func(): return Game.wear_from_ground(s, uid)), "SmallButton")
 	if Game.on_stairs(s):
 		any = true
 		Kit.spacer(v, 4)

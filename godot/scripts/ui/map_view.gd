@@ -1251,6 +1251,12 @@ func _draw_top() -> void:
 	var T := tile_px
 	for pr in frame_anim.get("projectiles", []):
 		_draw_projectile(ci, pr)
+	# Gilde der Einweisung: bis das Inventar freigeschaltet ist, steht sie beschriftet auf der Karte
+	if not Game.has_unlock(s, "inventar"):
+		for r in s.map.rooms:
+			if r.get("marked", false):
+				var c := MapGen.center(r)
+				_tag(ci, _sx(c.x) + T / 2, _sy(r.y) - 2 * px, "Gilde der Einweisung", "#7cd4ea")
 	var font := UiFonts.pixel(700)
 	var fs := UiFonts.px(16 if px < 2 else 24)
 	for f in frame_anim.get("floaters", []):

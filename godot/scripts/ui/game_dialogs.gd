@@ -492,7 +492,7 @@ static func run_talk_show(gv: GameView, title: String, intro: Array) -> Modals.J
 ## Alle Tasten und Bedienhinweise auf einen Blick.
 static func show_help(gv: GameView) -> void:
 	var rows := [
-		["Laufen", "Klick auf ein bekanntes Feld · Pfeiltasten oder Ziffernblock (gedrückt halten = weiterlaufen)"],
+		["Laufen", "Klick auf ein bekanntes Feld · linke Maustaste gedrückt halten: der Maus folgen · Pfeiltasten oder Ziffernblock (gedrückt halten = weiterlaufen)"],
 		["Angreifen", "Klick auf einen Gegner oder in ihn hineinlaufen · im Kampf Enter"],
 		["Körperteil", "1 Faust · 2 Tritt · 3 Knie · 4 Ellbogen · 5 Kopfstoß · 6 Waffe · 7 Wurf"],
 		["Ausführung", "Q Normal · W Sprung · E Stampfen · R Anlauf"],

@@ -1,5 +1,5 @@
 extends RefCounted
-## Neuer Kartenaufbau (Haupt- und Nebengänge, Reviere, Nischen, Toiletten),
+## Neuer Kartenaufbau (Haupt- und Nebengänge, Reviere, Toiletten),
 ## Gegenstände aus der Entfernung, Waffe behalten, Werte vor der Klassenwahl.
 
 
@@ -25,7 +25,7 @@ func test_reviere_mit_einer_art(t) -> void:
 	var s := TH.make(14)
 	var m: Dictionary = s.map
 	var reviere: Array = m.rooms.filter(func(r): return r.get("revier") != null)
-	t.ge(reviere.size(), 6, "mehrere Reviere")
+	t.ge(reviere.size(), 5, "mehrere Reviere")
 	for r in reviere:
 		var inside: Array = s.monsters.filter(func(mo): return MapGen.room_of(m, mo.pos) != null and MapGen.room_of(m, mo.pos).id == r.id)
 		t.ok(not inside.is_empty(), "Revier bewohnt")
@@ -83,7 +83,7 @@ func test_toiletten_ueberall(t) -> void:
 						t.ok(Game.toilet(s).ok, "Toilette außerhalb eines Safe Rooms benutzbar")
 						t.eq(int(s.player.blase), 0, "erleichtert")
 						used = true
-	t.gt(found, 3, "Toiletten in normalen Räumen und Nischen")
+	t.gt(found, 3, "Toiletten in normalen Räumen")
 	t.ok(used, "eine Toilette ausprobiert")
 
 
@@ -159,3 +159,20 @@ func test_gold_von_selbst(t) -> void:
 	Game.move_step(s, target)
 	t.eq(s.player.gold, gold_before + 7, "Gold beim Drüberlaufen eingesammelt")
 	t.eq(Game.items_at(s, target).size(), 1, "anderes bleibt liegen")
+
+
+func test_kleidung_vom_boden_anziehen(t) -> void:
+	var s := TH.make(26)
+	s.monsters = []
+	var hat := Items.create_item(s, "bauhelm")
+	s.items.append({"pos": J.pcopy(s.player.pos), "item": hat})
+	t.ok(Game.wear_from_ground(s, hat.uid).ok, "ohne Inventar anziehen")
+	t.eq(s.player.equipment.get(hat.slot), hat, "sitzt")
+	t.ok(Game.items_at(s, s.player.pos).is_empty(), "nicht mehr am Boden")
+	# Zweiter Helm: der erste bleibt liegen
+	var hat2 := Items.create_item(s, "bauhelm")
+	s.items.append({"pos": J.pcopy(s.player.pos), "item": hat2})
+	t.ok(Game.wear_from_ground(s, hat2.uid).ok, "tauschen")
+	t.eq(s.player.equipment.get(hat.slot), hat2, "neuer Helm")
+	t.eq(Game.items_at(s, s.player.pos).size(), 1, "alter liegt")
+

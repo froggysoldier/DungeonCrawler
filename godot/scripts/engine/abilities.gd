@@ -15,6 +15,7 @@ const ABILITY_NAMES := {
 	"brennend": "setzt in Brand",
 	"blendend": "blendet",
 	"furchterregend": "jagt Angst ein",
+	"geisterhaft": "schwebt durch Wände",
 }
 
 const NEIGHBORS := [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]

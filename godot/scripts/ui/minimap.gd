@@ -96,6 +96,11 @@ func _draw() -> void:
 		var sy := oy + (si / mw) * cell + cell / 2
 		var r := maxf(3, floorf(cell * 1.6))
 		draw_rect(Rect2(floorf(sx - r), floorf(sy - r), r * 2, r * 2), Color("#f1d867"), false, 2.0)
+	# Gilde der Einweisung umrahmt, bis das Inventar freigeschaltet ist
+	if not Game.has_unlock(s, "inventar"):
+		for r in m.rooms:
+			if r.get("marked", false):
+				draw_rect(Rect2(ox + (r.x - 1) * cell, oy + (r.y - 1) * cell, (r.w + 2) * cell, (r.h + 2) * cell), Color("#7cd4ea"), false, 2.0)
 	var px: float = ox + s.player.pos.x * cell + cell / 2
 	var py: float = oy + s.player.pos.y * cell + cell / 2
 	var g := maxf(4, floorf(cell * 2.4))

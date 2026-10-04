@@ -61,6 +61,9 @@ static func ready(s: Dictionary, min_w: int = 5) -> Dictionary:
 	s.crawlers = []
 	s.traps = []
 	var r = J.find(s.map.rooms, func(x): return x.kind == "normal" and x.w >= min_w)
+	if r == null:
+		# Kein so breiter Raum: der breiteste normale
+		r = J.sort(s.map.rooms.filter(func(x): return x.kind == "normal"), func(a, b): return b.w - a.w)[0]
 	s.player.pos = {"x": r.x + 1, "y": r.y + 1}
 	return r
 

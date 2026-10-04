@@ -43,6 +43,11 @@ var traveling := false
 var is_ended := false
 var selecting := false
 var held: Variant = null
+## Linke Maustaste gedrückt auf der Karte: nach kurzer Zeit folgt die Figur
+## der Maus, bis ein Kampf beginnt oder die Taste losgelassen wird.
+var _press_at := -1.0
+var _mouse_follow := false
+const FOLLOW_AFTER_MS := 220.0
 ## Nach dem Laufen nachzuholen: speichern, alles neu aufbauen.
 var _save_due := false
 var _refresh_due := false
@@ -382,6 +387,7 @@ func _process(_delta: float) -> void:
 			# Fester Takt (nicht ab "jetzt"), damit die Schritte nahtlos ineinandergehen
 			last_step = maxf(last_step + STEP_MS, now - STEP_MS)
 			step_dir(held.dir)
+	_follow_mouse(now)
 	if not walking():
 		if _refresh_due:
 			_refresh_due = false
@@ -574,9 +580,35 @@ class Banner:
 
 # ---------------------------------------------------------------- Aktionen
 
+## Maustaste gehalten: Schritt für Schritt in festem Takt auf die Maus zu.
+func _follow_mouse(now: float) -> void:
+	if _press_at < 0:
+		return
+	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) or s.status != "playing" or modal_open() or in_combat():
+		_press_at = -1.0
+		_mouse_follow = false
+		return
+	if not _mouse_follow:
+		if now - _press_at < FOLLOW_AFTER_MS:
+			return
+		_mouse_follow = true
+		traveling = false
+		last_step = now - STEP_MS
+	if hover == null or now - last_step < STEP_MS:
+		return
+	var goal := _pos(hover)
+	if goal.x == s.player.pos.x and goal.y == s.player.pos.y:
+		return
+	var path = Game.plan_path(s, goal)
+	if not (path is Array) or path.is_empty() or Ai.monster_at(s, path[0]) != null:
+		return
+	last_step = maxf(last_step + STEP_MS, now - STEP_MS)
+	act(func(): return Game.move_step(s, path[0]))
+
+
 ## Läuft die Figur gerade (Taste gehalten oder Klick-Weg)?
 func walking() -> bool:
-	return held != null or traveling
+	return held != null or traveling or _mouse_follow
 
 
 ## Spielstand und Meta speichern, wenn sich etwas geändert hat.
@@ -823,6 +855,8 @@ func _on_map_click(t: Vector2i, button: int) -> void:
 	if traveling:
 		traveling = false
 		return
+	# Gedrückt halten: die Figur folgt der Maus (siehe _follow_mouse)
+	_press_at = Animator.now_ms()
 	var tp := _pos(t)
 	var vis := _vis_now()
 	var i := MapGen.idx(s.map, t.x, t.y) if MapGen.in_bounds(s.map, t.x, t.y) else -1

@@ -148,6 +148,7 @@ static func new_game(opts: Dictionary) -> Dictionary:
 		Ai.pet_level_up(s)
 
 	_enter_floor(s, 1, meta)
+	_mark_tutorial_guild(s)
 	p.hp = Player.max_hp(s)
 	p.ausdauer = Player.max_ausdauer(s)
 
@@ -165,6 +166,7 @@ static func new_game(opts: Dictionary) -> Dictionary:
 		pages.append("Die Systemstimme hat dich analysiert. Deine Eigenschaften: %s. Details findest du im Crawler-Tab." % ", ".join(names))
 	pages.append("Du hast nichts. Kein Inventar, keine Karte, keine Ahnung. Irgendwo auf dieser Etage gibt es eine Gilde der Einweisung – such sie. Bis dahin kannst du genau einen Gegenstand in der Hand halten. Und deine Fäuste. Und Füße. Viel Spaß!")
 	s.pendingDialogs.append({"title": "%s – Staffel %d" % [show_name, s.season], "speaker": Db.world("SYSTEM_NAME"), "pages": pages})
+	s.pendingDialogs.append({"title": "So spielst du", "speaker": Db.world("SYSTEM_NAME"), "pages": Rules.controls_pages()})
 	Events.emit(s, {"type": "start"})
 	return s
 
@@ -327,6 +329,11 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 			Log.add(s, "Du drängst dich an %s vorbei." % other.name, "info")
 	p.lastMoveDir = J.pos(to.x - p.pos.x, to.y - p.pos.y)
 	p.pos = J.pcopy(to)
+	# In der Tür einer Boss-Kammer bleibt man nicht stehen: ein Schritt hinein,
+	# und die Tür fällt hinter einem zu (siehe _on_enter_room)
+	var inside = _lair_step_inside(s, to, p.lastMoveDir)
+	if inside != null:
+		p.pos = inside
 	s.counters.steps += 1
 	Events.emit(s, {"type": "moved"})
 	after_move(s)
@@ -335,6 +342,24 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 	if Mounts.mount_step(s):
 		end_turn(s, true)
 	return _ok()
+
+
+## Feld hinter der offenen Tür einer Boss-Kammer mit lebendem Boss (oder null).
+static func _lair_step_inside(s: Dictionary, at: Dictionary, dir: Dictionary) -> Variant:
+	if MapGen.tile_at(s.map, at.x, at.y) != "dooropen" or not is_lair_door(s, at):
+		return null
+	var cands: Array = [J.pos(at.x + dir.x, at.y + dir.y)]
+	for d in MapGen.DIRS4:
+		cands.append(J.pos(at.x + d[0], at.y + d[1]))
+	for q in cands:
+		var r = MapGen.room_of(s.map, q)
+		if r == null or (r.kind != "boss" and r.kind != "arena"):
+			continue
+		if not J.some(s.monsters, func(m): return m.get("homeRoom") == r.id and (m.rank == "nachbarschaftsboss" or m.rank == "boroughboss")):
+			return null
+		if MapGen.is_walkable(s.map, q.x, q.y) and Ai.monster_at(s, q) == null and MapGen.furniture_at(s.map, q) == null:
+			return q
+	return null
 
 
 ## Die Boss-Kammer, in der der Crawler gerade eingeschlossen ist.
@@ -781,6 +806,23 @@ static func _run_tutorial(s: Dictionary) -> void:
 
 # ================================================================ Gegenstände
 
+## Die Gilde der Einweisung (die nächste Gilde zum Start) ist von Anfang an
+## auf der Karte: Raum samt Wänden aufgedeckt und markiert.
+static func _mark_tutorial_guild(s: Dictionary) -> void:
+	var m: Dictionary = s.map
+	var best = null
+	for r in m.rooms:
+		if r.kind == "guild" and (best == null or J.cheb(MapGen.center(r), s.player.pos) < J.cheb(MapGen.center(best), s.player.pos)):
+			best = r
+	if best == null:
+		return
+	best.marked = true
+	for y in range(best.y - 1, best.y + best.h + 1):
+		for x in range(best.x - 1, best.x + best.w + 1):
+			if MapGen.in_bounds(m, x, y):
+				m.explored[MapGen.idx(m, x, y)] = true
+
+
 static func pickup(s: Dictionary, uid: Variant = null) -> Dictionary:
 	var p: Dictionary = s.player
 	var here := items_at(s, p.pos).filter(func(e): return uid == null or e.item.uid == uid)
@@ -987,6 +1029,37 @@ static func equip(s: Dictionary, uid: String) -> Dictionary:
 		p.inventory.append(old)
 	p.equipment[slot] = it
 	Log.add(s, "Angelegt: %s." % Identify.item_name(s, it), "info")
+	Events.emit(s, {"type": "equip", "item": it})
+	Player.clamp_vitals(s)
+	end_turn(s)
+	return _ok()
+
+
+## Ausrüstung, die am Boden liegt, direkt anziehen. Was vorher an dem Platz
+## war, bleibt dafür liegen. Geht auch ohne Inventar (nur Waffen nicht: die
+## nimmt man ohne Rucksack in die Hand).
+static func wear_from_ground(s: Dictionary, uid: String) -> Dictionary:
+	var p: Dictionary = s.player
+	var entry = J.find(items_at(s, p.pos), func(e): return e.item.uid == uid)
+	if entry == null:
+		return _fail("Das liegt nicht hier.")
+	var it: Dictionary = entry.item
+	if it.kind != "ausruestung":
+		return _fail("Das kann man nicht anziehen.")
+	if it.get("slot") == "waffe" and not has_unlock(s, "inventar"):
+		return _fail("Ohne Inventar nimmst du Waffen in die Hand: aufheben.")
+	var slot = _slot_for(s, it)
+	if slot == null:
+		return _fail("Kein passender Platz.")
+	s.items = J.without(s.items, entry)
+	var old = p.equipment.get(slot)
+	if old != null:
+		s.items.append({"pos": J.pcopy(p.pos), "item": old})
+		Log.add(s, "Du legst %s ab." % Identify.item_name(s, old), "info")
+	p.equipment[slot] = it
+	s.counters.itemsPicked += 1
+	Log.add(s, "Angezogen: %s." % Identify.item_name(s, it), "loot")
+	Events.emit(s, {"type": "pickup", "item": it})
 	Events.emit(s, {"type": "equip", "item": it})
 	Player.clamp_vitals(s)
 	end_turn(s)

@@ -78,7 +78,7 @@ static func shape(s: Dictionary, m: Dictionary) -> void:
 static func populate(s: Dictionary, m: Dictionary, monsters: Array, occupied: Dictionary) -> void:
 	var mid := J.pos(int(m.width / 2), int(m.height / 2))
 	var cands: Array = m.rooms.filter(func(r):
-		if r.kind != "normal" or r.get("feature") != null or r.get("sealed") or r.get("antechamberOf") != null or r.w * r.h < 16:
+		if r.kind != "normal" or r.get("feature") != null or r.get("sealed") or r.get("antechamberOf") != null or r.w * r.h < 12:
 			return false
 		if MapGen.room_has_tile(m, r, "stairs"):
 			return false
@@ -88,7 +88,7 @@ static func populate(s: Dictionary, m: Dictionary, monsters: Array, occupied: Di
 			for x in range(r.x, r.x + r.w):
 				if m.tiles[MapGen.idx(m, x, y)] == "floor":
 					dry += 1
-		return dry >= 14)
+		return dry >= 10)
 	if cands.is_empty():
 		return
 	J.sort(cands, func(a, b): return MapGen.dist(MapGen.center(a), mid) - MapGen.dist(MapGen.center(b), mid))

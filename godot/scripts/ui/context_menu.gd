@@ -30,11 +30,17 @@ static func actions(gv: GameView, t: Vector2i) -> Array:
 		out.append(["Ansprechen: %s" % Crawlers.describe(npc), func(): gv.go_then(tp, true, func(): return Game.talk_crawler(s, cuid))])
 	for e in Game.items_at(s, tp).slice(0, 5):
 		var iuid: String = e.item.uid
-		var label := "Aufheben: %s" % Identify.item_name(s, e.item)
+		var iname := Identify.item_name(s, e.item)
+		var wearable: bool = e.item.kind == "ausruestung" and (e.item.get("slot") != "waffe" or Game.has_unlock(s, "inventar"))
+		var verb := "Anlegen" if e.item.get("slot") == "waffe" else "Anziehen"
 		if on_player:
-			out.append([label, func(): gv.act(func(): return Game.pickup(s, iuid))])
+			out.append(["Aufheben: %s" % iname, func(): gv.act(func(): return Game.pickup(s, iuid))])
+			if wearable:
+				out.append(["%s: %s" % [verb, iname], func(): gv.act(func(): return Game.wear_from_ground(s, iuid))])
 		else:
-			out.append([label, func(): gv.go_then(tp, false, func(): return Game.pickup(s, iuid))])
+			out.append(["Aufheben: %s" % iname, func(): gv.go_then(tp, false, func(): return Game.pickup(s, iuid))])
+			if wearable:
+				out.append(["%s: %s" % [verb, iname], func(): gv.go_then(tp, false, func(): return Game.wear_from_ground(s, iuid))])
 	var fu = MapGen.furniture_at(m, tp)
 	if fu != null:
 		var f: Dictionary = fu
