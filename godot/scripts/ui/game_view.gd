@@ -55,6 +55,7 @@ var minimap: Minimap
 var _top: HBoxContainer
 var _mapwrap: Control
 var _room_label: Label
+var _room_wrap: PanelContainer
 var _mini_wrap: PanelContainer
 var _zoom_out: Button
 var _zoom_in: Button
@@ -162,6 +163,7 @@ func _build() -> void:
 	_combat_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_mapwrap.add_child(_combat_frame)
 	var rl := PanelContainer.new()
+	_room_wrap = rl
 	rl.theme_type_variation = "RoomLabel"
 	rl.position = Vector2(12, 12)
 	rl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -281,7 +283,9 @@ func _layout_minimap() -> void:
 	var w := _mapwrap.size
 	var sz := Vector2(minf(520, w.x * 0.7), minf(360, w.y * 0.7)) if minimap_big else Vector2(190, 130)
 	_mini_wrap.size = sz
-	_mini_wrap.position = Vector2(12, w.y - sz.y - 12)
+	# Übersichtskarte oben links, der Raumname rechts daneben
+	_mini_wrap.position = Vector2(12, 12)
+	_room_wrap.position = Vector2(12 + sz.x + 10, 12) if _mini_wrap.visible else Vector2(12, 12)
 	minimap.queue_redraw()
 
 

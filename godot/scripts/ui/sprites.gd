@@ -7,15 +7,23 @@ extends RefCounted
 const BY_DEF := {
 	"kellerratte": "ratte", "rattenmensch": "ratte", "rattenschamane": "ratte", "knochenratte": "ratte", "koenig_kanalratte": "ratte", "rattenkaiser": "ratte",
 	"riesenkakerlake": "kakerlake",
-	"kobold": "kobold", "kobold_schleuder": "kobold", "elster_goblin": "kobold", "kobold_bombe": "kobold_tnt", "schmuggler": "kobold", "wechselbalg": "kobold",
+	# Goblins aus dem Pack: Fackel, Dynamit, Fass; abgewandelte Haut
+	"kobold": "kobold", "kobold_schleuder": "kobold", "elster_goblin": "kobold", "kobold_bombe": "kobold_tnt", "schmuggler": "kobold_tnt", "wechselbalg": "wechselbalg",
+	"gnom_buerokrat": "gnom", "heinzelmann": "gnom", "gartenzwerg": "gnom",
+	"troll_lehrling": "troll", "brueckentroll": "troll", "schwarzmarkt_oger": "oger",
+	"fischmensch": "fischmensch",
+	"muellsack_mimic": "fass", "reifenstapel_mimic": "fass", "treibgut_mimic": "fass",
+	# Menschen aus dem Pack (rote Einheiten, Teamfarbe = Farbe der Art)
+	"abtruenniger_crawler": "krieger", "lumpensammler": "mensch_holz", "schleusenwaerter": "zombie_axt",
+	"ghul": "zombie", "moorleiche": "zombie", "morlock": "zombie",
+	"kanalhexe": "moench", "kesselkoenigin": "moench", "pfandbaron": "mensch_messer", "hausverwalter": "moench",
+	"die_sammlerin": "mensch_gold", "der_hausmeister": "mensch_hammer", "kammerjaeger": "bogen", "parkwaechter": "krieger",
+	# Schädel und Schaf aus dem Pack
+	"kellermeister": "schaedel", "wolpertinger": "schaf",
 	"schleim": "schleim", "klaerschlamm": "schleim", "kommandant_schlamm": "schleim",
-	"wolpertinger": "hase",
 	"poltergeist": "geist", "nachtmahr": "geist",
 	"grauer_spaeher": "alien",
-	"muellsack_mimic": "sack",
 	"tatzelwurm": "wurm", "neunauge": "wurm",
-	"ghul": "zombie", "moorleiche": "zombie",
-	"gnom_buerokrat": "gnom", "heinzelmann": "gnom", "gartenzwerg": "gnom",
 	"kellerspinne": "spinne",
 	"fledermaus": "fledermaus",
 	"blaehkroete": "kroete",
@@ -24,23 +32,28 @@ const BY_DEF := {
 	"toaster_mimic": "maschine", "waschmaschine_mimic": "maschine", "muttis_mixer": "maschine", "heizungsbestie": "maschine",
 	"grey_drohne": "drohne",
 	"chupacabra": "hund", "ghulhund": "hund",
-	"troll_lehrling": "troll", "schwarzmarkt_oger": "troll",
-	"kellermeister": "skelett",
-	"abtruenniger_crawler": "mensch", "morlock": "zombie",
 	"wutelementar": "elementar",
 	"kanalkroko": "kroko",
-	"fischmensch": "fisch", "nixe": "fisch", "kanalkoenigin": "fisch",
-	"kanalhexe": "hexe", "kesselkoenigin": "hexe",
+	"nixe": "fisch", "kanalkoenigin": "fisch",
 	"pilzmensch": "pilz",
 	"mottenmann": "motte", "mottenmutter": "motte",
 	"taubenschwarm": "vogel",
 	"rostkaefer": "kakerlake", "oelschleim": "schleim", "abgasgeist": "geist", "parkautomat": "maschine",
-	"garagenkatze": "katze", "reifenstapel_mimic": "sack",
-	"parkwaechter": "mensch", "rostkoenigin": "maschine", "oelschlick": "schleim", "abschleppwurm": "wurm",
+	"garagenkatze": "katze",
+	"rostkoenigin": "maschine", "oelschlick": "schleim", "abschleppwurm": "wurm",
 	"schlickkrebs": "krebs", "stromaal": "aal", "riesenegel": "egel", "gullyqualle": "qualle",
-	"lumpensammler": "mensch", "rohrgolem": "maschine", "schimmelteppich": "pilz", "kloakenhund": "hund",
-	"schleusenwaerter": "zombie", "faulgasblase": "irrlicht", "treibgut_mimic": "sack", "brueckentroll": "troll",
-	"die_sammlerin": "mensch", "der_hausmeister": "mensch", "kammerjaeger": "mensch", "pfandbaron": "mensch", "hausverwalter": "mensch",
+	"rohrgolem": "maschine", "schimmelteppich": "pilz", "kloakenhund": "hund",
+	"faulgasblase": "irrlicht",
+}
+
+## Bosse, die eine Figur aus dem Pack bekommen statt eines eigenen Bildes.
+const PACK_BOSSES := ["die_sammlerin", "der_hausmeister", "kesselkoenigin", "kammerjaeger", "pfandbaron", "hausverwalter", "parkwaechter", "schwarzmarkt_oger"]
+
+## Spielfigur je Klassen-Archetyp (blaue Einheiten aus dem Pack); ohne Klasse der Arbeiter.
+const HERO_UNITS := {
+	"nahkampf": "krieger", "verteidigung": "krieger", "exotisch": "krieger",
+	"fernkampf": "bogen", "magie": "moench", "heilung": "moench",
+	"heimlich": "messer", "handwerk": "hammer", "show": "gold", "tiere": "fleisch",
 }
 
 
@@ -94,7 +107,7 @@ static func pet_sprite(species: String) -> Array:
 
 ## Voller Bildname einer Monsterart: eigene Boss-Figur, sonst die Kreatur.
 static func sprite_name(def_id: String, rank_ghost: bool = false) -> String:
-	if not rank_ghost and PixelArt.has("boss/" + def_id):
+	if not rank_ghost and not def_id in PACK_BOSSES and PixelArt.has("boss/" + def_id):
 		return "boss/" + def_id
 	return "kreatur/" + sprite_for(def_id, rank_ghost)
 
@@ -130,34 +143,10 @@ static func draw_hero(ci: CanvasItem, foot: Vector2, scale: int, flip: bool = fa
 
 # ---------------------------------------------------------------- Spielfigur
 
-## Sichtbare Ausrüstung an der Figur (HeroLook zeichnet sie): GEAR_BEHIND
-## hinter der Figur, GEAR_BODY am Körper, GEAR_TOP über dem Kopf.
-const GEAR_BEHIND := ["ruecken"]
-const GEAR_BODY := ["beine", "fuesse", "brust", "guertel", "hals", "schultern", "arme", "haende"]
-const GEAR_TOP := ["gesicht", "kopf", "waffe"]
 const OUTLINE := Color("#161c2e")
-## Ab dieser Bildzeile bewegen sich im Laufbild nur die Beine (um WALK_STEP nach außen).
-const WALK_ROW := HeroLook.WALK_ROW
-const WALK_STEP := 3
 
-
-## Laufbild: unterhalb von WALK_ROW rückt alles von der Mitte weg.
-static func _walk_frame(img: Image) -> Image:
-	var w := img.get_width()
-	var out := img.duplicate() as Image
-	out.fill_rect(Rect2i(0, WALK_ROW, w, img.get_height() - WALK_ROW), Color(0, 0, 0, 0))
-	for y in range(WALK_ROW, img.get_height()):
-		for x in w:
-			var c := img.get_pixel(x, y)
-			if c.a < 0.5:
-				continue
-			var nx := x + (-WALK_STEP if x < w / 2 else WALK_STEP)
-			if nx >= 0 and nx < w:
-				out.set_pixel(nx, y, c)
-	return out
-
-## Hautfarbe und Körperbau je Rasse (normal, klein, gross, breit). Kopf, Haare
-## und Anbauten jeder Rasse zeichnet HeroLook.
+## Hautfarbe und Körperbau je Rasse (normal, klein, gross, breit), für
+## Beschreibungen; gezeichnet wird die Spielfigur als Einheit aus dem Pack.
 const RACE_LOOKS := {
 	"mensch": {"skin": "#e8b796", "body": "normal"},
 	"elf": {"skin": "#f4e2d0", "body": "normal"},
@@ -186,24 +175,12 @@ const RACE_LOOKS := {
 }
 
 
-## Bildname der Spielfigur mit Rasse und angelegter Ausrüstung. Sie wird einmal
-## im Tiny-Swords-Stil gezeichnet (samt Laufbild „_2“) und unter einem Namen
-## aus Rasse, Plätzen und Farben abgelegt.
+## Bildname der Spielfigur: eine blaue Einheit aus dem Pack, je nach Klasse
+## (vor der Klassenwahl der Arbeiter). Ruhe- und Laufbilder liegen in den Bögen.
 static func hero_name(p: Dictionary) -> String:
-	var eq: Dictionary = J.nn(p, "equipment", {})
-	var race := String(p.get("race")) if p.get("race") != null else "mensch"
-	if not RACE_LOOKS.has(race):
-		race = "mensch"
-	var parts: Array = [race]
-	var colors := {}
-	for slot in GEAR_BEHIND + GEAR_BODY + GEAR_TOP:
-		if eq.get(slot) != null:
-			colors[slot] = item_color(eq[slot])
-			parts.append("%s=%s" % [slot, colors[slot]])
-	var name := "kreatur/held@" + ",".join(parts)
-	if not PixelArt.has(name):
-		var look: Dictionary = RACE_LOOKS[race]
-		var img := TsRender.render(HeroLook.shapes(race, look.body, look.skin, colors, 0))
-		PixelArt.register(name, img, 2)
-		PixelArt.register(name + "_2", _walk_frame(img), 2)
-	return name
+	var unit := "pawn"
+	var kl = p.get("klass")
+	if kl != null and Db.klass(kl) != null:
+		unit = HERO_UNITS.get(String(J.nn(Db.klass(kl), "archetype", "")), "krieger")
+	return "kreatur/spieler_" + unit
+

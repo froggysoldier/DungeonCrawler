@@ -102,7 +102,7 @@ func test_eigene_bosse_und_monster(t) -> void:
 	var own: Array = Db.t("monsters", "HOOD_BOSSES").filter(func(b): return b.floors[0] == 2 and b.rank == "nachbarschaftsboss")
 	t.eq(own.size(), 4, "vier eigene Nachbarschaftsbosse")
 	for b in own:
-		t.ok(PixelArt.has("boss/" + b.id), "%s hat eine Figur" % b.id)
+		t.ok(PixelArt.has(Sprites.sprite_name(b.id)), "%s hat eine Figur" % b.id)
 		t.ge(J.arr(b, "specials").size(), 2, "%s: Spezialangriffe" % b.id)
 		for l in b.loot:
 			t.ok(Items.base_exists(l), "%s: Beute %s" % [b.id, l])

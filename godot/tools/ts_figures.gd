@@ -8,37 +8,51 @@ const R := preload("res://scripts/ui/ts_render.gd")
 
 ## Name -> Anzahl Bilder (1 oder 2). Kreaturen unter kreatur/, Bosse unter boss/.
 const CREATURES := {
-	"ratte": 1, "schleim": 2, "troll": 1, "geist": 2, "pilz": 1, "spinne": 1,
-	"aal": 1, "alien": 1, "drache": 1, "drohne": 2, "egel": 1, "elementar": 1, "fisch": 1,
-	"fledermaus": 2, "gnom": 1, "hase": 1, "haustier": 1, "hexe": 1, "hund": 1, "irrlicht": 2,
+	"ratte": 1, "schleim": 2, "geist": 2, "pilz": 1, "spinne": 1,
+	"aal": 1, "alien": 1, "drache": 1, "drohne": 2, "egel": 1, "elementar": 1,
+	"fledermaus": 2, "hase": 1, "haustier": 1, "hund": 1, "irrlicht": 2,
 	"kakerlake": 1, "katze": 1, "krebs": 1, "kroete": 1, "kroko": 1, "maschine": 1, "motte": 2,
-	"qualle": 1, "raptor": 1, "sack": 1, "skelett": 1, "tentakel": 1, "vogel": 2, "wurm": 1, "zombie": 1,
+	"qualle": 1, "raptor": 1, "sack": 1, "skelett": 1, "tentakel": 1, "vogel": 2, "wurm": 1,
 }
+## Bosse ohne passende Figur im Pack (die übrigen: Sprites.PACK_BOSSES).
 const BOSSES := {
-	"rattenkaiser": 1, "koenig_kanalratte": 1, "kesselkoenigin": 1, "kammerjaeger": 1, "mottenmutter": 1,
-	"muttis_mixer": 1, "nixe": 1, "oelschlick": 1, "parkwaechter": 1, "pfandbaron": 1, "rostkoenigin": 1,
-	"schwarzmarkt_oger": 1, "abschleppwurm": 1, "die_sammlerin": 1, "der_hausmeister": 1, "hausverwalter": 1,
-	"heizungsbestie": 1, "kanalkoenigin": 1, "kommandant_schlamm": 1,
+	"rattenkaiser": 1, "koenig_kanalratte": 1, "mottenmutter": 1, "muttis_mixer": 1, "nixe": 1,
+	"oelschlick": 1, "rostkoenigin": 1, "abschleppwurm": 1, "heizungsbestie": 1, "kanalkoenigin": 1,
+	"kommandant_schlamm": 1,
 }
-## Figuren direkt aus dem Pack (tools/import_tinyswords.gd, Teamfarbe tönbar).
-const UNITS := {
-	"kobold": ["goblin"], "kobold_tnt": ["goblin_tnt"], "mensch": ["pawn", "pawn_2"],
-}
+const UNIT_DIR := "res://assets/tinyswords/units/"
 
 
-## Bild f einer Figur: aus dem Pack oder aus Formen gezeichnet.
+## Figuren direkt aus dem Pack (tools/import_tinyswords.gd): Name -> [Ruhebilder, Laufbilder].
+static func units() -> Dictionary:
+	var out := {}
+	var dir := ProjectSettings.globalize_path(UNIT_DIR)
+	for f in DirAccess.get_files_at(dir):
+		if not f.ends_with(".png"):
+			continue
+		var base := f.get_basename()
+		var name := base.substr(0, base.rfind("_"))
+		var tail := base.substr(base.rfind("_") + 1)
+		if not out.has(name):
+			out[name] = [0, 0]
+		if tail.begins_with("lauf"):
+			out[name][1] += 1
+		else:
+			out[name][0] += 1
+	return out
+
+
+static func unit_image(name: String, file: String) -> Image:
+	var img := Image.load_from_file(ProjectSettings.globalize_path(UNIT_DIR + "%s_%s.png" % [name, file]))
+	img.convert(Image.FORMAT_RGBA8)
+	return img
+
+
 static func image(name: String, f: int) -> Image:
-	if UNITS.has(name):
-		var path := ProjectSettings.globalize_path("res://assets/tinyswords/units/%s.png" % UNITS[name][f])
-		var img := Image.load_from_file(path)
-		img.convert(Image.FORMAT_RGBA8)
-		return img
 	return R.render(shapes(name, f))
 
 
 static func frames(name: String) -> int:
-	if UNITS.has(name):
-		return UNITS[name].size()
 	return CREATURES.get(name, BOSSES.get(name, 1))
 
 
@@ -90,22 +104,6 @@ static func _schleim(f: int) -> Array:
 		["eye", 40, 70 + sq],
 		["eye", 54, 70 + sq],
 		["dl", 45, 79 + sq, 51, 79 + sq, "k"],
-	]
-
-
-static func _troll(_f: int) -> Array:
-	return legs(39, 57, 76, 10, "t") + [
-		["l", 27, 52, 22, 74, 11, "T"],
-		["l", 69, 52, 74, 74, 11, "T"],
-		["e", 48, 62, 23, 21, "T"],
-		["e", 48, 70, 13, 10, "TL", "n"],
-		["r", 31, 72, 34, 10, 4, "d"],
-		["e", 48, 38, 15, 13, "T"],
-		["e", 48, 44, 7, 4, "t", "n"],
-		["eye", 41, 34],
-		["eye", 53, 34],
-		["d", 43, 48, 1.4, "w"],
-		["d", 53, 48, 1.4, "w"],
 	]
 
 
@@ -248,24 +246,6 @@ static func _elementar(_f: int) -> Array:
 	]
 
 
-static func _fisch(_f: int) -> Array:
-	return legs(41, 55, 78, 8, "t") + [
-		["l", 34, 62, 26, 78, 7, "T"],
-		["l", 62, 62, 70, 78, 7, "T"],
-		["p", [22, 78, 30, 76, 26, 84], "t"],
-		["p", [74, 78, 66, 76, 70, 84], "t"],
-		["e", 48, 70, 15, 14, "T"],
-		["e", 48, 73, 9, 9, "h", "n"],
-		["p", [40, 30, 48, 20, 56, 30], "t"],
-		["e", 48, 44, 17, 14, "T"],
-		["eyeb", 36, 42, 4.0, "k"],
-		["eyeb", 60, 42, 4.0, "k"],
-		["dl", 42, 52, 54, 52, "k"],
-		["dl", 26, 46, 30, 50, "t"],
-		["dl", 70, 46, 66, 50, "t"],
-	]
-
-
 static func _fledermaus(f: int) -> Array:
 	var wing: Array = [48, 50, 30, 38, 14, 46, 18, 54, 26, 52, 30, 60, 40, 58] if f == 0 else [48, 50, 34, 60, 20, 70, 24, 62, 30, 66, 34, 72, 42, 64]
 	var right: Array = []
@@ -282,19 +262,6 @@ static func _fledermaus(f: int) -> Array:
 		["d", 52, 49, 1.6, "R"],
 		["dl", 45, 57, 46, 59, "w"],
 		["dl", 51, 57, 50, 59, "w"],
-	]
-
-
-static func _gnom(_f: int) -> Array:
-	return legs(42, 54, 78, 7, "K") + [
-		["e", 48, 72, 14, 12, "b"],
-		["e", 48, 54, 10, 9, "s"],
-		["p", [36, 56, 60, 56, 58, 70, 48, 78, 38, 70], "w"],
-		["e", 48, 57, 4, 3, "f"],
-		["p", [32, 48, 64, 48, 52, 22, 46, 18], "T"],
-		["e", 48, 48, 17, 4, "T", "n"],
-		["eye", 42, 51],
-		["eye", 52, 51],
 	]
 
 
@@ -324,21 +291,6 @@ static func _haustier(_f: int) -> Array:
 		["eye", 40, 60],
 		["eye", 54, 60],
 		["d", 48, 66, 1.5, "f"],
-	]
-
-
-static func _hexe(_f: int) -> Array:
-	return [
-		["l", 70, 50, 74, 86, 3, "d"],
-		["p", [28, 86, 68, 86, 60, 54, 36, 54], "T"],
-		["e", 48, 48, 10, 9, "l"],
-		["e", 54, 52, 4, 4, "l", "n"],
-		["e", 68, 64, 4, 4, "l"],
-		["e", 48, 40, 19, 5, "t"],
-		["p", [36, 40, 60, 40, 56, 22, 66, 12, 50, 18], "T"],
-		["eye", 44, 46],
-		["eye", 51, 46],
-		["dl", 44, 54, 50, 55, "k"],
 	]
 
 
@@ -607,23 +559,6 @@ static func _wurm(_f: int) -> Array:
 	]
 
 
-static func _zombie(_f: int) -> Array:
-	return legs(41, 55, 76, 7, "K") + [
-		["l", 56, 64, 78, 64, 7, "T"],
-		["r", 34, 54, 28, 26, 7, "n"],
-		["dl", 38, 74, 44, 70, "k"],
-		["l", 58, 58, 80, 56, 7, "T"],
-		["e", 48, 40, 14, 13, "T"],
-		["d", 42, 39, 2, "R"],
-		["d", 53, 38, 1.5, "R"],
-		["dl", 42, 48, 54, 47, "k"],
-		["dl", 46, 30, 52, 32, "t"],
-	]
-
-
-# ================================================================ Bosse (größer, eigene Farben)
-
-## Menschliche Figur: Beine, Körper, Kopf; Kleidung und Haut wählbar.
 static func person(body: String, legs_col: String, skin: String, w: float = 15.0, top: float = 50.0) -> Array:
 	return legs(41, 55, top + 26, 9, legs_col) + [
 		["l", 48 - w, top + 8, 48 - w - 4, top + 28, 9, body],

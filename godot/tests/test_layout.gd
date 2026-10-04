@@ -140,3 +140,22 @@ func test_werte_vor_der_klassenwahl(t) -> void:
 		t.le(int(s.player.stats[k]) - int(before[k]), 1, "gleichmäßig (%s)" % k)
 	t.eq(sum_after - sum_before, 3, "drei Punkte verteilt")
 	t.ok(not Game.allocate_stat(s, "str").ok, "frei verteilen erst nach der Wahl")
+
+
+func test_gold_von_selbst(t) -> void:
+	var s := TH.make(25)
+	TH.tutorial(s)
+	s.monsters = []
+	var gold_before: int = s.player.gold
+	var p: Dictionary = s.player.pos
+	var target = null
+	for d in [[1, 0], [-1, 0], [0, 1], [0, -1]]:
+		if MapGen.is_walkable(s.map, p.x + d[0], p.y + d[1]):
+			target = J.pos(p.x + d[0], p.y + d[1])
+			break
+	t.not_null(target, "freies Nachbarfeld")
+	s.items.append({"pos": target, "item": Items.create_gold(s, 7)})
+	s.items.append({"pos": J.pcopy(target), "item": Items.create_item(s, "stein")})
+	Game.move_step(s, target)
+	t.eq(s.player.gold, gold_before + 7, "Gold beim Drüberlaufen eingesammelt")
+	t.eq(Game.items_at(s, target).size(), 1, "anderes bleibt liegen")

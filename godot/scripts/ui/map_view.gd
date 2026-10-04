@@ -270,16 +270,25 @@ const FLAPPING := ["kreatur/fledermaus", "kreatur/motte", "kreatur/vogel", "krea
 const WALKERS := ["kreatur/held", "kreatur/mensch"]
 
 
-## Welches Bild gerade dran ist: erstes oder zweites (Name mit „_2“).
+## Welches Bild gerade dran ist. Figuren aus dem Pack haben ganze Bildfolgen:
+## Ruhebilder (Name, Name_2, Name_3 …) und Laufbilder (Name_lauf1 …).
+## Ältere Figuren wechseln nur zwischen erstem und zweitem Bild.
 func _frame(name: String, key: String, moving: bool, idle: bool = true) -> String:
-	var alt := name + "_2"
-	if not idle or not PixelArt.has(alt):
-		return name
 	var time: float = frame_anim.get("time", 0.0)
+	var phase := float(absi(key.hash()) % 97) * 11.0
+	var runs := PixelArt.run_count(name)
+	if moving and runs > 0:
+		return "%s_lauf%d" % [name, int(time / 100.0) % runs + 1]
+	var n := PixelArt.frame_count(name)
+	if not idle or n < 2:
+		return name
+	if n > 2:
+		var i := int((time + phase) / 110.0) % n
+		return name if i == 0 else "%s_%d" % [name, i + 1]
+	var alt := name + "_2"
 	if name.get_slice("@", 0) in WALKERS:
 		return alt if moving and fmod(time / 130.0, 2.0) >= 1.0 else name
 	# Jede Figur mit eigenem Takt, damit nicht alle gleichzeitig schlagen
-	var phase := float(absi(key.hash()) % 97) * 11.0
 	var period := 170.0 if name in FLAPPING else 420.0
 	return alt if fmod((time + phase) / period, 2.0) >= 1.0 else name
 
@@ -988,7 +997,7 @@ func _draw_dynamic_body() -> void:
 		var mod := Color(1, 1, 1, 0.75 if mo.rank == "geist" else 1.0)
 		if asleep:
 			mod = Color(0.8, 0.8, 0.9, mod.a)
-		_figure(ci, mo.uid, name, sx - gx * px, sy - (gy + 2) * px + bob, mo.color, p.x > ppos.x, mod, false, not asleep)
+		_figure(ci, mo.uid, name, sx - gx * px, sy - (gy + 2) * px + bob, mo.color, p.x > ppos.x, mod, anim != null and anim.moving(mo.uid), not asleep)
 		var top := sprite_top(name) - 2 - gy
 		var crown_h := PixelArt.size_of("aufsatz/krone").y
 		if boss and not name.begins_with("boss/"):

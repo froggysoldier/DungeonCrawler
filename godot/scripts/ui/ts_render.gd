@@ -146,12 +146,11 @@ static func render(shapes: Array) -> Image:
 				if _inside(s, x + 0.5, y + 0.5):
 					owner[y * n + x] = si
 	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
-	# Flächen mit drei Tönen
+	# Flächen wie im Pack: Grundfarbe, schmale Lichtkante oben links, Schattenband unten rechts
+	var lit_off := [Vector2i(0, -2), Vector2i(-1, -2), Vector2i(-2, -1), Vector2i(-2, 0)]
+	var dark_off := [Vector2i(0, 3), Vector2i(1, 3), Vector2i(3, 1), Vector2i(3, 0), Vector2i(2, 2)]
 	for si in bodies.size():
 		var fr: Rect2 = frames[si]
-		var c := fr.get_center()
-		var hw := maxf(1.0, fr.size.x / 2.0)
-		var hh := maxf(1.0, fr.size.y / 2.0)
 		var flat: bool = String(flags[si]).contains("f")
 		var tn: Array = tones[si]
 		var g: Rect2 = fr.grow(1)
@@ -161,13 +160,22 @@ static func render(shapes: Array) -> Image:
 					continue
 				var tone := 1
 				if not flat:
-					var nx := (x + 0.5 - c.x) / hw
-					var ny := (y + 0.5 - c.y) / hh
-					var lit := nx * LIGHT.x + ny * LIGHT.y
-					if lit > 0.42:
-						tone = 2
-					elif lit < -0.38 or ny > 0.62:
+					var dark := false
+					for o in dark_off:
+						var qx: int = x + o.x
+						var qy: int = y + o.y
+						if qx < 0 or qy < 0 or qx >= n or qy >= n or owner[qy * n + qx] != si:
+							dark = true
+							break
+					if dark:
 						tone = 0
+					else:
+						for o in lit_off:
+							var qx: int = x + o.x
+							var qy: int = y + o.y
+							if qx < 0 or qy < 0 or qx >= n or qy >= n or owner[qy * n + qx] != si:
+								tone = 2
+								break
 				img.set_pixel(x, y, tn[tone])
 	# Feine Linien, wo eine Form über einer anderen liegt
 	var out := img.duplicate()

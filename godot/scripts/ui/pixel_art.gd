@@ -51,6 +51,31 @@ static func has(name: String) -> bool:
 	return _index.has(name) or _runtime.has(name)
 
 
+static var _counts := {}
+
+
+## Anzahl der Ruhebilder einer Figur (Name, Name_2, Name_3 …).
+static func frame_count(name: String) -> int:
+	var key := "r|" + name
+	if not _counts.has(key):
+		var n := 1 if has(name) else 0
+		while has("%s_%d" % [name, n + 1]):
+			n += 1
+		_counts[key] = n
+	return _counts[key]
+
+
+## Anzahl der Laufbilder (Name_lauf1 …).
+static func run_count(name: String) -> int:
+	var key := "l|" + name
+	if not _counts.has(key):
+		var n := 0
+		while has("%s_lauf%d" % [name, n + 1]):
+			n += 1
+		_counts[key] = n
+	return _counts[key]
+
+
 ## Ein zur Laufzeit gebautes Bild unter einem Namen bereitstellen; danach geht
 ## es wie jedes Bild aus den Bögen (Tönen, Silhouette, Zeichnen).
 static func register(name: String, img: Image, res: int = 1) -> void:
@@ -255,4 +280,5 @@ static func reset() -> void:
 	_tinted = {}
 	_runtime = {}
 	_runtime_res = {}
+	_counts = {}
 	_pixel_lists = {}

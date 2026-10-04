@@ -225,24 +225,36 @@ func sprite(name: String, rows: Array, outline: bool = true, eyes: bool = false)
 
 
 func _build_all() -> void:
+	var units := TsFig.units()
 	for n in Defs.CREATURES:
 		var base: String = n.trim_suffix("_2")
-		if TsFig.CREATURES.has(base) or TsFig.UNITS.has(base):
+		if TsFig.CREATURES.has(base) or units.has(base):
 			continue
 		_add("kreaturen", "kreatur/" + n, sprite(n, Defs.CREATURES[n], true, true))
-	for n in TsFig.CREATURES.keys() + TsFig.UNITS.keys():
+	for n in TsFig.CREATURES:
 		_add_ts("kreaturen", "kreatur/", n, TsFig.frames(n))
+	# Figuren aus dem Pack mit allen Ruhe- und Laufbildern
+	for n in units:
+		var c: Array = units[n]
+		for i in c[0]:
+			var full: String = "kreatur/" + n + ("" if i == 0 else "_%d" % (i + 1))
+			res[full] = 2
+			_add("einheiten", full, TsFig.unit_image(n, str(i)))
+		for i in c[1]:
+			var full: String = "kreatur/%s_lauf%d" % [n, i + 1]
+			res[full] = 2
+			_add("einheiten", full, TsFig.unit_image(n, "lauf%d" % i))
 	for n in Defs.OVERLAYS:
 		_add("kreaturen", "aufsatz/" + n, sprite(n, Defs.OVERLAYS[n]))
 	for n in Defs.BOSSES:
-		if TsFig.BOSSES.has(n):
+		if TsFig.BOSSES.has(n) or Sprites.PACK_BOSSES.has(n):
 			continue
 		_add("bosse", "boss/" + n, _bottom(sprite(n, Defs.BOSSES[n], true, true), 2))
 	for n in TsFig.BOSSES:
 		_add_ts("bosse", "boss/", n, TsFig.frames(n))
 	for n in Defs.MOUNTS:
 		_add("kreaturen", "reittier/" + n, sprite(n, Defs.MOUNTS[n], true, true))
-	# Spielfigur und Ausrüstung zeichnet HeroLook zur Laufzeit (Tiny-Swords-Stil)
+	# Die Spielfigur ist eine blaue Einheit aus dem Pack (siehe unten)
 	_add("kreaturen", "aufsatz/schatten", _shadow(28, 10))
 	_add("kreaturen", "aufsatz/schatten_klein", _shadow(20, 6))
 	_add("kreaturen", "aufsatz/ring", _ring(32, 14))

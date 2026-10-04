@@ -219,41 +219,141 @@ func _ui() -> void:
 
 ## Rote Teamfarbe der Einheiten -> Magenta-Stufen (PixelArt.TINT_KEYS), damit
 ## Kleidung und Kapuze die Farbe der Monsterart annehmen.
-const TEAM := {"693d5b": 1, "924159": 1, "ab6282": 2, "b65555": 2, "e76161": 3, "f76666": 3}
+const TEAM := {"693d5b": 1, "864659": 1, "924159": 1, "9c4d57": 2, "ab6282": 2, "b65555": 2, "bb655e": 2, "c07265": 3, "e76161": 3, "f76666": 3}
+## Bildfläche der Pack-Figuren: 128 x 128, Füße auf Zeile 121.
+const UNIT_SIZE := 128
+const UNIT_FOOT := 121
+
+## Figuren aus dem Pack: Name -> [Bogen, Feldgröße, [Ruhe-Reihe, Bilder], [Lauf-Reihe, Bilder] oder null,
+## Teamfarbe tönbar].  Die Bögen ohne Reihe sind einzeilig (Reihe 0).
+const UNITS := {
+	# Spielfigur: blaue Einheiten in ihren echten Farben
+	"spieler_pawn": ["Units/Blue Units/Pawn/Pawn_Idle.png|Units/Blue Units/Pawn/Pawn_Run.png", 192, [0, 8], [0, 6], false],
+	"spieler_krieger": ["Units/Blue Units/Warrior/Warrior_Idle.png|Units/Blue Units/Warrior/Warrior_Run.png", 192, [0, 8], [0, 6], false],
+	"spieler_bogen": ["Units/Blue Units/Archer/Archer_Idle.png|Units/Blue Units/Archer/Archer_Run.png", 192, [0, 6], [0, 4], false],
+	"spieler_moench": ["Units/Blue Units/Monk/Idle.png|Units/Blue Units/Monk/Run.png", 192, [0, 6], [0, 4], false],
+	"spieler_messer": ["Units/Blue Units/Pawn/Pawn_Idle Knife.png|Units/Blue Units/Pawn/Pawn_Run Knife.png", 192, [0, 8], [0, 6], false],
+	"spieler_hammer": ["Units/Blue Units/Pawn/Pawn_Idle Hammer.png|Units/Blue Units/Pawn/Pawn_Run Hammer.png", 192, [0, 8], [0, 6], false],
+	"spieler_gold": ["Units/Blue Units/Pawn/Pawn_Idle Gold.png|Units/Blue Units/Pawn/Pawn_Run Gold.png", 192, [0, 8], [0, 6], false],
+	"spieler_fleisch": ["Units/Blue Units/Pawn/Pawn_Idle Meat.png|Units/Blue Units/Pawn/Pawn_Run Meat.png", 192, [0, 8], [0, 6], false],
+	# Menschen und Crawler: rote Einheiten, Teamfarbe in der Farbe der Art
+	"mensch": ["Units/Red Units/Pawn/Pawn_Idle.png|Units/Red Units/Pawn/Pawn_Run.png", 192, [0, 8], [0, 6], true],
+	"mensch_hammer": ["Units/Red Units/Pawn/Pawn_Idle Hammer.png|Units/Red Units/Pawn/Pawn_Run Hammer.png", 192, [0, 8], [0, 6], true],
+	"mensch_gold": ["Units/Red Units/Pawn/Pawn_Idle Gold.png|Units/Red Units/Pawn/Pawn_Run Gold.png", 192, [0, 8], [0, 6], true],
+	"mensch_holz": ["Units/Red Units/Pawn/Pawn_Idle Wood.png|Units/Red Units/Pawn/Pawn_Run Wood.png", 192, [0, 8], [0, 6], true],
+	"mensch_axt": ["Units/Red Units/Pawn/Pawn_Idle Axe.png|Units/Red Units/Pawn/Pawn_Run Axe.png", 192, [0, 8], [0, 6], true],
+	"mensch_messer": ["Units/Red Units/Pawn/Pawn_Idle Knife.png|Units/Red Units/Pawn/Pawn_Run Knife.png", 192, [0, 8], [0, 6], true],
+	"krieger": ["Units/Red Units/Warrior/Warrior_Idle.png|Units/Red Units/Warrior/Warrior_Run.png", 192, [0, 8], [0, 6], true],
+	"bogen": ["Units/Red Units/Archer/Archer_Idle.png|Units/Red Units/Archer/Archer_Run.png", 192, [0, 6], [0, 4], true],
+	"moench": ["Units/Red Units/Monk/Idle.png|Units/Red Units/Monk/Run.png", 192, [0, 6], [0, 4], true],
+	# Goblins (Kobolde): Fackel, Dynamit, Fass
+	"kobold": ["U:Factions/Goblins/Troops/Torch/Red/Torch_Red.png", 192, [0, 7], [1, 6], true],
+	"kobold_tnt": ["U:Factions/Goblins/Troops/TNT/Red/TNT_Red.png", 192, [0, 6], [1, 6], true],
+	"fass": ["U:Factions/Goblins/Troops/Barrel/Red/Barrel_Red.png", 128, [0, 1], null, true],
+	# Schädel und Schaf
+	"schaedel": ["U:Factions/Knights/Troops/Dead/Dead.png", 128, [0, 1, 3], null, false],
+	"schaf": ["U:Resources/Sheep/HappySheep_Idle.png|U:Resources/Sheep/HappySheep_Bouncing.png", 128, [0, 8], [0, 6], false],
+}
+
+## Hautfarbe der Goblins (grün) und der Menschen, für Abwandlungen.
+const GOBLIN_SKIN := ["417168", "38b251", "95d562"]
+## Abwandlungen: neuer Name -> [Figur, Hautfarben (dunkel, mittel, hell)].
+const SKINS := {
+	"fischmensch": ["kobold", ["2f5a7a", "3e8fb8", "8cc8e0"]],
+	"wechselbalg": ["kobold", ["5a3f78", "8a62b0", "c09ee0"]],
+	"gnom": ["kobold", ["8a5a4a", "d89a7a", "f0c8a8"]],
+	"troll": ["kobold_tnt", ["3f5a48", "6a8a5a", "9ab888"]],
+	"oger": ["kobold_tnt", ["5a4a3a", "8a7050", "b89a70"]],
+}
+const HUMAN_SKIN := ["c8a876", "efe1ab"]
+const UNDEAD := {
+	"zombie": ["mensch", ["8aa878", "b8d0a0"]],
+	"zombie_axt": ["mensch_axt", ["8aa878", "b8d0a0"]],
+}
 
 
-## Ein Bild aus einem Einheiten-Bogen (192er Felder) als 96 x 96 mit den Füßen
-## auf Zeile 89, ohne den eingebauten Schatten, Teamfarbe tönbar.
-func _unit(rel: String, frame: int) -> Image:
-	var sheet := _load(rel)
-	var fr := sheet.get_region(Rect2i(frame * 192, 0, 192, 192))
-	var bottom := 0
-	for y in 192:
-		for x in 192:
-			if fr.get_pixel(x, y).a > 0.99:
-				bottom = y
-	var out := Image.create(96, 96, false, Image.FORMAT_RGBA8)
+func _sheet(spec: String) -> Image:
+	if spec.begins_with("U:"):
+		return _load(UPD + spec.substr(2))
+	return _load(FREE + spec)
+
+
+## Ein Feld eines Bogens: ohne eingebauten Schatten, Teamfarbe auf Wunsch tönbar.
+func _cell(sheet: Image, size: int, row: int, col: int, tint: bool) -> Image:
+	var fr := sheet.get_region(Rect2i(col * size, row * size, size, size))
 	var keys: Array = PixelArt.TINT_KEYS.map(func(k): return Color(k))
-	for y in 96:
-		for x in 96:
-			var sy := y + bottom - 89
-			if sy < 0 or sy >= 192:
-				continue
-			var c := fr.get_pixel(x + 48, sy)
+	for y in size:
+		for x in size:
+			var c := fr.get_pixel(x, y)
 			if c.a < 0.99:
-				continue
-			var k = TEAM.get(c.to_html(false))
-			out.set_pixel(x, y, keys[k] if k != null else c)
+				fr.set_pixel(x, y, Color(0, 0, 0, 0))
+			elif tint and TEAM.has(c.to_html(false)):
+				fr.set_pixel(x, y, keys[TEAM[c.to_html(false)]])
+	return fr
+
+
+static func _bottom(img: Image) -> int:
+	var used := img.get_used_rect()
+	return used.end.y - 1
+
+
+## Feld auf die Bildfläche der Figuren setzen, Füße (Unterkante der Ruhefigur) auf UNIT_FOOT.
+func _place(fr: Image, bottom: int) -> Image:
+	var out := Image.create(UNIT_SIZE, UNIT_SIZE, false, Image.FORMAT_RGBA8)
+	var ox := (UNIT_SIZE - fr.get_width()) / 2
+	out.blend_rect(fr, Rect2i(Vector2i.ZERO, fr.get_size()), Vector2i(ox, UNIT_FOOT - bottom))
+	return out
+
+
+func _recolor_skin(img: Image, from: Array, to: Array) -> Image:
+	var out := img.duplicate()
+	for y in img.get_height():
+		for x in img.get_width():
+			var i := from.find(img.get_pixel(x, y).to_html(false))
+			if i >= 0 and img.get_pixel(x, y).a > 0.5:
+				out.set_pixel(x, y, Color(to[i]))
 	return out
 
 
 func _units() -> void:
-	var g := UPD + "Factions/Goblins/Troops/"
-	_save(_unit(g + "Torch/Red/Torch_Red.png", 0), "units/goblin")
-	_save(_unit(g + "TNT/Red/TNT_Red.png", 0), "units/goblin_tnt")
-	var p := FREE + "Units/Red Units/Pawn/"
-	_save(_unit(p + "Pawn_Idle.png", 0), "units/pawn")
-	_save(_unit(p + "Pawn_Run.png", 2), "units/pawn_2")
+	var dir := ProjectSettings.globalize_path(OUT + "units")
+	for f in DirAccess.get_files_at(dir):
+		DirAccess.remove_absolute(dir.path_join(f))
+	var made_frames := {}
+	for name in UNITS:
+		var u: Array = UNITS[name]
+		var files := String(u[0]).split("|")
+		var size: int = u[1]
+		var idle: Array = u[2]
+		var run = u[3]
+		var tint: bool = u[4]
+		var idle_sheet := _sheet(files[0])
+		var run_sheet := _sheet(files[1]) if files.size() > 1 else idle_sheet
+		var start: int = idle[2] if idle.size() > 2 else 0
+		var first := _cell(idle_sheet, size, idle[0], start, tint)
+		var bottom := _bottom(first)
+		var frames: Array = []
+		for i in idle[1]:
+			frames.append(_place(_cell(idle_sheet, size, idle[0], start + i, tint), bottom))
+		var runs: Array = []
+		if run != null:
+			for i in run[1]:
+				runs.append(_place(_cell(run_sheet, size, run[0], i, tint), bottom))
+		made_frames[name] = [frames, runs]
+		_save_unit(name, frames, runs)
+	for name in SKINS:
+		var base: Array = made_frames[SKINS[name][0]]
+		_save_unit(name, base[0].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])), base[1].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])))
+	for name in UNDEAD:
+		var base: Array = made_frames[UNDEAD[name][0]]
+		_save_unit(name, base[0].map(func(i): return _recolor_skin(i, HUMAN_SKIN, UNDEAD[name][1])), base[1].map(func(i): return _recolor_skin(i, HUMAN_SKIN, UNDEAD[name][1])))
+
+
+func _save_unit(name: String, frames: Array, runs: Array) -> void:
+	for i in frames.size():
+		_save(frames[i], "units/%s_%d" % [name, i])
+	for i in runs.size():
+		_save(runs[i], "units/%s_lauf%d" % [name, i])
 
 
 # ================================================================ Gelände

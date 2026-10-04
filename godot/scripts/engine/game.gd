@@ -684,6 +684,10 @@ static func after_move(s: Dictionary) -> void:
 		s.currentRoom = room_id
 		if room != null:
 			_on_enter_room(s, room)
+	# Gold hebt man beim Drüberlaufen von selbst auf
+	for e in items_at(s, s.player.pos):
+		if e.item.kind == "gold":
+			pickup(s, e.item.uid)
 	var here := items_at(s, s.player.pos)
 	if not here.is_empty():
 		Log.add(s, "Hier liegt: %s." % ", ".join(here.map(func(e): return Identify.item_name(s, e.item))), "loot")

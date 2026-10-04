@@ -157,22 +157,24 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
   (Kopfzeile, Reiter) geschnitztes Holz, Abschnittsüberschriften gelbe Bänder.
   Balken haben einen Holzrahmen mit Rinne wie die Balken des Packs.
 
-- Monster und Bosse: fein gezeichnet wie die Einheiten des Packs (96 × 96
-  Bildpixel, zwei je Kunstpixel, 48 Kunstpixel groß, die Füße auf der Kachel,
-  größer als eine Kachel). Kobolde sind die Goblins des Packs (Fackel, Dynamit
-  für den Bombenkobold), Menschen und andere Crawler der Arbeiter; ihre
-  Teamfarbe ist tönbar. Alle übrigen 32 Kreaturen und 19 Bosse sind aus Formen
-  gebaut (`tools/ts_figures.gd`) und werden von `tools/ts_render.gd` im Stil
-  des Packs gezeichnet: dicker Nachtblau-Umriss außen, feine Linien zwischen
-  den Teilen, jede Form mit Licht oben links und Schatten unten rechts.
-  Im Index steht dafür `"res": 2`; `PixelArt.size_of` gibt Kunstpixel zurück.
-  Vorschau: `godot --headless --path godot -s res://tools/shot_ts.gd -- bild.png [namen]`.
-- Spielfigur: `HeroLook` baut sie zur Laufzeit aus Formen, mit dem Körperbau
-  der Rasse (normal, klein, gross, breit), ihren Merkmalen (Ohren, Hörner,
-  Schwanz, Flügel, Bart …) und der sichtbaren Ausrüstung in der Farbe ihrer
-  Seltenheit; `TsRender` zeichnet sie (etwa 20 ms, einmal je Ausrüstung), das
-  Laufbild entsteht daraus durch Verschieben der Beine. Vorschau aller Rassen:
-  `godot --headless --path godot -s res://tools/shot_heroes.gd -- bild.png`.
+- Figuren aus dem Pack, mit ihren Animationen (Ruhebilder `Name`, `Name_2` …,
+  Laufbilder `Name_lauf1` …; Bogen `einheiten.png`, 128 × 128, zwei Bildpixel
+  je Kunstpixel):
+  - Spielfigur: blaue Einheit je Klassen-Archetyp (`Sprites.HERO_UNITS`),
+    vor der Klassenwahl der Arbeiter.
+  - Crawler, Menschen und menschliche Bosse: rote Einheiten (Arbeiter mit
+    Werkzeug, Krieger, Bogenschütze, Mönch), Teamfarbe in der Farbe der Art;
+    Untote mit fahler Haut.
+  - Kobolde, Gnome, Trolle, Fischmenschen: die Goblins des Packs (Fackel,
+    Dynamit) mit abgewandelter Hautfarbe; Mimiks sind der Fass-Goblin.
+  - Skelett: der Schädel, Wolpertinger: das Schaf.
+- Übrige Kreaturen und Bosse (Tiere, Schleime, Maschinen …) gibt es im Pack
+  nicht. Sie sind aus Formen gebaut (`tools/ts_figures.gd`) und werden von
+  `TsRender` wie die Pack-Figuren schattiert: dicker Nachtblau-Umriss, feine
+  Linien zwischen den Teilen, schmale Lichtkante oben links, Schattenband
+  unten rechts. Vorschau: `godot --headless --path godot -s res://tools/shot_ts.gd -- bild.png [namen]`.
+- Gold wird beim Drüberlaufen eingesammelt, die Kamera folgt dem Crawler ohne
+  Verzögerung, die Übersichtskarte liegt oben links.
 
 `tools/import_tinyswords.gd` holt die Teile aus `asset-pack/`, setzt die
 Bögen mit Lücken zu 9-Slices zusammen, färbt um und verkleinert Knöpfe auf

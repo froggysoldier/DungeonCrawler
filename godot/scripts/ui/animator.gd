@@ -261,11 +261,8 @@ func frame(s: Dictionary, now: float = -1.0) -> Dictionary:
 	if now < 0:
 		now = now_ms()
 	var player := draw_pos("p", Vector2(s.player.pos.x, s.player.pos.y), now)
-	if _cam == null:
-		_cam = player
-	_cam = (_cam as Vector2).lerp(player, 0.25)
-	if absf(_cam.x - player.x) < 0.01 and absf(_cam.y - player.y) < 0.01:
-		_cam = player
+	# Die Kamera klebt am Crawler (der Schritt selbst ist schon weich animiert)
+	_cam = player
 	var projectiles: Array = []
 	_shots = _shots.filter(func(sh): return now < sh.start + sh.dur)
 	for sh in _shots:
