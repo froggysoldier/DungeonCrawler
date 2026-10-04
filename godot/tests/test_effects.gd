@@ -90,6 +90,17 @@ func test_treffer_und_tod_aus_dem_pack(t) -> void:
 	t.gt(a.bursts(2000.0 + Animator.BURST_MS + 50).size(), 0, "Umfallen dauert länger als Zerfallen")
 
 
+func test_spielfigur_stirbt_sichtbar(t) -> void:
+	var a := Animator.new()
+	t.eq(a.dying(1000.0), -1.0, "lebt")
+	a.player_death(Vector2(4, 4), 1000.0)
+	t.eq(a.dying(1000.0 + Animator.PLAYER_DEATH_MS / 2), 0.5, "kippt um")
+	t.eq(a.dying(1000.0 + Animator.PLAYER_DEATH_MS * 3), 1.0, "bleibt liegen")
+	t.eq(a.fx(1500.0).filter(func(e): return e.kind == "staub").size(), 1, "Staub beim Aufprall")
+	a.reset()
+	t.eq(a.dying(5000.0), -1.0, "neues Spiel: lebt wieder")
+
+
 func test_schwerer_treffer_bebt(t) -> void:
 	var a := Animator.new()
 	var s := TH.make(22)

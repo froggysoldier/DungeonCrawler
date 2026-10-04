@@ -575,7 +575,12 @@ func after_action() -> void:
 		is_ended = true
 		traveling = false
 		var title := "Geschafft!" if s.status == "victory" else "Tot."
-		await get_tree().create_timer(0.3).timeout
+		if s.status == "victory":
+			await get_tree().create_timer(0.3).timeout
+		else:
+			# Erst sieht man die Figur umkippen und ihren Geist aufsteigen
+			anim.player_death(Vector2(s.player.pos.x, s.player.pos.y))
+			await get_tree().create_timer(Animator.PLAYER_DEATH_MS / 1000.0 + 0.2).timeout
 		var text := "Du hast alle bisher gebauten Etagen überlebt." if s.status == "victory" else "Todesursache: %s." % J.nn(s, "deathCause", "unbekannt")
 		await modals().html(title, func(root): Modals.page(root, Kit.esc(text)), "Weiter").closed
 		ended.emit(s)

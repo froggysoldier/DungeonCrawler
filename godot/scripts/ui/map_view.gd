@@ -1159,6 +1159,34 @@ func _draw_sparkles(ci: CanvasItem, sx: float, sy: float, k: float) -> void:
 			ci.draw_rect(Rect2(sx + x * px, sy + y * px + d, d, d), Color(c, alpha * 0.4))
 
 
+## Tod der Spielfigur (k von 0 bis 1): sie kippt mit ihrer Ausrüstung nach
+## hinten um, prallt kurz nach, wird blasser; aus ihr steigt der Geist auf.
+func _draw_player_death(ci: CanvasItem, sx: float, sy: float, hero: String, hx: float, hy: float, flip: bool, k: float) -> void:
+	var T := tile_px
+	var fall := minf(1.0, k / 0.24)
+	var angle := fall * fall * PI / 2
+	if k > 0.24 and k < 0.34:
+		angle -= sin((k - 0.24) / 0.1 * PI) * 0.18
+	# Nach hinten: weg von der Blickrichtung
+	if not flip:
+		angle = -angle
+	var foot := Vector2(sx + T / 2, sy + T - 3 * px)
+	var fade := 1.0 if k < 0.5 else 1.0 - (k - 0.5) / 0.5 * 0.45
+	# Liegend bleibt der Körper auf seinem Feld: der Drehpunkt rückt mit
+	var slide := Vector2((1.0 if not flip else -1.0) * fall * 12 * px, -fall * 9 * px)
+	ci.draw_set_transform(foot + slide, angle, Vector2.ONE)
+	PixelArt.draw(ci, hero, Vector2(sx - hx * px, sy - hy * px) - foot, px, null, flip, Color(1, 1, 1, fade))
+	ci.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	if k > 0.3:
+		var g := (k - 0.3) / 0.7
+		var ghost := "kreatur/geist"
+		var gs := PixelArt.size_of(ghost)
+		var gx := sx - (gs.x - TILE) / 2.0 * px + sin(g * 9.0) * 3 * px
+		var gy := sy - (gs.y - TILE) * px - g * 40 * px
+		var alpha := minf(1.0, g * 4.0) * (1.0 - g * g) * 0.85
+		_spr(ci, ghost, gx, gy, "#cfe6ff", flip, Color(1, 1, 1, alpha))
+
+
 func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
 	var p: Dictionary = s.player
 	var T := tile_px
@@ -1188,6 +1216,10 @@ func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
 	var hsz := PixelArt.size_of(hero)
 	var hx := (hsz.x - TILE) / 2
 	var hy := hsz.y - TILE
+	var dying: float = anim.dying(frame_anim.get("now", -1.0)) if anim else -1.0
+	if dying >= 0:
+		_draw_player_death(ci, sx, sy, hero, hx, hy, flip, dying)
+		return
 	_figure(ci, "p", hero, sx - hx * px, sy - hy * px - lift + (0.0 if walking else bob), null, flip, Color.WHITE, walking)
 	if riding and vehicle:
 		_spr(ci, mount_name, sx, sy, null, flip)

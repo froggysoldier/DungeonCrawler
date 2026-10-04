@@ -206,6 +206,10 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
   (`make_pixel_art._add_flinch`); selbst gebaute Kreaturen zerfallen beim Tod
   weiter in Pixel und Staub. Der Animator spielt Treffer mit 80 ms, Tod mit
   90 ms je Bild (`hurt_frame`, Bursts mit Todesbildern dauern länger).
+- Tod der Spielfigur: Sie kippt mit ihrer Ausrüstung nach hinten um
+  (gedreht um die Füße), es staubt und bebt beim Aufprall, ihr Geist steigt
+  auf und verblasst (`Animator.player_death`, `map_view._draw_player_death`,
+  1,8 s). Erst danach öffnet `game_view` das Fenster „Tot.“.
 - Größen: Tiny-RPG-Menschen und der Magier dreifach, kleine Skelette, Orks
   und Werbär vierfach vergrößert, damit sie neben der Spielfigur stimmen.
 - Übrige Kreaturen und Bosse (Tiere, Schleime, Geräte wie Toaster, Waschmaschine, Parkautomat und Rohrgolem …) gibt es im Pack

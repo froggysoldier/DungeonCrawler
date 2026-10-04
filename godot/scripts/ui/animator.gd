@@ -17,6 +17,8 @@ const ATTACK_FRAME_MS := 70.0
 ## Treffer- und Todesbilder: so lange je Bild.
 const HURT_FRAME_MS := 80.0
 const DEATH_FRAME_MS := 90.0
+## Tod der Spielfigur: umkippen, Staub, der Geist steigt auf.
+const PLAYER_DEATH_MS := 1800.0
 
 var _tweens: Dictionary = {}
 var _lunges: Dictionary = {}
@@ -24,6 +26,8 @@ var _lunges: Dictionary = {}
 var _attacks: Dictionary = {}
 ## Getroffene Figuren: Figur -> Beginn der Trefferbilder.
 var _hurts: Dictionary = {}
+## Beginn des Todes der Spielfigur (-1: lebt).
+var _player_death := -1.0
 var _flashes: Dictionary = {}
 var _bursts: Array = []
 var _shake: Dictionary = {}
@@ -192,6 +196,25 @@ func hurt_frame(key: String, frames: int, now: float = -1.0) -> int:
 	return i if i >= 0 else -1
 
 
+## Die Spielfigur stirbt an Feld at: Umkippen beginnt, beim Aufprall staubt es.
+func player_death(at: Vector2, now: float = -1.0) -> void:
+	if now < 0:
+		now = now_ms()
+	_player_death = now
+	_fx.append({"at": at, "kind": "staub", "start": now + 420.0, "dur": BURST_MS})
+	_shake = {"start": now + 420.0, "dur": SHAKE_MS, "amp": 1}
+
+
+## Fortschritt des Todes der Spielfigur (0 bis 1, danach bleibt sie liegen),
+## -1 solange sie lebt.
+func dying(now: float = -1.0) -> float:
+	if _player_death < 0:
+		return -1.0
+	if now < 0:
+		now = now_ms()
+	return clampf((now - _player_death) / PLAYER_DEATH_MS, 0.0, 1.0)
+
+
 ## Richtung des laufenden Angriffs (null ohne Angriff).
 func attack_dir(key: String) -> Variant:
 	var a = _attacks.get(key)
@@ -303,6 +326,7 @@ func reset() -> void:
 	_lunges.clear()
 	_attacks.clear()
 	_hurts.clear()
+	_player_death = -1.0
 	_flashes.clear()
 	_bursts.clear()
 	_sparkles.clear()
