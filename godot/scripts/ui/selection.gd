@@ -84,7 +84,7 @@ static func _stats_preview(parent: Node, s: Dictionary, r: Dictionary, c: Dictio
 		Kit.label(g, Bonuses.STAT_NAMES[k], 12)
 		var val := "[b]%d[/b]" % before
 		if delta:
-			val += " [b]%s[/b]" % Kit.col("→ %d" % after, "ok" if delta > 0 else "danger")
+			val += " [b]%s[/b]" % Kit.col("» %d" % after, "ok" if delta > 0 else "danger")
 		Kit.text(g, val, 12)
 
 
@@ -158,7 +158,7 @@ static func show_selection(gv: GameView) -> Modals.Job:
 				var b := Kit.button(filter_el, fl[1], func():
 					state.filter = fid
 					fns.draw.call(), "SelButton" if state.filter == fid else "SmallButton")
-				b.add_theme_font_size_override("font_size", 12)
+				b.add_theme_font_size_override("font_size", UiFonts.px(12))
 			Kit.clear(class_el)
 			var rare_names: Dictionary = Db.t("classes", "CLASS_RARITY_NAMES")
 			for co in classes:

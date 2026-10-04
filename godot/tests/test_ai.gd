@@ -33,14 +33,17 @@ func test_verletzte_fliehen_nicht(t) -> void:
 	t.ok(not ghul.get("fleeing", false), "flieht nicht")
 
 
-func test_feiglinge_halten_abstand(t) -> void:
+func test_feiglinge_fliehen_erst_verletzt(t) -> void:
 	var s := TH.make(9100, {"beruf": 1})
 	var at := _arena(s)
 	var gnom := _spawn(s, "gnom_buerokrat", 1, at.call(2))
 	s.monsters = [gnom]
 	Ai.monster_turn(s, gnom)
+	t.ok(not gnom.get("fleeing", false), "unverletzt bleibt er")
+	gnom.hp = int(gnom.maxHp * 0.4)
 	Ai.monster_turn(s, gnom)
-	t.eq(gnom.get("fleeing"), true, "flieht")
+	Ai.monster_turn(s, gnom)
+	t.eq(gnom.get("fleeing"), true, "verletzt flieht er")
 
 
 func test_schlafende_wachen_durch_laerm(t) -> void:

@@ -25,7 +25,7 @@ godot/
   scenes/main.*          Einstieg: Titel, Interview, Spiel, Endbildschirm
   assets/pixel/          Pixel-Bögen (PNG) und index.json mit der Lage jedes Bildes
   assets/tinyswords/     Teile aus dem Tiny-Swords-Pack (Pixel Frog): Oberfläche, Wände, Wasser, Effekte
-  assets/fonts/          Montserrat und Pixelify Sans (beide SIL Open Font License)
+  assets/fonts/          Jersey 10 und Montserrat (beide SIL Open Font License)
   tests/                 Testlauf, Tests, Replay-Bot und Aufnahmen (fixtures)
   tools/                 Werkzeuge: Bildschirmfotos, Aufnahmen, Balance-Simulation
 ```
@@ -40,7 +40,8 @@ godot/
 | `map_view.gd` | Karte: statische Ebene (nur bei Änderungen neu), belebte Ebene, Nebel und Licht mit Dithering (Shader), Figuren, Effekte |
 | `sprites.gd` | Welche Figur zu welcher Monsterart gehört, große Porträts |
 | `animator.gd` | Gleiten, Kamera, Geschosse, aufsteigende Zahlen |
-| `game_view.gd` | Spielansicht, Eingabe, Kampfmodus, Log |
+| `game_view.gd` | Spielansicht (Kopfzeile mit Reitern, Karte mit ausklappbarer Reiter-Tafel, rechts Werte, „Hier“ und Chat, unten Aktionsleiste), Eingabe, Laufen, Kampfmodus, Chat |
+| `context_menu.gd` | Rechtsklick-Menü auf der Karte (Aktionen je Feld, hinlaufen und handeln) |
 | `game_vitals.gd`, `game_here.gd`, `game_tabs.gd`, `game_combat.gd`, `game_dialogs.gd` | Feste Lebensanzeige, Seitenleiste, Reiter, Kampfsequenz, Tooltip, Versus, Talkshow, Hilfe, Menü |
 | `selection.gd`, `screens.gd` | Rassen- und Klassenwahl, Titel, Interview, Ende |
 | `modals.gd`, `typing.gd` | Dialoge mit Warteschlange, Schreibmaschinen-Effekt |
@@ -230,9 +231,10 @@ Nachtblau-Kontur, Rampe zu Creme, Palette des Packs.
 in eigenen Spielen erlaubt; das Pack selbst darf nicht weiterverteilt oder
 verkauft werden. Siehe `assets/tinyswords/LIZENZ.md`.
 
-**Schriften:** Fließtext in Montserrat, Überschriften, Knöpfe, Reiter und die
-Karte in Pixelify Sans. Pixelify ist bei Größen in Zehnerschritten ganz
-scharf (ein Schriftpixel = 1/10 der Größe).
+**Schrift:** Jersey 10 überall (Titel, Knöpfe, Reiter, Werte, Chat, Texte,
+Karte), ohne Kantenglättung. Sie wirkt bei gleicher Punktzahl kleiner als
+eine normale Schrift; `UiFonts.px()` rechnet alle Größen der Oberfläche um
+(Faktor 1,45). Montserrat liefert nur noch Zeichen, die Jersey fehlen.
 
 ## Werkzeuge
 

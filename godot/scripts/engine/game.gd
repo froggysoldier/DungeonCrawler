@@ -699,7 +699,7 @@ static func _on_enter_room(s: Dictionary, room: Dictionary) -> void:
 	var first: bool = not room.get("visited")
 	room.visited = true
 	if first:
-		Log.add(s, "【%s】 %s" % [room.name, room.description], "info")
+		Log.add(s, "» %s « %s" % [room.name, room.description], "info")
 	else:
 		Log.add(s, "Du betrittst: %s." % room.name, "info")
 	if room.kind == "guild" and not has_unlock(s, "inventar"):
@@ -1025,8 +1025,8 @@ static func drop_item(s: Dictionary, uid: String) -> Dictionary:
 
 static func open_box(s: Dictionary, uid: String) -> Dictionary:
 	var p: Dictionary = s.player
-	if not Combat.is_in_safe_room(s, p.pos):
-		return _fail("Lootboxen kannst du nur in einem Safe Room öffnen.")
+	if not Combat.can_open_boxes(s, p.pos):
+		return _fail("Lootboxen kannst du nur in einem Safe Room oder einer Gilde öffnen.")
 	if not has_unlock(s, "inventar"):
 		return _fail("Du brauchst erst ein Inventar. Schließ das Tutorial in der Gilde ab.")
 	var box = J.find(p.boxes, func(b): return b.uid == uid)

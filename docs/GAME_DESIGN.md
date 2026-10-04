@@ -237,7 +237,7 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
   aufgehoben werden → deckt das Viertel auf) + Boss-Box + Unikat.
 - **Borough-Bosse** je Etage: Oma Gulasch (1), Der Hausverwalter (2),
   Der Rattenkaiser (3) – die Treppe liegt direkt dahinter.
-- Mobs fliehen bei wenig Leben, verlieren das Interesse, wenn man weit weg ist.
+- Mobs fliehen selten: kleine Tiere bei wenig Leben, Feiglinge erst ab 40 % Verlust, Diebe mit Beute, alle unter Furcht. Wer in die Ecke gedrängt ist, wehrt sich. Fernkämpfer weichen ab und zu (30 %) einen Schritt zurück. Mobs verlieren das Interesse, wenn man weit weg ist.
 
 ### 3.7 Safe Rooms
 - Keine Gewalt; Mobs, die angreifen, werden weggebeamt. Monster betreten
@@ -246,7 +246,7 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
   pro Crawler; meist nützlich, manchmal ein Scherzartikel), ab Etage 3
   einen Händler, ein Bett und eine Toilette. **Restaurants** haben zusätzlich einen Wirt mit
   Buff-Essen und Zimmer. Möbel benutzt man, indem man hineinläuft.
-- Nur hier: **Lootboxen öffnen** und **schlafen** (8 h, heilt, Haustier kehrt zurück).
+- Hier (und in der Gilde) **Lootboxen öffnen**; nur hier **schlafen** (8 h, heilt, Haustier kehrt zurück).
 - **Toilette:** Erleichtern darf man sich nur hier (siehe Blase).
 - **Laden** (ab Etage 3) mit wechselnder Besitzerin oder wechselndem Besitzer: kaufen,
   verkaufen (40 % des Werts) und **feilschen** – einmal pro Angebot, Chance
@@ -696,12 +696,15 @@ Nach dem Tutorial ruft die Regie etwa alle 220–340 Züge eine Einlage aus (die
 Dazu: Achievement-Familien „Einlagen“ (1/5/12) und „Kopfgelder“ (1/3/8), Sponsor „Kopfjäger Wettbüro“ (mag Kopfgelder, Einlagen und Elite-Kills, hasst verfallene Kopfgelder) und neue Verbrauchsgegenstände: Kühlpack (löscht Brennen), Augentropfen (gegen Blindheit), Baldriantropfen (gegen Furcht), Glückskeks (+8 % Krit), Blaue Fokuspille (+10 Treffer, −3 Ausweichen), Dose Unterbodenschutz (+2 Rüstung) und Thermoskanne Kaffee (+1 Sichtweite). Sie liegen am Boden, in Autowracks und bei den Wanderhändlern.
 
 ### 3.30 Aufbau der Oberfläche
-- **Kopfzeile:** nur Etage, Einsturz-Zeit, laufende Einlage, Zuschauer (Details im Tooltip), Gold, Lootboxen (nur wenn vorhanden) und „Menü“ (Esc) mit Ton, Musik, Tippgeräusch und Steuerung.
-- **Seitenleiste oben, immer sichtbar:** Name, Stufe, Klasse, Balken für HP, Ausdauer, Mana, Blase und Erfahrung, dazu Zustände, Haustier, Reittier und Party in einer Zeile. Freie Wertepunkte erscheinen als Knopf.
-- **„Hier“:** nur wenn es am Standort etwas zu tun gibt; einklappbar (N).
-- **Reiter in zwei Reihen:** Crawler (P), Ziele (Z), Inventar (I), Handwerk (B), Skills (L), Erfolge (O); Tab blättert außerhalb des Kampfes. Ein goldener Punkt zeigt, wo etwas wartet (freie Punkte, Angebote, Abgaben, Kopfgeld). „Ziele“ bündelt Einlage, Aufträge, Sponsoren, Viertel und Party; im Crawler-Reiter lassen sich lange Abschnitte einklappen.
-- **Aktionsleiste außerhalb des Kampfes:** eine Zeile mit dem gewählten Angriff, Fähigkeit, Warten, Aufheben, Reittier und Zaubern. Körperteil und Ausführung wählt man im Kampf (oder mit 1–7, Q–R).
-- **Log:** Filter Alles, Kampf, Beute und Erfolge, Gespräche; gleiche Zeilen hintereinander werden zusammengefasst („(9×)“).
+Schrift überall: Jersey 10 (Pixelschrift im Stil von Tiny Swords).
+- **Kopfzeile:** links Etage, Uhrzeit, Einsturz-Zeit, laufende Einlage, Zuschauer (Details im Tooltip), Gold, Lootboxen (nur wenn vorhanden) und „Menü“ (Esc); rechts die **Reiter** Crawler (P), Ziele (Z), Inventar (I), Handwerk (B), Skills (L), Erfolge (O). Ein Klick oder die Taste klappt den Reiter als Tafel oben rechts über der Karte auf, derselbe Klick, „Schließen“ oder Esc klappt ihn zu; Tab blättert außerhalb des Kampfes. Ein goldener Punkt zeigt, wo etwas wartet (freie Punkte, Angebote, Abgaben, Kopfgeld).
+- **Rechts, oben immer sichtbar:** Name, Stufe, Klasse, Balken für HP, Ausdauer, Mana, Blase und Erfahrung, dazu Zustände, Haustier, Reittier und Party. Freie Wertepunkte erscheinen als Knopf.
+- **„Hier“** darunter: nur wenn es am Standort etwas zu tun gibt (Safe Room, Gilde mit Lootboxen, Händler, Crawler, Fallen); einklappbar (N), höchstens 40 % der Höhe.
+- **Chat** rechts darunter, über die ganze restliche Höhe und in größerer Schrift: Filter Alles, Kampf, Beute und Erfolge, Gespräche; gleiche Zeilen hintereinander werden zusammengefasst („(9×)“).
+- **Aktionsleiste unten** außerhalb des Kampfes: eine Zeile mit dem gewählten Angriff, Fähigkeit, Warten, Aufheben, Reittier und Zaubern; im Kampf die Kampfsequenz (womit, wie, wohin, welcher Gegner).
+- **Rechtsklick auf die Karte:** Menü mit allem, was auf dem Feld geht (aufheben, angreifen, ansprechen, benutzen, Tür öffnen, Kiste zerschlagen, Wrack durchsuchen, entschärfen, hinabsteigen, hierher gehen, untersuchen). Liegt das Ziel weiter weg, läuft die Figur erst hin.
+- **Laufen:** Außerhalb des Kampfes läuft die Figur ohne Halt bis ans Ziel (Klick) oder solange die Taste gedrückt ist, in festem Takt und gleichmäßig. Anhalten nur bei Gefahr: Kampf beginnt, Schaden, neu entdeckte Falle. Gespeichert und alles neu aufgebaut wird, sobald sie steht.
+- **Tutorial:** Der Guide in der Gilde erklärt auch den Bildschirm (Reiter, Chat, Aktionsleiste, Rechtsklick, Karte, Hilfe mit H).
 
 ### 3.31 Zeit nutzen: Schwierigkeit der nächsten Etage
 Jede Etage ist so ausgelegt, dass man sie gut schafft, wenn man die vorige

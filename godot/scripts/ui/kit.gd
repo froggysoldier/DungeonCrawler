@@ -22,7 +22,7 @@ static func muted(text: String) -> String:
 
 
 static func small(text: String) -> String:
-	return "[font_size=12]%s[/font_size]" % text
+	return "[font_size=%d]%s[/font_size]" % [UiFonts.px(12), text]
 
 
 static func b(text: String) -> String:
@@ -105,7 +105,7 @@ static func text(parent: Node, bb: String, size: int = 14, color: Variant = null
 	rt.add_theme_constant_override("line_separation", line_sep)
 	if size != 14:
 		for k in ["normal_font_size", "bold_font_size", "italics_font_size", "bold_italics_font_size"]:
-			rt.add_theme_font_size_override(k, size)
+			rt.add_theme_font_size_override(k, UiFonts.px(size))
 	if color != null:
 		rt.add_theme_color_override("default_color", UiTheme.css(UiTheme.HEX.get(color, color)) if color is String else color)
 	rt.text = bb
@@ -118,7 +118,7 @@ static func label(parent: Node, t: String, size: int = 14, color: Variant = null
 	l.text = t
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if size != 14:
-		l.add_theme_font_size_override("font_size", size)
+		l.add_theme_font_size_override("font_size", UiFonts.px(size))
 	if weight != 400:
 		l.add_theme_font_override("font", UiFonts.get_font(weight))
 	if color != null:
@@ -142,7 +142,7 @@ static func section(parent: Node, title: String, extra_bb: String = "") -> HBoxC
 	h.add_child(rib)
 	var l := Label.new()
 	l.text = title.to_upper()
-	l.add_theme_font_size_override("font_size", 16)
+	l.add_theme_font_size_override("font_size", UiFonts.px(16))
 	l.add_theme_font_override("font", UiFonts.pixel(700, 1))
 	l.add_theme_color_override("font_color", UiTheme.OUTLINE)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -242,7 +242,7 @@ static func keycap(key: String) -> PanelContainer:
 	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var l := Label.new()
 	l.text = key
-	l.add_theme_font_size_override("font_size", 14)
+	l.add_theme_font_size_override("font_size", UiFonts.px(14))
 	l.add_theme_font_override("font", UiFonts.pixel(700))
 	l.add_theme_color_override("font_color", UiTheme.OUTLINE)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -329,7 +329,7 @@ class Bar:
 	var c0 := Color.RED
 	var c1 := Color.RED
 	var pulse := false
-	var font_size := 16
+	var font_size := UiFonts.px(13)
 
 	func _process(_d: float) -> void:
 		if pulse:
@@ -371,7 +371,7 @@ class Bar:
 			draw_rect(Rect2(inner.position.x + fw - u, inner.position.y, u, inner.size.y), Color(0, 0, 0, 0.2 * a))
 		if label == "":
 			return
-		var f := UiFonts.pixel(700) if font_size >= 16 else UiFonts.get_font(700)
+		var f := UiFonts.get_font(700)
 		var fs := font_size
 		var y := roundf((h + f.get_ascent(fs) - f.get_descent(fs)) / 2.0)
 		draw_string(f, Vector2(10, y + 2), label, HORIZONTAL_ALIGNMENT_LEFT, w - 14, fs, Color(UiTheme.OUTLINE, 0.95))

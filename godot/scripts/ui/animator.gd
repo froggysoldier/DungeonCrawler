@@ -39,10 +39,6 @@ var _floaters: Array = []
 var _cam: Variant = null
 
 
-static func _ease(t: float) -> float:
-	return 2 * t * t if t < 0.5 else 1 - pow(-2 * t + 2, 2) / 2
-
-
 static func now_ms() -> float:
 	return Time.get_ticks_usec() / 1000.0
 
@@ -149,7 +145,8 @@ func draw_pos(key: String, fallback: Vector2, now: float = -1.0) -> Vector2:
 	if k >= 1:
 		_tweens.erase(key)
 		return t.to
-	return (t.from as Vector2).lerp(t.to, _ease(k))
+	# Gleichmäßig: beim Dauerlaufen gehen die Schritte ohne Abbremsen ineinander über
+	return (t.from as Vector2).lerp(t.to, k)
 
 
 ## Ausfallschritt einer Figur in Kacheln (0 außerhalb eines Angriffs).

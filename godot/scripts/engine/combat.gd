@@ -66,6 +66,12 @@ static func is_in_safe_room(s: Dictionary, p: Dictionary) -> bool:
 	return r != null and r.kind == "safe"
 
 
+## Lootboxen öffnen geht in Safe Rooms und Gilden.
+static func can_open_boxes(s: Dictionary, p: Dictionary) -> bool:
+	var r = MapGen.room_of(s.map, p)
+	return r != null and (r.kind == "safe" or r.kind == "guild")
+
+
 ## Grund, warum eine Technik nicht geht (oder null).
 static func technique_blocker(s: Dictionary, target: Dictionary, t: Dictionary) -> Variant:
 	var p: Dictionary = s.player

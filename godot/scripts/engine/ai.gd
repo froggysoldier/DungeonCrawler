@@ -221,8 +221,9 @@ static func _wants_to_flee(s: Dictionary, m: Dictionary, d: int) -> bool:
 		return true
 	if m.rank != "normal":
 		return false
+	# Feiglinge kämpfen, bis sie verletzt sind; dann laufen sie davon
 	if m.behavior == "coward":
-		return d <= 4
+		return d <= 4 and m.hp < m.maxHp * 0.6
 	if m.get("stolenGold"):
 		return true
 	var small_animal: bool = (m.size == "winzig" or m.size == "klein") and Observer.target_facets(s, m).has("z:tier")
@@ -372,10 +373,13 @@ static func _monster_turn(s: Dictionary, m: Dictionary) -> void:
 		if not _wants_to_flee(s, m, d) and m.behavior != "coward":
 			m.fleeing = false
 		else:
+			var from = m.pos
 			_step_away(s, m, p.pos)
 			if Abilities.has(m, "schnell"):
 				_step_away(s, m, p.pos)
-			return
+			# In die Ecke gedrängt: wehrt sich, statt stehen zu bleiben
+			if not is_same(m.pos, from) or d > 1 or Conditions.has_condition(m, "furcht"):
+				return
 
 	if (m.rank == "elite" or m.rank == "nachbarschaftsboss" or m.rank == "boroughboss") and not m.get("enraged") and m.hp < m.maxHp * 0.3:
 		m.enraged = true
@@ -387,7 +391,8 @@ static func _monster_turn(s: Dictionary, m: Dictionary) -> void:
 	if Crawlers.monster_hits_crawler(s, m):
 		return
 	var ranged: bool = m.behavior == "ranged" or not not m.get("range")
-	if ranged and d <= 1 and R.chance(s, 0.6):
+	# Fernkämpfer weichen ab und zu einen Schritt zurück, um wieder zu schießen
+	if ranged and d <= 1 and R.chance(s, 0.3):
 		var before = m.pos
 		_step_away(s, m, p.pos)
 		if not is_same(m.pos, before):

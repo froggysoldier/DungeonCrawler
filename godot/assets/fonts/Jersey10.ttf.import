@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://cvhhos1nu0yc4"
-path="res://.godot/imported/PixelifySans.ttf-4613dc276f227b5d31d032a4586e3281.fontdata"
+uid="uid://brdwwl8wgt8id"
+path="res://.godot/imported/Jersey10.ttf-0178de518bf7fb57c4e123d87dda228f.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/PixelifySans.ttf"
-dest_files=["res://.godot/imported/PixelifySans.ttf-4613dc276f227b5d31d032a4586e3281.fontdata"]
+source_file="res://assets/fonts/Jersey10.ttf"
+dest_files=["res://.godot/imported/Jersey10.ttf-0178de518bf7fb57c4e123d87dda228f.fontdata"]
 
 [params]
 

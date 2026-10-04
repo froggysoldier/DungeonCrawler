@@ -21,6 +21,8 @@ var s: Dictionary
 var meta: Dictionary
 
 var tab := "crawler"
+## Ist ein Reiter ausgeklappt?
+var tab_open := false
 var here_folded := false
 var folds := {}
 var log_filter := "alles"
@@ -41,6 +43,9 @@ var traveling := false
 var is_ended := false
 var selecting := false
 var held: Variant = null
+## Nach dem Laufen nachzuholen: speichern, alles neu aufbauen.
+var _save_due := false
+var _refresh_due := false
 var last_step := 0.0
 var _path_cache := {"key": "", "path": null}
 var _minimap_key := ""
@@ -68,6 +73,10 @@ var _here_scroll: ScrollContainer
 var _tabs: HBoxContainer
 var _tab_content: VBoxContainer
 var _tab_scroll: ScrollContainer
+## Ausgeklappter Reiter über der Karte.
+var _drawer: PanelContainer
+var _drawer_title: Label
+var _side: PanelContainer
 var _actionbar: PanelContainer
 var _log_scroll: ScrollContainer
 var _log: VBoxContainer
@@ -116,21 +125,27 @@ func _build() -> void:
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_theme_constant_override("separation", 0)
 	add_child(root)
-	# Kopfzeile
+	# Kopfzeile: links Sendung, Etage, Uhr und Hinweise, rechts die Reiter
 	var top_panel := PanelContainer.new()
 	top_panel.theme_type_variation = "TopBar"
-	top_panel.custom_minimum_size = Vector2(0, 46)
+	top_panel.custom_minimum_size = Vector2(0, 52)
 	root.add_child(top_panel)
+	var top_row := Kit.hbox(top_panel, 10)
 	# Zu viele Einträge werden rechts abgeschnitten, statt die Ansicht zu verbreitern
 	var top_clip := ScrollContainer.new()
 	top_clip.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
 	top_clip.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	top_clip.mouse_filter = Control.MOUSE_FILTER_PASS
-	top_panel.add_child(top_clip)
+	top_clip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top_row.add_child(top_clip)
 	_top = HBoxContainer.new()
 	_top.add_theme_constant_override("separation", 8)
 	_top.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top_clip.add_child(_top)
+	_tabs = HBoxContainer.new()
+	_tabs.add_theme_constant_override("separation", 4)
+	_tabs.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	top_row.add_child(_tabs)
 	_line(root)
 	var body := HBoxContainer.new()
 	body.add_theme_constant_override("separation", 0)
@@ -195,9 +210,27 @@ func _build() -> void:
 		zb.custom_minimum_size = Vector2(34, 34)
 	zc.add_child(_zoom_out)
 	zc.add_child(_zoom_in)
+	# Ausgeklappter Reiter: Tafel oben rechts über der Karte
+	_drawer = PanelContainer.new()
+	_drawer.theme_type_variation = "Drawer"
+	_drawer.visible = false
+	_drawer.z_index = 4
+	_mapwrap.add_child(_drawer)
+	var dv := Kit.vbox(_drawer, 6)
+	var dh := Kit.hbox(dv, 6)
+	_drawer_title = Kit.label(dh, "", 18, UiTheme.ACCENT, 700)
+	_drawer_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	Kit.button(dh, "Schließen", func(): close_tab(), "SmallButton", false, "Reiter zuklappen (Esc oder dieselbe Taste)")
+	_tab_scroll = ScrollContainer.new()
+	_tab_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_tab_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	dv.add_child(_tab_scroll)
+	var tm := Kit.margin(_tab_scroll, 2, 2, 10, 2)
+	_tab_content = Kit.vbox(tm, 5)
 	_mapwrap.resized.connect(func():
 		zc.position = _mapwrap.size - Vector2(12 + 34, 12 + 74)
-		_layout_minimap())
+		_layout_minimap()
+		_layout_drawer())
 	# Tooltip
 	_tip = PanelContainer.new()
 	_tip.theme_type_variation = "Tip"
@@ -206,8 +239,8 @@ func _build() -> void:
 	_tip.z_index = 5
 	_mapwrap.add_child(_tip)
 	_tip_text = Kit.text(_tip, "", 13, null, 4)
-	_tip_text.custom_minimum_size = Vector2(266, 0)
-	# Unten: Aktionsleiste und Log
+	_tip_text.custom_minimum_size = Vector2(300, 0)
+	# Unten: Aktionsleiste (im Kampf die Kampfsequenz)
 	var bottom := PanelContainer.new()
 	bottom.theme_type_variation = "Bottom"
 	left.add_child(bottom)
@@ -218,29 +251,18 @@ func _build() -> void:
 	_actionbar = PanelContainer.new()
 	_actionbar.theme_type_variation = "ActionBar"
 	bv.add_child(_actionbar)
-	_line(bv)
-	_log_bar = Kit.hbox(Kit.margin(bv, 14, 4, 14, 0), 4)
-	_log_scroll = ScrollContainer.new()
-	_log_scroll.custom_minimum_size = Vector2(0, 150)
-	_log_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	bv.add_child(_log_scroll)
-	var lm := Kit.margin(_log_scroll, 14, 8, 14, 8)
-	_log = Kit.vbox(lm, 2)
-	_log_scroll.gui_input.connect(func(ev):
-		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
-			_typer.finish_all())
-	# Seitenleiste
+	# Rechts: Werte, "Hier" und der Chat (Log)
 	var vline := ColorRect.new()
 	vline.color = UiTheme.LINE
 	vline.custom_minimum_size = Vector2(1, 0)
 	body.add_child(vline)
-	var side := PanelContainer.new()
-	side.theme_type_variation = "Side"
-	side.custom_minimum_size = Vector2(340, 0)
-	body.add_child(side)
+	_side = PanelContainer.new()
+	_side.theme_type_variation = "Side"
+	_side.custom_minimum_size = Vector2(400, 0)
+	body.add_child(_side)
 	var sv := VBoxContainer.new()
 	sv.add_theme_constant_override("separation", 0)
-	side.add_child(sv)
+	_side.add_child(sv)
 	var vm := Kit.margin(sv, 14, 10, 14, 10)
 	_vitals = Kit.vbox(vm, 5)
 	_line(sv)
@@ -250,19 +272,17 @@ func _build() -> void:
 	var hm := Kit.margin(_here_scroll, 14, 2, 14, 0)
 	_here = Kit.vbox(hm, 4)
 	_here.minimum_size_changed.connect(_fit_here)
-	var tabs_panel := PanelContainer.new()
-	tabs_panel.theme_type_variation = "Tabs"
-	sv.add_child(tabs_panel)
-	_tabs = HBoxContainer.new()
-	_tabs.add_theme_constant_override("separation", 3)
-	tabs_panel.add_child(_tabs)
 	_line(sv)
-	_tab_scroll = ScrollContainer.new()
-	_tab_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_tab_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	sv.add_child(_tab_scroll)
-	var tm := Kit.margin(_tab_scroll, 14, 12, 14, 12)
-	_tab_content = Kit.vbox(tm, 5)
+	_log_bar = Kit.hbox(Kit.margin(sv, 14, 6, 14, 2), 4)
+	_log_scroll = ScrollContainer.new()
+	_log_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_log_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sv.add_child(_log_scroll)
+	var lm := Kit.margin(_log_scroll, 14, 6, 14, 10)
+	_log = Kit.vbox(lm, 4)
+	_log_scroll.gui_input.connect(func(ev):
+		if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+			_typer.finish_all())
 
 
 static func _line(parent: Node) -> void:
@@ -275,8 +295,21 @@ static func _line(parent: Node) -> void:
 
 func _fit_here() -> void:
 	var h := _here.get_combined_minimum_size().y
-	var sv_h := size.y - 46 - _vitals.get_combined_minimum_size().y - 20
-	_here_scroll.custom_minimum_size.y = minf(h + 2, sv_h * 0.42) if h > 1 else 0.0
+	var sv_h := size.y - 52 - _vitals.get_combined_minimum_size().y - 20
+	# Der Chat behält immer mindestens gut die Hälfte
+	_here_scroll.custom_minimum_size.y = minf(h + 2, sv_h * 0.4) if h > 1 else 0.0
+
+
+## Tafel des ausgeklappten Reiters: oben rechts, so hoch wie nötig.
+func _layout_drawer() -> void:
+	if _drawer == null:
+		return
+	var w := _mapwrap.size
+	var dw := minf(560, w.x - 24)
+	# So hoch wie der Inhalt, höchstens bis zum unteren Rand der Karte
+	var want := _tab_content.get_combined_minimum_size().y + 110
+	_drawer.size = Vector2(dw, clampf(want, 160, maxf(160, w.y - 24)))
+	_drawer.position = Vector2(w.x - dw - 12, 12)
 
 
 func _layout_minimap() -> void:
@@ -346,8 +379,14 @@ func _process(_delta: float) -> void:
 			# Im Kampf zählt jeder Schritt einzeln
 			held = null
 		else:
-			last_step = now
+			# Fester Takt (nicht ab "jetzt"), damit die Schritte nahtlos ineinandergehen
+			last_step = maxf(last_step + STEP_MS, now - STEP_MS)
 			step_dir(held.dir)
+	if not walking():
+		if _refresh_due:
+			_refresh_due = false
+			refresh()
+		_persist()
 	_draw_frame()
 
 
@@ -521,7 +560,7 @@ class Banner:
 		if h < full:
 			return
 		var f := UiFonts.pixel(700, 4)
-		var fs := 40
+		var fs := UiFonts.px(36)
 		var up := title.to_upper()
 		var tw := f.get_string_size(up, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
 		var x := roundf((w - tw) / 2)
@@ -529,11 +568,38 @@ class Banner:
 		draw_string(f, Vector2(x, y + 52), up, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color(1, 1, 1, a))
 		if sub != "":
 			var f2 := UiFonts.get_font(500)
-			var sw2 := f2.get_string_size(sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
-			draw_string(f2, Vector2(roundf((w - sw2) / 2), y + 80), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1, 1, 1, 0.85 * a))
+			var sw2 := f2.get_string_size(sub, HORIZONTAL_ALIGNMENT_LEFT, -1, UiFonts.px(14)).x
+			draw_string(f2, Vector2(roundf((w - sw2) / 2), y + 80), sub, HORIZONTAL_ALIGNMENT_LEFT, -1, UiFonts.px(14), Color(1, 1, 1, 0.85 * a))
 
 
 # ---------------------------------------------------------------- Aktionen
+
+## Läuft die Figur gerade (Taste gehalten oder Klick-Weg)?
+func walking() -> bool:
+	return held != null or traveling
+
+
+## Spielstand und Meta speichern, wenn sich etwas geändert hat.
+func _persist() -> void:
+	if not _save_due:
+		return
+	_save_due = false
+	Meta.sync_meta(meta, s)
+	Meta.save_meta(meta)
+	if s.status == "playing":
+		Meta.save_run(s)
+
+
+## Schritt beim Laufen: Karte, Kampfmodus, Werte, Umgebung und Log.
+func _refresh_light() -> void:
+	_refresh_due = true
+	_vis_key = ""
+	_draw_frame()
+	_update_combat_mode()
+	refresh_vitals()
+	refresh_here()
+	refresh_log()
+
 
 ## Führt eine Engine-Aktion aus und kümmert sich um alles danach.
 func act(fn: Callable) -> bool:
@@ -565,11 +631,14 @@ func after_action() -> void:
 	for t in Game.drain_toasts(s):
 		if t.kind == "warnung" and modals():
 			modals().toast(t.title, t.text, t.kind)
-	Meta.sync_meta(meta, s)
-	Meta.save_meta(meta)
-	if s.status == "playing":
-		Meta.save_run(s)
-	refresh()
+	# Beim Laufen außerhalb des Kampfes nur das Nötigste: Karte, Werte, Log.
+	# Gespeichert und alles neu aufgebaut wird, sobald die Figur steht.
+	_save_due = true
+	if walking() and s.status == "playing" and not in_combat():
+		_refresh_light()
+	else:
+		_persist()
+		refresh()
 	flush_dialogs()
 	if s.status != "playing" and not is_ended:
 		is_ended = true
@@ -597,7 +666,9 @@ func flush_dialogs() -> void:
 		job.closed.connect(func(_r):
 			refresh()
 			maybe_select())
-	Meta.save_run(s)
+	_save_due = true
+	if not walking():
+		_persist()
 	var reveal = s.get("pendingReveal")
 	if reveal != null:
 		s.erase("pendingReveal")
@@ -634,6 +705,42 @@ func step_dir(dir: Vector2i) -> void:
 		act(func(): return Game.move_step(s, to))
 
 
+## Angreifen, wenn es geht; sonst einen Schritt auf den Gegner zu.
+func attack_or_approach(uid: String) -> void:
+	var mon = J.find(s.monsters, func(m): return m.uid == uid)
+	if mon == null:
+		return
+	var blocker = Combat.technique_blocker(s, mon, technique())
+	if blocker == null:
+		attack_monster(uid)
+		return
+	if Fov.chebyshev(s.player.pos, mon.pos) > 1 and part != "wurf":
+		step_toward(mon.pos)
+		return
+	say(blocker)
+
+
+## Hinlaufen (auf das Feld oder daneben) und dann fn als Aktion ausführen.
+func go_then(tp: Dictionary, adjacent: bool, fn: Callable) -> void:
+	var close := func() -> bool:
+		var d := Fov.chebyshev(s.player.pos, tp)
+		return d <= 1 if adjacent else d == 0
+	if not close.call():
+		var path = Game.plan_path(s, tp)
+		if not (path is Array) or path.is_empty():
+			say("Dorthin kennst du keinen Weg.")
+			return
+		if adjacent and path.size() > 0 and path[-1].x == tp.x and path[-1].y == tp.y:
+			path = path.slice(0, path.size() - 1)
+		if in_combat():
+			act(func(): return Game.move_step(s, path[0]))
+			return
+		await travel(path)
+		if not close.call() or in_combat() or s.status != "playing":
+			return
+	act(fn)
+
+
 func step_toward(target: Dictionary) -> void:
 	var path = Game.plan_path(s, target)
 	var next = path[0] if path is Array and not path.is_empty() else null
@@ -653,26 +760,31 @@ func visible_monsters() -> Array:
 	return s.monsters.filter(func(m): return vis.has(MapGen.idx(s.map, m.pos.x, m.pos.y)))
 
 
+## Klick-Weg: ohne Kampf läuft die Figur ohne Halt bis ans Ziel. Anhalten
+## nur bei Gefahr: Kampf beginnt, Schaden, neue Falle, Weg versperrt.
 func travel(path: Array) -> void:
 	if traveling:
 		return
 	traveling = true
-	var seen_before := {}
-	for m in visible_monsters():
-		seen_before[m.uid] = true
 	var k := 0
+	var next_at := Animator.now_ms()
 	while k < path.size():
 		var step: Dictionary = path[k]
 		if not traveling or s.status != "playing" or modal_open():
 			break
+		while Animator.now_ms() < next_at:
+			await get_tree().process_frame
+			if not traveling:
+				break
+		if not traveling:
+			break
+		next_at = maxf(next_at + STEP_MS, Animator.now_ms() - STEP_MS)
 		# Tür auf dem Weg: erst öffnen, dann hindurch
 		if MapGen.tile_at(s.map, step.x, step.y) == "door":
 			if not act(func(): return Game.move_step(s, step)):
 				break
-			await get_tree().create_timer(STEP_MS / 1000.0).timeout
 			continue
 		var hp_before: int = s.player.hp
-		var room_before = s.get("currentRoom")
 		var traps_before := J.arr(s, "traps").filter(func(x): return not x.get("hidden", false)).size()
 		if not act(func(): return Game.move_step(s, step)):
 			break
@@ -680,22 +792,11 @@ func travel(path: Array) -> void:
 			break
 		if s.player.pos.x != step.x or s.player.pos.y != step.y:
 			break
-		var fresh = null
-		for m in visible_monsters():
-			if not seen_before.has(m.uid) or m.get("aware", false):
-				fresh = m
-				break
-		if fresh != null:
-			say("Du hältst an: %s in Sicht." % Identify.describe_monster(s, fresh).name)
+		if in_combat():
 			break
 		if s.player.hp < hp_before:
 			break
-		if s.get("currentRoom") != room_before:
-			break
-		if not Game.items_at(s, s.player.pos).is_empty() or Game.on_stairs(s):
-			break
 		k += 1
-		await get_tree().create_timer(STEP_MS / 1000.0).timeout
 	traveling = false
 
 
@@ -716,7 +817,8 @@ func _on_map_click(t: Vector2i, button: int) -> void:
 	if modal_open():
 		return
 	if button == MOUSE_BUTTON_RIGHT:
-		examine(t)
+		traveling = false
+		ContextMenu.open(self, t, get_viewport().get_mouse_position())
 		return
 	if traveling:
 		traveling = false
@@ -734,15 +836,7 @@ func _on_map_click(t: Vector2i, button: int) -> void:
 		act(func(): return Game.cast(s, sp, {"targetUid": target.uid if target != null else null, "pos": tp, "mana": missile_mana}))
 		return
 	if mon != null and seen:
-		var blocker = Combat.technique_blocker(s, mon, technique())
-		if blocker == null:
-			attack_monster(mon.uid)
-			return
-		var d := Fov.chebyshev(s.player.pos, mon.pos)
-		if d > 1 and part != "wurf":
-			step_toward(mon.pos)
-			return
-		say(blocker)
+		attack_or_approach(mon.uid)
 		return
 	var npc = Crawlers.crawler_at(s, tp)
 	if npc != null and seen and not npc.get("party", false):
@@ -802,7 +896,7 @@ func _show_card(t: Vector2i) -> void:
 	var bb = GameDialogs.tooltip_for(self, t, true)
 	if bb == null:
 		return
-	_tip_text.text = bb + "\n[font_size=11][color=#8cc8ff]NOCHMAL KLICKEN, UM HINZUGEHEN[/color][/font_size]"
+	_tip_text.text = bb + "\n[font_size=%d][color=#8cc8ff]NOCHMAL KLICKEN, UM HINZUGEHEN · RECHTSKLICK: AKTIONEN[/color][/font_size]" % UiFonts.px(11)
 	_tip.visible = true
 	_tip.reset_size()
 	var tl := map.tile_px
@@ -953,6 +1047,8 @@ func _unhandled_input(ev: InputEvent) -> void:
 			refresh_actions()
 		elif traveling:
 			traveling = false
+		elif tab_open:
+			close_tab()
 		else:
 			open_menu()
 
@@ -960,6 +1056,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		held = null
+		_persist()
+	elif what == NOTIFICATION_EXIT_TREE or what == NOTIFICATION_WM_CLOSE_REQUEST:
+		_persist()
 
 
 func ask_descend() -> void:
@@ -1027,7 +1126,7 @@ func refresh_top() -> void:
 		_pill("Zuschauer %s" % J.de(Viewers.live_viewers(s)), "achv", "Pill", 400, "Follower %s · Hype %d%s" % [J.de(s.viewers.follower), J.rnd(s.viewers.hype), (" · Crawler übrig %s" % J.de(Crawlers.population(s).alive)) if Game.has_unlock(s, "inventar") else ""])
 	_pill("Gold %s" % J.s(p.gold), Color("#ffd700"))
 	if not p.boxes.is_empty():
-		_pill("Lootboxen %d" % p.boxes.size(), "accent", "PillTimer", 700, "Öffnen kannst du sie in einem Safe Room")
+		_pill("Lootboxen %d" % p.boxes.size(), "accent", "PillTimer", 700, "Öffnen kannst du sie in einem Safe Room oder einer Gilde")
 	var btn := Kit.button(_top, "Menü", open_menu, "PillButton", false, "Hilfe, Ton und Musik (Esc)")
 	btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 
@@ -1080,7 +1179,7 @@ func _pill_bb(bb: String) -> void:
 	rt.add_theme_font_override("normal_font", UiFonts.pixel(400))
 	rt.add_theme_font_override("bold_font", UiFonts.pixel(700))
 	for k in ["normal_font_size", "bold_font_size"]:
-		rt.add_theme_font_size_override(k, 16)
+		rt.add_theme_font_size_override(k, UiFonts.px(16))
 	rt.autowrap_mode = TextServer.AUTOWRAP_OFF
 	rt.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 
@@ -1146,10 +1245,24 @@ func refresh_vitals() -> void:
 	GameVitals.build(self, _vitals)
 
 
-## Einen Reiter der Seitenleiste öffnen.
+## Einen Reiter ausklappen; derselbe noch einmal klappt ihn wieder zu.
 func show_tab(id: String) -> void:
+	if tab_open and tab == id:
+		close_tab()
+		return
+	open_tab(id)
+
+
+## Einen Reiter ausklappen (bleibt offen, wenn er es schon ist).
+func open_tab(id: String) -> void:
 	tab = id
+	tab_open = true
 	_tab_scroll.scroll_vertical = 0
+	refresh_side()
+
+
+func close_tab() -> void:
+	tab_open = false
 	refresh_side()
 
 
@@ -1174,25 +1287,25 @@ func tab_badge(id: String) -> bool:
 
 func refresh_side() -> void:
 	Kit.clear(_tabs)
-	var grid := GridContainer.new()
-	grid.columns = 3
-	grid.add_theme_constant_override("h_separation", 3)
-	grid.add_theme_constant_override("v_separation", 3)
-	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_tabs.add_child(grid)
 	for t in TABS:
 		var id: String = t[0]
-		var b := Kit.button(grid, t[1], func(): show_tab(id), "TabActive" if tab == id else "TabButton", false, "%s (Taste %s)" % [t[1], t[2]])
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var active: bool = tab_open and tab == id
+		var b := Kit.button(_tabs, t[1], func(): show_tab(id), "TabActive" if active else "TabButton", false, "%s ausklappen (Taste %s)" % [t[1], t[2]])
+		b.custom_minimum_size.x = 92
 		var badge := tab_badge(id)
-		var active: bool = tab == id
 		b.draw.connect(func():
 			if active:
 				# Goldene Unterkante
 				b.draw_rect(Rect2(1, b.size.y - 2, b.size.x - 2, 2), UiTheme.ACCENT)
 			if badge:
 				b.draw_rect(Rect2(b.size.x - 10, 5, 5, 5), UiTheme.ACCENT if not active else Color("#ff8a4a")))
+	_drawer.visible = tab_open
 	Kit.clear(_tab_content)
+	if not tab_open:
+		return
+	for t in TABS:
+		if t[0] == tab:
+			_drawer_title.text = String(t[1]).to_upper()
 	match tab:
 		"crawler": GameTabs.crawler_tab(self, _tab_content)
 		"ziele": GameTabs.goals_tab(self, _tab_content)
@@ -1200,6 +1313,7 @@ func refresh_side() -> void:
 		"handwerk": GameTabs.craft_tab(self, _tab_content)
 		"skills": GameTabs.skills_tab(self, _tab_content)
 		"erfolge": GameTabs.achievements_tab(self, _tab_content)
+	_layout_drawer.call_deferred()
 
 
 func refresh_actions() -> void:
@@ -1263,7 +1377,7 @@ func _log_line(l: Dictionary, n: int) -> String:
 		body = "[i]%s[/i]" % body
 	if n > 1:
 		body += " [color=#8a8f9c](%d×)[/color]" % n
-	return "[font_size=11][color=#555b69][b]%s[/b][/color][/font_size]  [color=%s]%s[/color]" % [ViewHelpers.clock_at(s, int(l.turn)), color, body]
+	return "[font_size=%d][color=#555b69][b]%s[/b][/color][/font_size]  [color=%s]%s[/color]" % [UiFonts.px(11), ViewHelpers.clock_at(s, int(l.turn)), color, body]
 
 
 ## Neue Log-Zeilen werden angehängt und Zeichen für Zeichen getippt.
@@ -1271,7 +1385,7 @@ func _log_line(l: Dictionary, n: int) -> String:
 ## oben blendet ganze Arten aus.
 func refresh_log(rebuild: bool = false) -> void:
 	Kit.clear(_log_bar)
-	var lt := Kit.label(_log_bar, "LOG", 12, "muted")
+	var lt := Kit.label(_log_bar, "CHAT", 13, "muted")
 	lt.add_theme_font_override("font", UiFonts.pixel(700, 1))
 	lt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -1300,7 +1414,7 @@ func refresh_log(rebuild: bool = false) -> void:
 			_log_prev.rt.visible = true
 			continue
 		var bb := _log_line(l, 1)
-		var rt := Kit.text(_log, "", 13, null, 3)
+		var rt := Kit.text(_log, "", 16, null, 3)
 		if first:
 			rt.text = bb
 		else:

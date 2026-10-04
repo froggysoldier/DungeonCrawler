@@ -28,7 +28,7 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 	wt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var points := int(J.num(p, "statPoints"))
 	if points > 0 and Game.has_unlock(s, "stats"):
-		Kit.button(head, "+%d Punkte" % points, func(): gv.show_tab("crawler"), "SmallPrimary", false, "Freie Wertepunkte verteilen")
+		Kit.button(head, "+%d Punkte" % points, func(): gv.open_tab("crawler"), "SmallPrimary", false, "Freie Wertepunkte verteilen")
 	# Balken: zwei Spalten, XP schmal darunter
 	var poisoned := J.some(p.buffs, func(x): return x.name == "Vergiftet")
 	var g := Kit.grid(root, 2, 6, 5)
@@ -72,5 +72,5 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 
 static func _bar(parent: Node, frac: float, t: String, c0: String, c1: String, pulse: bool, tip: String) -> void:
 	var b := Kit.bar(parent, frac, t, c0, c1, 18, pulse)
-	b.font_size = 12
+	b.font_size = UiFonts.px(12)
 	b.tooltip_text = tip

@@ -1,7 +1,7 @@
 <title>Der Große Abstieg</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Pixelify+Sans:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap">
 <style>
 /* Vollflächiges Spiel; davor ein Ladebildschirm im Pixel-Stil des Spiels (bewusst nur dunkel). */
 :root {
@@ -13,8 +13,8 @@
 	--accent: #f4c24f;
 	--accent-2: #b0306e;
 	--danger: #ff5d5d;
-	--display: "Pixelify Sans", "Courier New", monospace;
-	--body: "Montserrat", system-ui, sans-serif;
+	--display: "Jersey 10", "Courier New", monospace;
+	--body: "Jersey 10", system-ui, sans-serif;
 	color-scheme: dark;
 }
 html, body { height: 100%; margin: 0; overflow: hidden; }
@@ -31,18 +31,18 @@ body { background: var(--bg); color: var(--text); font-family: var(--body); touc
 	clip-path: polygon(0 4px, 4px 4px, 4px 0, calc(100% - 4px) 0, calc(100% - 4px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 4px calc(100% - 4px), 0 calc(100% - 4px));
 }
 h1 {
-	margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(32px, 8vw, 50px);
+	margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(40px, 10vw, 64px);
 	line-height: 1.05; color: var(--accent); text-shadow: 4px 4px 0 var(--accent-2); text-wrap: balance;
 }
-.lead { margin: 0; color: var(--muted); line-height: 1.6; max-width: 60ch; }
+.lead { margin: 0; color: var(--muted); line-height: 1.4; font-size: 21px; max-width: 60ch; }
 .bar { height: 20px; background: #07080b; border: 4px solid var(--line); display: grid; }
 .fill { width: 0%; background: repeating-linear-gradient(90deg, var(--accent) 0 12px, #e0a42a 12px 16px); transition: width 0.2s steps(4); }
-.note { margin: 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; min-height: 1.4em; }
+.note { margin: 0; font-size: 19px; color: var(--muted); font-variant-numeric: tabular-nums; min-height: 1.4em; }
 .note.error { color: var(--danger); white-space: pre-wrap; }
-.keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; font-size: 13px; }
+.keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; font-size: 19px; }
 .keys dt { font-family: var(--display); font-weight: 500; color: var(--accent); white-space: nowrap; }
 .keys dd { margin: 0; color: var(--text); min-width: 0; }
-.small { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.small { margin: 0; font-size: 18px; color: var(--muted); line-height: 1.5; }
 @media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
 </style>
 

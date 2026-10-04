@@ -64,7 +64,7 @@ static func css(v: Variant) -> Color:
 
 ## Größe der Pixel-Schrift zu einer früheren Montserrat-Größe.
 static func pixel_size(size: int) -> int:
-	return 16 if size <= 13 else (18 if size <= 15 else 20)
+	return UiFonts.px(size + 1)
 
 
 ## Pixel-Rahmen. radius wählt die Eckenstufe, border_w zählt in Kunstpixeln (2 px).
@@ -140,7 +140,7 @@ static func _button(t: Theme, type: String, normal: StyleBox, hover: StyleBox, p
 	t.set_color("font_hover_pressed_color", type, hover_color if hover_color.a > 0 else font_color)
 	t.set_color("font_focus_color", type, font_color)
 	t.set_color("font_disabled_color", type, Color(MUTED, 0.6) if font_color.v < 0.2 else Color(font_color, 0.38))
-	t.set_font_size("font_size", type, pixel_size(size) if pixel else size)
+	t.set_font_size("font_size", type, pixel_size(size) if pixel else UiFonts.px(size))
 	t.set_font("font", type, UiFonts.pixel(weight) if pixel else UiFonts.get_font(weight))
 
 
@@ -154,17 +154,17 @@ static func get_theme() -> Theme:
 		return _theme
 	var t := Theme.new()
 	t.default_font = UiFonts.get_font(400)
-	t.default_font_size = 14
+	t.default_font_size = UiFonts.px(14)
 	t.set_color("font_color", "Label", TEXT)
 	t.set_color("default_color", "RichTextLabel", TEXT)
 	t.set_font("normal_font", "RichTextLabel", UiFonts.get_font(400))
 	t.set_font("bold_font", "RichTextLabel", UiFonts.get_font(700))
 	t.set_font("italics_font", "RichTextLabel", UiFonts.get_font(400, true))
 	t.set_font("bold_italics_font", "RichTextLabel", UiFonts.get_font(700, true))
-	t.set_font_size("normal_font_size", "RichTextLabel", 14)
-	t.set_font_size("bold_font_size", "RichTextLabel", 14)
-	t.set_font_size("italics_font_size", "RichTextLabel", 14)
-	t.set_font_size("bold_italics_font_size", "RichTextLabel", 14)
+	t.set_font_size("normal_font_size", "RichTextLabel", UiFonts.px(14))
+	t.set_font_size("bold_font_size", "RichTextLabel", UiFonts.px(14))
+	t.set_font_size("italics_font_size", "RichTextLabel", UiFonts.px(14))
+	t.set_font_size("bold_italics_font_size", "RichTextLabel", UiFonts.px(14))
 	t.set_constant("line_separation", "RichTextLabel", 3)
 	t.set_color("selection_color", "RichTextLabel", Color(ACCENT, 0.35))
 
@@ -218,6 +218,8 @@ static func get_theme() -> Theme:
 	_panel(t, "VersusModal", tex("paper", paper_edge, Vector4(30, 28, 30, 28), Color("#f0b4a8")))
 	var tp := tex("paper_small", small_edge, Vector4(13, 10, 13, 10))
 	_panel(t, "Tip", tp)
+	# Ausgeklappter Reiter über der Karte
+	_panel(t, "Drawer", tex("paper", paper_edge, Vector4(24, 20, 24, 20)))
 	var carved_edge := Vector4(8, 8, 8, 8)
 	_panel(t, "Pill", tex("carved", carved_edge, Vector4(11, 4, 11, 4)))
 	_panel(t, "PillWarn", tex("carved", carved_edge, Vector4(11, 4, 11, 4), Color("#ff9a8a")))
@@ -251,7 +253,7 @@ static func get_theme() -> Theme:
 	t.set_color("font_placeholder_color", "LineEdit", Color(MUTED, 0.7))
 	t.set_color("caret_color", "LineEdit", ACCENT)
 	t.set_color("selection_color", "LineEdit", Color(ACCENT, 0.35))
-	t.set_font_size("font_size", "LineEdit", 15)
+	t.set_font_size("font_size", "LineEdit", UiFonts.px(15))
 
 	# Bildlaufleisten
 	var grab := box(Color("#8a6e4c"), OUTLINE, 8, 1, Vector4(4, 4, 4, 4))
@@ -269,6 +271,6 @@ static func get_theme() -> Theme:
 	# Hinweise (Tooltips)
 	t.set_stylebox("panel", "TooltipPanel", tp)
 	t.set_color("font_color", "TooltipLabel", TEXT)
-	t.set_font_size("font_size", "TooltipLabel", 13)
+	t.set_font_size("font_size", "TooltipLabel", UiFonts.px(13))
 	_theme = t
 	return t

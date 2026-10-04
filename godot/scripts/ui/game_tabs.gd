@@ -452,7 +452,7 @@ static func inventory_tab(gv: GameView, root: VBoxContainer) -> void:
 	else:
 		for bx in p.boxes:
 			Kit.text(root, Kit.col(Kit.esc(bx.name), Db.world("BOX_TIER_COLORS")[bx.box.tier]), 12)
-		Kit.text(root, "Öffnen nur in einem Safe Room.", 12, "muted")
+		Kit.text(root, "Öffnen in einem Safe Room oder einer Gilde.", 12, "muted")
 
 
 # ================================================================ Handwerk

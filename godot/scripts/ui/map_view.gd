@@ -930,7 +930,7 @@ func _level_pill(ci: CanvasItem, sx: float, sy: float, text: String, color: Vari
 ## Kleines Schild unter einer Figur, z. B. „am Boden“.
 func _tag(ci: CanvasItem, cx: float, y: float, text: String, color: String) -> void:
 	var f := UiFonts.pixel(500)
-	var fs := 20 if px < 2 else 30
+	var fs := UiFonts.px(16 if px < 2 else 24)
 	var w := f.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 12
 	var h := fs + 4
 	var r := Rect2(roundf(cx - w / 2), roundf(y), roundf(w), h)
@@ -1252,7 +1252,7 @@ func _draw_top() -> void:
 	for pr in frame_anim.get("projectiles", []):
 		_draw_projectile(ci, pr)
 	var font := UiFonts.pixel(700)
-	var fs := 20 if px < 2 else 30
+	var fs := UiFonts.px(16 if px < 2 else 24)
 	for f in frame_anim.get("floaters", []):
 		var text: String = f.text
 		var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x

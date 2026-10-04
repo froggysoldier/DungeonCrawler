@@ -102,7 +102,7 @@ func test_werfen_ohne_objekt(t) -> void:
 	t.matches(Combat.technique_blocker(s, rat, {"part": "wurf", "move": "normal"}), "nichts zum Werfen")
 
 
-func test_boxen_nur_im_safe_room(t) -> void:
+func test_boxen_im_safe_room_und_in_der_gilde(t) -> void:
 	var s := TH.make(90)
 	s.unlocks.append("inventar")
 	var box: Dictionary = s.player.boxes[0]
@@ -113,6 +113,13 @@ func test_boxen_nur_im_safe_room(t) -> void:
 	t.ok(res.ok, "im Safe Room")
 	t.gt(res.contents.size(), 0, "Inhalt")
 	t.has(s.achievements, "unboxing")
+	# Auch in der Gilde
+	var spare: Dictionary = box.duplicate(true)
+	spare.uid = "box_gilde"
+	s.player.boxes.append(spare)
+	var guild = TH.room(s, "guild")
+	TH.teleport(s, {"x": guild.x + 1, "y": guild.y + 1})
+	t.ok(Game.open_box(s, "box_gilde").ok, "in der Gilde")
 
 
 func test_mobs_im_safe_room_weggebeamt(t) -> void:
@@ -151,6 +158,11 @@ func test_gilde_schaltet_inventar_frei(t) -> void:
 	t.has(s.unlocks, "inventar")
 	t.is_null(s.player.hand, "Hand leer")
 	t.ok(J.some(s.pendingDialogs, func(d): return d.title == "Gilde der Einweisung"), "Dialog")
+	var tut = J.find(s.pendingDialogs, func(d): return d.title == "Gilde der Einweisung")
+	if tut != null:
+		var all := " ".join(tut.pages)
+		for w in ["Reiter", "Chat", "Aktionsleiste", "rechte Maustaste"]:
+			t.ok(all.contains(w), "Tutorial erklärt: %s" % w)
 	var potion = J.find(s.player.inventory, func(i): return i.baseId == "kleiner_heiltrank")
 	t.not_null(potion, "Heiltrank")
 	s.player.hp = 1

@@ -2,7 +2,8 @@ class_name GameHere
 extends RefCounted
 ## Der Bereich „Hier“ oben in der Seitenleiste:
 ## Gegenstände am Boden, Treppe, Türen, andere Crawler, Fallen und alles,
-## was ein Safe Room bietet (Automat, Wirt, Bett, Toilette, Laden, Boxen).
+## was ein Safe Room bietet (Automat, Wirt, Bett, Toilette, Laden, Boxen),
+## in der Gilde die Boxen.
 
 const FURNITURE_NAMES := {"automat": "Gratis-Automat", "wirt": "Wirt an der Theke", "bett": "Bett", "toilette": "Toilette", "schrein": "Schrein", "bildschirm": "Bildschirm"}
 
@@ -106,6 +107,10 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 	if room != null and room.kind == "safe":
 		any = true
 		_safe_room(gv, v, room)
+	elif room != null and room.kind == "guild" and not s.player.boxes.is_empty():
+		any = true
+		Kit.section(v, "Gilde")
+		_boxes(gv, v)
 	elif room != null and (room.get("feature") != null or not J.arr(room, "furniture").is_empty()):
 		any = _feature_room(gv, v, room) or any
 	if any:
@@ -166,23 +171,29 @@ static func _safe_room(gv: GameView, v: VBoxContainer, room: Dictionary) -> void
 	var shop = room.get("shop")
 	if shop != null and (legacy or near.call("haendler")):
 		_shop(gv, v, room, shop)
-	var boxes: Array = s.player.boxes
-	if not boxes.is_empty():
-		Kit.spacer(v, 6)
-		var bh := Kit.hbox(v, 6)
-		var bl := Kit.text(bh, "Lootboxen [b]%d[/b]" % boxes.size(), 13)
-		bl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		if boxes.size() > 1:
-			Kit.button(bh, "Alle öffnen", func(): _open_all(gv), "SmallPrimary")
-		var shown := boxes if gv.show_all_boxes else boxes.slice(0, 3)
-		for bx in shown:
-			var uid: String = bx.uid
-			var h := _row(v, Kit.col(Kit.esc(bx.name), Db.world("BOX_TIER_COLORS")[bx.box.tier]), 13)
-			Kit.button(h, "Öffnen", func(): _open_box(gv, uid), "SmallButton")
-		if boxes.size() > 3:
-			Kit.button(v, "Weniger anzeigen" if gv.show_all_boxes else "%d weitere anzeigen" % (boxes.size() - 3), func():
-				gv.show_all_boxes = not gv.show_all_boxes
-				gv.refresh_here(), "LinkBtn").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_boxes(gv, v)
+
+
+## Lootboxen zum Öffnen (Safe Room und Gilde).
+static func _boxes(gv: GameView, v: VBoxContainer) -> void:
+	var boxes: Array = gv.s.player.boxes
+	if boxes.is_empty():
+		return
+	Kit.spacer(v, 6)
+	var bh := Kit.hbox(v, 6)
+	var bl := Kit.text(bh, "Lootboxen [b]%d[/b]" % boxes.size(), 13)
+	bl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	if boxes.size() > 1:
+		Kit.button(bh, "Alle öffnen", func(): _open_all(gv), "SmallPrimary")
+	var shown := boxes if gv.show_all_boxes else boxes.slice(0, 3)
+	for bx in shown:
+		var uid: String = bx.uid
+		var h := _row(v, Kit.col(Kit.esc(bx.name), Db.world("BOX_TIER_COLORS")[bx.box.tier]), 13)
+		Kit.button(h, "Öffnen", func(): _open_box(gv, uid), "SmallButton")
+	if boxes.size() > 3:
+		Kit.button(v, "Weniger anzeigen" if gv.show_all_boxes else "%d weitere anzeigen" % (boxes.size() - 3), func():
+			gv.show_all_boxes = not gv.show_all_boxes
+			gv.refresh_here(), "LinkBtn").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 
 
 static func _shop(gv: GameView, v: VBoxContainer, room: Dictionary, shop: Dictionary) -> void:
