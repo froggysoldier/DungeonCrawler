@@ -17,8 +17,8 @@
   "h": 64,
   "sheet": "kreaturen",
   "w": 64,
-  "x": 352,
-  "y": 256
+  "x": 64,
+  "y": 928
  },
  "aufsatz/leuchten_klein": {
   "h": 32,
@@ -38,8 +38,8 @@
   "h": 18,
   "sheet": "kreaturen",
   "w": 40,
-  "x": 288,
-  "y": 256
+  "x": 0,
+  "y": 928
  },
  "aufsatz/schatten": {
   "h": 10,
@@ -494,10 +494,146 @@
   "res": 2,
   "sheet": "bosse",
   "w": 96,
+  "x": 1344,
+  "y": 96
+ },
+ "boss/abschleppwurm_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1440,
+  "y": 96
+ },
+ "boss/abschleppwurm_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1536,
+  "y": 96
+ },
+ "boss/abschleppwurm_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1632,
+  "y": 96
+ },
+ "boss/abschleppwurm_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1728,
+  "y": 96
+ },
+ "boss/heizungsbestie": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1824,
+  "y": 96
+ },
+ "boss/heizungsbestie_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1920,
+  "y": 96
+ },
+ "boss/heizungsbestie_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 0,
+  "y": 192
+ },
+ "boss/heizungsbestie_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 96,
+  "y": 192
+ },
+ "boss/heizungsbestie_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 192,
+  "y": 192
+ },
+ "boss/kanalkoenigin": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 288,
+  "y": 192
+ },
+ "boss/kanalkoenigin_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 384,
+  "y": 192
+ },
+ "boss/kanalkoenigin_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 480,
+  "y": 192
+ },
+ "boss/kanalkoenigin_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 576,
+  "y": 192
+ },
+ "boss/kanalkoenigin_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 672,
+  "y": 192
+ },
+ "boss/koenig_kanalratte": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 480,
+  "y": 0
+ },
+ "boss/koenig_kanalratte_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 576,
+  "y": 0
+ },
+ "boss/koenig_kanalratte_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
   "x": 672,
   "y": 0
  },
- "boss/heizungsbestie": {
+ "boss/koenig_kanalratte_angriff3": {
   "h": 96,
   "res": 2,
   "sheet": "bosse",
@@ -505,7 +641,7 @@
   "x": 768,
   "y": 0
  },
- "boss/kanalkoenigin": {
+ "boss/koenig_kanalratte_angriff4": {
   "h": 96,
   "res": 2,
   "sheet": "bosse",
@@ -513,15 +649,47 @@
   "x": 864,
   "y": 0
  },
- "boss/koenig_kanalratte": {
+ "boss/kommandant_schlamm": {
   "h": 96,
   "res": 2,
   "sheet": "bosse",
   "w": 96,
-  "x": 96,
-  "y": 0
+  "x": 768,
+  "y": 192
  },
- "boss/kommandant_schlamm": {
+ "boss/kommandant_schlamm_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 864,
+  "y": 192
+ },
+ "boss/kommandant_schlamm_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 960,
+  "y": 192
+ },
+ "boss/kommandant_schlamm_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1056,
+  "y": 192
+ },
+ "boss/kommandant_schlamm_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1152,
+  "y": 192
+ },
+ "boss/mottenmutter": {
   "h": 96,
   "res": 2,
   "sheet": "bosse",
@@ -529,12 +697,36 @@
   "x": 960,
   "y": 0
  },
- "boss/mottenmutter": {
+ "boss/mottenmutter_angriff1": {
   "h": 96,
   "res": 2,
   "sheet": "bosse",
   "w": 96,
-  "x": 192,
+  "x": 1056,
+  "y": 0
+ },
+ "boss/mottenmutter_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1152,
+  "y": 0
+ },
+ "boss/mottenmutter_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1248,
+  "y": 0
+ },
+ "boss/mottenmutter_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1344,
   "y": 0
  },
  "boss/muttis_mixer": {
@@ -542,7 +734,39 @@
   "res": 2,
   "sheet": "bosse",
   "w": 96,
-  "x": 288,
+  "x": 1440,
+  "y": 0
+ },
+ "boss/muttis_mixer_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1536,
+  "y": 0
+ },
+ "boss/muttis_mixer_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1632,
+  "y": 0
+ },
+ "boss/muttis_mixer_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1728,
+  "y": 0
+ },
+ "boss/muttis_mixer_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1824,
   "y": 0
  },
  "boss/nixe": {
@@ -550,16 +774,80 @@
   "res": 2,
   "sheet": "bosse",
   "w": 96,
-  "x": 384,
+  "x": 1920,
   "y": 0
+ },
+ "boss/nixe_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 0,
+  "y": 96
+ },
+ "boss/nixe_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 96,
+  "y": 96
+ },
+ "boss/nixe_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 192,
+  "y": 96
+ },
+ "boss/nixe_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 288,
+  "y": 96
  },
  "boss/oelschlick": {
   "h": 96,
   "res": 2,
   "sheet": "bosse",
   "w": 96,
+  "x": 384,
+  "y": 96
+ },
+ "boss/oelschlick_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
   "x": 480,
-  "y": 0
+  "y": 96
+ },
+ "boss/oelschlick_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 576,
+  "y": 96
+ },
+ "boss/oelschlick_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 672,
+  "y": 96
+ },
+ "boss/oelschlick_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 768,
+  "y": 96
  },
  "boss/rattenkaiser": {
   "h": 96,
@@ -569,13 +857,77 @@
   "x": 0,
   "y": 0
  },
+ "boss/rattenkaiser_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 96,
+  "y": 0
+ },
+ "boss/rattenkaiser_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 192,
+  "y": 0
+ },
+ "boss/rattenkaiser_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 288,
+  "y": 0
+ },
+ "boss/rattenkaiser_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 384,
+  "y": 0
+ },
  "boss/rostkoenigin": {
   "h": 96,
   "res": 2,
   "sheet": "bosse",
   "w": 96,
-  "x": 576,
-  "y": 0
+  "x": 864,
+  "y": 96
+ },
+ "boss/rostkoenigin_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 960,
+  "y": 96
+ },
+ "boss/rostkoenigin_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1056,
+  "y": 96
+ },
+ "boss/rostkoenigin_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1152,
+  "y": 96
+ },
+ "boss/rostkoenigin_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "bosse",
+  "w": 96,
+  "x": 1248,
+  "y": 96
  },
  "ding/bombe": {
   "h": 32,
@@ -918,16 +1270,80 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
+  "x": 576,
+  "y": 160
+ },
+ "kreatur/aal_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
   "x": 672,
-  "y": 64
+  "y": 160
+ },
+ "kreatur/aal_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 768,
+  "y": 160
+ },
+ "kreatur/aal_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 864,
+  "y": 160
+ },
+ "kreatur/aal_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 960,
+  "y": 160
  },
  "kreatur/alien": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 768,
-  "y": 64
+  "x": 1056,
+  "y": 160
+ },
+ "kreatur/alien_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1152,
+  "y": 160
+ },
+ "kreatur/alien_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1248,
+  "y": 160
+ },
+ "kreatur/alien_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1344,
+  "y": 160
+ },
+ "kreatur/alien_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1440,
+  "y": 160
  },
  "kreatur/bogen": {
   "h": 128,
@@ -1078,40 +1494,168 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 864,
-  "y": 64
+  "x": 1536,
+  "y": 160
+ },
+ "kreatur/drache_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1632,
+  "y": 160
+ },
+ "kreatur/drache_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1728,
+  "y": 160
+ },
+ "kreatur/drache_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1824,
+  "y": 160
+ },
+ "kreatur/drache_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1920,
+  "y": 160
  },
  "kreatur/drohne": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 960,
-  "y": 64
+  "x": 0,
+  "y": 256
  },
  "kreatur/drohne_2": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1056,
-  "y": 64
+  "x": 96,
+  "y": 256
+ },
+ "kreatur/drohne_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 256
+ },
+ "kreatur/drohne_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 256
+ },
+ "kreatur/drohne_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 384,
+  "y": 256
+ },
+ "kreatur/drohne_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 480,
+  "y": 256
  },
  "kreatur/egel": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1152,
-  "y": 64
+  "x": 576,
+  "y": 256
+ },
+ "kreatur/egel_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 672,
+  "y": 256
+ },
+ "kreatur/egel_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 768,
+  "y": 256
+ },
+ "kreatur/egel_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 864,
+  "y": 256
+ },
+ "kreatur/egel_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 960,
+  "y": 256
  },
  "kreatur/elementar": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
+  "x": 1056,
+  "y": 256
+ },
+ "kreatur/elementar_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1152,
+  "y": 256
+ },
+ "kreatur/elementar_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
   "x": 1248,
-  "y": 64
+  "y": 256
+ },
+ "kreatur/elementar_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1344,
+  "y": 256
+ },
+ "kreatur/elementar_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1440,
+  "y": 256
  },
  "kreatur/fass": {
   "h": 128,
@@ -1333,23 +1877,55 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1344,
-  "y": 64
+  "x": 1536,
+  "y": 256
  },
  "kreatur/fledermaus_2": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1440,
-  "y": 64
+  "x": 1632,
+  "y": 256
+ },
+ "kreatur/fledermaus_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1728,
+  "y": 256
+ },
+ "kreatur/fledermaus_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1824,
+  "y": 256
+ },
+ "kreatur/fledermaus_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1920,
+  "y": 256
+ },
+ "kreatur/fledermaus_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 0,
+  "y": 352
  },
  "kreatur/geist": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 288,
+  "x": 1056,
   "y": 64
  },
  "kreatur/geist_2": {
@@ -1357,7 +1933,39 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 384,
+  "x": 1152,
+  "y": 64
+ },
+ "kreatur/geist_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1248,
+  "y": 64
+ },
+ "kreatur/geist_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1344,
+  "y": 64
+ },
+ "kreatur/geist_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1440,
+  "y": 64
+ },
+ "kreatur/geist_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1536,
   "y": 64
  },
  "kreatur/gnom": {
@@ -1517,16 +2125,80 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1536,
-  "y": 64
+  "x": 96,
+  "y": 352
+ },
+ "kreatur/hase_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 352
+ },
+ "kreatur/hase_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 352
+ },
+ "kreatur/hase_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 384,
+  "y": 352
+ },
+ "kreatur/hase_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 480,
+  "y": 352
  },
  "kreatur/haustier": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1632,
-  "y": 64
+  "x": 576,
+  "y": 352
+ },
+ "kreatur/haustier_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 672,
+  "y": 352
+ },
+ "kreatur/haustier_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 768,
+  "y": 352
+ },
+ "kreatur/haustier_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 864,
+  "y": 352
+ },
+ "kreatur/haustier_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 960,
+  "y": 352
  },
  "kreatur/held": {
   "h": 32,
@@ -1554,48 +2226,208 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1728,
-  "y": 64
+  "x": 1056,
+  "y": 352
+ },
+ "kreatur/hund_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1152,
+  "y": 352
+ },
+ "kreatur/hund_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1248,
+  "y": 352
+ },
+ "kreatur/hund_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1344,
+  "y": 352
+ },
+ "kreatur/hund_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1440,
+  "y": 352
  },
  "kreatur/irrlicht": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1824,
-  "y": 64
+  "x": 1536,
+  "y": 352
  },
  "kreatur/irrlicht_2": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
+  "x": 1632,
+  "y": 352
+ },
+ "kreatur/irrlicht_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1728,
+  "y": 352
+ },
+ "kreatur/irrlicht_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1824,
+  "y": 352
+ },
+ "kreatur/irrlicht_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
   "x": 1920,
-  "y": 64
+  "y": 352
+ },
+ "kreatur/irrlicht_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 0,
+  "y": 448
  },
  "kreatur/kaefer": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 192,
-  "y": 256
+  "x": 1536,
+  "y": 832
+ },
+ "kreatur/kaefer_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1632,
+  "y": 832
+ },
+ "kreatur/kaefer_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1728,
+  "y": 832
+ },
+ "kreatur/kaefer_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1824,
+  "y": 832
+ },
+ "kreatur/kaefer_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1920,
+  "y": 832
  },
  "kreatur/kakerlake": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 0,
-  "y": 160
+  "x": 96,
+  "y": 448
+ },
+ "kreatur/kakerlake_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 448
+ },
+ "kreatur/kakerlake_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 448
+ },
+ "kreatur/kakerlake_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 384,
+  "y": 448
+ },
+ "kreatur/kakerlake_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 480,
+  "y": 448
  },
  "kreatur/katze": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 96,
-  "y": 160
+  "x": 576,
+  "y": 448
+ },
+ "kreatur/katze_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 672,
+  "y": 448
+ },
+ "kreatur/katze_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 768,
+  "y": 448
+ },
+ "kreatur/katze_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 864,
+  "y": 448
+ },
+ "kreatur/katze_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 960,
+  "y": 448
  },
  "kreatur/kobold": {
   "h": 128,
@@ -1906,8 +2738,40 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 192,
-  "y": 160
+  "x": 1056,
+  "y": 448
+ },
+ "kreatur/krebs_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1152,
+  "y": 448
+ },
+ "kreatur/krebs_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1248,
+  "y": 448
+ },
+ "kreatur/krebs_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1344,
+  "y": 448
+ },
+ "kreatur/krebs_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1440,
+  "y": 448
  },
  "kreatur/krieger": {
   "h": 128,
@@ -2058,16 +2922,80 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 288,
-  "y": 160
+  "x": 1536,
+  "y": 448
+ },
+ "kreatur/kroete_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1632,
+  "y": 448
+ },
+ "kreatur/kroete_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1728,
+  "y": 448
+ },
+ "kreatur/kroete_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1824,
+  "y": 448
+ },
+ "kreatur/kroete_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1920,
+  "y": 448
  },
  "kreatur/kroko": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
+  "x": 0,
+  "y": 544
+ },
+ "kreatur/kroko_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 96,
+  "y": 544
+ },
+ "kreatur/kroko_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 544
+ },
+ "kreatur/kroko_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 544
+ },
+ "kreatur/kroko_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
   "x": 384,
-  "y": 160
+  "y": 544
  },
  "kreatur/magier": {
   "h": 192,
@@ -2267,7 +3195,39 @@
   "sheet": "kreaturen",
   "w": 96,
   "x": 480,
-  "y": 160
+  "y": 544
+ },
+ "kreatur/maschine_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 576,
+  "y": 544
+ },
+ "kreatur/maschine_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 672,
+  "y": 544
+ },
+ "kreatur/maschine_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 768,
+  "y": 544
+ },
+ "kreatur/maschine_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 864,
+  "y": 544
  },
  "kreatur/mensch": {
   "h": 128,
@@ -3186,48 +4146,208 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 576,
-  "y": 160
+  "x": 960,
+  "y": 544
  },
  "kreatur/motte_2": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 672,
-  "y": 160
+  "x": 1056,
+  "y": 544
+ },
+ "kreatur/motte_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1152,
+  "y": 544
+ },
+ "kreatur/motte_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1248,
+  "y": 544
+ },
+ "kreatur/motte_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1344,
+  "y": 544
+ },
+ "kreatur/motte_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1440,
+  "y": 544
  },
  "kreatur/parkautomat": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1920,
-  "y": 160
+  "x": 96,
+  "y": 832
+ },
+ "kreatur/parkautomat_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 832
+ },
+ "kreatur/parkautomat_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 832
+ },
+ "kreatur/parkautomat_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 384,
+  "y": 832
+ },
+ "kreatur/parkautomat_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 480,
+  "y": 832
  },
  "kreatur/pilz": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 480,
+  "x": 1632,
   "y": 64
+ },
+ "kreatur/pilz_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1728,
+  "y": 64
+ },
+ "kreatur/pilz_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1824,
+  "y": 64
+ },
+ "kreatur/pilz_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1920,
+  "y": 64
+ },
+ "kreatur/pilz_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 0,
+  "y": 160
  },
  "kreatur/qualle": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 768,
-  "y": 160
+  "x": 1536,
+  "y": 544
+ },
+ "kreatur/qualle_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1632,
+  "y": 544
+ },
+ "kreatur/qualle_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1728,
+  "y": 544
+ },
+ "kreatur/qualle_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1824,
+  "y": 544
+ },
+ "kreatur/qualle_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1920,
+  "y": 544
  },
  "kreatur/raptor": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 864,
-  "y": 160
+  "x": 0,
+  "y": 640
+ },
+ "kreatur/raptor_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 96,
+  "y": 640
+ },
+ "kreatur/raptor_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 640
+ },
+ "kreatur/raptor_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 640
+ },
+ "kreatur/raptor_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 384,
+  "y": 640
  },
  "kreatur/ratte": {
   "h": 96,
@@ -3237,13 +4357,77 @@
   "x": 0,
   "y": 64
  },
+ "kreatur/ratte_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 96,
+  "y": 64
+ },
+ "kreatur/ratte_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 64
+ },
+ "kreatur/ratte_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 64
+ },
+ "kreatur/ratte_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 384,
+  "y": 64
+ },
  "kreatur/rohrgolem": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 0,
-  "y": 256
+  "x": 576,
+  "y": 832
+ },
+ "kreatur/rohrgolem_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 672,
+  "y": 832
+ },
+ "kreatur/rohrgolem_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 768,
+  "y": 832
+ },
+ "kreatur/rohrgolem_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 864,
+  "y": 832
+ },
+ "kreatur/rohrgolem_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 960,
+  "y": 832
  },
  "kreatur/rpg_axtkaempfer": {
   "h": 192,
@@ -6946,8 +8130,40 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 960,
-  "y": 160
+  "x": 480,
+  "y": 640
+ },
+ "kreatur/sack_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 576,
+  "y": 640
+ },
+ "kreatur/sack_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 672,
+  "y": 640
+ },
+ "kreatur/sack_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 768,
+  "y": 640
+ },
+ "kreatur/sack_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 864,
+  "y": 640
  },
  "kreatur/schaf": {
   "h": 128,
@@ -7066,15 +8282,47 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 96,
-  "y": 256
+  "x": 1056,
+  "y": 832
+ },
+ "kreatur/schimmel_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1152,
+  "y": 832
+ },
+ "kreatur/schimmel_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1248,
+  "y": 832
+ },
+ "kreatur/schimmel_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1344,
+  "y": 832
+ },
+ "kreatur/schimmel_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1440,
+  "y": 832
  },
  "kreatur/schleim": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 96,
+  "x": 480,
   "y": 64
  },
  "kreatur/schleim_2": {
@@ -7082,7 +8330,39 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 192,
+  "x": 576,
+  "y": 64
+ },
+ "kreatur/schleim_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 672,
+  "y": 64
+ },
+ "kreatur/schleim_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 768,
+  "y": 64
+ },
+ "kreatur/schleim_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 864,
+  "y": 64
+ },
+ "kreatur/schleim_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 960,
   "y": 64
  },
  "kreatur/skelett": {
@@ -7090,8 +8370,40 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
+  "x": 960,
+  "y": 640
+ },
+ "kreatur/skelett_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
   "x": 1056,
-  "y": 160
+  "y": 640
+ },
+ "kreatur/skelett_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1152,
+  "y": 640
+ },
+ "kreatur/skelett_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1248,
+  "y": 640
+ },
+ "kreatur/skelett_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1344,
+  "y": 640
  },
  "kreatur/spieler_pawn": {
   "h": 128,
@@ -7242,32 +8554,128 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 576,
-  "y": 64
+  "x": 96,
+  "y": 160
+ },
+ "kreatur/spinne_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 160
+ },
+ "kreatur/spinne_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 160
+ },
+ "kreatur/spinne_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 384,
+  "y": 160
+ },
+ "kreatur/spinne_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 480,
+  "y": 160
  },
  "kreatur/tentakel": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1152,
-  "y": 160
+  "x": 1440,
+  "y": 640
+ },
+ "kreatur/tentakel_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1536,
+  "y": 640
+ },
+ "kreatur/tentakel_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1632,
+  "y": 640
+ },
+ "kreatur/tentakel_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1728,
+  "y": 640
+ },
+ "kreatur/tentakel_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1824,
+  "y": 640
  },
  "kreatur/toaster": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1536,
-  "y": 160
+  "x": 960,
+  "y": 736
  },
  "kreatur/toaster_2": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1632,
-  "y": 160
+  "x": 1056,
+  "y": 736
+ },
+ "kreatur/toaster_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1152,
+  "y": 736
+ },
+ "kreatur/toaster_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1248,
+  "y": 736
+ },
+ "kreatur/toaster_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1344,
+  "y": 736
+ },
+ "kreatur/toaster_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1440,
+  "y": 736
  },
  "kreatur/troll": {
   "h": 32,
@@ -7281,32 +8689,96 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1248,
-  "y": 160
+  "x": 1920,
+  "y": 640
  },
  "kreatur/vogel_2": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1344,
-  "y": 160
+  "x": 0,
+  "y": 736
+ },
+ "kreatur/vogel_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 96,
+  "y": 736
+ },
+ "kreatur/vogel_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 192,
+  "y": 736
+ },
+ "kreatur/vogel_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 288,
+  "y": 736
+ },
+ "kreatur/vogel_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 384,
+  "y": 736
  },
  "kreatur/waschmaschine": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1728,
-  "y": 160
+  "x": 1536,
+  "y": 736
  },
  "kreatur/waschmaschine_2": {
   "h": 96,
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
+  "x": 1632,
+  "y": 736
+ },
+ "kreatur/waschmaschine_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1728,
+  "y": 736
+ },
+ "kreatur/waschmaschine_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
   "x": 1824,
-  "y": 160
+  "y": 736
+ },
+ "kreatur/waschmaschine_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 1920,
+  "y": 736
+ },
+ "kreatur/waschmaschine_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 0,
+  "y": 832
  },
  "kreatur/wechselbalg": {
   "h": 128,
@@ -7465,8 +8937,40 @@
   "res": 2,
   "sheet": "kreaturen",
   "w": 96,
-  "x": 1440,
-  "y": 160
+  "x": 480,
+  "y": 736
+ },
+ "kreatur/wurm_angriff1": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 576,
+  "y": 736
+ },
+ "kreatur/wurm_angriff2": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 672,
+  "y": 736
+ },
+ "kreatur/wurm_angriff3": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 768,
+  "y": 736
+ },
+ "kreatur/wurm_angriff4": {
+  "h": 96,
+  "res": 2,
+  "sheet": "kreaturen",
+  "w": 96,
+  "x": 864,
+  "y": 736
  },
  "kreatur/zombie": {
   "h": 32,

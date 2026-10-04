@@ -196,8 +196,9 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
   einer größeren Fläche (192 statt 128, Tiny RPG 256 statt 192), die Füße
   gleich weit über dem unteren Rand; `map_view._figure` gleicht das aus. Der
   Animator merkt sich Beginn und Richtung jedes Angriffs (`attack_frame`,
-  `attack_dir`), 70 ms je Bild. Selbst gebaute Kreaturen machen weiter nur
-  den Ausfallschritt.
+  `attack_dir`), 70 ms je Bild. Selbst gebaute Kreaturen und Bosse bekommen
+  vier Angriffsbilder aus ihrer eigenen Figur (`make_pixel_art._lean`:
+  ausholen, nach vorn schnellen, zurückfedern, Füße fest).
 - Größen: Tiny-RPG-Menschen und der Magier dreifach, kleine Skelette, Orks
   und Werbär vierfach vergrößert, damit sie neben der Spielfigur stimmen.
 - Übrige Kreaturen und Bosse (Tiere, Schleime, Geräte wie Toaster, Waschmaschine, Parkautomat und Rohrgolem …) gibt es im Pack

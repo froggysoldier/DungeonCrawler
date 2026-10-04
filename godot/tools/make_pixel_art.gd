@@ -169,6 +169,36 @@ func _add_ts(sheet_name: String, prefix: String, name: String, frames: int) -> v
 		var full := prefix + name + ("_2" if f == 1 else "")
 		res[full] = 2
 		_add(sheet_name, full, TsFig.image(name, f))
+	# Angriff: ausholen, nach vorn schnellen, zurückfedern (die Packs haben für
+	# diese Figuren keine Angriffsbilder)
+	var base := TsFig.image(name, 0)
+	for i in LEAN.size():
+		var full := "%s%s_angriff%d" % [prefix, name, i + 1]
+		res[full] = 2
+		_add(sheet_name, full, _lean(base, LEAN[i][0], LEAN[i][1], LEAN[i][2]))
+
+
+## Angriffsbilder selbst gebauter Figuren: [Neigung oben in Bildpixeln,
+## Streckung waagrecht, Streckung senkrecht]; die Füße bleiben stehen.
+const LEAN := [[-4.0, 0.96, 1.05], [10.0, 1.12, 0.92], [7.0, 1.07, 0.96], [2.0, 1.0, 1.0]]
+
+
+## Figur nach vorn (positiv) oder hinten neigen und strecken, Füße fest.
+static func _lean(img: Image, shift: float, sx: float, sy: float) -> Image:
+	var used := img.get_used_rect()
+	var foot := used.end.y - 1
+	var cx := used.get_center().x
+	var out := Image.create(img.get_width(), img.get_height(), false, Image.FORMAT_RGBA8)
+	for y in img.get_height():
+		var t := clampf(float(foot - y) / maxf(1.0, used.size.y), 0.0, 1.0)
+		var src_y := roundi(foot - (foot - y) / sy)
+		if src_y < 0 or src_y >= img.get_height():
+			continue
+		for x in img.get_width():
+			var src_x := roundi(cx + (x - cx - shift * t) / sx)
+			if src_x >= 0 and src_x < img.get_width():
+				out.set_pixel(x, y, img.get_pixel(src_x, src_y))
+	return out
 
 
 func _add(sheet_name: String, name: String, img: Image) -> void:

@@ -264,6 +264,15 @@ func test_angriffsbilder(t) -> void:
 	for n in TsFig.units():
 		if n != "schaf":
 			t.ge(PixelArt.attack_count("kreatur/" + n), 3, "%s greift sichtbar an" % n)
+	# Selbst gebaute Kreaturen und Bosse holen aus und schnellen vor
+	for n in TsFig.CREATURES:
+		t.eq(PixelArt.attack_count("kreatur/" + n), 4, "%s greift sichtbar an" % n)
+	for n in TsFig.BOSSES:
+		t.eq(PixelArt.attack_count("boss/" + n), 4, "%s greift sichtbar an" % n)
+	var still := PixelArt.image("kreatur/ratte").get_used_rect()
+	var lunge := PixelArt.image("kreatur/ratte_angriff2").get_used_rect()
+	t.gt(lunge.end.x, still.end.x, "nach vorn")
+	t.eq(lunge.end.y, still.end.y, "Füße bleiben stehen")
 	# Größere Fläche, Füße gleich weit über dem unteren Rand
 	var idle := PixelArt.size_of("kreatur/kobold")
 	var hit := PixelArt.size_of("kreatur/kobold_angriff1")
