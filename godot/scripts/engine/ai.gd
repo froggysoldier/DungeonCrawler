@@ -284,6 +284,34 @@ static func make_noise(s: Dictionary, at: Dictionary, radius: int) -> void:
 			m.searching = 12
 
 
+## Kampfrunde: ein wacher Gegner läuft vor seinem eigentlichen Zug bis zu
+## steps Felder heran (Fernkämpfer nur, bis sie schießen können; Fliehende
+## laufen weg). Den letzten Schritt oder den Angriff macht monster_turn.
+static func close_in(s: Dictionary, m: Dictionary, steps: int) -> void:
+	if steps <= 0 or not J.has_same(s.monsters, m) or not m.get("aware", false) or m.get("asleep"):
+		return
+	if m.downed > 0 or (m.get("stunned") and m.stunned > 0) or m.get("mudStuck") or m.behavior == "stationary":
+		return
+	var p: Dictionary = s.player
+	var ranged: bool = m.behavior == "ranged" or not not m.get("range")
+	var reach := int(J.nn(m, "range", 4))
+	for k in steps:
+		if s.status != "playing" or not J.has_same(s.monsters, m):
+			return
+		var d := J.cheb(m.pos, p.pos)
+		var from = m.pos
+		if m.get("fleeing") or Conditions.has_condition(m, "furcht"):
+			_step_away(s, m, p.pos)
+		elif d <= 1 or (ranged and d <= reach and Fov.has_line_of_sight(s.map, m.pos, p.pos)):
+			return
+		else:
+			_step_toward(s, m, p.pos)
+		if is_same(m.pos, from):
+			return
+		Traps.on_monster_step(s, m)
+		Dungeon.on_monster_step(s, m)
+
+
 static func monster_turn(s: Dictionary, m: Dictionary) -> void:
 	var before := J.pcopy(m.pos)
 	_monster_turn(s, m)

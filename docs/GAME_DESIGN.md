@@ -122,10 +122,19 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   Richtungstaste flüssig weiter; Klick-Reisen öffnen Türen unterwegs.
 - **Untersuchen ohne Hinlaufen:** Ein Klick auf Gegenstände, Möbel, Fallen
   oder die Treppe zeigt eine Info-Karte; erst der zweite Klick läuft hin.
-- **Kampfmodus:** Sobald ein wacher Gegner dich bemerkt, erscheint ein
-  Banner, die Karte bekommt einen roten Rahmen, ein Klang ertönt und jeder
-  Zug zählt einzeln (kein automatisches Weiterlaufen). Am Ende zeigt ein
-  Banner die Bilanz (Züge, Besiegte, Erfahrung, verlorene Lebenspunkte).
+- **Kampfmodus in Runden (wie Baldur's Gate):** Sobald ein wacher Gegner
+  dich sieht, erscheint ein Banner, die Karte bekommt einen roten Rahmen, ein
+  Klang ertönt, und der Kampf läuft in Runden (`rounds.gd`). Pro Runde hast du
+  einen Bewegungsvorrat (6 Felder, Geschick ±, Reittier +2, festgehalten 1),
+  auf der Karte blau eingefärbt, und eine Aktion (Angriff, Zauber, Gegenstand,
+  Deckung, Warten). Ein Klick auf ein blaues Feld läuft am Stück hin; ein
+  Klick auf einen Gegner läuft hin und greift an, wenn die Bewegung reicht.
+  Schritte kosten keine Spielzeit, die Gegner warten. Die Aktion oder die
+  Leertaste beendet die Runde: dann laufen die Gegner bis zu ihrer Reichweite
+  heran (4 Felder, klein 5, riesig 3, schnell +2, fliegend +1; Fernkämpfer nur,
+  bis sie schießen können) und greifen an. Eine Runde ist ein Zug (3 Minuten).
+  Darunter wird weiter in Feldern gerechnet. Am Ende zeigt ein Banner die
+  Bilanz (Züge, Besiegte, Erfahrung, verlorene Lebenspunkte).
 - **Figuren:** Crawler und Monster sind gezeichnete Kreaturen (Ratte,
   Spinne, Kobold, Schleim …); unbekannte Monster zeigen ihre Gestalt mit
   einer Fragezeichen-Marke.

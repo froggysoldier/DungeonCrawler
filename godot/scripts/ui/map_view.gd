@@ -22,6 +22,8 @@ var tiles: Tiles
 var anim: Animator
 var hover: Variant = null
 var path: Variant = null
+## Kampfrunde: erreichbare Felder (Index -> Schritte), sonst leer.
+var reach: Dictionary = {}
 var selected: Variant = null
 
 var zoom_index: int = 1
@@ -955,7 +957,22 @@ func _draw_dynamic_body() -> void:
 	var time: float = frame_anim.time
 	var T := tile_px
 
-	# --- Pfadvorschau
+	# --- Kampfrunde: wie weit der Crawler noch kommt (blau), Rand betont
+	if not reach.is_empty():
+		var w: int = m.width
+		var fill := Color(0.42, 0.72, 1.0, 0.13)
+		var edge := Color(0.55, 0.8, 1.0, 0.55)
+		for i in reach:
+			var x: int = i % w
+			var y: int = i / w
+			var sx := _sx(x)
+			var sy := _sy(y)
+			ci.draw_rect(Rect2(sx, sy, T, T), fill)
+			for d in [[0, -1, 0, 0, 32, 2], [0, 1, 0, 30, 32, 2], [-1, 0, 0, 0, 2, 32], [1, 0, 30, 0, 2, 32]]:
+				if not reach.has(i + d[0] + d[1] * w):
+					_rect(ci, sx, sy, d[2], d[3], d[4], d[5], edge)
+
+	# --- Pfadvorschau (im Kampf: was über die Bewegung der Runde hinausgeht, rot)
 	if path is Array and not (path as Array).is_empty():
 		var pl: Array = path
 		for n in pl.size():
@@ -963,6 +980,8 @@ func _draw_dynamic_body() -> void:
 			var sx := _sx(p.x)
 			var sy := _sy(p.y)
 			var c := Color(1, 214 / 255.0, 90 / 255.0, maxf(0.3, 0.85 - n * 0.03))
+			if not reach.is_empty() and not reach.has(MapGen.idx(m, p.x, p.y)):
+				c = Color(1, 0.36, 0.36, 0.7)
 			if n == pl.size() - 1:
 				for q in [[10, 10, 12, 2], [10, 20, 12, 2], [10, 10, 2, 12], [20, 10, 2, 12]]:
 					_rect(ci, sx, sy, q[0], q[1], q[2], q[3], c)

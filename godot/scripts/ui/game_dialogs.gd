@@ -493,12 +493,12 @@ static func run_talk_show(gv: GameView, title: String, intro: Array) -> Modals.J
 static func show_help(gv: GameView) -> void:
 	var rows := [
 		["Laufen", "Klick auf ein bekanntes Feld · linke Maustaste gedrückt halten: der Maus folgen · Pfeiltasten oder Ziffernblock (gedrückt halten = weiterlaufen)"],
-		["Angreifen", "Klick auf einen Gegner oder in ihn hineinlaufen · im Kampf Enter"],
+		["Kampfrunde", "Pro Runde Bewegung (blaue Felder) und eine Aktion · Klick auf ein blaues Feld läuft am Stück dorthin · Klick auf einen Gegner läuft hin und greift an · Enter greift das gewählte Ziel an · Leertaste beendet die Runde"],
 		["Körperteil", "1 Faust · 2 Tritt · 3 Knie · 4 Ellbogen · 5 Kopfstoß · 6 Waffe · 7 Wurf"],
 		["Ausführung", "Q Normal · W Sprung · E Stampfen · R Anlauf"],
 		["Trefferzone", "Y Kopf · X Körper · C Arme · V Beine"],
 		["Ziel wechseln", "Tab"],
-		["Warten", "Leertaste (wer brennt, wälzt sich am Boden)"],
+		["Warten / Runde beenden", "Leertaste (wer brennt, wälzt sich am Boden)"],
 		["Aufheben", "G"],
 		["Treppe nehmen", "Enter auf der Treppe"],
 		["Klassenfähigkeit", "F (ab Etage 3)"],

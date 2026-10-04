@@ -118,6 +118,13 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 	var outer := VBoxContainer.new()
 	outer.add_theme_constant_override("separation", 6)
 	bar.add_child(outer)
+	# Runde: Bewegung übrig, eine Aktion, Runde beenden
+	if Rounds.active(s):
+		var rh := Kit.hbox(outer, 10)
+		var left := int(s.round.move)
+		var info := Kit.text(rh, "[b]Runde %d[/b]   Bewegung: [color=#8cc8ff][b]%d[/b] von %d Feldern[/color]   Aktion: [color=#6ee07a]bereit[/color]   [color=#8b8f99]Klick auf ein blaues Feld läuft dorthin, Klick auf einen Gegner läuft hin und greift an.[/color]" % [int(s.round.n), left, int(s.round.max)], 13)
+		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		Kit.kbutton(rh, "Runde beenden", "Leer", func(): gv.act(func(): return Game.wait(s)), "Button")
 	var cols := HBoxContainer.new()
 	cols.add_theme_constant_override("separation", 12)
 	outer.add_child(cols)
@@ -249,6 +256,7 @@ static func _target_row(gv: GameView, list: Node, m: Dictionary) -> void:
 	var d := Fov.chebyshev(m.pos, p.pos)
 	var chance := ""
 	var blocker = null
+	var approach := false
 	var tech := gv.technique()
 	if gv.pending_spell != null:
 		var def: Dictionary = Db.spell(gv.pending_spell)
@@ -261,6 +269,17 @@ static func _target_row(gv: GameView, list: Node, m: Dictionary) -> void:
 		blocker = Combat.technique_blocker(s, m, tech)
 		if blocker == null:
 			chance = ("%d %% Treffer" % Combat.hit_chance(s, m, tech)) if info.showHitChance else "Trefferchance unklar"
+		elif d > 1 and tech.part != "wurf":
+			# Nahkampf auf Entfernung: hinlaufen und zuschlagen, wenn die Bewegung reicht
+			var path = Game.plan_path(s, m.pos)
+			var need: int = (path.size() - 1) if path is Array and not path.is_empty() else 99
+			var left: int = int(s.round.move) if Rounds.active(s) else 99
+			if need <= left:
+				blocker = null
+				approach = true
+				chance = "Hinlaufen (%d %s) und zuschlagen" % [need, "Feld" if need == 1 else "Felder"]
+			else:
+				blocker = "Zu weit für diese Runde (%d Felder, %d übrig)." % [need, left]
 	var states: Array = []
 	if m.get("asleep", false):
 		states.append("schläft")
@@ -304,7 +323,12 @@ static func _target_row(gv: GameView, list: Node, m: Dictionary) -> void:
 	var h := Kit.hbox(v, 6)
 	var ct := Kit.text(h, Kit.esc(blocker if blocker != null else chance), 12, "muted" if blocker != null else "ok")
 	ct.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var btn := Kit.button(h, "Zaubern" if gv.pending_spell != null else "Angreifen", func(): gv.strike(uid), "SmallPrimary", blocker != null)
+	var btn := Kit.button(h, "Zaubern" if gv.pending_spell != null else "Angreifen", func():
+		if approach:
+			gv.target_uid = uid
+			gv.attack_or_approach(uid)
+		else:
+			gv.strike(uid), "SmallPrimary", blocker != null)
 	btn.mouse_filter = Control.MOUSE_FILTER_STOP
 	cp.pressed.connect(func():
 		gv.target_uid = uid

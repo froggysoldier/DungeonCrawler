@@ -103,7 +103,7 @@ static func controls_pages() -> Array:
 	return [
 		"Laufen: Klick auf ein Feld, und du läufst hin. Linke Maustaste gedrückt halten, und du folgst der Maus. Die Pfeiltasten gehen auch, gedrückt halten heißt weiterlaufen. Solange dich nichts angreift, läufst du ohne Pause.",
 		"Handeln: Rechtsklick auf ein Feld öffnet ein Menü mit allem, was dort geht – aufheben, anziehen, angreifen, ansprechen, öffnen, untersuchen. Ist es weiter weg, läufst du von selbst hin. Gold sammelst du beim Drüberlaufen ein.",
-		"Kämpfen: Lauf in einen Gegner hinein oder klick ihn an. Sobald dich etwas entdeckt, beginnt der Kampf, und jeder Zug zählt einzeln. Unten wählst du, womit (1 bis 7: Faust, Tritt, Knie …), wie (Q bis R) und wohin (Y bis V) du zuschlägst. Enter greift das gewählte Ziel an, Tab wechselt es, die Leertaste wartet.",
+		"Kämpfen: Sobald dich etwas entdeckt, läuft der Kampf in Runden. Pro Runde kannst du dich ein Stück bewegen – die blauen Felder – und eine Aktion ausführen. Klick auf ein blaues Feld, und du läufst am Stück hin. Klick auf einen Gegner, und du läufst hin und schlägst zu. Unten wählst du, womit (1 bis 7), wie (Q bis R) und wohin (Y bis V). Die Leertaste beendet die Runde, dann sind die Gegner dran.",
 		"Dein Bildschirm: Oben stehen Etage, Uhrzeit und der Countdown bis zum Einsturz, rechts oben die Reiter (Inventar, Erfolge und mehr). Rechts siehst du deine Werte und den Chat mit allem, was passiert. Links oben ist die Karte, K macht sie groß.",
 		"Dein erstes Ziel: die Gilde der Einweisung. Sie ist auf deiner Karte markiert. Dort bekommst du ein Inventar und erfährst den Rest. Danach suchst du die Treppe nach unten, bevor die Etage einstürzt. H zeigt dir jederzeit alle Tasten.",
 	]

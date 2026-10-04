@@ -90,3 +90,40 @@ func test_monster_betreten_keine_safe_rooms(t) -> void:
 	var inside := MapGen.center(safe)
 	var m := _spawn(s, "heinzelmann", 1, inside)
 	t.ok(not Ai._allowed_tile(s, m, inside), "Safe Room ist für Monster gesperrt")
+
+
+func test_kampfrunden(t) -> void:
+	var s := TH.make(9100, {"beruf": 1})
+	var at := _arena(s)
+	var ghul := _spawn(s, "ghul", 2, at.call(5))
+	ghul.aware = true
+	s.monsters = [ghul]
+	Rounds.after_turn(s)
+	t.ok(Rounds.active(s), "Kampf läuft in Runden")
+	var budget: int = s.round.move
+	t.ge(budget, 4, "Bewegungsvorrat")
+	var turn: int = s.turn
+	var ghul_at: Dictionary = ghul.pos.duplicate()
+	# Schritte kosten keine Zeit, der Gegner wartet
+	var moved := 0
+	for d in [[0, 1], [0, -1]]:
+		var to := {"x": s.player.pos.x + d[0], "y": s.player.pos.y + d[1]}
+		if Game.move_step(s, to).ok:
+			moved += 1
+	t.eq(s.turn, turn, "Schritte in der Runde kosten keine Zeit")
+	t.eq(ghul.pos, ghul_at, "der Gegner wartet")
+	t.eq(int(s.round.move), budget - moved, "Vorrat sinkt")
+	# Ist der Vorrat leer, geht kein Schritt mehr
+	s.round.move = 0
+	t.ok(not Game.move_step(s, {"x": s.player.pos.x - 1, "y": s.player.pos.y}).ok, "ohne Vorrat kein Schritt")
+	# Runde beenden: Gegner läuft mehrere Felder heran, neue Runde mit vollem Vorrat
+	var before := J.cheb(ghul.pos, s.player.pos)
+	Game.wait(s)
+	t.eq(s.turn, turn + 1, "eine Runde ist ein Zug")
+	t.ge(before - J.cheb(ghul.pos, s.player.pos), mini(2, before - 1), "Gegner kommt mehrere Felder näher")
+	if Rounds.active(s):
+		t.eq(int(s.round.move), int(s.round.max), "neue Runde, voller Vorrat")
+	# Ohne Gegner endet der Kampf
+	s.monsters = []
+	Game.wait(s)
+	t.ok(not Rounds.active(s), "Kampf vorbei")

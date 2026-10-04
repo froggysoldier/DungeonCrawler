@@ -53,6 +53,7 @@ var _save_due := false
 var _refresh_due := false
 var last_step := 0.0
 var _path_cache := {"key": "", "path": null}
+var _reach_key := ""
 var _minimap_key := ""
 var _last_log_id := -1
 var _typer := Typing.Queue.new()
@@ -380,8 +381,8 @@ func zoom_map(delta: int) -> void:
 func _process(_delta: float) -> void:
 	var now := Animator.now_ms()
 	if held != null and not modal_open() and s.status == "playing" and now - last_step >= STEP_MS:
-		if in_combat():
-			# Im Kampf zählt jeder Schritt einzeln
+		if in_combat() and not Rounds.can_move(s):
+			# Bewegung der Runde aufgebraucht
 			held = null
 		else:
 			# Fester Takt (nicht ab "jetzt"), damit die Schritte nahtlos ineinandergehen
@@ -412,6 +413,10 @@ func _draw_frame() -> void:
 	map.hover = hover
 	map.path = path
 	map.selected = inspected
+	var rkey := "%d|%d,%d|%s" % [s.turn, s.player.pos.x, s.player.pos.y, str(s.get("round"))]
+	if _reach_key != rkey:
+		_reach_key = rkey
+		map.reach = reach()
 	map.redraw()
 	var room = Game.current_room(s)
 	_room_label.text = room.name if room != null else "Gang"
@@ -447,12 +452,36 @@ func toggle_minimap() -> void:
 # ---------------------------------------------------------------- Kampfmodus
 
 ## Kampf läuft, sobald ein wacher Gegner, der dich bemerkt hat, in Sicht ist.
+## Läuft eine Kampfrunde (siehe Rounds)?
 func in_combat() -> bool:
-	var vis := _vis_now()
-	for m in s.monsters:
-		if m.get("aware", false) and not m.get("asleep", false) and vis.has(MapGen.idx(s.map, m.pos.x, m.pos.y)):
-			return true
-	return false
+	return Rounds.active(s)
+
+
+## Felder, die der Crawler in dieser Kampfrunde noch erreicht (Index -> Schritte).
+func reach() -> Dictionary:
+	if not in_combat():
+		return {}
+	var m: Dictionary = s.map
+	var left := int(s.round.move)
+	var start := MapGen.idx(m, s.player.pos.x, s.player.pos.y)
+	var out := {start: 0}
+	var frontier: Array = [s.player.pos]
+	for step in range(1, left + 1):
+		var next: Array = []
+		for q in frontier:
+			for d in [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]:
+				var n := {"x": q.x + d[0], "y": q.y + d[1]}
+				if not MapGen.in_bounds(m, n.x, n.y):
+					continue
+				var i := MapGen.idx(m, n.x, n.y)
+				if out.has(i) or not m.explored[i] or not Pathfinding.can_step(m, q, n):
+					continue
+				if Ai.monster_at(s, n) != null or MapGen.furniture_at(m, n) != null:
+					continue
+				out[i] = step
+				next.append(n)
+		frontier = next
+	return out
 
 
 ## Sichtbare Felder zum aktuellen Stand (nach einer Aktion sofort neu).
@@ -482,7 +511,7 @@ func _update_combat_mode() -> void:
 		var foes := combat_targets().filter(func(m): return m.get("aware", false))
 		var names := J.uniq(foes.map(func(m): return Identify.describe_monster(s, m).name))
 		var who := ("%s und weitere" % ", ".join(names.slice(0, 2))) if names.size() > 2 else " und ".join(names)
-		Log.add(s, "Kampf! %s %s dich entdeckt. Ab jetzt zählt jeder Zug einzeln." % [who, "haben" if foes.size() > 1 else "hat"], "gefahr")
+		Log.add(s, "%s %s dich entdeckt." % [who, "haben" if foes.size() > 1 else "hat"], "gefahr")
 		# Beim Betreten einer Boss-Kammer übernimmt der Versus-Bildschirm den Auftritt
 		if s.get("pendingVersus") == null:
 			banner("Kampf", who, "start")
@@ -747,7 +776,9 @@ func attack_or_approach(uid: String) -> void:
 		attack_monster(uid)
 		return
 	if Fov.chebyshev(s.player.pos, mon.pos) > 1 and part != "wurf":
-		step_toward(mon.pos)
+		# Hinlaufen und zuschlagen, wenn die Bewegung reicht
+		var t := technique()
+		go_then(mon.pos, true, func(): return Game.attack(s, uid, t))
 		return
 	say(blocker)
 
@@ -764,11 +795,10 @@ func go_then(tp: Dictionary, adjacent: bool, fn: Callable) -> void:
 			return
 		if adjacent and path.size() > 0 and path[-1].x == tp.x and path[-1].y == tp.y:
 			path = path.slice(0, path.size() - 1)
-		if in_combat():
-			act(func(): return Game.move_step(s, path[0]))
-			return
+		var fight := in_combat()
 		await travel(path)
-		if not close.call() or in_combat() or s.status != "playing":
+		# Ohne Kampf hält man an, sobald einer beginnt; im Kampf zählt nur, ob es reicht
+		if not close.call() or s.status != "playing" or (not fight and in_combat()):
 			return
 	act(fn)
 
@@ -798,6 +828,9 @@ func travel(path: Array) -> void:
 	if traveling:
 		return
 	traveling = true
+	# Im Kampf: am Stück laufen, solange die Bewegung der Runde reicht
+	var fight := in_combat()
+	var round_n: int = int(s.round.n) if fight else -1
 	var k := 0
 	var next_at := Animator.now_ms()
 	while k < path.size():
@@ -824,7 +857,9 @@ func travel(path: Array) -> void:
 			break
 		if s.player.pos.x != step.x or s.player.pos.y != step.y:
 			break
-		if in_combat():
+		if not fight and in_combat():
+			break
+		if fight and (not in_combat() or int(s.round.n) != round_n):
 			break
 		if s.player.hp < hp_before:
 			break
@@ -901,10 +936,8 @@ func _on_map_click(t: Vector2i, button: int) -> void:
 	var path = Game.plan_path(s, tp)
 	if not (path is Array) or path.is_empty():
 		say("Dorthin kennst du keinen Weg.")
-	elif in_combat():
-		# Im Kampf geht es nur Schritt für Schritt voran
-		act(func(): return Game.move_step(s, path[0]))
 	else:
+		# Im Kampf so weit, wie die Bewegung der Runde reicht
 		travel(path)
 
 

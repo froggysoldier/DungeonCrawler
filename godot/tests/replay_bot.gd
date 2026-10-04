@@ -154,6 +154,13 @@ func _play(seed: int, answers: Dictionary, steps: int, every_n: int) -> Dictiona
 			break
 		guard += 1
 		var p: Dictionary = s.player
+		# Kampfrunde ohne Bewegung: zuschlagen, wenn jemand daneben steht, sonst die Runde beenden
+		if s.get("round") != null and int(s.round.move) <= 0:
+			var adj = J.find(s.monsters, func(m): return J.cheb(m.pos, p.pos) <= 1)
+			if adj != null and _act("attack", [adj.uid, {"part": PARTS[_pick_index(3)], "move": "normal"}]):
+				continue
+			_act("wait")
+			continue
 		if s.floor != floor_no:
 			floor_no = s.floor
 			phase = "clear"

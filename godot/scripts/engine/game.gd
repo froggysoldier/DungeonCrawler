@@ -290,6 +290,8 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 	var p: Dictionary = s.player
 	if J.cheb(p.pos, to) != 1:
 		return _fail("Nur ein Feld pro Zug.")
+	if not Rounds.can_move(s):
+		return _fail("Keine Bewegung mehr in dieser Runde. Greif an oder beende die Runde (Leertaste).")
 	var furn = MapGen.furniture_at(s.map, to)
 	if furn != null:
 		return use_furniture(s, furn)
@@ -340,7 +342,7 @@ static func move_step(s: Dictionary, to: Dictionary) -> Dictionary:
 	Traps.on_player_step(s)
 	Dungeon.on_player_step(s)
 	if Mounts.mount_step(s):
-		end_turn(s, true)
+		end_turn(s, true, "move")
 	return _ok()
 
 
@@ -533,20 +535,28 @@ static func wait(s: Dictionary) -> Dictionary:
 	return _ok()
 
 
-static func end_turn(s: Dictionary, keep_move_dir: bool = false) -> void:
+## Ende eines Zuges. kind: "move" (Schritt; im Kampf zehrt er nur am
+## Bewegungsvorrat der Runde), sonst eine Aktion, die die Runde beendet.
+static func end_turn(s: Dictionary, keep_move_dir: bool = false, kind: String = "action") -> void:
 	if not keep_move_dir:
 		s.player.lastMoveDir = null
 	if s.status != "playing":
 		return
+	if not Rounds.spend(s, kind):
+		return
+	var fighting := Rounds.active(s)
 	var before := time_left(s)
 	s.turn += 1
-	# Monster in der Nähe handeln; weit entfernte schlafen
+	# Monster in der Nähe handeln; weit entfernte schlafen. In der Kampfrunde
+	# laufen wache Gegner erst bis zu ihrer Reichweite heran.
 	for m in s.monsters.duplicate():
 		if s.status != "playing":
 			break
 		if J.cheb(m.pos, s.player.pos) > 24 and not m.aware:
 			continue
 		var from = m.pos
+		if fighting:
+			Ai.close_in(s, m, Rounds.monster_speed(m) - 1)
 		Ai.monster_turn(s, m)
 		if not is_same(m.pos, from):
 			Traps.on_monster_step(s, m)
@@ -559,6 +569,7 @@ static func end_turn(s: Dictionary, keep_move_dir: bool = false) -> void:
 		return
 	_tick_time(s, 1, before)
 	Arena.check(s)
+	Rounds.after_turn(s)
 
 
 ## Zeit vergeht: Buffs, Regeneration, Nachspawns, Einsturz.

@@ -42,6 +42,7 @@ godot/
 | `animator.gd` | Gleiten, Kamera, Geschosse, aufsteigende Zahlen |
 | `game_view.gd` | Spielansicht (Kopfzeile mit Reitern, Karte mit ausklappbarer Reiter-Tafel, rechts Werte, „Hier“ und Chat, unten Aktionsleiste), Eingabe, Laufen, Kampfmodus, Chat |
 | `context_menu.gd` | Rechtsklick-Menü auf der Karte (Aktionen je Feld, hinlaufen und handeln) |
+| `engine/rounds.gd` | Kampfrunden: Bewegungsvorrat, eine Aktion, Gegner-Reichweite |
 | `game_vitals.gd`, `game_here.gd`, `game_tabs.gd`, `game_combat.gd`, `game_dialogs.gd` | Feste Lebensanzeige, Seitenleiste, Reiter, Kampfsequenz, Tooltip, Versus, Talkshow, Hilfe, Menü |
 | `selection.gd`, `screens.gd` | Rassen- und Klassenwahl, Titel, Interview, Ende |
 | `modals.gd`, `typing.gd` | Dialoge mit Warteschlange, Schreibmaschinen-Effekt |
