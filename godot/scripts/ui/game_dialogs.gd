@@ -339,7 +339,7 @@ static func maybe_versus(gv: GameView) -> void:
 		hero.custom_minimum_size = Vector2(220, 240)
 		hero.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		var hero_look := Sprites.hero_name(p)
-		hero.draw_fn = func(ci: CanvasItem): Sprites.draw_hero(ci, Vector2(110, 226), 6, false, hero_look)
+		hero.draw_fn = func(ci: CanvasItem): Sprites.draw_hero(ci, Vector2(110, 236), 3, false, hero_look)
 		left.add_child(hero)
 		_center_label(left, p.name, 30, UiTheme.ACCENT, 700, true)
 		_center_label(left, "%s · Level %d" % [who if who != "" else "Crawler", p.level], 13, UiTheme.MUTED)

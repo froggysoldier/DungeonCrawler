@@ -2773,837 +2773,117 @@
   "x": 192,
   "y": 640
  },
- "kreatur/spieler_bogen": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 6272
- },
- "kreatur/spieler_bogen_2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 6272
- },
- "kreatur/spieler_bogen_3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 6272
- },
- "kreatur/spieler_bogen_4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 6400
- },
- "kreatur/spieler_bogen_5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 6400
- },
- "kreatur/spieler_bogen_6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 6400
- },
- "kreatur/spieler_bogen_lauf1": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 6400
- },
- "kreatur/spieler_bogen_lauf2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 6528
- },
- "kreatur/spieler_bogen_lauf3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 6528
- },
- "kreatur/spieler_bogen_lauf4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 6528
- },
- "kreatur/spieler_fleisch": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 6528
- },
- "kreatur/spieler_fleisch_2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 6656
- },
- "kreatur/spieler_fleisch_3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 6656
- },
- "kreatur/spieler_fleisch_4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 6656
- },
- "kreatur/spieler_fleisch_5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 6656
- },
- "kreatur/spieler_fleisch_6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 6784
- },
- "kreatur/spieler_fleisch_7": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 6784
- },
- "kreatur/spieler_fleisch_8": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 6784
- },
- "kreatur/spieler_fleisch_lauf1": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 6784
- },
- "kreatur/spieler_fleisch_lauf2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 6912
- },
- "kreatur/spieler_fleisch_lauf3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 6912
- },
- "kreatur/spieler_fleisch_lauf4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 6912
- },
- "kreatur/spieler_fleisch_lauf5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 6912
- },
- "kreatur/spieler_fleisch_lauf6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 7040
- },
- "kreatur/spieler_gold": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 7040
- },
- "kreatur/spieler_gold_2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 7040
- },
- "kreatur/spieler_gold_3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 7040
- },
- "kreatur/spieler_gold_4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 7168
- },
- "kreatur/spieler_gold_5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 7168
- },
- "kreatur/spieler_gold_6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 7168
- },
- "kreatur/spieler_gold_7": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 7168
- },
- "kreatur/spieler_gold_8": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 7296
- },
- "kreatur/spieler_gold_lauf1": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 7296
- },
- "kreatur/spieler_gold_lauf2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 7296
- },
- "kreatur/spieler_gold_lauf3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 7296
- },
- "kreatur/spieler_gold_lauf4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 7424
- },
- "kreatur/spieler_gold_lauf5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 7424
- },
- "kreatur/spieler_gold_lauf6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 7424
- },
- "kreatur/spieler_hammer": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 7424
- },
- "kreatur/spieler_hammer_2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 7552
- },
- "kreatur/spieler_hammer_3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 7552
- },
- "kreatur/spieler_hammer_4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 7552
- },
- "kreatur/spieler_hammer_5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 7552
- },
- "kreatur/spieler_hammer_6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 7680
- },
- "kreatur/spieler_hammer_7": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 7680
- },
- "kreatur/spieler_hammer_8": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 7680
- },
- "kreatur/spieler_hammer_lauf1": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 7680
- },
- "kreatur/spieler_hammer_lauf2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 7808
- },
- "kreatur/spieler_hammer_lauf3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 7808
- },
- "kreatur/spieler_hammer_lauf4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 7808
- },
- "kreatur/spieler_hammer_lauf5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 7808
- },
- "kreatur/spieler_hammer_lauf6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 7936
- },
- "kreatur/spieler_krieger": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 7936
- },
- "kreatur/spieler_krieger_2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 7936
- },
- "kreatur/spieler_krieger_3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 7936
- },
- "kreatur/spieler_krieger_4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 8064
- },
- "kreatur/spieler_krieger_5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 8064
- },
- "kreatur/spieler_krieger_6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 8064
- },
- "kreatur/spieler_krieger_7": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 8064
- },
- "kreatur/spieler_krieger_8": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 8192
- },
- "kreatur/spieler_krieger_lauf1": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 8192
- },
- "kreatur/spieler_krieger_lauf2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 8192
- },
- "kreatur/spieler_krieger_lauf3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 8192
- },
- "kreatur/spieler_krieger_lauf4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 8320
- },
- "kreatur/spieler_krieger_lauf5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 8320
- },
- "kreatur/spieler_krieger_lauf6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 8320
- },
- "kreatur/spieler_messer": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 8320
- },
- "kreatur/spieler_messer_2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 8448
- },
- "kreatur/spieler_messer_3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 8448
- },
- "kreatur/spieler_messer_4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 8448
- },
- "kreatur/spieler_messer_5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 8448
- },
- "kreatur/spieler_messer_6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 8576
- },
- "kreatur/spieler_messer_7": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 8576
- },
- "kreatur/spieler_messer_8": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 8576
- },
- "kreatur/spieler_messer_lauf1": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 8576
- },
- "kreatur/spieler_messer_lauf2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 8704
- },
- "kreatur/spieler_messer_lauf3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 8704
- },
- "kreatur/spieler_messer_lauf4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 8704
- },
- "kreatur/spieler_messer_lauf5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 8704
- },
- "kreatur/spieler_messer_lauf6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 8832
- },
- "kreatur/spieler_moench": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 8832
- },
- "kreatur/spieler_moench_2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 8832
- },
- "kreatur/spieler_moench_3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 8832
- },
- "kreatur/spieler_moench_4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 8960
- },
- "kreatur/spieler_moench_5": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 8960
- },
- "kreatur/spieler_moench_6": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 8960
- },
- "kreatur/spieler_moench_lauf1": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 384,
-  "y": 8960
- },
- "kreatur/spieler_moench_lauf2": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 0,
-  "y": 9088
- },
- "kreatur/spieler_moench_lauf3": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 128,
-  "y": 9088
- },
- "kreatur/spieler_moench_lauf4": {
-  "h": 128,
-  "res": 2,
-  "sheet": "einheiten",
-  "w": 128,
-  "x": 256,
-  "y": 9088
- },
  "kreatur/spieler_pawn": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 9088
+  "x": 128,
+  "y": 6272
  },
  "kreatur/spieler_pawn_2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 9216
+  "x": 256,
+  "y": 6272
  },
  "kreatur/spieler_pawn_3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 9216
+  "x": 384,
+  "y": 6272
  },
  "kreatur/spieler_pawn_4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 9216
+  "x": 0,
+  "y": 6400
  },
  "kreatur/spieler_pawn_5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 9216
+  "x": 128,
+  "y": 6400
  },
  "kreatur/spieler_pawn_6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 9344
+  "x": 256,
+  "y": 6400
  },
  "kreatur/spieler_pawn_7": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 9344
+  "x": 384,
+  "y": 6400
  },
  "kreatur/spieler_pawn_8": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 9344
+  "x": 0,
+  "y": 6528
  },
  "kreatur/spieler_pawn_lauf1": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 9344
+  "x": 128,
+  "y": 6528
  },
  "kreatur/spieler_pawn_lauf2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 9472
+  "x": 256,
+  "y": 6528
  },
  "kreatur/spieler_pawn_lauf3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 9472
+  "x": 384,
+  "y": 6528
  },
  "kreatur/spieler_pawn_lauf4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 9472
+  "x": 0,
+  "y": 6656
  },
  "kreatur/spieler_pawn_lauf5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 9472
+  "x": 128,
+  "y": 6656
  },
  "kreatur/spieler_pawn_lauf6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 9600
+  "x": 256,
+  "y": 6656
  },
  "kreatur/spinne": {
   "h": 96,
@@ -3626,96 +2906,96 @@
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 9600
+  "x": 384,
+  "y": 6656
  },
  "kreatur/troll_2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 9600
+  "x": 0,
+  "y": 6784
  },
  "kreatur/troll_3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 9600
+  "x": 128,
+  "y": 6784
  },
  "kreatur/troll_4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 9728
+  "x": 256,
+  "y": 6784
  },
  "kreatur/troll_5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 9728
+  "x": 384,
+  "y": 6784
  },
  "kreatur/troll_6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 9728
+  "x": 0,
+  "y": 6912
  },
  "kreatur/troll_lauf1": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 9728
+  "x": 128,
+  "y": 6912
  },
  "kreatur/troll_lauf2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 9856
+  "x": 256,
+  "y": 6912
  },
  "kreatur/troll_lauf3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 9856
+  "x": 384,
+  "y": 6912
  },
  "kreatur/troll_lauf4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 9856
+  "x": 0,
+  "y": 7040
  },
  "kreatur/troll_lauf5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 9856
+  "x": 128,
+  "y": 7040
  },
  "kreatur/troll_lauf6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 9984
+  "x": 256,
+  "y": 7040
  },
  "kreatur/vogel": {
   "h": 96,
@@ -3738,104 +3018,104 @@
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 9984
+  "x": 384,
+  "y": 7040
  },
  "kreatur/wechselbalg_2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 9984
+  "x": 0,
+  "y": 7168
  },
  "kreatur/wechselbalg_3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 9984
+  "x": 128,
+  "y": 7168
  },
  "kreatur/wechselbalg_4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 10112
+  "x": 256,
+  "y": 7168
  },
  "kreatur/wechselbalg_5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 10112
+  "x": 384,
+  "y": 7168
  },
  "kreatur/wechselbalg_6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 10112
+  "x": 0,
+  "y": 7296
  },
  "kreatur/wechselbalg_7": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 10112
+  "x": 128,
+  "y": 7296
  },
  "kreatur/wechselbalg_lauf1": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 10240
+  "x": 256,
+  "y": 7296
  },
  "kreatur/wechselbalg_lauf2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 10240
+  "x": 384,
+  "y": 7296
  },
  "kreatur/wechselbalg_lauf3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 10240
+  "x": 0,
+  "y": 7424
  },
  "kreatur/wechselbalg_lauf4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 10240
+  "x": 128,
+  "y": 7424
  },
  "kreatur/wechselbalg_lauf5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 10368
+  "x": 256,
+  "y": 7424
  },
  "kreatur/wechselbalg_lauf6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 10368
+  "x": 384,
+  "y": 7424
  },
  "kreatur/wurm": {
   "h": 96,
@@ -3850,224 +3130,224 @@
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 10368
+  "x": 0,
+  "y": 7552
  },
  "kreatur/zombie_2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 10368
+  "x": 128,
+  "y": 7552
  },
  "kreatur/zombie_3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 10496
+  "x": 256,
+  "y": 7552
  },
  "kreatur/zombie_4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 10496
+  "x": 384,
+  "y": 7552
  },
  "kreatur/zombie_5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 10496
+  "x": 0,
+  "y": 7680
  },
  "kreatur/zombie_6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 10496
+  "x": 128,
+  "y": 7680
  },
  "kreatur/zombie_7": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 10624
+  "x": 256,
+  "y": 7680
  },
  "kreatur/zombie_8": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 10624
+  "x": 384,
+  "y": 7680
  },
  "kreatur/zombie_axt": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 10880
+  "x": 256,
+  "y": 7936
  },
  "kreatur/zombie_axt_2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 10880
+  "x": 384,
+  "y": 7936
  },
  "kreatur/zombie_axt_3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 10880
+  "x": 0,
+  "y": 8064
  },
  "kreatur/zombie_axt_4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 10880
+  "x": 128,
+  "y": 8064
  },
  "kreatur/zombie_axt_5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 11008
+  "x": 256,
+  "y": 8064
  },
  "kreatur/zombie_axt_6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 11008
+  "x": 384,
+  "y": 8064
  },
  "kreatur/zombie_axt_7": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 11008
+  "x": 0,
+  "y": 8192
  },
  "kreatur/zombie_axt_8": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 11008
+  "x": 128,
+  "y": 8192
  },
  "kreatur/zombie_axt_lauf1": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 11136
+  "x": 256,
+  "y": 8192
  },
  "kreatur/zombie_axt_lauf2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 11136
+  "x": 384,
+  "y": 8192
  },
  "kreatur/zombie_axt_lauf3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 11136
+  "x": 0,
+  "y": 8320
  },
  "kreatur/zombie_axt_lauf4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 11136
+  "x": 128,
+  "y": 8320
  },
  "kreatur/zombie_axt_lauf5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 11264
+  "x": 256,
+  "y": 8320
  },
  "kreatur/zombie_axt_lauf6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 11264
+  "x": 384,
+  "y": 8320
  },
  "kreatur/zombie_lauf1": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 10624
+  "x": 0,
+  "y": 7808
  },
  "kreatur/zombie_lauf2": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 10624
+  "x": 128,
+  "y": 7808
  },
  "kreatur/zombie_lauf3": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 0,
-  "y": 10752
+  "x": 256,
+  "y": 7808
  },
  "kreatur/zombie_lauf4": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 128,
-  "y": 10752
+  "x": 384,
+  "y": 7808
  },
  "kreatur/zombie_lauf5": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 256,
-  "y": 10752
+  "x": 0,
+  "y": 7936
  },
  "kreatur/zombie_lauf6": {
   "h": 128,
   "res": 2,
   "sheet": "einheiten",
   "w": 128,
-  "x": 384,
-  "y": 10752
+  "x": 128,
+  "y": 7936
  },
  "moebel/automat": {
   "h": 32,

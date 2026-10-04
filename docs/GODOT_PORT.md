@@ -160,8 +160,16 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
 - Figuren aus dem Pack, mit ihren Animationen (Ruhebilder `Name`, `Name_2` …,
   Laufbilder `Name_lauf1` …; Bogen `einheiten.png`, 128 × 128, zwei Bildpixel
   je Kunstpixel):
-  - Spielfigur: blaue Einheit je Klassen-Archetyp (`Sprites.HERO_UNITS`),
-    vor der Klassenwahl der Arbeiter.
+  - Spielfigur: der blaue Arbeiter. Darüber liegt die sichtbare Ausrüstung
+    (`GearLook`): je Platz einige Formen (Helm, Mütze, Kappe, Hut, Spitzhut,
+    Krone, Stirnband; Brille, Schutzbrille, Maske, Nase; Jacke, Shirt, Mantel,
+    Weste; Umhang, Rucksack; Schläger, Werkzeug, Messer, Pfanne, Tasche;
+    Handschuhe, Armschienen, Hose, Stiefel, Gürtel, Kette, Schal, Polster),
+    die Form nach dem Gegenstand (`GearLook.VARIANT_OF`), die Farbe nach der
+    Seltenheit. Jedes Teil hängt an einem Ankerpunkt (Kopf, Körper, Hände,
+    Füße), der für jedes Ruhe- und Laufbild aus der Figur bestimmt wird
+    (`assets/tinyswords/anker.json`, von `tools/make_pixel_art.gd`).
+    Vorschau: `godot --headless --path godot -s res://tools/shot_gear.gd -- ordner`.
   - Crawler, Menschen und menschliche Bosse: rote Einheiten (Arbeiter mit
     Werkzeug, Krieger, Bogenschütze, Mönch), Teamfarbe in der Farbe der Art;
     Untote mit fahler Haut.

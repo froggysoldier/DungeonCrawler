@@ -94,6 +94,53 @@ func _initialize() -> void:
 	quit()
 
 
+## Wo Kopf, Körper, Hände und Füße der Spielfigur in einem Bild liegen
+## (für die Ausrüstung, GearLook): Gesicht, Hemd, Hautflecken an den Händen,
+## Pixel unter dem Hemd.
+static func _anchors(img: Image) -> Dictionary:
+	var face := []
+	var shirt := []
+	var skin := []
+	var solid := []
+	for y in img.get_height():
+		for x in img.get_width():
+			var c := img.get_pixel(x, y)
+			if c.a < 0.5:
+				continue
+			var h := c.to_html(false)
+			solid.append(Vector2(x, y))
+			if h == "efe1ab":
+				face.append(Vector2(x, y))
+			elif h == "485884" or h == "4697ac":
+				shirt.append(Vector2(x, y))
+			elif h == "c8a876":
+				skin.append(Vector2(x, y))
+	var mean := func(pts: Array, fallback: Vector2) -> Array:
+		if pts.is_empty():
+			return [fallback.x, fallback.y]
+		var sum := Vector2.ZERO
+		for q in pts:
+			sum += q
+		sum /= pts.size()
+		return [snappedf(sum.x, 0.1), snappedf(sum.y, 0.1)]
+	var top := 999.0
+	var bottom := 0.0
+	for q in shirt:
+		top = minf(top, q.y)
+		bottom = maxf(bottom, q.y)
+	var hands: Array = skin.filter(func(q): return q.y >= top - 2)
+	var feet: Array = solid.filter(func(q): return q.y > bottom + 1)
+	var body: Array = mean.call(shirt, Vector2(64, 110))
+	return {
+		"kopf": mean.call(face, Vector2(75, 98)),
+		"koerper": body,
+		"lh": mean.call(hands.filter(func(q): return q.x < 60), Vector2(46, 110)),
+		"rh": mean.call(hands.filter(func(q): return q.x >= 60), Vector2(82, 107)),
+		"lf": mean.call(feet.filter(func(q): return q.x < 64), Vector2(58, 119)),
+		"rf": mean.call(feet.filter(func(q): return q.x >= 64), Vector2(70, 118)),
+	}
+
+
 func _entry(name: String, sheet_name: String, at: Vector2i, sub: Image) -> Dictionary:
 	var e := {"sheet": sheet_name, "x": at.x, "y": at.y, "w": sub.get_width(), "h": sub.get_height()}
 	if res.has(name):
@@ -233,17 +280,26 @@ func _build_all() -> void:
 		_add("kreaturen", "kreatur/" + n, sprite(n, Defs.CREATURES[n], true, true))
 	for n in TsFig.CREATURES:
 		_add_ts("kreaturen", "kreatur/", n, TsFig.frames(n))
-	# Figuren aus dem Pack mit allen Ruhe- und Laufbildern
+	# Figuren aus dem Pack mit allen Ruhe- und Laufbildern; für die Spielfigur
+	# die Ankerpunkte der Ausrüstung je Bild
+	var anchors := {}
 	for n in units:
 		var c: Array = units[n]
 		for i in c[0]:
 			var full: String = "kreatur/" + n + ("" if i == 0 else "_%d" % (i + 1))
 			res[full] = 2
 			_add("einheiten", full, TsFig.unit_image(n, str(i)))
+			if n == "spieler_pawn":
+				anchors[full] = _anchors(TsFig.unit_image(n, str(i)))
 		for i in c[1]:
 			var full: String = "kreatur/%s_lauf%d" % [n, i + 1]
 			res[full] = 2
 			_add("einheiten", full, TsFig.unit_image(n, "lauf%d" % i))
+			if n == "spieler_pawn":
+				anchors[full] = _anchors(TsFig.unit_image(n, "lauf%d" % i))
+	var af := FileAccess.open("res://assets/tinyswords/anker.json", FileAccess.WRITE)
+	af.store_string(JSON.stringify(anchors, " ", true) + "\n")
+	af.close()
 	for n in Defs.OVERLAYS:
 		_add("kreaturen", "aufsatz/" + n, sprite(n, Defs.OVERLAYS[n]))
 	for n in Defs.BOSSES:

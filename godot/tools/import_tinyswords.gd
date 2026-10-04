@@ -227,15 +227,8 @@ const UNIT_FOOT := 121
 ## Figuren aus dem Pack: Name -> [Bogen, Feldgröße, [Ruhe-Reihe, Bilder], [Lauf-Reihe, Bilder] oder null,
 ## Teamfarbe tönbar].  Die Bögen ohne Reihe sind einzeilig (Reihe 0).
 const UNITS := {
-	# Spielfigur: blaue Einheiten in ihren echten Farben
+	# Spielfigur: der blaue Arbeiter in seinen echten Farben (Ausrüstung: GearLook)
 	"spieler_pawn": ["Units/Blue Units/Pawn/Pawn_Idle.png|Units/Blue Units/Pawn/Pawn_Run.png", 192, [0, 8], [0, 6], false],
-	"spieler_krieger": ["Units/Blue Units/Warrior/Warrior_Idle.png|Units/Blue Units/Warrior/Warrior_Run.png", 192, [0, 8], [0, 6], false],
-	"spieler_bogen": ["Units/Blue Units/Archer/Archer_Idle.png|Units/Blue Units/Archer/Archer_Run.png", 192, [0, 6], [0, 4], false],
-	"spieler_moench": ["Units/Blue Units/Monk/Idle.png|Units/Blue Units/Monk/Run.png", 192, [0, 6], [0, 4], false],
-	"spieler_messer": ["Units/Blue Units/Pawn/Pawn_Idle Knife.png|Units/Blue Units/Pawn/Pawn_Run Knife.png", 192, [0, 8], [0, 6], false],
-	"spieler_hammer": ["Units/Blue Units/Pawn/Pawn_Idle Hammer.png|Units/Blue Units/Pawn/Pawn_Run Hammer.png", 192, [0, 8], [0, 6], false],
-	"spieler_gold": ["Units/Blue Units/Pawn/Pawn_Idle Gold.png|Units/Blue Units/Pawn/Pawn_Run Gold.png", 192, [0, 8], [0, 6], false],
-	"spieler_fleisch": ["Units/Blue Units/Pawn/Pawn_Idle Meat.png|Units/Blue Units/Pawn/Pawn_Run Meat.png", 192, [0, 8], [0, 6], false],
 	# Menschen und Crawler: rote Einheiten, Teamfarbe in der Farbe der Art
 	"mensch": ["Units/Red Units/Pawn/Pawn_Idle.png|Units/Red Units/Pawn/Pawn_Run.png", 192, [0, 8], [0, 6], true],
 	"mensch_hammer": ["Units/Red Units/Pawn/Pawn_Idle Hammer.png|Units/Red Units/Pawn/Pawn_Run Hammer.png", 192, [0, 8], [0, 6], true],

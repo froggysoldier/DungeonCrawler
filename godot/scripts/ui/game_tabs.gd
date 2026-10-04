@@ -135,12 +135,13 @@ static func item_body(gv: GameView, v: Node, it: Dictionary, with_actions: bool,
 static func portrait(s: Dictionary) -> Control:
 	var st := Kit.Stage.new()
 	st.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	st.items = [{"name": Sprites.hero_name(s.player), "scale": 3, "foot": Vector2(48, 96)}]
-	st.custom_minimum_size = Vector2(96, 108)
+	# Die Pack-Figur ist größer als eine Kachel: doppelt vergrößert passt sie ganz hinein
+	st.items = [{"name": Sprites.hero_name(s.player), "scale": 2, "foot": Vector2(48, 106)}]
+	st.custom_minimum_size = Vector2(96, 112)
 	var pet = s.player.get("pet")
 	if pet != null:
 		var look := Sprites.pet_sprite(String(pet.get("species", "")))
-		st.items.append({"name": look[0], "tint": look[1], "scale": 2, "foot": Vector2(112, 96), "flip": true, "mod": Color.WHITE if pet.alive else Color(1, 1, 1, 0.4)})
+		st.items.append({"name": look[0], "tint": look[1], "scale": 2, "foot": Vector2(112, 106), "flip": true, "mod": Color.WHITE if pet.alive else Color(1, 1, 1, 0.4)})
 		st.custom_minimum_size.x = 146
 	return st
 

@@ -166,33 +166,60 @@ func _diff_rows(a: Image, b: Image) -> Array:
 	var rows: Array = []
 	for y in a.get_height():
 		for x in a.get_width():
-			if a.get_pixel(x, y) != b.get_pixel(x, y):
+			var ca := a.get_pixel(x, y)
+			var cb := b.get_pixel(x, y)
+			# Durchsichtige Pixel zählen gleich, egal welche Farbe darin steht
+			if (ca.a > 0.5 or cb.a > 0.5) and ca != cb:
 				rows.append(y)
 				break
 	return rows
 
 
 func test_spielfigur_aus_dem_pack(t) -> void:
-	# Vor der Klassenwahl der Arbeiter, danach die Einheit des Archetyps
-	t.eq(Sprites.hero_name({}), "kreatur/spieler_pawn", "ohne Klasse: Arbeiter")
-	for kl in Db.t("classes", "CLASSES"):
-		var n := Sprites.hero_name({"klass": kl.id})
-		t.ok(PixelArt.has(n), "%s: Figur %s" % [kl.id, n])
-	for unit in ["pawn", "krieger", "bogen", "moench", "messer", "hammer", "gold", "fleisch"]:
-		var n: String = "kreatur/spieler_" + unit
-		t.ge(PixelArt.frame_count(n), 6, "%s: Ruhebilder" % unit)
-		t.ge(PixelArt.run_count(n), 4, "%s: Laufbilder" % unit)
-		t.eq(PixelArt.size_of(n), Vector2i(64, 64), "%s: Bildfläche" % unit)
-	# Blaue Teamfarbe aus dem Pack, unverändert
-	var img := PixelArt.image("kreatur/spieler_krieger")
+	var plain := Sprites.hero_name({})
+	t.eq(plain, GearLook.BASE, "ohne Ausrüstung: blauer Arbeiter")
+	t.ge(PixelArt.frame_count(plain), 6, "Ruhebilder")
+	t.ge(PixelArt.run_count(plain), 4, "Laufbilder")
+	t.eq(PixelArt.size_of(plain), Vector2i(64, 64), "Bildfläche")
+	var img := PixelArt.image(plain)
 	var blue := false
 	for y in img.get_height():
 		for x in img.get_width():
 			if img.get_pixel(x, y).to_html(false) == "4697ac":
 				blue = true
 	t.ok(blue, "Blau wie im Pack")
-	for slot in ["ruecken", "beine", "fuesse", "brust", "kopf", "waffe"]:
+	t.eq(Sprites.hero_name({"equipment": {"ring1": _gear("ring", "episch")}}), plain, "Ringe sieht man nicht")
+	for slot in GearLook.SLOTS:
 		t.has(GameTabs.EQUIP_ORDER, slot, "%s ist ein Ausrüstungsplatz" % slot)
+
+
+func test_ausruestung_auf_der_figur(t) -> void:
+	var plain := PixelArt.image(GearLook.BASE)
+	var helm := Sprites.hero_name({"equipment": {"kopf": _gear("kopf", "selten")}})
+	t.ok(helm != GearLook.BASE, "mit Helm eigene Figur")
+	t.eq(PixelArt.frame_count(helm), PixelArt.frame_count(GearLook.BASE), "alle Ruhebilder")
+	t.eq(PixelArt.run_count(helm), PixelArt.run_count(GearLook.BASE), "alle Laufbilder")
+	t.eq(PixelArt.res(helm), 2, "fein")
+	var rows := _diff_rows(plain, PixelArt.image(helm))
+	t.ok(not rows.is_empty() and rows.max() < 90, "Helm nur am Kopf")
+	var boots := PixelArt.image(Sprites.hero_name({"equipment": {"fuesse": _gear("fuesse", "selten")}}))
+	rows = _diff_rows(plain, boots)
+	t.ok(not rows.is_empty() and rows.min() >= 112, "Stiefel nur an den Füßen")
+	# Form nach Gegenstand, Farbe nach Seltenheit
+	t.eq(GearLook.variant("kopf", "cowboyhut"), "hut", "Cowboyhut ist ein Hut")
+	t.eq(GearLook.variant("waffe", "bratpfanne"), "pfanne", "Pfanne")
+	t.eq(GearLook.variant("waffe", "gibt_es_nicht"), "schlaeger", "Standardform")
+	var a := Sprites.hero_name({"equipment": {"kopf": _gear("kopf", "selten")}})
+	var b := Sprites.hero_name({"equipment": {"kopf": _gear("kopf", "episch")}})
+	t.ok(a != b, "andere Seltenheit, andere Figur")
+	t.eq(Sprites.hero_name({"equipment": {"kopf": _gear("kopf", "selten")}}), a, "gleiche Ausrüstung, gleicher Name")
+	# Die Ausrüstung wandert mit: im Laufbild sitzt der Helm anders als im Ruhebild
+	var run := PixelArt.image(a + "_lauf2")
+	t.ok(run.get_data() != PixelArt.image(GearLook.BASE + "_lauf2").get_data(), "Helm auch im Laufbild")
+	for slot in GearLook.SLOTS:
+		for v in GearLook.SLOTS[slot].variants:
+			var sh = GearLook.shapes(slot, v)
+			t.ok(sh is Array and not sh.is_empty(), "%s/%s hat Formen" % [slot, v])
 
 
 func test_monster_aus_dem_pack(t) -> void:

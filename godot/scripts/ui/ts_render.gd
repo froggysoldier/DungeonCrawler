@@ -123,8 +123,10 @@ static func _frame(s: Array) -> Rect2:
 	return Rect2()
 
 
-static func render(shapes: Array) -> Image:
-	var n := SIZE
+## size: Bildgröße; fine: für Ausrüstung auf den Pack-Figuren (ein Pixel
+## Umriss, schmalere Licht- und Schattenkanten).
+static func render(shapes: Array, size: int = SIZE, fine: bool = false) -> Image:
+	var n := size
 	var owner := PackedInt32Array()
 	owner.resize(n * n)
 	owner.fill(-1)
@@ -145,10 +147,28 @@ static func render(shapes: Array) -> Image:
 			for x in range(maxi(0, floori(fr.position.x)), mini(n, ceili(fr.end.x) + 1)):
 				if _inside(s, x + 0.5, y + 0.5):
 					owner[y * n + x] = si
+	# Nur im belegten Bereich (mit Rand für den Umriss) rechnen
+	var bx0 := n
+	var by0 := n
+	var bx1 := 0
+	var by1 := 0
+	for fr in frames:
+		var r: Rect2 = fr
+		bx0 = mini(bx0, floori(r.position.x))
+		by0 = mini(by0, floori(r.position.y))
+		bx1 = maxi(bx1, ceili(r.end.x))
+		by1 = maxi(by1, ceili(r.end.y))
+	bx0 = clampi(bx0 - 4, 0, n)
+	by0 = clampi(by0 - 4, 0, n)
+	bx1 = clampi(bx1 + 5, 0, n)
+	by1 = clampi(by1 + 5, 0, n)
 	var img := Image.create(n, n, false, Image.FORMAT_RGBA8)
 	# Flächen wie im Pack: Grundfarbe, schmale Lichtkante oben links, Schattenband unten rechts
 	var lit_off := [Vector2i(0, -2), Vector2i(-1, -2), Vector2i(-2, -1), Vector2i(-2, 0)]
 	var dark_off := [Vector2i(0, 3), Vector2i(1, 3), Vector2i(3, 1), Vector2i(3, 0), Vector2i(2, 2)]
+	if fine:
+		lit_off = [Vector2i(0, -1), Vector2i(-1, -1), Vector2i(-1, 0)]
+		dark_off = [Vector2i(0, 2), Vector2i(1, 2), Vector2i(2, 1), Vector2i(1, 1)]
 	for si in bodies.size():
 		var fr: Rect2 = frames[si]
 		var flat: bool = String(flags[si]).contains("f")
@@ -180,8 +200,8 @@ static func render(shapes: Array) -> Image:
 	# Feine Linien, wo eine Form über einer anderen liegt
 	var out := img.duplicate()
 	var navy := NAVY
-	for y in n:
-		for x in n:
+	for y in range(by0, by1):
+		for x in range(bx0, bx1):
 			var si := owner[y * n + x]
 			if si < 0 or String(flags[si]).contains("n"):
 				continue
@@ -203,8 +223,8 @@ static func render(shapes: Array) -> Image:
 			solid[i] = 1
 	var ring := PackedByteArray()
 	ring.resize(n * n)
-	for y in n:
-		for x in n:
+	for y in range(by0, by1):
+		for x in range(bx0, bx1):
 			if owner[y * n + x] >= 0:
 				continue
 			var hit := false
@@ -215,9 +235,9 @@ static func render(shapes: Array) -> Image:
 			if hit:
 				ring[y * n + x] = 1
 				out.set_pixel(x, y, navy)
-	for y in n:
-		for x in n:
-			var i := y * n + x
+	for y in (range(0) if fine else range(by0, by1)):
+		for x in range(bx0, bx1):
+			var i: int = y * n + x
 			if owner[i] >= 0 or ring[i] == 1:
 				continue
 			if (x > 0 and ring[i - 1] == 1) or (x < n - 1 and ring[i + 1] == 1) or (y > 0 and ring[i - n] == 1) or (y < n - 1 and ring[i + n] == 1):

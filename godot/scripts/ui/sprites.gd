@@ -49,13 +49,6 @@ const BY_DEF := {
 ## Bosse, die eine Figur aus dem Pack bekommen statt eines eigenen Bildes.
 const PACK_BOSSES := ["die_sammlerin", "der_hausmeister", "kesselkoenigin", "kammerjaeger", "pfandbaron", "hausverwalter", "parkwaechter", "schwarzmarkt_oger"]
 
-## Spielfigur je Klassen-Archetyp (blaue Einheiten aus dem Pack); ohne Klasse der Arbeiter.
-const HERO_UNITS := {
-	"nahkampf": "krieger", "verteidigung": "krieger", "exotisch": "krieger",
-	"fernkampf": "bogen", "magie": "moench", "heilung": "moench",
-	"heimlich": "messer", "handwerk": "hammer", "show": "gold", "tiere": "fleisch",
-}
-
 
 ## Haustier-Art: Bild und Fellfarbe.
 const PETS := {
@@ -175,12 +168,26 @@ const RACE_LOOKS := {
 }
 
 
-## Bildname der Spielfigur: eine blaue Einheit aus dem Pack, je nach Klasse
-## (vor der Klassenwahl der Arbeiter). Ruhe- und Laufbilder liegen in den Bögen.
+## Bildname der Spielfigur: der blaue Arbeiter aus dem Pack, darüber die
+## sichtbare Ausrüstung (GearLook) in der Form des Gegenstands und der Farbe
+## seiner Seltenheit. Alle Ruhe- und Laufbilder werden einmal zusammengesetzt
+## und unter einem Namen aus Plätzen, Formen und Farben abgelegt.
 static func hero_name(p: Dictionary) -> String:
-	var unit := "pawn"
-	var kl = p.get("klass")
-	if kl != null and Db.klass(kl) != null:
-		unit = HERO_UNITS.get(String(J.nn(Db.klass(kl), "archetype", "")), "krieger")
-	return "kreatur/spieler_" + unit
+	var eq: Dictionary = J.nn(p, "equipment", {})
+	var gear := {}
+	var parts: Array = []
+	for slot in GearLook.SLOTS:
+		var it = eq.get(slot)
+		if it == null:
+			continue
+		gear[slot] = [GearLook.variant(slot, String(J.nn(it, "baseId", ""))), item_color(it)]
+		parts.append("%s=%s:%s" % [slot, gear[slot][0], gear[slot][1]])
+	if gear.is_empty():
+		return GearLook.BASE
+	var name := "kreatur/held@" + ",".join(parts)
+	if not PixelArt.has(name):
+		var frames := GearLook.compose(gear)
+		for fr in frames:
+			PixelArt.register(name + String(fr).trim_prefix(GearLook.BASE), frames[fr], 2)
+	return name
 
