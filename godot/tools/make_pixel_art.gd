@@ -132,14 +132,16 @@ static func _anchors(img: Image) -> Dictionary:
 		bottom = maxf(bottom, q.y)
 	var hands: Array = skin.filter(func(q): return q.y >= top - 2)
 	var feet: Array = solid.filter(func(q): return q.y > bottom + 1)
-	var body: Array = mean.call(shirt, Vector2(64, 110))
+	# Größere Bildflächen (Angriffe): Mitte und Füße liegen um d verschoben
+	var d := Vector2((img.get_width() - 128) / 2, img.get_height() - 128)
+	var body: Array = mean.call(shirt, Vector2(64, 110) + d)
 	return {
-		"kopf": mean.call(face, Vector2(75, 98)),
+		"kopf": mean.call(face, Vector2(75, 98) + d),
 		"koerper": body,
-		"lh": mean.call(hands.filter(func(q): return q.x < 60), Vector2(46, 110)),
-		"rh": mean.call(hands.filter(func(q): return q.x >= 60), Vector2(82, 107)),
-		"lf": mean.call(feet.filter(func(q): return q.x < 64), Vector2(58, 119)),
-		"rf": mean.call(feet.filter(func(q): return q.x >= 64), Vector2(70, 118)),
+		"lh": mean.call(hands.filter(func(q): return q.x < 60 + d.x), Vector2(46, 110) + d),
+		"rh": mean.call(hands.filter(func(q): return q.x >= 60 + d.x), Vector2(82, 107) + d),
+		"lf": mean.call(feet.filter(func(q): return q.x < 64 + d.x), Vector2(58, 119) + d),
+		"rf": mean.call(feet.filter(func(q): return q.x >= 64 + d.x), Vector2(70, 118) + d),
 	}
 
 
@@ -282,7 +284,7 @@ func _build_all() -> void:
 		_add("kreaturen", "kreatur/" + n, sprite(n, Defs.CREATURES[n], true, true))
 	for n in TsFig.CREATURES:
 		_add_ts("kreaturen", "kreatur/", n, TsFig.frames(n))
-	# Figuren aus dem Pack mit allen Ruhe- und Laufbildern; für die Spielfigur
+	# Figuren aus dem Pack mit allen Ruhe-, Lauf- und Angriffsbildern; für die Spielfigur
 	# die Ankerpunkte der Ausrüstung je Bild
 	var anchors := {}
 	for n in units:
@@ -299,6 +301,14 @@ func _build_all() -> void:
 			_add("einheiten", full, TsFig.unit_image(n, "lauf%d" % i))
 			if n == "spieler_pawn":
 				anchors[full] = _anchors(TsFig.unit_image(n, "lauf%d" % i))
+		for i in c[2]:
+			var full: String = "kreatur/%s_angriff%d" % [n, i + 1]
+			res[full] = 2
+			var hit := TsFig.unit_image(n, "angriff%d" % i)
+			# Zwei Bögen, damit keiner zu hoch wird
+			_add("angriffe" if hit.get_width() <= 192 else "angriffe_gross", full, hit)
+			if n == "spieler_pawn":
+				anchors[full] = _anchors(hit)
 	var af := FileAccess.open("res://assets/tinyswords/anker.json", FileAccess.WRITE)
 	af.store_string(JSON.stringify(anchors, " ", true) + "\n")
 	af.close()

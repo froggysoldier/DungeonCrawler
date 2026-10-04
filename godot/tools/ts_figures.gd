@@ -24,7 +24,7 @@ const BOSSES := {
 const UNIT_DIR := "res://assets/tinyswords/units/"
 
 
-## Figuren direkt aus dem Pack (tools/import_tinyswords.gd): Name -> [Ruhebilder, Laufbilder].
+## Figuren direkt aus dem Pack (tools/import_tinyswords.gd): Name -> [Ruhebilder, Laufbilder, Angriffsbilder].
 static func units() -> Dictionary:
 	var out := {}
 	var dir := ProjectSettings.globalize_path(UNIT_DIR)
@@ -35,9 +35,11 @@ static func units() -> Dictionary:
 		var name := base.substr(0, base.rfind("_"))
 		var tail := base.substr(base.rfind("_") + 1)
 		if not out.has(name):
-			out[name] = [0, 0]
+			out[name] = [0, 0, 0]
 		if tail.begins_with("lauf"):
 			out[name][1] += 1
+		elif tail.begins_with("angriff"):
+			out[name][2] += 1
 		else:
 			out[name][0] += 1
 	return out

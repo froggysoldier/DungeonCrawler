@@ -2,6 +2,8 @@ extends RefCounted
 ## Pixel-Bögen: Zu allem, was das Spiel zeichnet, gibt es ein Bild, und das
 ## Tönen ersetzt die Magenta-Schlüssel vollständig.
 
+const TsFig := preload("res://tools/ts_figures.gd")
+
 
 func _missing(names: Array) -> Array:
 	return names.filter(func(n): return not PixelArt.has(n))
@@ -255,6 +257,37 @@ func test_monster_aus_dem_pack(t) -> void:
 	t.ok(a.get_data() != b.get_data(), "Teamfarbe in der Farbe der Monsterart")
 	# Abgewandelte Haut: Fischmensch blau statt grün
 	t.ok(PixelArt.image("kreatur/fischmensch").get_data() != PixelArt.image("kreatur/kobold").get_data(), "eigene Hautfarbe")
+
+
+func test_angriffsbilder(t) -> void:
+	# Jede Figur aus den Packs (außer dem Schaf) hat Angriffsbilder
+	for n in TsFig.units():
+		if n != "schaf":
+			t.ge(PixelArt.attack_count("kreatur/" + n), 3, "%s greift sichtbar an" % n)
+	# Größere Fläche, Füße gleich weit über dem unteren Rand
+	var idle := PixelArt.size_of("kreatur/kobold")
+	var hit := PixelArt.size_of("kreatur/kobold_angriff1")
+	t.gt(hit.x, idle.x, "Platz für den Schwung")
+	t.eq(_feet(PixelArt.image("kreatur/kobold_angriff1")) - hit.y * 2, _feet(PixelArt.image("kreatur/kobold")) - idle.y * 2, "Füße auf gleicher Höhe")
+	# Spielfigur mit Ausrüstung: Angriffsbilder mit Ausrüstung darauf
+	var p := {"equipment": {"kopf": {"kind": "kleidung", "rarity": "selten", "baseId": "bauhelm"}}}
+	var hero := Sprites.hero_name(p)
+	t.eq(PixelArt.attack_count(hero), PixelArt.attack_count(GearLook.BASE), "Held greift mit Helm an")
+	t.ok(PixelArt.image(hero + "_angriff1").get_data() != PixelArt.image(GearLook.BASE + "_angriff1").get_data(), "Helm auch im Angriff")
+
+
+## Unterste Zeile mit Pixeln.
+static func _feet(img: Image) -> int:
+	return img.get_used_rect().end.y
+
+
+func test_proportionen(t) -> void:
+	# Menschen und Magier ungefähr so groß wie die Spielfigur, Orks nicht kleiner
+	var h := func(n: String) -> float: return PixelArt.image("kreatur/" + n).get_used_rect().size.y / float(PixelArt.res("kreatur/" + n))
+	var pawn: float = h.call("spieler_pawn")
+	for n in ["magier", "rpg_ritter", "rpg_soldat", "rpg_priester", "rpg_skelett", "rpg_ork", "rpg_werbaer"]:
+		var r: float = h.call(n) / pawn
+		t.ok(r > 0.8 and r < 1.3, "%s passt zur Spielfigur (%.2f)" % [n, r])
 
 
 func test_truhe_beim_oeffnen(t) -> void:

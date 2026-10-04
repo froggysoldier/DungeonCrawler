@@ -977,6 +977,70 @@
   "x": 640,
   "y": 0
  },
+ "kreatur/bogen_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 0,
+  "y": 0
+ },
+ "kreatur/bogen_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 192,
+  "y": 0
+ },
+ "kreatur/bogen_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 384,
+  "y": 0
+ },
+ "kreatur/bogen_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 576,
+  "y": 0
+ },
+ "kreatur/bogen_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 768,
+  "y": 0
+ },
+ "kreatur/bogen_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 960,
+  "y": 0
+ },
+ "kreatur/bogen_angriff7": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1152,
+  "y": 0
+ },
+ "kreatur/bogen_angriff8": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1344,
+  "y": 0
+ },
  "kreatur/bogen_lauf1": {
   "h": 128,
   "res": 2,
@@ -1057,6 +1121,54 @@
   "x": 1280,
   "y": 0
  },
+ "kreatur/fass_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1536,
+  "y": 0
+ },
+ "kreatur/fass_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1728,
+  "y": 0
+ },
+ "kreatur/fass_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 0,
+  "y": 192
+ },
+ "kreatur/fass_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 192,
+  "y": 192
+ },
+ "kreatur/fass_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 384,
+  "y": 192
+ },
+ "kreatur/fass_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 576,
+  "y": 192
+ },
  "kreatur/fisch": {
   "h": 32,
   "sheet": "kreaturen",
@@ -1119,6 +1231,54 @@
   "w": 128,
   "x": 128,
   "y": 128
+ },
+ "kreatur/fischmensch_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 768,
+  "y": 192
+ },
+ "kreatur/fischmensch_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 960,
+  "y": 192
+ },
+ "kreatur/fischmensch_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1152,
+  "y": 192
+ },
+ "kreatur/fischmensch_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1344,
+  "y": 192
+ },
+ "kreatur/fischmensch_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1536,
+  "y": 192
+ },
+ "kreatur/fischmensch_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1728,
+  "y": 192
  },
  "kreatur/fischmensch_lauf1": {
   "h": 128,
@@ -1255,6 +1415,54 @@
   "w": 128,
   "x": 1792,
   "y": 128
+ },
+ "kreatur/gnom_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 0,
+  "y": 384
+ },
+ "kreatur/gnom_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 192,
+  "y": 384
+ },
+ "kreatur/gnom_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 384,
+  "y": 384
+ },
+ "kreatur/gnom_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 576,
+  "y": 384
+ },
+ "kreatur/gnom_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 768,
+  "y": 384
+ },
+ "kreatur/gnom_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 960,
+  "y": 384
  },
  "kreatur/gnom_lauf1": {
   "h": 128,
@@ -1445,6 +1653,54 @@
   "x": 1408,
   "y": 256
  },
+ "kreatur/kobold_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1152,
+  "y": 384
+ },
+ "kreatur/kobold_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1344,
+  "y": 384
+ },
+ "kreatur/kobold_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1536,
+  "y": 384
+ },
+ "kreatur/kobold_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1728,
+  "y": 384
+ },
+ "kreatur/kobold_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 0,
+  "y": 576
+ },
+ "kreatur/kobold_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 192,
+  "y": 576
+ },
  "kreatur/kobold_lauf1": {
   "h": 128,
   "res": 2,
@@ -1540,6 +1796,62 @@
   "w": 128,
   "x": 896,
   "y": 384
+ },
+ "kreatur/kobold_tnt_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 384,
+  "y": 576
+ },
+ "kreatur/kobold_tnt_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 576,
+  "y": 576
+ },
+ "kreatur/kobold_tnt_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 768,
+  "y": 576
+ },
+ "kreatur/kobold_tnt_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 960,
+  "y": 576
+ },
+ "kreatur/kobold_tnt_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1152,
+  "y": 576
+ },
+ "kreatur/kobold_tnt_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1344,
+  "y": 576
+ },
+ "kreatur/kobold_tnt_angriff7": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1536,
+  "y": 576
  },
  "kreatur/kobold_tnt_lauf1": {
   "h": 128,
@@ -1660,6 +1972,38 @@
   "w": 128,
   "x": 640,
   "y": 512
+ },
+ "kreatur/krieger_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1728,
+  "y": 576
+ },
+ "kreatur/krieger_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 0,
+  "y": 768
+ },
+ "kreatur/krieger_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 192,
+  "y": 768
+ },
+ "kreatur/krieger_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 384,
+  "y": 768
  },
  "kreatur/krieger_lauf1": {
   "h": 128,
@@ -1788,6 +2132,70 @@
   "w": 192,
   "x": 960,
   "y": 704
+ },
+ "kreatur/magier_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 0
+ },
+ "kreatur/magier_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 0
+ },
+ "kreatur/magier_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 0
+ },
+ "kreatur/magier_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 0
+ },
+ "kreatur/magier_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 0
+ },
+ "kreatur/magier_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 0
+ },
+ "kreatur/magier_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 0
+ },
+ "kreatur/magier_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 0
  },
  "kreatur/magier_lauf1": {
   "h": 192,
@@ -1925,6 +2333,38 @@
   "x": 1664,
   "y": 896
  },
+ "kreatur/mensch_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 576,
+  "y": 768
+ },
+ "kreatur/mensch_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 768,
+  "y": 768
+ },
+ "kreatur/mensch_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 960,
+  "y": 768
+ },
+ "kreatur/mensch_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1152,
+  "y": 768
+ },
  "kreatur/mensch_gold": {
   "h": 128,
   "res": 2,
@@ -1988,6 +2428,54 @@
   "w": 128,
   "x": 1408,
   "y": 1088
+ },
+ "kreatur/mensch_gold_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1344,
+  "y": 768
+ },
+ "kreatur/mensch_gold_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1536,
+  "y": 768
+ },
+ "kreatur/mensch_gold_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1728,
+  "y": 768
+ },
+ "kreatur/mensch_gold_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 0,
+  "y": 960
+ },
+ "kreatur/mensch_gold_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 192,
+  "y": 960
+ },
+ "kreatur/mensch_gold_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 384,
+  "y": 960
  },
  "kreatur/mensch_gold_lauf1": {
   "h": 128,
@@ -2101,6 +2589,30 @@
   "x": 1152,
   "y": 1216
  },
+ "kreatur/mensch_hammer_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 576,
+  "y": 960
+ },
+ "kreatur/mensch_hammer_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 768,
+  "y": 960
+ },
+ "kreatur/mensch_hammer_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 960,
+  "y": 960
+ },
  "kreatur/mensch_hammer_lauf1": {
   "h": 128,
   "res": 2,
@@ -2212,6 +2724,54 @@
   "w": 128,
   "x": 896,
   "y": 1344
+ },
+ "kreatur/mensch_holz_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1152,
+  "y": 960
+ },
+ "kreatur/mensch_holz_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1344,
+  "y": 960
+ },
+ "kreatur/mensch_holz_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1536,
+  "y": 960
+ },
+ "kreatur/mensch_holz_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1728,
+  "y": 960
+ },
+ "kreatur/mensch_holz_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 0,
+  "y": 1152
+ },
+ "kreatur/mensch_holz_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 192,
+  "y": 1152
  },
  "kreatur/mensch_holz_lauf1": {
   "h": 128,
@@ -2373,6 +2933,38 @@
   "x": 640,
   "y": 1472
  },
+ "kreatur/mensch_messer_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 384,
+  "y": 1152
+ },
+ "kreatur/mensch_messer_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 576,
+  "y": 1152
+ },
+ "kreatur/mensch_messer_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 768,
+  "y": 1152
+ },
+ "kreatur/mensch_messer_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 960,
+  "y": 1152
+ },
  "kreatur/mensch_messer_lauf1": {
   "h": 128,
   "res": 2,
@@ -2468,6 +3060,94 @@
   "w": 128,
   "x": 128,
   "y": 1600
+ },
+ "kreatur/moench_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1152,
+  "y": 1152
+ },
+ "kreatur/moench_angriff10": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 960,
+  "y": 1344
+ },
+ "kreatur/moench_angriff11": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1152,
+  "y": 1344
+ },
+ "kreatur/moench_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1344,
+  "y": 1152
+ },
+ "kreatur/moench_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1536,
+  "y": 1152
+ },
+ "kreatur/moench_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1728,
+  "y": 1152
+ },
+ "kreatur/moench_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 0,
+  "y": 1344
+ },
+ "kreatur/moench_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 192,
+  "y": 1344
+ },
+ "kreatur/moench_angriff7": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 384,
+  "y": 1344
+ },
+ "kreatur/moench_angriff8": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 576,
+  "y": 1344
+ },
+ "kreatur/moench_angriff9": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 768,
+  "y": 1344
  },
  "kreatur/moench_lauf1": {
   "h": 128,
@@ -2613,6 +3293,78 @@
   "x": 1728,
   "y": 1600
  },
+ "kreatur/rpg_axtkaempfer_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 256
+ },
+ "kreatur/rpg_axtkaempfer_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 256
+ },
+ "kreatur/rpg_axtkaempfer_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 256
+ },
+ "kreatur/rpg_axtkaempfer_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 256
+ },
+ "kreatur/rpg_axtkaempfer_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 256
+ },
+ "kreatur/rpg_axtkaempfer_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 256
+ },
+ "kreatur/rpg_axtkaempfer_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 256
+ },
+ "kreatur/rpg_axtkaempfer_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 256
+ },
+ "kreatur/rpg_axtkaempfer_angriff9": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 512
+ },
  "kreatur/rpg_axtkaempfer_lauf1": {
   "h": 192,
   "res": 2,
@@ -2724,6 +3476,78 @@
   "w": 192,
   "x": 576,
   "y": 1984
+ },
+ "kreatur/rpg_bogenschuetzin_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 512
+ },
+ "kreatur/rpg_bogenschuetzin_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 512
+ },
+ "kreatur/rpg_bogenschuetzin_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 512
+ },
+ "kreatur/rpg_bogenschuetzin_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 512
+ },
+ "kreatur/rpg_bogenschuetzin_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 512
+ },
+ "kreatur/rpg_bogenschuetzin_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 512
+ },
+ "kreatur/rpg_bogenschuetzin_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 512
+ },
+ "kreatur/rpg_bogenschuetzin_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 768
+ },
+ "kreatur/rpg_bogenschuetzin_angriff9": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 768
  },
  "kreatur/rpg_bogenschuetzin_lauf1": {
   "h": 192,
@@ -2837,6 +3661,54 @@
   "x": 1344,
   "y": 2176
  },
+ "kreatur/rpg_fledermaus_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 768
+ },
+ "kreatur/rpg_fledermaus_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 768
+ },
+ "kreatur/rpg_fledermaus_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 768
+ },
+ "kreatur/rpg_fledermaus_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 768
+ },
+ "kreatur/rpg_fledermaus_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 768
+ },
+ "kreatur/rpg_fledermaus_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 768
+ },
  "kreatur/rpg_lanzenreiter": {
   "h": 192,
   "res": 2,
@@ -2884,6 +3756,54 @@
   "w": 192,
   "x": 576,
   "y": 2368
+ },
+ "kreatur/rpg_lanzenreiter_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 1024
+ },
+ "kreatur/rpg_lanzenreiter_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 1024
+ },
+ "kreatur/rpg_lanzenreiter_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 1024
+ },
+ "kreatur/rpg_lanzenreiter_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 1024
+ },
+ "kreatur/rpg_lanzenreiter_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 1024
+ },
+ "kreatur/rpg_lanzenreiter_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 1024
  },
  "kreatur/rpg_lanzenreiter_lauf1": {
   "h": 192,
@@ -2997,6 +3917,78 @@
   "x": 1344,
   "y": 2560
  },
+ "kreatur/rpg_nekromant_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 1024
+ },
+ "kreatur/rpg_nekromant_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 1024
+ },
+ "kreatur/rpg_nekromant_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 1280
+ },
+ "kreatur/rpg_nekromant_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 1280
+ },
+ "kreatur/rpg_nekromant_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 1280
+ },
+ "kreatur/rpg_nekromant_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 1280
+ },
+ "kreatur/rpg_nekromant_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 1280
+ },
+ "kreatur/rpg_nekromant_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 1280
+ },
+ "kreatur/rpg_nekromant_angriff9": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 1280
+ },
  "kreatur/rpg_nekromant_lauf1": {
   "h": 192,
   "res": 2,
@@ -3093,6 +4085,54 @@
   "x": 1728,
   "y": 2752
  },
+ "kreatur/rpg_ork_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 1280
+ },
+ "kreatur/rpg_ork_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 1536
+ },
+ "kreatur/rpg_ork_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 1536
+ },
+ "kreatur/rpg_ork_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 1536
+ },
+ "kreatur/rpg_ork_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 1536
+ },
+ "kreatur/rpg_ork_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 1536
+ },
  "kreatur/rpg_ork_elite": {
   "h": 192,
   "res": 2,
@@ -3140,6 +4180,62 @@
   "w": 192,
   "x": 576,
   "y": 3136
+ },
+ "kreatur/rpg_ork_elite_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 1536
+ },
+ "kreatur/rpg_ork_elite_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 1536
+ },
+ "kreatur/rpg_ork_elite_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 1536
+ },
+ "kreatur/rpg_ork_elite_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 1792
+ },
+ "kreatur/rpg_ork_elite_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 1792
+ },
+ "kreatur/rpg_ork_elite_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 1792
+ },
+ "kreatur/rpg_ork_elite_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 1792
  },
  "kreatur/rpg_ork_elite_lauf1": {
   "h": 192,
@@ -3317,6 +4413,70 @@
   "x": 1344,
   "y": 3328
  },
+ "kreatur/rpg_ork_reiter_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 1792
+ },
+ "kreatur/rpg_ork_reiter_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 1792
+ },
+ "kreatur/rpg_ork_reiter_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 1792
+ },
+ "kreatur/rpg_ork_reiter_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 1792
+ },
+ "kreatur/rpg_ork_reiter_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 2048
+ },
+ "kreatur/rpg_ork_reiter_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 2048
+ },
+ "kreatur/rpg_ork_reiter_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 2048
+ },
+ "kreatur/rpg_ork_reiter_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 2048
+ },
  "kreatur/rpg_ork_reiter_lauf1": {
   "h": 192,
   "res": 2,
@@ -3428,6 +4588,62 @@
   "w": 192,
   "x": 192,
   "y": 3712
+ },
+ "kreatur/rpg_ork_ruestung_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 2048
+ },
+ "kreatur/rpg_ork_ruestung_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 2048
+ },
+ "kreatur/rpg_ork_ruestung_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 2048
+ },
+ "kreatur/rpg_ork_ruestung_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 2048
+ },
+ "kreatur/rpg_ork_ruestung_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 2304
+ },
+ "kreatur/rpg_ork_ruestung_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 2304
+ },
+ "kreatur/rpg_ork_ruestung_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 2304
  },
  "kreatur/rpg_ork_ruestung_lauf1": {
   "h": 192,
@@ -3541,6 +4757,78 @@
   "x": 960,
   "y": 3904
  },
+ "kreatur/rpg_priester_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 2304
+ },
+ "kreatur/rpg_priester_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 2304
+ },
+ "kreatur/rpg_priester_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 2304
+ },
+ "kreatur/rpg_priester_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 2304
+ },
+ "kreatur/rpg_priester_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 2304
+ },
+ "kreatur/rpg_priester_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 2560
+ },
+ "kreatur/rpg_priester_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 2560
+ },
+ "kreatur/rpg_priester_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 2560
+ },
+ "kreatur/rpg_priester_angriff9": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 2560
+ },
  "kreatur/rpg_priester_lauf1": {
   "h": 192,
   "res": 2,
@@ -3652,6 +4940,62 @@
   "w": 192,
   "x": 1728,
   "y": 4096
+ },
+ "kreatur/rpg_ritter_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 2560
+ },
+ "kreatur/rpg_ritter_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 2560
+ },
+ "kreatur/rpg_ritter_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 2560
+ },
+ "kreatur/rpg_ritter_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 2560
+ },
+ "kreatur/rpg_ritter_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 2816
+ },
+ "kreatur/rpg_ritter_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 2816
+ },
+ "kreatur/rpg_ritter_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 2816
  },
  "kreatur/rpg_ritter_lauf1": {
   "h": 192,
@@ -3765,6 +5109,54 @@
   "x": 576,
   "y": 4480
  },
+ "kreatur/rpg_schleim_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 2816
+ },
+ "kreatur/rpg_schleim_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 2816
+ },
+ "kreatur/rpg_schleim_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 2816
+ },
+ "kreatur/rpg_schleim_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 2816
+ },
+ "kreatur/rpg_schleim_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 2816
+ },
+ "kreatur/rpg_schleim_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 3072
+ },
  "kreatur/rpg_schleim_lauf1": {
   "h": 192,
   "res": 2,
@@ -3860,6 +5252,62 @@
   "w": 192,
   "x": 960,
   "y": 4672
+ },
+ "kreatur/rpg_schwertkaempfer_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 3072
+ },
+ "kreatur/rpg_schwertkaempfer_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 3072
+ },
+ "kreatur/rpg_schwertkaempfer_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 3072
+ },
+ "kreatur/rpg_schwertkaempfer_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 3072
+ },
+ "kreatur/rpg_schwertkaempfer_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 3072
+ },
+ "kreatur/rpg_schwertkaempfer_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 3072
+ },
+ "kreatur/rpg_schwertkaempfer_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 3072
  },
  "kreatur/rpg_schwertkaempfer_lauf1": {
   "h": 192,
@@ -3973,6 +5421,54 @@
   "x": 1728,
   "y": 4864
  },
+ "kreatur/rpg_skelett_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 3328
+ },
+ "kreatur/rpg_skelett_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 3328
+ },
+ "kreatur/rpg_skelett_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 3328
+ },
+ "kreatur/rpg_skelett_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 3328
+ },
+ "kreatur/rpg_skelett_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 3328
+ },
+ "kreatur/rpg_skelett_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 3328
+ },
  "kreatur/rpg_skelett_bogen": {
   "h": 192,
   "res": 2,
@@ -4020,6 +5516,78 @@
   "w": 192,
   "x": 576,
   "y": 5248
+ },
+ "kreatur/rpg_skelett_bogen_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 3328
+ },
+ "kreatur/rpg_skelett_bogen_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 3328
+ },
+ "kreatur/rpg_skelett_bogen_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 3584
+ },
+ "kreatur/rpg_skelett_bogen_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 3584
+ },
+ "kreatur/rpg_skelett_bogen_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 3584
+ },
+ "kreatur/rpg_skelett_bogen_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 3584
+ },
+ "kreatur/rpg_skelett_bogen_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 3584
+ },
+ "kreatur/rpg_skelett_bogen_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 3584
+ },
+ "kreatur/rpg_skelett_bogen_angriff9": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 3584
  },
  "kreatur/rpg_skelett_bogen_lauf1": {
   "h": 192,
@@ -4197,6 +5765,70 @@
   "x": 1344,
   "y": 5440
  },
+ "kreatur/rpg_skelett_ruestung_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 3584
+ },
+ "kreatur/rpg_skelett_ruestung_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 3840
+ },
+ "kreatur/rpg_skelett_ruestung_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 3840
+ },
+ "kreatur/rpg_skelett_ruestung_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 3840
+ },
+ "kreatur/rpg_skelett_ruestung_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 3840
+ },
+ "kreatur/rpg_skelett_ruestung_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 3840
+ },
+ "kreatur/rpg_skelett_ruestung_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 3840
+ },
+ "kreatur/rpg_skelett_ruestung_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 3840
+ },
  "kreatur/rpg_skelett_ruestung_lauf1": {
   "h": 192,
   "res": 2,
@@ -4308,6 +5940,78 @@
   "w": 192,
   "x": 192,
   "y": 5824
+ },
+ "kreatur/rpg_skelett_schwert_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 3840
+ },
+ "kreatur/rpg_skelett_schwert_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 4096
+ },
+ "kreatur/rpg_skelett_schwert_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 4096
+ },
+ "kreatur/rpg_skelett_schwert_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 4096
+ },
+ "kreatur/rpg_skelett_schwert_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 4096
+ },
+ "kreatur/rpg_skelett_schwert_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 4096
+ },
+ "kreatur/rpg_skelett_schwert_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 4096
+ },
+ "kreatur/rpg_skelett_schwert_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 4096
+ },
+ "kreatur/rpg_skelett_schwert_angriff9": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 4096
  },
  "kreatur/rpg_skelett_schwert_lauf1": {
   "h": 192,
@@ -4429,6 +6133,54 @@
   "x": 1152,
   "y": 6016
  },
+ "kreatur/rpg_soldat_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 4352
+ },
+ "kreatur/rpg_soldat_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 4352
+ },
+ "kreatur/rpg_soldat_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 4352
+ },
+ "kreatur/rpg_soldat_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 4352
+ },
+ "kreatur/rpg_soldat_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 4352
+ },
+ "kreatur/rpg_soldat_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 4352
+ },
  "kreatur/rpg_soldat_lauf1": {
   "h": 192,
   "res": 2,
@@ -4540,6 +6292,62 @@
   "w": 192,
   "x": 0,
   "y": 6400
+ },
+ "kreatur/rpg_templer_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 4352
+ },
+ "kreatur/rpg_templer_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 4352
+ },
+ "kreatur/rpg_templer_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 4608
+ },
+ "kreatur/rpg_templer_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 4608
+ },
+ "kreatur/rpg_templer_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 4608
+ },
+ "kreatur/rpg_templer_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 4608
+ },
+ "kreatur/rpg_templer_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 4608
  },
  "kreatur/rpg_templer_lauf1": {
   "h": 192,
@@ -4653,6 +6461,78 @@
   "x": 768,
   "y": 6592
  },
+ "kreatur/rpg_werbaer_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 4608
+ },
+ "kreatur/rpg_werbaer_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 4608
+ },
+ "kreatur/rpg_werbaer_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 4608
+ },
+ "kreatur/rpg_werbaer_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 4864
+ },
+ "kreatur/rpg_werbaer_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 4864
+ },
+ "kreatur/rpg_werbaer_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 4864
+ },
+ "kreatur/rpg_werbaer_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 4864
+ },
+ "kreatur/rpg_werbaer_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 4864
+ },
+ "kreatur/rpg_werbaer_angriff9": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 4864
+ },
  "kreatur/rpg_werbaer_lauf1": {
   "h": 192,
   "res": 2,
@@ -4765,6 +6645,78 @@
   "x": 1536,
   "y": 6784
  },
+ "kreatur/rpg_werwolf_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 4864
+ },
+ "kreatur/rpg_werwolf_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 4864
+ },
+ "kreatur/rpg_werwolf_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 5120
+ },
+ "kreatur/rpg_werwolf_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 5120
+ },
+ "kreatur/rpg_werwolf_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 5120
+ },
+ "kreatur/rpg_werwolf_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 5120
+ },
+ "kreatur/rpg_werwolf_angriff7": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 5120
+ },
+ "kreatur/rpg_werwolf_angriff8": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1280,
+  "y": 5120
+ },
+ "kreatur/rpg_werwolf_angriff9": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1536,
+  "y": 5120
+ },
  "kreatur/rpg_werwolf_lauf1": {
   "h": 192,
   "res": 2,
@@ -4876,6 +6828,54 @@
   "w": 192,
   "x": 384,
   "y": 7168
+ },
+ "kreatur/rpg_zauberer_angriff1": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1792,
+  "y": 5120
+ },
+ "kreatur/rpg_zauberer_angriff2": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 0,
+  "y": 5376
+ },
+ "kreatur/rpg_zauberer_angriff3": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 256,
+  "y": 5376
+ },
+ "kreatur/rpg_zauberer_angriff4": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 512,
+  "y": 5376
+ },
+ "kreatur/rpg_zauberer_angriff5": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 768,
+  "y": 5376
+ },
+ "kreatur/rpg_zauberer_angriff6": {
+  "h": 256,
+  "res": 2,
+  "sheet": "angriffe_gross",
+  "w": 256,
+  "x": 1024,
+  "y": 5376
  },
  "kreatur/rpg_zauberer_lauf1": {
   "h": 192,
@@ -5157,6 +7157,38 @@
   "x": 896,
   "y": 7552
  },
+ "kreatur/spieler_pawn_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1344,
+  "y": 1344
+ },
+ "kreatur/spieler_pawn_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1536,
+  "y": 1344
+ },
+ "kreatur/spieler_pawn_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1728,
+  "y": 1344
+ },
+ "kreatur/spieler_pawn_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 0,
+  "y": 1536
+ },
  "kreatur/spieler_pawn_lauf1": {
   "h": 128,
   "res": 2,
@@ -5331,6 +7363,54 @@
   "w": 128,
   "x": 512,
   "y": 7680
+ },
+ "kreatur/wechselbalg_angriff1": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 192,
+  "y": 1536
+ },
+ "kreatur/wechselbalg_angriff2": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 384,
+  "y": 1536
+ },
+ "kreatur/wechselbalg_angriff3": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 576,
+  "y": 1536
+ },
+ "kreatur/wechselbalg_angriff4": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 768,
+  "y": 1536
+ },
+ "kreatur/wechselbalg_angriff5": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 960,
+  "y": 1536
+ },
+ "kreatur/wechselbalg_angriff6": {
+  "h": 192,
+  "res": 2,
+  "sheet": "angriffe",
+  "w": 192,
+  "x": 1152,
+  "y": 1536
  },
  "kreatur/wechselbalg_lauf1": {
   "h": 128,

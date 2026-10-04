@@ -225,25 +225,30 @@ const UNIT_SIZE := 128
 const UNIT_FOOT := 121
 
 ## Figuren aus dem Pack: Name -> [Bogen, Feldgröße, [Ruhe-Reihe, Bilder], [Lauf-Reihe, Bilder] oder null,
-## Teamfarbe tönbar].  Die Bögen ohne Reihe sind einzeilig (Reihe 0).
+## Teamfarbe tönbar, Angriff [Bogen oder "" (derselbe), Reihe, Bilder] oder null].
+## Die Bögen ohne Reihe sind einzeilig (Reihe 0).
+const P := "Units/Red Units/Pawn/Pawn_"
+## Bildfläche der Angriffsbilder (Pack-Figuren und Tiny RPG).
+const ATTACK_SIZE := 192
+const RPG_ATTACK_SIZE := 256
 const UNITS := {
 	# Spielfigur: der blaue Arbeiter in seinen echten Farben (Ausrüstung: GearLook)
-	"spieler_pawn": ["Units/Blue Units/Pawn/Pawn_Idle.png|Units/Blue Units/Pawn/Pawn_Run.png", 192, [0, 8], [0, 6], false],
+	"spieler_pawn": ["Units/Blue Units/Pawn/Pawn_Idle.png|Units/Blue Units/Pawn/Pawn_Run.png", 192, [0, 8], [0, 6], false, ["Units/Blue Units/Pawn/Pawn_Interact Knife.png", 0, 4]],
 	# Menschen und Crawler: rote Einheiten, Teamfarbe in der Farbe der Art
-	"mensch": ["Units/Red Units/Pawn/Pawn_Idle.png|Units/Red Units/Pawn/Pawn_Run.png", 192, [0, 8], [0, 6], true],
-	"mensch_hammer": ["Units/Red Units/Pawn/Pawn_Idle Hammer.png|Units/Red Units/Pawn/Pawn_Run Hammer.png", 192, [0, 8], [0, 6], true],
-	"mensch_gold": ["Units/Red Units/Pawn/Pawn_Idle Gold.png|Units/Red Units/Pawn/Pawn_Run Gold.png", 192, [0, 8], [0, 6], true],
-	"mensch_holz": ["Units/Red Units/Pawn/Pawn_Idle Wood.png|Units/Red Units/Pawn/Pawn_Run Wood.png", 192, [0, 8], [0, 6], true],
-	"mensch_messer": ["Units/Red Units/Pawn/Pawn_Idle Knife.png|Units/Red Units/Pawn/Pawn_Run Knife.png", 192, [0, 8], [0, 6], true],
-	"krieger": ["Units/Red Units/Warrior/Warrior_Idle.png|Units/Red Units/Warrior/Warrior_Run.png", 192, [0, 8], [0, 6], true],
-	"bogen": ["Units/Red Units/Archer/Archer_Idle.png|Units/Red Units/Archer/Archer_Run.png", 192, [0, 6], [0, 4], true],
-	"moench": ["Units/Red Units/Monk/Idle.png|Units/Red Units/Monk/Run.png", 192, [0, 6], [0, 4], true],
+	"mensch": [P + "Idle.png|" + P + "Run.png", 192, [0, 8], [0, 6], true, [P + "Interact Knife.png", 0, 4]],
+	"mensch_hammer": [P + "Idle Hammer.png|" + P + "Run Hammer.png", 192, [0, 8], [0, 6], true, [P + "Interact Hammer.png", 0, 3]],
+	"mensch_gold": [P + "Idle Gold.png|" + P + "Run Gold.png", 192, [0, 8], [0, 6], true, [P + "Interact Pickaxe.png", 0, 6]],
+	"mensch_holz": [P + "Idle Wood.png|" + P + "Run Wood.png", 192, [0, 8], [0, 6], true, [P + "Interact Axe.png", 0, 6]],
+	"mensch_messer": [P + "Idle Knife.png|" + P + "Run Knife.png", 192, [0, 8], [0, 6], true, [P + "Interact Knife.png", 0, 4]],
+	"krieger": ["Units/Red Units/Warrior/Warrior_Idle.png|Units/Red Units/Warrior/Warrior_Run.png", 192, [0, 8], [0, 6], true, ["Units/Red Units/Warrior/Warrior_Attack1.png", 0, 4]],
+	"bogen": ["Units/Red Units/Archer/Archer_Idle.png|Units/Red Units/Archer/Archer_Run.png", 192, [0, 6], [0, 4], true, ["Units/Red Units/Archer/Archer_Shoot.png", 0, 8]],
+	"moench": ["Units/Red Units/Monk/Idle.png|Units/Red Units/Monk/Run.png", 192, [0, 6], [0, 4], true, ["Units/Red Units/Monk/Heal.png", 0, 11]],
 	# Goblins (Kobolde): Fackel, Dynamit, Fass
-	"kobold": ["U:Factions/Goblins/Troops/Torch/Red/Torch_Red.png", 192, [0, 7], [1, 6], true],
-	"kobold_tnt": ["U:Factions/Goblins/Troops/TNT/Red/TNT_Red.png", 192, [0, 6], [1, 6], true],
-	"fass": ["U:Factions/Goblins/Troops/Barrel/Red/Barrel_Red.png", 128, [0, 1], null, true],
+	"kobold": ["U:Factions/Goblins/Troops/Torch/Red/Torch_Red.png", 192, [0, 7], [1, 6], true, ["", 2, 6]],
+	"kobold_tnt": ["U:Factions/Goblins/Troops/TNT/Red/TNT_Red.png", 192, [0, 6], [1, 6], true, ["", 2, 7]],
+	"fass": ["U:Factions/Goblins/Troops/Barrel/Red/Barrel_Red.png", 128, [0, 1], null, true, ["", 1, 6]],
 	# Schaf
-	"schaf": ["U:Resources/Sheep/HappySheep_Idle.png|U:Resources/Sheep/HappySheep_Bouncing.png", 128, [0, 8], [0, 6], false],
+	"schaf": ["U:Resources/Sheep/HappySheep_Idle.png|U:Resources/Sheep/HappySheep_Bouncing.png", 128, [0, 8], [0, 6], false, null],
 }
 
 ## Hautfarbe der Goblins (grün) und der Menschen, für Abwandlungen.
@@ -281,11 +286,13 @@ static func _bottom(img: Image) -> int:
 	return used.end.y - 1
 
 
-## Feld auf die Bildfläche der Figuren setzen, Füße (Unterkante der Ruhefigur) auf UNIT_FOOT.
-func _place(fr: Image, bottom: int) -> Image:
-	var out := Image.create(UNIT_SIZE, UNIT_SIZE, false, Image.FORMAT_RGBA8)
-	var ox := (UNIT_SIZE - fr.get_width()) / 2
-	out.blend_rect(fr, Rect2i(Vector2i.ZERO, fr.get_size()), Vector2i(ox, UNIT_FOOT - bottom))
+## Feld auf die Bildfläche der Figuren setzen, Füße (Unterkante der Ruhefigur)
+## auf UNIT_FOOT. Angriffe bekommen eine größere Fläche (canvas) für den
+## Schwung, die Füße bleiben gleich weit über dem unteren Rand.
+func _place(fr: Image, bottom: int, canvas: int = UNIT_SIZE) -> Image:
+	var out := Image.create(canvas, canvas, false, Image.FORMAT_RGBA8)
+	var ox := (canvas - fr.get_width()) / 2
+	out.blend_rect(fr, Rect2i(Vector2i.ZERO, fr.get_size()), Vector2i(ox, UNIT_FOOT + canvas - UNIT_SIZE - bottom))
 	return out
 
 
@@ -323,11 +330,18 @@ func _units() -> void:
 		if run != null:
 			for i in run[1]:
 				runs.append(_place(_cell(run_sheet, size, run[0], i, tint), bottom))
-		made_frames[name] = [frames, runs]
-		_save_unit(name, frames, runs)
+		var hits: Array = []
+		var atk = u[5]
+		if atk != null:
+			var atk_sheet := idle_sheet if atk[0] == "" else _sheet(atk[0])
+			for i in atk[2]:
+				hits.append(_place(_cell(atk_sheet, size, atk[1], i, tint), bottom, ATTACK_SIZE))
+		made_frames[name] = [frames, runs, hits]
+		_save_unit(name, frames, runs, hits)
 	for name in SKINS:
 		var base: Array = made_frames[SKINS[name][0]]
-		_save_unit(name, base[0].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])), base[1].map(func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])))
+		var skin := func(i): return _recolor_skin(i, GOBLIN_SKIN, SKINS[name][1])
+		_save_unit(name, base[0].map(skin), base[1].map(skin), base[2].map(skin))
 	_rpg_units()
 	_royal_mage()
 
@@ -335,39 +349,40 @@ func _units() -> void:
 # ---------------------------------------------------------------- Tiny RPG Character Pack
 
 const RPG := "asset-pack/Assets/Tiny RPG Character Asset Pack 01 v2.0 -Full 22 Characters/Tiny RPG Character Asset Pack 01 v2.0 -Full 22 Characters/Characters(100x100 split)/"
-## Figuren aus dem Tiny RPG Character Pack (100er Felder, dreifach vergrößert
-## auf eine Bildfläche von 192): Name -> [Figur, Ruhe-Animation,
-## Lauf-Animation oder "", tönbar (Schleim), Schwebehöhe in Bildpixeln].
-const RPG_SCALE := 3
+## Figuren aus dem Tiny RPG Character Pack (100er Felder, vergrößert auf eine
+## Bildfläche von 192): Name -> [Figur, Ruhe-, Lauf- ("" ohne) und
+## Angriffs-Animation, Vergrößerung, tönbar (Schleim), Schwebehöhe in
+## Bildpixeln]. Die Vergrößerung gleicht die Größen an: Menschen etwa so groß
+## wie die Spielfigur, kleine Skelette auch, Orks und Werbär größer.
 const RPG_SIZE := 192
 const RPG_FOOT := 185
 const RPG_UNITS := {
-	"rpg_schleim": ["Slime", "Idle", "Walk", true],
-	"rpg_fledermaus": ["Bat", "Flying", "", false, 33],
-	"rpg_skelett": ["Skeleton", "Idle", "Walk", false],
-	"rpg_skelett_schwert": ["Greatsword Skeleton", "Idle", "Walk", false],
-	"rpg_skelett_ruestung": ["Armored Skeleton", "Idle", "Walk", false],
-	"rpg_skelett_bogen": ["Skeleton Archer", "Idle", "Walk", false],
-	"rpg_ork": ["Orc", "Idle", "Walk", false],
-	"rpg_ork_ruestung": ["Armored Orc", "Idle", "Walk", false],
-	"rpg_ork_elite": ["Elite Orc", "Idle", "Walk", false],
-	"rpg_werbaer": ["Werebear", "Idle", "Walk", false],
-	"rpg_werwolf": ["Werewolf", "Idle", "Walk", false],
-	"rpg_nekromant": ["Necromancer", "Idle", "Walk", false],
-	"rpg_zauberer": ["Wizard", "Idle", "Walk", false],
-	"rpg_priester": ["Priest", "Idle", "Walk", false],
-	"rpg_ritter": ["Knight", "Idle", "Walk", false],
-	"rpg_templer": ["Knight Templar", "Idle", "Walk01", false],
-	"rpg_soldat": ["Soldier", "Idle", "Walk", false],
-	"rpg_schwertkaempfer": ["Swordsman", "Idle", "Walk", false],
-	"rpg_bogenschuetzin": ["Archer", "Idle", "Walk", false],
-	"rpg_lanzenreiter": ["Lancer", "Idle", "Walk01", false],
-	"rpg_axtkaempfer": ["Armored Axeman", "Idle", "Walk", false],
-	"rpg_ork_reiter": ["Orc rider", "Idle", "Walk", false],
+	"rpg_schleim": ["Slime", "Idle", "Walk", "Attack01", 3, true],
+	"rpg_fledermaus": ["Bat", "Flying", "", "Attack01", 3, false, 33],
+	"rpg_skelett": ["Skeleton", "Idle", "Walk", "Attack01", 4],
+	"rpg_skelett_schwert": ["Greatsword Skeleton", "Idle", "Walk", "Attack01", 3],
+	"rpg_skelett_ruestung": ["Armored Skeleton", "Idle", "Walk", "Attack01", 3],
+	"rpg_skelett_bogen": ["Skeleton Archer", "Idle", "Walk", "Attack", 3],
+	"rpg_ork": ["Orc", "Idle", "Walk", "Attack01", 4],
+	"rpg_ork_ruestung": ["Armored Orc", "Idle", "Walk", "Attack01", 4],
+	"rpg_ork_elite": ["Elite Orc", "Idle", "Walk", "Attack01", 3],
+	"rpg_ork_reiter": ["Orc rider", "Idle", "Walk", "Attack01", 3],
+	"rpg_werbaer": ["Werebear", "Idle", "Walk", "Attack01", 4],
+	"rpg_werwolf": ["Werewolf", "Idle", "Walk", "Attack01", 3],
+	"rpg_nekromant": ["Necromancer", "Idle", "Walk", "Attack01", 3],
+	"rpg_zauberer": ["Wizard", "Idle", "Walk", "Attack01", 3],
+	"rpg_priester": ["Priest", "Idle", "Walk", "Attack", 3],
+	"rpg_ritter": ["Knight", "Idle", "Walk", "Attack01", 3],
+	"rpg_templer": ["Knight Templar", "Idle", "Walk01", "Attack01", 3],
+	"rpg_soldat": ["Soldier", "Idle", "Walk", "Attack01", 3],
+	"rpg_schwertkaempfer": ["Swordsman", "Idle", "Walk", "Attack01", 3],
+	"rpg_bogenschuetzin": ["Archer", "Idle", "Walk", "Attack01", 3],
+	"rpg_lanzenreiter": ["Lancer", "Idle", "Walk01", "Attack01", 3],
+	"rpg_axtkaempfer": ["Armored Axeman", "Idle", "Walk", "Attack01", 3],
 }
 
 
-func _rpg_frames(who: String, anim: String, tint: bool) -> Array:
+func _rpg_frames(who: String, anim: String, scale: int, tint: bool) -> Array:
 	var img := _load(RPG + "%s/%s/%s_%s.png" % [who, who, who, anim])
 	var out: Array = []
 	for i in img.get_width() / 100:
@@ -385,7 +400,7 @@ func _rpg_frames(who: String, anim: String, tint: bool) -> Array:
 		if used.size.x == 0:
 			continue
 		var big := fr.duplicate() as Image
-		big.resize(100 * RPG_SCALE, 100 * RPG_SCALE, Image.INTERPOLATE_NEAREST)
+		big.resize(100 * scale, 100 * scale, Image.INTERPOLATE_NEAREST)
 		out.append(big)
 	return out
 
@@ -393,25 +408,29 @@ func _rpg_frames(who: String, anim: String, tint: bool) -> Array:
 func _rpg_units() -> void:
 	for name in RPG_UNITS:
 		var u: Array = RPG_UNITS[name]
-		var idle := _rpg_frames(u[0], u[1], u[3])
-		var runs := _rpg_frames(u[0], u[2], u[3]) if u[2] != "" else []
-		# Fliegende schweben über dem Boden (fünfter Eintrag: Höhe in Bildpixeln)
-		var bottom := _bottom(idle[0]) + (int(u[4]) if u.size() > 4 else 0)
-		_save_unit(name, idle.map(func(f): return _place_big(f, bottom)), runs.map(func(f): return _place_big(f, bottom)))
+		var scale: int = u[4]
+		var tint: bool = u.size() > 5 and u[5]
+		var idle := _rpg_frames(u[0], u[1], scale, tint)
+		var runs := _rpg_frames(u[0], u[2], scale, tint) if u[2] != "" else []
+		var hits := _rpg_frames(u[0], u[3], scale, tint)
+		# Fliegende schweben über dem Boden (Höhe in Bildpixeln)
+		var bottom := _bottom(idle[0]) + (int(u[6]) if u.size() > 6 else 0)
+		var put := func(f): return _place_big(f, bottom)
+		_save_unit(name, idle.map(put), runs.map(put), hits.map(func(f): return _place_big(f, bottom, RPG_ATTACK_SIZE)))
 
 
-## Vergrößertes Feld mittig auf die Bildfläche, Füße auf RPG_FOOT.
-func _place_big(fr: Image, bottom: int) -> Image:
-	var out := Image.create(RPG_SIZE, RPG_SIZE, false, Image.FORMAT_RGBA8)
-	var src := Rect2i((fr.get_width() - RPG_SIZE) / 2, bottom - RPG_FOOT, RPG_SIZE, RPG_SIZE)
+## Vergrößertes Feld mittig auf die Bildfläche, Füße auf RPG_FOOT (bei
+## größerer Fläche gleich weit über dem unteren Rand).
+func _place_big(fr: Image, bottom: int, canvas: int = RPG_SIZE) -> Image:
+	var out := Image.create(canvas, canvas, false, Image.FORMAT_RGBA8)
+	var src := Rect2i((fr.get_width() - canvas) / 2, bottom - RPG_FOOT - canvas + RPG_SIZE, canvas, canvas)
 	out.blit_rect(fr, src, Vector2i.ZERO)
 	return out
 
 
 ## Royal Mage (32er Felder, Reihen: Ruhe, Laufen, Angriff, Treffer, Tod,
-## Zauber entsteht, Zauber fliegt, Zauber trifft). Zweifach vergrößert: die
-## Figur füllt ihr Feld weiter aus als die Tiny-RPG-Figuren, so sind beide
-## gleich groß.
+## Zauber entsteht, Zauber fliegt, Zauber trifft), dreifach vergrößert wie die
+## Menschen aus dem Tiny RPG Pack.
 const MAGE := "asset-pack/Assets/Royal Mage Sprite Sheet.png"
 
 
@@ -428,10 +447,12 @@ func _mage_row(row: int, scale: int) -> Array:
 
 
 func _royal_mage() -> void:
-	var idle := _mage_row(0, 2)
-	var runs := _mage_row(1, 2)
+	var idle := _mage_row(0, 3)
+	var runs := _mage_row(1, 3)
+	var hits := _mage_row(2, 3)
 	var bottom := _bottom(idle[0])
-	_save_unit("magier", idle.map(func(f): return _place_big(f, bottom)), runs.map(func(f): return _place_big(f, bottom)))
+	var put := func(f): return _place_big(f, bottom)
+	_save_unit("magier", idle.map(put), runs.map(put), hits.map(func(f): return _place_big(f, bottom, RPG_ATTACK_SIZE)))
 
 
 ## Zauberkugel im Flug (Geschoss) und ihr Aufschlag (Effekt), je ein Streifen.
@@ -444,11 +465,13 @@ func _royal_mage_fx() -> void:
 		_save(strip, "fx/" + pair[1])
 
 
-func _save_unit(name: String, frames: Array, runs: Array) -> void:
+func _save_unit(name: String, frames: Array, runs: Array, hits: Array = []) -> void:
 	for i in frames.size():
 		_save(frames[i], "units/%s_%d" % [name, i])
 	for i in runs.size():
 		_save(runs[i], "units/%s_lauf%d" % [name, i])
+	for i in hits.size():
+		_save(hits[i], "units/%s_angriff%d" % [name, i])
 
 
 # ================================================================ Gelände

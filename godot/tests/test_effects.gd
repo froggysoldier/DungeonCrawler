@@ -64,6 +64,9 @@ func test_animator_macht_daraus_bewegung(t) -> void:
 	a.after(s, before, fx, 1000.0)
 	t.gt(a.lunge("p", 1000.0 + Animator.LUNGE_MS / 2).length(), 0.2, "Spielfigur beugt sich vor")
 	t.eq(a.lunge("p", 1000.0 + Animator.LUNGE_MS + 1), Vector2.ZERO, "und steht danach wieder")
+	t.eq(a.attack_frame("p", 4, 1000.0 + Animator.ATTACK_FRAME_MS * 1.5), 1, "Angriffsbilder laufen der Reihe nach")
+	t.eq(a.attack_dir("p"), Vector2(m.pos.x - s.player.pos.x, m.pos.y - s.player.pos.y).normalized(), "in Richtung des Gegners")
+	t.eq(a.attack_frame("p", 4, 1000.0 + Animator.ATTACK_FRAME_MS * 4 + 1), -1, "und enden nach dem letzten Bild")
 	var bursts := a.bursts(1200.0)
 	t.eq(bursts.size(), 1, "Ratte zerfällt")
 	if not bursts.is_empty():

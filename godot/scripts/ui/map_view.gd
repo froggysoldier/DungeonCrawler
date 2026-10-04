@@ -276,6 +276,11 @@ const WALKERS := ["kreatur/held", "kreatur/mensch"]
 func _frame(name: String, key: String, moving: bool, idle: bool = true) -> String:
 	var time: float = frame_anim.get("time", 0.0)
 	var phase := float(absi(key.hash()) % 97) * 11.0
+	if anim:
+		var hits := PixelArt.attack_count(name)
+		var a := anim.attack_frame(key, hits, frame_anim.get("now", -1.0))
+		if a >= 0:
+			return "%s_angriff%d" % [name, a + 1]
 	var runs := PixelArt.run_count(name)
 	if moving and runs > 0:
 		return "%s_lauf%d" % [name, int(time / 100.0) % runs + 1]
@@ -296,6 +301,12 @@ func _frame(name: String, key: String, moving: bool, idle: bool = true) -> Strin
 ## Eine Figur zeichnen: zweites Bild, weißes Aufblitzen bei Treffern.
 func _figure(ci: CanvasItem, key: String, name: String, x: float, y: float, tint: Variant, flip: bool, mod: Color = Color.WHITE, moving: bool = false, idle: bool = true) -> void:
 	var n := _frame(name, key, moving, idle)
+	# Angriffsbilder sind größer (Platz für den Schwung): mittig, Füße gleich
+	var bs := PixelArt.size_of(name)
+	var fs := PixelArt.size_of(n)
+	if fs != bs:
+		x -= (fs.x - bs.x) / 2.0 * px
+		y -= (fs.y - bs.y) * px
 	if anim and anim.flashing(key, frame_anim.get("now", -1.0)):
 		PixelArt.draw_texture(ci, PixelArt.silhouette(n), Vector2(x, y), px, flip, Color(1, 1, 1, mod.a), PixelArt.res(n))
 		return
@@ -1142,6 +1153,9 @@ func _draw_player(ci: CanvasItem, sx: float, sy: float, time: float) -> void:
 	_glow(ci, sx + T / 2, sy + T / 2, "#ffd66e", 0.5)
 	var dir = p.get("lastMoveDir")
 	var flip: bool = dir != null and dir.x < 0
+	var hit_dir = anim.attack_dir("p") if anim else null
+	if hit_dir != null and absf(hit_dir.x) > 0.01:
+		flip = hit_dir.x < 0
 	var mount = p.get("mount")
 	var riding: bool = p.get("riding", false) and mount != null and not mount.get("down", false)
 	var mount_name := ""

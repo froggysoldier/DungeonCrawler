@@ -221,9 +221,12 @@ static func compose(gear: Dictionary) -> Dictionary:
 		frames.append("%s_%d" % [BASE, i])
 	for i in range(1, PixelArt.run_count(BASE) + 1):
 		frames.append("%s_lauf%d" % [BASE, i])
+	for i in range(1, PixelArt.attack_count(BASE) + 1):
+		frames.append("%s_angriff%d" % [BASE, i])
 	for fr in frames:
 		var base := PixelArt.image(fr)
-		var img := Image.create(SIZE, SIZE, false, Image.FORMAT_RGBA8)
+		# Angriffsbilder liegen auf einer größeren Fläche; die Anker gleichen das aus
+		var img := Image.create(base.get_width(), base.get_height(), false, Image.FORMAT_RGBA8)
 		if layers.has("ruecken"):
 			_blend(img, layers.ruecken, fr)
 		img.blend_rect(base, Rect2i(Vector2i.ZERO, base.get_size()), Vector2i.ZERO)

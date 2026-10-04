@@ -176,18 +176,28 @@ Grafik und Oberfläche folgen dem Asset-Pack **Tiny Swords** von Pixel Frog
   - Kobolde, Gnome, Trolle, Fischmenschen: die Goblins des Packs (Fackel,
     Dynamit) mit abgewandelter Hautfarbe; Mimiks sind der Fass-Goblin.
   - Wolpertinger: das Schaf.
-  - Aus dem Tiny RPG Character Pack (`asset-pack/Assets/Tiny RPG …`, dreifach
-    vergrößert auf eine Bildfläche von 192, Namen `rpg_…`): Schleime
+  - Aus dem Tiny RPG Character Pack (`asset-pack/Assets/Tiny RPG …`, drei-
+    oder vierfach vergrößert auf eine Bildfläche von 192, Namen `rpg_…`): Schleime
     (umgefärbt), Fledermaus, Skelette (Ghul, Moorleiche, Kellermeister,
     Schleusenwärter), Orks (Troll-Lehrling, Morlock, Schwarzmarkt-Oger),
     Werbär (Brückentroll), Werwolf (Hunde), Totenbeschwörer (Nachtmahr),
     Zauberer (Kanalhexe), Axtkämpfer (Abtrünniger Crawler), Ork-Reiter (Schmuggler-Kobold). Die anderen
     Crawler sind Ritter, Templer, Soldat, Schwertkämpfer, Bogenschützin,
     Lanzenreiter, Priester, Magier oder Arbeiter, je Crawler fest (`Sprites.crawler_sprite`).
-  - Royal Mage (`asset-pack/Assets/Royal Mage Sprite Sheet.png`, zweifach
+  - Royal Mage (`asset-pack/Assets/Royal Mage Sprite Sheet.png`, dreifach
     vergrößert, Name `magier`): einer der anderen Crawler. Seine Zauberkugel
     (`fx/zauber_flug`, acht Bilder, in Flugrichtung gedreht) ist das Geschoss
     aller magischen Angriffe, `fx/zauber_treffer` der Aufschlag.
+- Angriffe: Jede Pack-Figur hat Angriffsbilder (`Name_angriff1 …`): Schlag,
+  Wurf, Schuss, Zauber; die Spielfigur sticht mit dem Messer, ihre
+  Ausrüstung sitzt auch dabei (Anker je Bild). Angriffsbilder liegen auf
+  einer größeren Fläche (192 statt 128, Tiny RPG 256 statt 192), die Füße
+  gleich weit über dem unteren Rand; `map_view._figure` gleicht das aus. Der
+  Animator merkt sich Beginn und Richtung jedes Angriffs (`attack_frame`,
+  `attack_dir`), 70 ms je Bild. Selbst gebaute Kreaturen machen weiter nur
+  den Ausfallschritt.
+- Größen: Tiny-RPG-Menschen und der Magier dreifach, kleine Skelette, Orks
+  und Werbär vierfach vergrößert, damit sie neben der Spielfigur stimmen.
 - Übrige Kreaturen und Bosse (Tiere, Schleime, Geräte wie Toaster, Waschmaschine, Parkautomat und Rohrgolem …) gibt es im Pack
   nicht. Sie sind aus Formen gebaut (`tools/ts_figures.gd`) und werden von
   `TsRender` wie die Pack-Figuren schattiert: dicker Nachtblau-Umriss, feine

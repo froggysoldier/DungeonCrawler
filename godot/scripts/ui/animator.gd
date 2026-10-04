@@ -12,9 +12,13 @@ const FLASH_MS := 110.0
 const BURST_MS := 650.0
 const SHAKE_MS := 180.0
 const SPARKLE_MS := 1200.0
+## Angriffsbilder der Pack-Figuren: so lange je Bild.
+const ATTACK_FRAME_MS := 70.0
 
 var _tweens: Dictionary = {}
 var _lunges: Dictionary = {}
+## Laufende Angriffe (Schlag, Wurf, Zauber): Figur -> Beginn und Richtung.
+var _attacks: Dictionary = {}
 var _flashes: Dictionary = {}
 var _bursts: Array = []
 var _shake: Dictionary = {}
@@ -82,6 +86,9 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 				var a := Vector2(f.from.x, f.from.y)
 				var b := Vector2(f.to.x, f.to.y)
 				var dur := maxf(120.0, a.distance_to(b) * 45)
+				var shooter = at_key.get("%d,%d" % [f.from.x, f.from.y])
+				if shooter != null and a != b:
+					_attacks[shooter] = {"start": now + delay, "dir": (b - a).normalized()}
 				_shots.append({"from": a, "to": b, "start": now + delay, "dur": dur, "style": f.style})
 				if f.style in ["bombe", "feuer", "magie"]:
 					var kind: String = {"bombe": "explosion", "feuer": "feuer", "magie": "zauber"}[f.style]
@@ -93,6 +100,7 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 				var d := Vector2(f.to.x - f.from.x, f.to.y - f.from.y)
 				if key != null and d != Vector2.ZERO:
 					_lunges[key] = {"dir": d.normalized(), "start": now + delay, "dur": LUNGE_MS}
+					_attacks[key] = {"start": now + delay, "dir": d.normalized()}
 					arrival["%d,%d" % [f.to.x, f.to.y]] = now + delay + LUNGE_MS * 0.5
 			"hit":
 				var tile := "%d,%d" % [f.at.x, f.at.y]
@@ -144,6 +152,27 @@ func lunge(key: String, now: float = -1.0) -> Vector2:
 	if k < 0:
 		return Vector2.ZERO
 	return (l.dir as Vector2) * 0.3 * sin(k * PI)
+
+
+## Welches Angriffsbild (0 …) eine Figur mit frames Angriffsbildern gerade
+## zeigt, -1 außerhalb eines Angriffs.
+func attack_frame(key: String, frames: int, now: float = -1.0) -> int:
+	var a = _attacks.get(key)
+	if a == null or frames <= 0:
+		return -1
+	if now < 0:
+		now = now_ms()
+	var i := floori((now - a.start) / ATTACK_FRAME_MS)
+	if i >= frames:
+		_attacks.erase(key)
+		return -1
+	return i if i >= 0 else -1
+
+
+## Richtung des laufenden Angriffs (null ohne Angriff).
+func attack_dir(key: String) -> Variant:
+	var a = _attacks.get(key)
+	return null if a == null else a.dir
 
 
 ## Blitzt die Figur gerade auf (getroffen)?
@@ -249,6 +278,7 @@ func reset() -> void:
 	_shots.clear()
 	_floaters.clear()
 	_lunges.clear()
+	_attacks.clear()
 	_flashes.clear()
 	_bursts.clear()
 	_sparkles.clear()
