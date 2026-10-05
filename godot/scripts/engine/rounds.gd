@@ -13,6 +13,8 @@ extends RefCounted
 ## "acted": Aktion verbraucht}.
 
 const BASE_MOVE := 6
+## Haustier und Gruppe laufen pro Runde bis zu so viele Felder.
+const ALLY_SPEED := 5
 
 
 ## Läuft gerade eine Kampfrunde?

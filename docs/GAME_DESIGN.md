@@ -135,7 +135,9 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   und Bewegung verbraucht sind, oder wenn man eine zweite Aktion wählt (die
   zählt dann schon zur nächsten Runde): dann laufen die Gegner bis zu ihrer Reichweite
   heran (4 Felder, klein 5, riesig 3, schnell +2, fliegend +1; Fernkämpfer nur,
-  bis sie schießen können) und greifen an. Eine Runde ist ein Zug (3 Minuten).
+  bis sie schießen können) und greifen an. Haustier und Gruppenmitglieder
+  laufen ebenfalls bis zu 5 Felder zum bedrohlichsten Gegner oder dir hinterher.
+  Eine Runde ist ein Zug (3 Minuten).
   Darunter wird weiter in Feldern gerechnet. Am Ende zeigt ein Banner die
   Bilanz (Züge, Besiegte, Erfahrung, verlorene Lebenspunkte).
 - **Figuren:** Crawler und Monster sind gezeichnete Kreaturen (Ratte,

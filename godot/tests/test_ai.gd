@@ -138,3 +138,21 @@ func test_kampfrunden(t) -> void:
 	s.monsters = []
 	Game.wait(s)
 	t.ok(not Rounds.active(s), "Kampf vorbei")
+
+
+func test_haustier_laeuft_in_der_runde(t) -> void:
+	var s := TH.make(9100, {"beruf": 1})
+	var at := _arena(s)
+	var ghul := _spawn(s, "ghul", 2, at.call(4))
+	ghul.aware = true
+	s.monsters = [ghul]
+	var pet := Extras.make_pet_of("Katze", "Minka")
+	pet.pos = at.call(1)
+	s.player.pet = pet
+	Ai.pet_close_in(s, Rounds.ALLY_SPEED - 1)
+	t.eq(J.cheb(pet.pos, ghul.pos), 1, "Haustier läuft zum Gegner")
+	# Ohne Gegner holt es den Crawler in einer Runde ein
+	s.monsters = []
+	pet.pos = at.call(4)
+	Ai.pet_close_in(s, Rounds.ALLY_SPEED - 1)
+	t.le(J.cheb(pet.pos, s.player.pos), 2, "Haustier folgt mehrere Felder")

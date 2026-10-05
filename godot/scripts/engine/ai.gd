@@ -458,6 +458,35 @@ static func _monster_turn(s: Dictionary, m: Dictionary) -> void:
 		_step_toward(s, m, p.pos)
 
 
+## In der Kampfrunde läuft das Haustier wie die Gegner mehrere Felder: zu
+## einem Gegner, der den Crawler bedroht, sonst hinter dem Crawler her.
+static func pet_close_in(s: Dictionary, steps: int) -> void:
+	var pet = s.player.pet
+	if pet == null or not pet.alive:
+		return
+	var p: Dictionary = s.player
+	for k in steps:
+		if s.status != "playing":
+			return
+		if J.some(s.monsters, func(m): return J.cheb(m.pos, pet.pos) <= 1 and not Combat.is_in_safe_room(s, m.pos)):
+			return
+		var threats: Array = s.monsters.filter(func(m): return m.aware and J.cheb(m.pos, p.pos) <= 4 and J.cheb(m.pos, pet.pos) <= 8 and not Combat.is_in_safe_room(s, m.pos))
+		var goal = null
+		if not threats.is_empty():
+			J.sort(threats, func(a, b): return J.cheb(a.pos, pet.pos) - J.cheb(b.pos, pet.pos))
+			goal = threats[0].pos
+		elif J.cheb(pet.pos, p.pos) > 2:
+			goal = p.pos
+		if goal == null:
+			return
+		var g: Dictionary = goal
+		var path = Pathfinding.find_path(s.map, pet.pos, g, func(x, y): return not occupied(s, J.pos(x, y)) or (x == g.x and y == g.y), 120)
+		var next = path[0] if path != null and not path.is_empty() else null
+		if next == null or occupied(s, next):
+			return
+		pet.pos = next
+
+
 static func pet_turn(s: Dictionary) -> void:
 	var pet = s.player.pet
 	if pet == null or not pet.alive or s.status != "playing":

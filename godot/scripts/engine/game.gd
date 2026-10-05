@@ -567,6 +567,9 @@ static func end_turn(s: Dictionary, keep_move_dir: bool = false, kind: String = 
 		Ai.monster_turn(s, m)
 		if not is_same(m.pos, from):
 			Traps.on_monster_step(s, m)
+	if fighting:
+		Ai.pet_close_in(s, Rounds.ALLY_SPEED - 1)
+		Crawlers.close_in(s, Rounds.ALLY_SPEED - 1)
 	Ai.pet_turn(s)
 	Crawlers.turn(s)
 	# In der Grube wartet die Etage: keine Aufträge, die scheitern könnten

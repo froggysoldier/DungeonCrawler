@@ -373,6 +373,27 @@ static func _step_toward(s: Dictionary, c: Dictionary, goal: Dictionary, max_len
 		c.pos = next
 
 
+## In der Kampfrunde laufen Gruppenmitglieder mehrere Felder: zum Gegner,
+## der den Crawler bedroht, sonst hinter ihm her.
+static func close_in(s: Dictionary, steps: int) -> void:
+	for c in crawlers(s):
+		if not c.alive or not c.party:
+			continue
+		for k in steps:
+			if s.status != "playing":
+				return
+			if J.some(s.monsters, func(m): return J.cheb(m.pos, c.pos) <= 1 and not Combat.is_in_safe_room(s, m.pos)):
+				break
+			var from: Dictionary = J.pcopy(c.pos)
+			var threat = J.find(s.monsters, func(m): return m.aware and J.cheb(m.pos, s.player.pos) <= 3 and J.cheb(m.pos, c.pos) <= 6)
+			if threat != null:
+				_step_toward(s, c, threat.pos, 120)
+			elif J.cheb(c.pos, s.player.pos) > 2:
+				_step_toward(s, c, s.player.pos, 400)
+			if c.pos.x == from.x and c.pos.y == from.y:
+				break
+
+
 ## Alle NPC-Crawler handeln einmal.
 static func turn(s: Dictionary) -> void:
 	if s.status != "playing":
