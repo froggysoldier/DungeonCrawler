@@ -312,6 +312,32 @@ func _initialize() -> void:
 				await shot("ausruestung_tooltip")
 				quit()
 				return
+			if mode == "kampfweg":
+				# Kampfrunde: Gegner in einiger Entfernung, Maus darauf (Weg bis neben ihn),
+				# dann Runde beenden und mitten in seinem Lauf fotografieren
+				gv.meta["guide"] = {"step": 99, "fight": true}
+				TH.tutorial(s)
+				var r := TH.ready(s, 9)
+				TH.teleport(s, {"x": r.x, "y": r.y + 1})
+				var ghul := Monsters.spawn_monster(s, Db.monster("ghul"), 1, {"x": r.x + 6, "y": r.y + 2}, 0)
+				ghul.aware = true
+				s.monsters = [ghul]
+				Game.after_move(s)
+				Rounds.after_turn(s)
+				s.pendingDialogs.clear()
+				Modals.instance.close_all()
+				gv.anim.reset()
+				gv.refresh()
+				gv.hover = Vector2i(ghul.pos.x, ghul.pos.y)
+				await wait(0.6)
+				await shot("kampfweg")
+				gv.hover = null
+				gv.act(func(): return Game.wait(s))
+				Modals.instance.close_all()
+				await wait(0.25)
+				await shot("kampfweg_lauf")
+				quit()
+				return
 			if mode == "tutorial":
 				# Interaktives Tutorial: Schritt STEP (Standard 6: Inventar)
 				gv.meta["guide"] = {"step": int(OS.get_environment("STEP")) if OS.get_environment("STEP") != "" else 6, "fight": false}
@@ -344,6 +370,10 @@ func _initialize() -> void:
 								best = q
 				if best != null:
 					gv.hover = Vector2i(best.x, best.y)
+				# Im Kampf: Maus auf den nächsten Gegner (Weg bis neben ihn)
+				if mode == "combat" and not gv.combat_targets().is_empty():
+					var foe: Dictionary = gv.combat_targets()[0]
+					gv.hover = Vector2i(foe.pos.x, foe.pos.y)
 				await wait(0.3)
 				await shot(mode)
 	quit()

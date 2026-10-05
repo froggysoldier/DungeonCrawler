@@ -88,6 +88,13 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 		if from == null or from == to:
 			continue
 		var jump := maxf(absf(to.x - from.x), absf(to.y - from.y))
+		# Mehrere Felder auf einmal (Kampfrunde): den echten Weg entlang,
+		# geglättet, im gleichen Tempo wie ein Schritt
+		if jump > 1:
+			var pts := _trail(s, prev, from, to, jump)
+			if pts.size() > 1:
+				_tweens[key] = {"pts": pts, "start": now, "dur": maxf(30.0, STEP_MS * FreeMove.length(pts))}
+				continue
 		if jump > 3:
 			_tweens.erase(key)
 			continue
@@ -156,6 +163,22 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 				_floaters.append({"at": Vector2(f.at.x, f.at.y), "text": f.text, "color": f.color, "start": t0 + n * 260, "dur": 900.0})
 
 
+## Weg einer Figur über mehrere Felder (Linienzug ab prev) oder leer, wenn
+## es keinen sinnvollen gibt (Sprung, Teleport): dann wie bisher.
+static func _trail(s: Dictionary, prev: Vector2, from: Vector2, to: Vector2, jump: float) -> Array:
+	if s.is_empty() or not s.has("map") or jump > 12:
+		return []
+	var m: Dictionary = s.map
+	var path = Pathfinding.find_path(m, J.pos(int(from.x), int(from.y)), J.pos(int(to.x), int(to.y)), Callable(), 600, true)
+	if not (path is Array) or path.is_empty():
+		# Geister ohne Weg durch die Wände nehmen den geraden Weg
+		return [prev, to] if jump <= 8 else []
+	# Länger als eine Runde Laufen (Teleport, Rückweg durchs halbe Haus): springen
+	if path.size() > 14:
+		return []
+	return FreeMove.smooth(s, prev, path)
+
+
 func draw_pos(key: String, fallback: Vector2, now: float = -1.0) -> Vector2:
 	if key == "p" and free != null:
 		return free
@@ -165,6 +188,11 @@ func draw_pos(key: String, fallback: Vector2, now: float = -1.0) -> Vector2:
 	if now < 0:
 		now = now_ms()
 	var k := minf(1.0, (now - t.start) / t.dur)
+	if t.has("pts"):
+		if k >= 1:
+			_tweens.erase(key)
+			return t.pts[-1]
+		return FreeMove.point_at(t.pts, maxf(0.0, k) * FreeMove.length(t.pts))
 	if k >= 1:
 		_tweens.erase(key)
 		return t.to

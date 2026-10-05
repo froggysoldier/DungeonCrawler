@@ -125,8 +125,13 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   linke Maustaste folgt der Maus, Pfeiltasten laufen frei (zwei zugleich
   schräg), an Wänden gleitet man entlang. Im Hintergrund rechnet das Spiel in
   Feldern: Betritt die Figur ein neues Feld, ist das ein Schritt. Die
-  Vorschau ist eine gepunktete Linie mit Länge in Metern (ein Feld = 1,5 m).
-  Klick-Reisen öffnen Türen unterwegs.
+  Vorschau ist eine gepunktete Linie mit Länge in Metern (ein Feld = 1,5 m);
+  über einem Gegner zeigt sie den Weg bis neben ihn („Angriff · 6 m“).
+  Klick-Reisen öffnen Türen unterwegs. Gegner, Haustier und Gruppe, die in
+  einer Kampfrunde mehrere Felder laufen, gleiten den echten Weg entlang
+  (geglättet, um Ecken statt durch Wände). Andere Figuren stehen je etwas
+  versetzt statt genau in der Feldmitte, damit sie sich nicht im Raster
+  aufreihen.
 - **Untersuchen ohne Hinlaufen:** Ein Klick auf Gegenstände, Möbel, Fallen
   oder die Treppe zeigt eine Info-Karte; erst der zweite Klick läuft hin.
 - **Kampfmodus in Runden (wie Baldur's Gate):** Sobald ein wacher Gegner

@@ -407,19 +407,13 @@ func _process(delta: float) -> void:
 
 func _draw_frame() -> void:
 	var path: Variant = null
-	if hover != null and not traveling and held.is_empty() and not _mouse_follow and Ai.monster_at(s, _pos(hover)) == null and s.status == "playing":
-		var key := "%d,%d|%d,%d|%d" % [hover.x, hover.y, s.player.pos.x, s.player.pos.y, s.turn]
+	var attack := false
+	if hover != null and not traveling and held.is_empty() and not _mouse_follow and s.status == "playing":
+		var key := "%d,%d|%d,%d|%d|%s" % [hover.x, hover.y, s.player.pos.x, s.player.pos.y, s.turn, part]
 		if _path_cache.key != key:
-			var m: Dictionary = s.map
-			var inside: bool = hover.x >= 0 and hover.y >= 0 and hover.x < m.width and hover.y < m.height
-			var ok := false
-			if inside:
-				var i := MapGen.idx(m, hover.x, hover.y)
-				ok = m.explored[i] and (MapGen.is_walkable(m, hover.x, hover.y) or MapGen.tile_at(m, hover.x, hover.y) == "door")
-			var grid = Game.plan_path(s, _pos(hover)) if ok else null
-			var pts: Array = FreeMove.smooth(s, _pos_now(), grid) if grid is Array and not grid.is_empty() else []
-			_path_cache = {"key": key, "path": grid, "pts": pts}
+			_path_cache = _plan_preview(key)
 		path = _path_cache.path
+		attack = _path_cache.get("attack", false)
 	map.hover = hover
 	map.path = path
 	map.path_pts = _path_cache.get("pts", []) if path != null else []
@@ -428,7 +422,7 @@ func _draw_frame() -> void:
 	map.path_label = ""
 	if path != null and not map.path_pts.is_empty():
 		var steps: int = (path as Array).size()
-		map.path_label = FreeMove.meters(steps)
+		map.path_label = ("Angriff · %s" % FreeMove.meters(steps)) if attack else FreeMove.meters(steps)
 		if in_combat():
 			var left := int(s.round.move)
 			map.path_ok = FreeMove.length(map.path_pts) * minf(1.0, float(left) / steps)
@@ -436,6 +430,34 @@ func _draw_frame() -> void:
 	var room = Game.current_room(s)
 	_room_label.text = room.name if room != null else "Gang"
 	_draw_minimap()
+
+
+## Wegvorschau zum Feld unter der Maus. Über einem Gegner: der Weg bis
+## neben ihn (hinlaufen und zuschlagen), sofern es ein Nahkampfangriff ist.
+func _plan_preview(key: String) -> Dictionary:
+	var out := {"key": key, "path": null, "pts": []}
+	var m: Dictionary = s.map
+	if not MapGen.in_bounds(m, hover.x, hover.y):
+		return out
+	var i := MapGen.idx(m, hover.x, hover.y)
+	if not m.explored[i]:
+		return out
+	var tp := _pos(hover)
+	var mon = Ai.monster_at(s, tp)
+	var grid: Variant = null
+	if mon != null:
+		if not _vis_now().has(i) or part == "wurf" or Fov.chebyshev(tp, s.player.pos) <= 1:
+			return out
+		grid = Game.plan_path(s, tp)
+		if grid is Array and not grid.is_empty():
+			grid = (grid as Array).slice(0, (grid as Array).size() - 1)
+		out.attack = true
+	elif MapGen.is_walkable(m, hover.x, hover.y) or MapGen.tile_at(m, hover.x, hover.y) == "door":
+		grid = Game.plan_path(s, tp)
+	if grid is Array and not grid.is_empty():
+		out.path = grid
+		out.pts = FreeMove.smooth(s, _pos_now(), grid)
+	return out
 
 
 static func _pos(v: Variant) -> Dictionary:
@@ -1473,7 +1495,7 @@ func refresh_side() -> void:
 		var active: bool = tab_open and tab == id
 		var b := Kit.button(_tabs, t[1], func(): show_tab(id), "TabActive" if active else "TabButton", false, "%s ausklappen (Taste %s)" % [t[1], t[2]])
 		tab_buttons[id] = b
-		b.custom_minimum_size.x = 92
+		b.custom_minimum_size.x = 76
 		var badge := tab_badge(id)
 		b.draw.connect(func():
 			if active:

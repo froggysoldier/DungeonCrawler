@@ -278,7 +278,16 @@ func _at(key: String, p: Dictionary) -> Vector2:
 	if anim == null:
 		return v
 	var now: float = frame_anim.get("now", -1.0)
-	return anim.draw_pos(key, v, now) + anim.lunge(key, now)
+	return anim.draw_pos(key, v, now) + anim.lunge(key, now) + nudge(key)
+
+
+## Andere Figuren stehen nicht genau in der Feldmitte, sondern jede etwas
+## versetzt (fest je Figur): So reihen sie sich nicht im Raster auf.
+static func nudge(key: String) -> Vector2:
+	if key == "p":
+		return Vector2.ZERO
+	var h := absi(key.hash())
+	return Vector2(float(h % 9 - 4) * 0.035, float((h / 9) % 7 - 3) * 0.03)
 
 
 ## Kreaturen mit zweitem Bild: flatternd oder schwebend (immer) und laufend (nur in Bewegung).
