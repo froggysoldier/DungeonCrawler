@@ -122,7 +122,9 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 	if Rounds.active(s):
 		var rh := Kit.hbox(outer, 10)
 		var left := int(s.round.move)
-		var info := Kit.text(rh, "[b]Runde %d[/b]   Bewegung: [color=#8cc8ff][b]%d[/b] von %d Feldern[/color]   Aktion: [color=#6ee07a]bereit[/color]   [color=#8b8f99]Klick auf ein blaues Feld läuft dorthin, Klick auf einen Gegner läuft hin und greift an.[/color]" % [int(s.round.n), left, int(s.round.max)], 13)
+		var acted: bool = s.round.get("acted", false)
+		var act_bb := "[color=#e0a040]verbraucht[/color]   [color=#8b8f99]Du kannst noch laufen oder die Runde beenden. Ein weiterer Angriff beginnt die nächste Runde.[/color]" if acted else "[color=#6ee07a]bereit[/color]   [color=#8b8f99]Klick auf ein blaues Feld läuft dorthin, Klick auf einen Gegner läuft hin und greift an.[/color]"
+		var info := Kit.text(rh, "[b]Runde %d[/b]   Bewegung: [color=#8cc8ff][b]%d[/b] von %d Feldern[/color]   Aktion: %s" % [int(s.round.n), left, int(s.round.max), act_bb], 13)
 		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		Kit.kbutton(rh, "Runde beenden", "Leer", func(): gv.act(func(): return Game.wait(s)), "Button")
 	var cols := HBoxContainer.new()

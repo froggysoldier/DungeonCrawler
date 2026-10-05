@@ -123,6 +123,17 @@ func test_kampfrunden(t) -> void:
 	t.ge(before - J.cheb(ghul.pos, s.player.pos), mini(2, before - 1), "Gegner kommt mehrere Felder näher")
 	if Rounds.active(s):
 		t.eq(int(s.round.move), int(s.round.max), "neue Runde, voller Vorrat")
+	# Nach der Aktion darf man weiterlaufen; die Runde endet erst danach
+	if Rounds.active(s):
+		var n0: int = s.round.n
+		var foe = s.monsters[0] if not s.monsters.is_empty() else null
+		if foe != null:
+			s.player.pos = MapGen.free_beside(s.map, foe.pos) if MapGen.free_beside(s.map, foe.pos) != null else s.player.pos
+			if J.cheb(s.player.pos, foe.pos) <= 1:
+				Game.attack(s, foe.uid, {"part": "faust", "move": "normal"})
+				if Rounds.active(s) and J.has_same(s.monsters, foe):
+					t.eq(int(s.round.n), n0, "Angriff beendet die Runde nicht")
+					t.ok(s.round.acted, "Aktion verbraucht")
 	# Ohne Gegner endet der Kampf
 	s.monsters = []
 	Game.wait(s)

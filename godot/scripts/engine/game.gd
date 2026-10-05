@@ -494,6 +494,9 @@ static func attack(s: Dictionary, target_uid: String, t: Dictionary) -> Dictiona
 		return _fail("Das Spiel ist vorbei.")
 	if s.pendingSelection:
 		return _fail(SELECT_FIRST)
+	Rounds.before_action(s)
+	if s.status != "playing":
+		return _fail("Das Spiel ist vorbei.")
 	var m = J.find(s.monsters, func(x): return x.uid == target_uid)
 	if m == null:
 		return _fail("Kein Ziel.")
@@ -509,6 +512,9 @@ static func defend(s: Dictionary) -> Dictionary:
 		return _fail("Das Spiel ist vorbei.")
 	if s.pendingSelection:
 		return _fail(SELECT_FIRST)
+	Rounds.before_action(s)
+	if s.status != "playing":
+		return _fail("Das Spiel ist vorbei.")
 	var p: Dictionary = s.player
 	p.buffs = p.buffs.filter(func(b): return b.name != "Deckung")
 	var guard := Player.skill_level(s, "abwehr")
@@ -526,17 +532,18 @@ static func wait(s: Dictionary) -> Dictionary:
 		return _fail(SELECT_FIRST)
 	if Conditions.clear_player(s, "brennen"):
 		Log.add(s, "Du wirfst dich zu Boden und wälzt dich, bis die Flammen erstickt sind.", "info")
-		end_turn(s)
+		end_turn(s, false, "end")
 		return _ok()
 	s.player.ausdauer = mini(Player.max_ausdauer(s), s.player.ausdauer + 1)
 	# Wer wartet, sieht sich um: Geheimtüren in der Nähe fallen eher auf
 	Dungeon.detect(s, visible_tiles(s))
-	end_turn(s)
+	# Im Kampf: Runde beenden
+	end_turn(s, false, "end")
 	return _ok()
 
 
-## Ende eines Zuges. kind: "move" (Schritt; im Kampf zehrt er nur am
-## Bewegungsvorrat der Runde), sonst eine Aktion, die die Runde beendet.
+## Ende eines Zuges. kind (siehe Rounds.spend): "move" (Schritt), "action"
+## oder "end". Im Kampf geht die Zeit erst weiter, wenn die Runde endet.
 static func end_turn(s: Dictionary, keep_move_dir: bool = false, kind: String = "action") -> void:
 	if not keep_move_dir:
 		s.player.lastMoveDir = null
@@ -940,6 +947,9 @@ static func _apply_effect(s: Dictionary, e: Dictionary, is_food: bool) -> void:
 
 
 static func use_item(s: Dictionary, uid: String) -> Dictionary:
+	Rounds.before_action(s)
+	if s.status != "playing":
+		return _fail("Das Spiel ist vorbei.")
 	var owned = _find_owned(s, uid)
 	if owned == null:
 		return _fail("Nicht gefunden.")
@@ -1261,6 +1271,9 @@ static func cast(s: Dictionary, spell_id: String, opts: Dictionary = {}) -> Dict
 		return _fail("Das Spiel ist vorbei.")
 	if s.pendingSelection:
 		return _fail(SELECT_FIRST)
+	Rounds.before_action(s)
+	if s.status != "playing":
+		return _fail("Das Spiel ist vorbei.")
 	var res := Magic.cast_spell(s, spell_id, opts)
 	if not res.ok:
 		return _fail(res.get("message", "Das geht nicht."))

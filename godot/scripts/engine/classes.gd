@@ -152,6 +152,9 @@ static func use_ability(s: Dictionary, technique: Dictionary) -> Dictionary:
 	var ab = current_ability(s)
 	if ab == null:
 		return {"ok": false, "message": "Du hast noch keine Klasse."}
+	Rounds.before_action(s)
+	if s.status != "playing":
+		return {"ok": false, "message": "Das Spiel ist vorbei."}
 	var p: Dictionary = s.player
 	if J.num(p, "abilityCooldown") > 0:
 		return {"ok": false, "message": "%s lädt noch (%s Züge)." % [ab.name, J.s(p.abilityCooldown)]}

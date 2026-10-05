@@ -2,13 +2,15 @@ class_name Rounds
 extends RefCounted
 ## Kampfrunden wie in Baldur's Gate: Sobald ein wacher Gegner den Crawler
 ## sieht, läuft der Kampf in Runden. Pro Runde gibt es einen Bewegungsvorrat
-## (Felder) und eine Aktion. Schritte innerhalb des Vorrats kosten keine
-## Spielzeit, die Gegner warten. Die Aktion (Angriff, Zauber, Gegenstand,
-## Deckung, Warten) beendet die Runde; dann sind die Gegner dran, laufen bis
-## zu ihrer Reichweite und greifen an. Außerhalb des Kampfes ist jeder
-## Schritt ein Zug wie bisher.
+## (Felder) und eine Aktion (Angriff, Zauber, Gegenstand, Deckung). Schritte
+## innerhalb des Vorrats kosten keine Spielzeit, die Gegner warten; auch nach
+## der Aktion darf man mit der übrigen Bewegung weiterlaufen. Die Runde endet
+## mit „Runde beenden“ (Warten) oder von selbst, wenn Aktion und Bewegung
+## verbraucht sind. Dann sind die Gegner dran, laufen bis zu ihrer Reichweite
+## und greifen an. Außerhalb des Kampfes ist jeder Schritt ein Zug wie bisher.
 ##
-## Zustand: s.round = {"move": übrige Felder, "max": Vorrat, "n": Runde}.
+## Zustand: s.round = {"move": übrige Felder, "max": Vorrat, "n": Runde,
+## "acted": Aktion verbraucht}.
 
 const BASE_MOVE := 6
 
@@ -49,7 +51,7 @@ static func after_turn(s: Dictionary) -> void:
 	if in_combat(s):
 		var first := not active(s)
 		var n := budget(s)
-		s.round = {"move": n, "max": n, "n": 1 if first else int(s.round.n) + 1}
+		s.round = {"move": n, "max": n, "n": 1 if first else int(s.round.n) + 1, "acted": false}
 		if first:
 			Log.add(s, "Kampf! Ab jetzt in Runden: pro Runde bis zu %d Felder Bewegung und eine Aktion." % n, "gefahr")
 	elif active(s):
@@ -62,18 +64,34 @@ static func can_move(s: Dictionary) -> bool:
 	return not active(s) or int(s.round.move) > 0
 
 
-## Kostet die Handlung die Runde? Schritte nicht (sie zehren am Vorrat),
-## alles andere schon. Nach einem Schritt ohne sichtbaren Gegner endet der Kampf.
+## Endet mit dieser Handlung die Runde? kind: "move" (ein Schritt),
+## "action" (Angriff, Zauber, Gegenstand …), "end" (Runde beenden).
+## Ohne Kampf endet jede Handlung den Zug. Nach einem Schritt ohne sichtbaren
+## Gegner endet der Kampf.
 static func spend(s: Dictionary, kind: String) -> bool:
 	if not active(s):
 		return true
-	if kind == "move":
-		s.round.move = maxi(0, int(s.round.move) - 1)
-		if not in_combat(s):
-			s.erase("round")
-			Log.add(s, "Der Kampf ist vorbei. Du bewegst dich wieder frei.", "system")
-		return false
+	match kind:
+		"move":
+			s.round.move = maxi(0, int(s.round.move) - 1)
+			if not in_combat(s):
+				s.erase("round")
+				Log.add(s, "Der Kampf ist vorbei. Du bewegst dich wieder frei.", "system")
+				return false
+			return bool(s.round.get("acted", false)) and int(s.round.move) <= 0
+		"action":
+			if s.round.get("acted", false):
+				return true
+			s.round.acted = true
+			return int(s.round.move) <= 0
 	return true
+
+
+## Vor einer Aktion: Ist die Aktion dieser Runde schon verbraucht, endet die
+## Runde zuerst (die Gegner sind dran), dann folgt die Aktion in der neuen.
+static func before_action(s: Dictionary) -> void:
+	if active(s) and s.round.get("acted", false):
+		Game.end_turn(s, false, "end")
 
 
 ## Wie weit ein Gegner in seiner Runde läuft.

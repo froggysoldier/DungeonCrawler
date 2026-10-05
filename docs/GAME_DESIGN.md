@@ -129,8 +129,11 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   auf der Karte blau eingefärbt, und eine Aktion (Angriff, Zauber, Gegenstand,
   Deckung, Warten). Ein Klick auf ein blaues Feld läuft am Stück hin; ein
   Klick auf einen Gegner läuft hin und greift an, wenn die Bewegung reicht.
-  Schritte kosten keine Spielzeit, die Gegner warten. Die Aktion oder die
-  Leertaste beendet die Runde: dann laufen die Gegner bis zu ihrer Reichweite
+  Schritte kosten keine Spielzeit, die Gegner warten. Auch nach der Aktion
+  darf man mit der übrigen Bewegung weiterlaufen (zuschlagen und zurückweichen).
+  Die Runde endet mit der Leertaste („Runde beenden“), von selbst, wenn Aktion
+  und Bewegung verbraucht sind, oder wenn man eine zweite Aktion wählt (die
+  zählt dann schon zur nächsten Runde): dann laufen die Gegner bis zu ihrer Reichweite
   heran (4 Felder, klein 5, riesig 3, schnell +2, fliegend +1; Fernkämpfer nur,
   bis sie schießen können) und greifen an. Eine Runde ist ein Zug (3 Minuten).
   Darunter wird weiter in Feldern gerechnet. Am Ende zeigt ein Banner die
