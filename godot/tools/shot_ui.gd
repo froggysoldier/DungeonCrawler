@@ -297,9 +297,9 @@ func _initialize() -> void:
 				s.monsters = []
 				gv.zoom_map(10)
 				gv.refresh_here()
-				for t in ["inventar", "crawler"]:
-					gv.tab = t
-					gv.refresh_side()
+				gv.folds["item:%s" % s.player.inventory[0].uid] = true
+				for t in ["inventar", "ausruestung", "crawler"]:
+					gv.open_tab(t)
 					await wait(0.4)
 					await shot("ausruestung_" + t)
 					if t == "inventar":
@@ -312,6 +312,13 @@ func _initialize() -> void:
 				await shot("ausruestung_tooltip")
 				quit()
 				return
+			if mode == "tutorial":
+				# Interaktives Tutorial: Schritt STEP (Standard 6: Inventar)
+				gv.meta["guide"] = {"step": int(OS.get_environment("STEP")) if OS.get_environment("STEP") != "" else 6, "fight": false}
+				await wait(0.8)
+				await shot("tutorial")
+				quit()
+				return
 			if mode == "walk" or mode == "tabs" or mode == "combat":
 				# Ein paar Schritte in Richtung eines Gegners oder zufällig
 				for i in 40:
@@ -322,11 +329,21 @@ func _initialize() -> void:
 					await wait(0.05)
 				await wait(1.0)
 			if mode == "tabs":
-				for t in ["crawler", "ziele", "inventar", "handwerk", "skills", "erfolge"]:
-					gv.tab = t
-					gv.refresh_side()
+				for t in ["crawler", "ziele", "inventar", "ausruestung", "handwerk", "skills", "erfolge"]:
+					gv.open_tab(t)
 					await wait(0.3)
 					await shot("tab_" + t)
 			else:
+				# Wegvorschau: Maus auf ein Feld ein paar Schritte entfernt
+				var best = null
+				for dy in range(-5, 6):
+					for dx in range(-6, 7):
+						var q := {"x": s.player.pos.x + dx, "y": s.player.pos.y + dy}
+						if absi(dx) + absi(dy) >= 5 and MapGen.in_bounds(s.map, q.x, q.y) and MapGen.is_walkable(s.map, q.x, q.y) and s.map.explored[MapGen.idx(s.map, q.x, q.y)] and Ai.monster_at(s, q) == null:
+							if best == null or absi(dx) + absi(dy) > absi(best.x - s.player.pos.x) + absi(best.y - s.player.pos.y):
+								best = q
+				if best != null:
+					gv.hover = Vector2i(best.x, best.y)
+				await wait(0.3)
 				await shot(mode)
 	quit()

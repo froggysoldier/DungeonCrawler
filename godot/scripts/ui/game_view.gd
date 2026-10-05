@@ -42,7 +42,15 @@ var inspected: Variant = null
 var traveling := false
 var is_ended := false
 var selecting := false
-var held: Variant = null
+## Gedrückte Richtungstasten (Taste -> Richtung); zwei zugleich gehen schräg.
+var held: Dictionary = {}
+## Klick-Weg: noch anzulaufende Punkte (frei, in Feldern).
+var _route: Array = []
+var _route_fight := false
+var _route_round := -1
+## Nach einem vergeblichen Schritt (Schlamm, festgehalten) kurz warten.
+var _wait_until := 0.0
+var _follow_cache := {"key": "", "pts": []}
 ## Linke Maustaste gedrückt auf der Karte: nach kurzer Zeit folgt die Figur
 ## der Maus, bis ein Kampf beginnt oder die Taste losgelassen wird.
 var _press_at := -1.0
@@ -53,7 +61,6 @@ var _save_due := false
 var _refresh_due := false
 var last_step := 0.0
 var _path_cache := {"key": "", "path": null}
-var _reach_key := ""
 var _minimap_key := ""
 var _last_log_id := -1
 var _typer := Typing.Queue.new()
@@ -89,6 +96,13 @@ var _log: VBoxContainer
 var _log_bar: HBoxContainer
 var _log_prev := {}
 var _banner: Control
+## Für das Tutorial: Knöpfe der Reiter, Einsturz-Anzeige, Menüknopf,
+## wie oft das Rechtsklick-Menü offen war.
+var tab_buttons := {}
+var collapse_pill: Control
+var menu_button: Control
+var context_count := 0
+var guide: Guide
 
 
 func _init(state: Dictionary, meta_state: Dictionary) -> void:
@@ -105,6 +119,8 @@ func _ready() -> void:
 	_build()
 	_typer.on_step = _scroll_log
 	refresh()
+	guide = Guide.new(self)
+	add_child(guide)
 
 
 static func modals() -> Modals:
@@ -220,7 +236,6 @@ func _build() -> void:
 	_drawer = PanelContainer.new()
 	_drawer.theme_type_variation = "Drawer"
 	_drawer.visible = false
-	_drawer.z_index = 4
 	_mapwrap.add_child(_drawer)
 	var dv := Kit.vbox(_drawer, 6)
 	var dh := Kit.hbox(dv, 6)
@@ -242,7 +257,7 @@ func _build() -> void:
 	_tip.theme_type_variation = "Tip"
 	_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tip.visible = false
-	_tip.z_index = 5
+	_tip.z_index = 1
 	_mapwrap.add_child(_tip)
 	_tip_text = Kit.text(_tip, "", 13, null, 4)
 	_tip_text.custom_minimum_size = Vector2(300, 0)
@@ -378,17 +393,10 @@ func zoom_map(delta: int) -> void:
 
 # ---------------------------------------------------------------- Bild für Bild
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	var now := Animator.now_ms()
-	if held != null and not modal_open() and s.status == "playing" and now - last_step >= STEP_MS:
-		if in_combat() and not Rounds.can_move(s):
-			# Bewegung der Runde aufgebraucht
-			held = null
-		else:
-			# Fester Takt (nicht ab "jetzt"), damit die Schritte nahtlos ineinandergehen
-			last_step = maxf(last_step + STEP_MS, now - STEP_MS)
-			step_dir(held.dir)
 	_follow_mouse(now)
+	_move_free(minf(delta, 0.05), now)
 	if not walking():
 		if _refresh_due:
 			_refresh_due = false
@@ -399,7 +407,7 @@ func _process(_delta: float) -> void:
 
 func _draw_frame() -> void:
 	var path: Variant = null
-	if hover != null and not traveling and held == null and Ai.monster_at(s, _pos(hover)) == null and s.status == "playing":
+	if hover != null and not traveling and held.is_empty() and not _mouse_follow and Ai.monster_at(s, _pos(hover)) == null and s.status == "playing":
 		var key := "%d,%d|%d,%d|%d" % [hover.x, hover.y, s.player.pos.x, s.player.pos.y, s.turn]
 		if _path_cache.key != key:
 			var m: Dictionary = s.map
@@ -408,15 +416,22 @@ func _draw_frame() -> void:
 			if inside:
 				var i := MapGen.idx(m, hover.x, hover.y)
 				ok = m.explored[i] and (MapGen.is_walkable(m, hover.x, hover.y) or MapGen.tile_at(m, hover.x, hover.y) == "door")
-			_path_cache = {"key": key, "path": Game.plan_path(s, _pos(hover)) if ok else null}
+			var grid = Game.plan_path(s, _pos(hover)) if ok else null
+			var pts: Array = FreeMove.smooth(s, _pos_now(), grid) if grid is Array and not grid.is_empty() else []
+			_path_cache = {"key": key, "path": grid, "pts": pts}
 		path = _path_cache.path
 	map.hover = hover
 	map.path = path
-	map.selected = inspected
-	var rkey := "%d|%d,%d|%s" % [s.turn, s.player.pos.x, s.player.pos.y, str(s.get("round"))]
-	if _reach_key != rkey:
-		_reach_key = rkey
-		map.reach = reach()
+	map.path_pts = _path_cache.get("pts", []) if path != null else []
+	# Im Kampf: Weg bis zur Reichweite der Runde, Länge in Metern
+	map.path_ok = -1.0
+	map.path_label = ""
+	if path != null and not map.path_pts.is_empty():
+		var steps: int = (path as Array).size()
+		map.path_label = FreeMove.meters(steps)
+		if in_combat():
+			var left := int(s.round.move)
+			map.path_ok = FreeMove.length(map.path_pts) * minf(1.0, float(left) / steps)
 	map.redraw()
 	var room = Game.current_room(s)
 	_room_label.text = room.name if room != null else "Gang"
@@ -445,6 +460,8 @@ func _draw_minimap() -> void:
 
 func toggle_minimap() -> void:
 	minimap_big = not minimap_big
+	if minimap_big:
+		raise_window(_mini_wrap)
 	_minimap_key = ""
 	_draw_minimap()
 
@@ -455,33 +472,6 @@ func toggle_minimap() -> void:
 ## Läuft eine Kampfrunde (siehe Rounds)?
 func in_combat() -> bool:
 	return Rounds.active(s)
-
-
-## Felder, die der Crawler in dieser Kampfrunde noch erreicht (Index -> Schritte).
-func reach() -> Dictionary:
-	if not in_combat():
-		return {}
-	var m: Dictionary = s.map
-	var left := int(s.round.move)
-	var start := MapGen.idx(m, s.player.pos.x, s.player.pos.y)
-	var out := {start: 0}
-	var frontier: Array = [s.player.pos]
-	for step in range(1, left + 1):
-		var next: Array = []
-		for q in frontier:
-			for d in [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]:
-				var n := {"x": q.x + d[0], "y": q.y + d[1]}
-				if not MapGen.in_bounds(m, n.x, n.y):
-					continue
-				var i := MapGen.idx(m, n.x, n.y)
-				if out.has(i) or not m.explored[i] or not Pathfinding.can_step(m, q, n):
-					continue
-				if Ai.monster_at(s, n) != null or MapGen.furniture_at(m, n) != null:
-					continue
-				out[i] = step
-				next.append(n)
-		frontier = next
-	return out
 
 
 ## Sichtbare Felder zum aktuellen Stand (nach einer Aktion sofort neu).
@@ -506,8 +496,8 @@ func _update_combat_mode() -> void:
 	_combat_frame.queue_redraw()
 	if now and fight == null:
 		fight = {"kills": Stats.stat(s, "kills"), "xp": Stats.stat(s, "xp.gesamt"), "turn": s.turn, "hp": s.player.hp}
-		traveling = false
-		held = null
+		_stop_moving()
+		held.clear()
 		var foes := combat_targets().filter(func(m): return m.get("aware", false))
 		var names := J.uniq(foes.map(func(m): return Identify.describe_monster(s, m).name))
 		var who := ("%s und weitere" % ", ".join(names.slice(0, 2))) if names.size() > 2 else " und ".join(names)
@@ -609,7 +599,7 @@ class Banner:
 
 # ---------------------------------------------------------------- Aktionen
 
-## Maustaste gehalten: Schritt für Schritt in festem Takt auf die Maus zu.
+## Maustaste gehalten: nach kurzer Zeit folgt die Figur der Maus (siehe _move_free).
 func _follow_mouse(now: float) -> void:
 	if _press_at < 0:
 		return
@@ -617,27 +607,140 @@ func _follow_mouse(now: float) -> void:
 		_press_at = -1.0
 		_mouse_follow = false
 		return
-	if not _mouse_follow:
-		if now - _press_at < FOLLOW_AFTER_MS:
-			return
+	if not _mouse_follow and now - _press_at >= FOLLOW_AFTER_MS:
 		_mouse_follow = true
-		traveling = false
-		last_step = now - STEP_MS
-	if hover == null or now - last_step < STEP_MS:
+		_stop_moving()
+
+
+# ---------------------------------------------------------------- Freies Laufen
+
+## Wo die Figur gerade steht (frei, in Feldern).
+func _pos_now() -> Vector2:
+	if anim.free != null:
+		return anim.free
+	return anim.draw_pos("p", Vector2(s.player.pos.x, s.player.pos.y))
+
+
+func _stop_moving() -> void:
+	traveling = false
+	_route.clear()
+	anim.free_moving = false
+
+
+## Jedes Bild: Die Figur läuft stufenlos – mit den Pfeiltasten (zwei zugleich
+## schräg), der Maus nach (Taste gehalten) oder einen Klick-Weg entlang.
+## Betritt sie ein neues Feld, macht das Spiel im Hintergrund einen Schritt.
+func _move_free(dt: float, now: float) -> void:
+	if s.status != "playing" or modal_open() or now < _wait_until:
+		anim.free_moving = false
 		return
-	var goal := _pos(hover)
-	if goal.x == s.player.pos.x and goal.y == s.player.pos.y:
+	var pos := _pos_now()
+	var dir := Vector2.ZERO
+	var goal: Variant = null
+	if not held.is_empty():
+		for k in held:
+			dir += Vector2(held[k])
+	elif _mouse_follow:
+		goal = _follow_goal(pos)
+	elif traveling:
+		while not _route.is_empty() and pos.distance_to(_route[0]) < 0.04:
+			_route.pop_front()
+		if _route.is_empty():
+			_stop_moving()
+			return
+		goal = _route[0]
+	var step := FreeMove.SPEED * dt
+	if goal != null:
+		var d: Vector2 = goal - pos
+		if d.length() < 0.02:
+			anim.free_moving = false
+			return
+		dir = d
+		step = minf(step, d.length())
+	if dir == Vector2.ZERO:
+		anim.free_moving = false
 		return
-	var path = Game.plan_path(s, goal)
-	if not (path is Array) or path.is_empty() or Ai.monster_at(s, path[0]) != null:
-		return
-	last_step = maxf(last_step + STEP_MS, now - STEP_MS)
-	act(func(): return Game.move_step(s, path[0]))
+	var nxt := pos + dir.normalized() * minf(step, 0.45)
+	var moved := _try_move(pos, nxt, now)
+	if not moved and (not held.is_empty() or _mouse_follow):
+		# An Wänden entlanggleiten
+		for alt in [Vector2(nxt.x, pos.y), Vector2(pos.x, nxt.y)]:
+			if alt.distance_to(pos) > 0.001 and _try_move(pos, alt, now):
+				moved = true
+				break
+	anim.free_moving = moved
+	if not moved and traveling and now >= _wait_until:
+		_stop_moving()
+
+
+## Ziel beim Folgen der Maus: geradeaus, wenn frei, sonst um die Ecke.
+func _follow_goal(pos: Vector2) -> Variant:
+	var mp := map.pos_from_local(map.get_local_mouse_position())
+	if pos.distance_to(mp) < 0.15:
+		return null
+	if FreeMove.clear_line(s, pos, mp):
+		return mp
+	var t := FreeMove.tile_of(mp)
+	var key := "%d,%d|%d,%d" % [t.x, t.y, s.player.pos.x, s.player.pos.y]
+	if _follow_cache.key != key:
+		var grid = Game.plan_path(s, J.pos(t.x, t.y)) if MapGen.in_bounds(s.map, t.x, t.y) else null
+		_follow_cache = {"key": key, "pts": FreeMove.smooth(s, pos, grid) if grid is Array and not grid.is_empty() else []}
+	var pts: Array = _follow_cache.pts
+	return pts[1] if pts.size() > 1 else mp
+
+
+## Ein Stück laufen. Bleibt die Figur auf ihrem Feld, ändert sich nur die
+## freie Position; auf einem neuen Feld macht das Spiel einen Schritt.
+func _try_move(pos: Vector2, nxt: Vector2, now: float) -> bool:
+	var cur := Vector2i(int(s.player.pos.x), int(s.player.pos.y))
+	var t := FreeMove.tile_of(nxt)
+	if t == cur:
+		anim.free = nxt
+		return true
+	if absi(t.x - cur.x) > 1 or absi(t.y - cur.y) > 1 or not MapGen.in_bounds(s.map, t.x, t.y):
+		return false
+	var tp := J.pos(t.x, t.y)
+	var tile := MapGen.tile_at(s.map, t.x, t.y)
+	if tile == "door":
+		# Tür öffnen, dann weiter
+		if (t.x == cur.x or t.y == cur.y) and not (in_combat() and not Rounds.can_move(s)):
+			anim.free = pos
+			act(func(): return Game.move_step(s, tp))
+			_wait_until = now + STEP_MS
+			return MapGen.tile_at(s.map, t.x, t.y) != "door"
+		return false
+	if Ai.monster_at(s, tp) != null or MapGen.furniture_at(s.map, tp) != null or Dungeon.is_crate(tile) or Tiefgarage.is_wreck(tile):
+		return false
+	if not Pathfinding.can_step(s.map, s.player.pos, tp):
+		return false
+	if in_combat() and not Rounds.can_move(s):
+		return false
+	var fight := in_combat()
+	var hp: int = s.player.hp
+	var traps := _known_traps()
+	anim.free = nxt
+	act(func(): return Game.move_step(s, tp))
+	if s.player.pos.x != t.x or s.player.pos.y != t.y:
+		# Nicht weitergekommen (Schlamm, festgehalten, verriegelt …)
+		_wait_until = now + STEP_MS
+		_route.clear()
+		return false
+	if (not fight and in_combat()) or s.player.hp < hp or _known_traps() > traps:
+		_stop_moving()
+		_mouse_follow = false
+		_press_at = -1.0
+	elif traveling and _route_fight and (not in_combat() or int(s.round.n) != _route_round):
+		_stop_moving()
+	return true
+
+
+func _known_traps() -> int:
+	return J.arr(s, "traps").filter(func(x): return not x.get("hidden", false)).size()
 
 
 ## Läuft die Figur gerade (Taste gehalten oder Klick-Weg)?
 func walking() -> bool:
-	return held != null or traveling or _mouse_follow
+	return not held.is_empty() or traveling or _mouse_follow
 
 
 ## Spielstand und Meta speichern, wenn sich etwas geändert hat.
@@ -822,48 +925,22 @@ func visible_monsters() -> Array:
 	return s.monsters.filter(func(m): return vis.has(MapGen.idx(s.map, m.pos.x, m.pos.y)))
 
 
-## Klick-Weg: ohne Kampf läuft die Figur ohne Halt bis ans Ziel. Anhalten
-## nur bei Gefahr: Kampf beginnt, Schaden, neue Falle, Weg versperrt.
-func travel(path: Array) -> void:
-	if traveling:
+## Klick-Weg: Die Figur läuft frei auf geraden Linien bis ans Ziel (siehe
+## _move_free). Anhalten nur bei Gefahr: Kampf beginnt, Schaden, neue Falle,
+## Weg versperrt. Im Kampf am Stück, solange die Bewegung der Runde reicht.
+func travel(path: Array, exact: Variant = null) -> void:
+	if traveling or path.is_empty():
 		return
+	_route = FreeMove.smooth(s, _pos_now(), path)
+	_route.pop_front()
+	# Genau dorthin, wo geklickt wurde (innerhalb des Zielfelds)
+	if exact != null and not _route.is_empty() and FreeMove.tile_of(exact) == FreeMove.tile_of(_route[-1]):
+		_route[-1] = exact
 	traveling = true
-	# Im Kampf: am Stück laufen, solange die Bewegung der Runde reicht
-	var fight := in_combat()
-	var round_n: int = int(s.round.n) if fight else -1
-	var k := 0
-	var next_at := Animator.now_ms()
-	while k < path.size():
-		var step: Dictionary = path[k]
-		if not traveling or s.status != "playing" or modal_open():
-			break
-		while Animator.now_ms() < next_at:
-			await get_tree().process_frame
-			if not traveling:
-				break
-		if not traveling:
-			break
-		next_at = maxf(next_at + STEP_MS, Animator.now_ms() - STEP_MS)
-		# Tür auf dem Weg: erst öffnen, dann hindurch
-		if MapGen.tile_at(s.map, step.x, step.y) == "door":
-			if not act(func(): return Game.move_step(s, step)):
-				break
-			continue
-		var hp_before: int = s.player.hp
-		var traps_before := J.arr(s, "traps").filter(func(x): return not x.get("hidden", false)).size()
-		if not act(func(): return Game.move_step(s, step)):
-			break
-		if J.arr(s, "traps").filter(func(x): return not x.get("hidden", false)).size() > traps_before:
-			break
-		if s.player.pos.x != step.x or s.player.pos.y != step.y:
-			break
-		if not fight and in_combat():
-			break
-		if fight and (not in_combat() or int(s.round.n) != round_n):
-			break
-		if s.player.hp < hp_before:
-			break
-		k += 1
+	_route_fight = in_combat()
+	_route_round = int(s.round.n) if _route_fight else -1
+	while traveling and is_inside_tree() and s.status == "playing":
+		await get_tree().process_frame
 	traveling = false
 
 
@@ -884,12 +961,11 @@ func _on_map_click(t: Vector2i, button: int) -> void:
 	if modal_open():
 		return
 	if button == MOUSE_BUTTON_RIGHT:
-		traveling = false
+		_stop_moving()
 		ContextMenu.open(self, t, get_viewport().get_mouse_position())
 		return
-	if traveling:
-		traveling = false
-		return
+	# Ein neuer Klick ändert das Ziel
+	_stop_moving()
 	# Gedrückt halten: die Figur folgt der Maus (siehe _follow_mouse)
 	_press_at = Animator.now_ms()
 	var tp := _pos(t)
@@ -930,7 +1006,7 @@ func _on_map_click(t: Vector2i, button: int) -> void:
 			act(func(): return Game.wait(s))
 		return
 	var closed_door := MapGen.in_bounds(s.map, t.x, t.y) and (MapGen.tile_at(s.map, t.x, t.y) == "door" or Dungeon.is_crate(MapGen.tile_at(s.map, t.x, t.y)) or MapGen.tile_at(s.map, t.x, t.y) == Tiefgarage.WRECK)
-	if Fov.chebyshev(tp, s.player.pos) == 1 and (Pathfinding.can_step(s.map, s.player.pos, tp) or closed_door):
+	if Fov.chebyshev(tp, s.player.pos) == 1 and closed_door:
 		act(func(): return Game.move_step(s, tp))
 		return
 	var path = Game.plan_path(s, tp)
@@ -938,7 +1014,7 @@ func _on_map_click(t: Vector2i, button: int) -> void:
 		say("Dorthin kennst du keinen Weg.")
 	else:
 		# Im Kampf so weit, wie die Bewegung der Runde reicht
-		travel(path)
+		travel(path, map.pos_from_local(map.get_local_mouse_position()))
 
 
 ## Felder, die man per Klick erst ansieht, statt sofort loszulaufen.
@@ -1021,8 +1097,7 @@ func examine(t: Vector2i) -> void:
 
 func _unhandled_input(ev: InputEvent) -> void:
 	if ev is InputEventKey and not ev.pressed:
-		if held != null and held.code == ev.keycode:
-			held = null
+		held.erase(ev.keycode)
 		return
 	if not (ev is InputEventKey) or not ev.pressed:
 		return
@@ -1033,12 +1108,16 @@ func _unhandled_input(ev: InputEvent) -> void:
 	var dir = DIR_KEYS.get(k)
 	if dir != null:
 		get_viewport().set_input_as_handled()
-		traveling = false
 		if ev.echo:
 			return
-		held = {"code": k, "dir": dir}
-		last_step = Animator.now_ms()
-		step_dir(dir)
+		_stop_moving()
+		# Steht in dieser Richtung ein Gegner, wird angegriffen statt gelaufen
+		var to := {"x": s.player.pos.x + dir.x, "y": s.player.pos.y + dir.y}
+		var mon = Ai.monster_at(s, to)
+		if mon != null and held.is_empty():
+			attack_monster(mon.uid)
+			return
+		held[k] = dir
 		return
 	if ev.echo:
 		return
@@ -1113,7 +1192,7 @@ func _unhandled_input(ev: InputEvent) -> void:
 			say("Zauber abgebrochen.")
 			refresh_actions()
 		elif traveling:
-			traveling = false
+			_stop_moving()
 		elif tab_open:
 			close_tab()
 		else:
@@ -1122,7 +1201,7 @@ func _unhandled_input(ev: InputEvent) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
-		held = null
+		held.clear()
 		_persist()
 	elif what == NOTIFICATION_EXIT_TREE or what == NOTIFICATION_WM_CLOSE_REQUEST:
 		_persist()
@@ -1179,7 +1258,7 @@ func refresh_top() -> void:
 	var inv = Invitations.pending(s)
 	if inv != null:
 		_pill("Einladung: " + Invitations.format_name(inv.format), "achv", "PillTimer", 700, "Im Safe Room am Bildschirm annehmen oder absagen. Gilt noch %s." % ViewHelpers.format_time(maxi(0, int(inv.until) - int(s.turn))))
-	_pill("Einsturz in %s" % ViewHelpers.format_time(left), "text" if left > 120 else "danger", "PillWarn" if left <= 120 else "PillTimer", 700, "Zeit bis zum Einsturz der Etage")
+	collapse_pill = _pill("Einsturz in %s" % ViewHelpers.format_time(left), "text" if left > 120 else "danger", "PillWarn" if left <= 120 else "PillTimer", 700, "Zeit bis zum Einsturz der Etage")
 	var rush := Progression.rush_bonus(s)
 	if rush >= 0.1:
 		_pill("Endspurt +%d %% XP" % J.rnd(rush * 100), "accent", "PillTimer", 700, "Je näher der Einsturz, desto mehr Erfahrung pro Kill")
@@ -1196,6 +1275,7 @@ func refresh_top() -> void:
 		_pill("Lootboxen %d" % p.boxes.size(), "accent", "PillTimer", 700, "Öffnen kannst du sie in einem Safe Room oder einer Gilde")
 	var btn := Kit.button(_top, "Menü", open_menu, "PillButton", false, "Hilfe, Ton und Musik (Esc)")
 	btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	menu_button = btn
 
 
 ## Menü mit Hilfe und Klangeinstellungen.
@@ -1221,12 +1301,16 @@ func open_menu() -> void:
 				b.text = "an" if get_on.call() else "aus", "SmallButton")
 			b.custom_minimum_size = Vector2(60, 0)
 		Kit.spacer(root, 8)
-		Kit.button(root, "Steuerung anzeigen (H)", func():
+		var hb := Kit.hbox(root, 8)
+		Kit.button(hb, "Steuerung anzeigen (H)", func():
 			modals().close_all()
-			GameDialogs.show_help.call_deferred(self), "Button").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN, "Weiter", 420)
+			GameDialogs.show_help.call_deferred(self), "Button")
+		Kit.button(hb, "Tutorial wiederholen", func():
+			modals().close_all()
+			guide.restart(), "Button"), "Weiter", 420)
 
 
-func _pill(text: String, color: Variant, variant: String = "Pill", weight: int = 400, tip: String = "") -> void:
+func _pill(text: String, color: Variant, variant: String = "Pill", weight: int = 400, tip: String = "") -> Control:
 	var pc := PanelContainer.new()
 	pc.theme_type_variation = variant
 	pc.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -1235,6 +1319,7 @@ func _pill(text: String, color: Variant, variant: String = "Pill", weight: int =
 	_top.add_child(pc)
 	var l := Kit.label(pc, text, 16, color)
 	l.add_theme_font_override("font", UiFonts.pixel(maxi(400, mini(700, weight))))
+	return pc
 
 
 func _pill_bb(bb: String) -> void:
@@ -1322,10 +1407,39 @@ func show_tab(id: String) -> void:
 
 ## Einen Reiter ausklappen (bleibt offen, wenn er es schon ist).
 func open_tab(id: String) -> void:
+	if not tab_open:
+		raise_window(_drawer)
 	tab = id
 	tab_open = true
 	_tab_scroll.scroll_vertical = 0
 	refresh_side()
+
+
+## Zuletzt geöffnetes Fenster über die anderen legen.
+func raise_window(c: Control) -> void:
+	if is_instance_valid(c) and c.get_parent() == _mapwrap:
+		_mapwrap.move_child(c, _mapwrap.get_child_count() - 1)
+		# Der Tooltip bleibt obenauf
+		_mapwrap.move_child(_tip, _mapwrap.get_child_count() - 1)
+
+
+## Klick neben das ausgeklappte Fenster (oder die große Karte) schließt es.
+## Auf der Karte löst der Klick dann nichts weiter aus.
+func _input(ev: InputEvent) -> void:
+	if not (ev is InputEventMouseButton) or not ev.pressed or modal_open():
+		return
+	if ev.button_index != MOUSE_BUTTON_LEFT and ev.button_index != MOUSE_BUTTON_RIGHT:
+		return
+	var at: Vector2 = ev.global_position
+	var closed := false
+	if tab_open and not _drawer.get_global_rect().has_point(at) and not _tabs.get_global_rect().has_point(at):
+		close_tab()
+		closed = true
+	if minimap_big and not _mini_wrap.get_global_rect().has_point(at):
+		toggle_minimap()
+		closed = true
+	if closed and map.get_global_rect().has_point(at) and not _actionbar.get_global_rect().has_point(at):
+		get_viewport().set_input_as_handled()
 
 
 func close_tab() -> void:
@@ -1334,7 +1448,7 @@ func close_tab() -> void:
 
 
 const TABS := [
-	["crawler", "Crawler", "P"], ["ziele", "Ziele", "Z"], ["inventar", "Inventar", "I"],
+	["crawler", "Crawler", "P"], ["ziele", "Ziele", "Z"], ["inventar", "Inventar", "I"], ["ausruestung", "Ausrüstung", "A"],
 	["handwerk", "Handwerk", "B"], ["skills", "Skills", "L"], ["erfolge", "Erfolge", "O"],
 ]
 
@@ -1358,6 +1472,7 @@ func refresh_side() -> void:
 		var id: String = t[0]
 		var active: bool = tab_open and tab == id
 		var b := Kit.button(_tabs, t[1], func(): show_tab(id), "TabActive" if active else "TabButton", false, "%s ausklappen (Taste %s)" % [t[1], t[2]])
+		tab_buttons[id] = b
 		b.custom_minimum_size.x = 92
 		var badge := tab_badge(id)
 		b.draw.connect(func():
@@ -1377,6 +1492,7 @@ func refresh_side() -> void:
 		"crawler": GameTabs.crawler_tab(self, _tab_content)
 		"ziele": GameTabs.goals_tab(self, _tab_content)
 		"inventar": GameTabs.inventory_tab(self, _tab_content)
+		"ausruestung": GameTabs.gear_tab(self, _tab_content)
 		"handwerk": GameTabs.craft_tab(self, _tab_content)
 		"skills": GameTabs.skills_tab(self, _tab_content)
 		"erfolge": GameTabs.achievements_tab(self, _tab_content)
@@ -1411,16 +1527,19 @@ func strike(uid: String) -> void:
 	attack_monster(uid)
 
 
+## Wenige Farben im Chat: normaler Text, Gold für Funde und Erfolge, Rot für
+## Gefahr. Gespräche stehen kursiv, Hinweise etwas gedämpft.
+const LOG_TEXT := "#e2ddd2"
 const LOG_COLORS := {
-	"kampf": "#e8e0d4", "info": "#b8ad9e", "system": "#f4c24f", "gefahr": "#ff5d5d", "loot": "#ffd27a",
-	"achievement": "#d58cff", "dialog": "#6cc4ff",
+	"kampf": LOG_TEXT, "info": "#bdb6aa", "system": "#f4c24f", "gefahr": "#ff6a5a", "loot": "#f4c24f",
+	"achievement": "#f4c24f", "dialog": LOG_TEXT,
 }
 
 
 const LOG_FILTERS := [
 	["alles", "Alles", []],
 	["kampf", "Kampf", ["kampf", "gefahr"]],
-	["funde", "Beute und Erfolge", ["loot", "achievement", "system"]],
+	["funde", "Funde", ["loot", "achievement", "system"]],
 	["story", "Gespräche", ["dialog", "info"]],
 ]
 
@@ -1443,8 +1562,8 @@ func _log_line(l: Dictionary, n: int) -> String:
 	if l.kind == "dialog":
 		body = "[i]%s[/i]" % body
 	if n > 1:
-		body += " [color=#8a8f9c](%d×)[/color]" % n
-	return "[font_size=%d][color=#555b69][b]%s[/b][/color][/font_size]  [color=%s]%s[/color]" % [UiFonts.px(11), ViewHelpers.clock_at(s, int(l.turn)), color, body]
+		body += " [color=#8f8a80](%d×)[/color]" % n
+	return "[font_size=%d][color=#6f6a62]%s[/color][/font_size]  [color=%s]%s[/color]" % [UiFonts.px(11), ViewHelpers.clock_at(s, int(l.turn)), color, body]
 
 
 ## Neue Log-Zeilen werden angehängt und Zeichen für Zeichen getippt.
@@ -1459,6 +1578,7 @@ func refresh_log(rebuild: bool = false) -> void:
 	for f in LOG_FILTERS:
 		var id: String = f[0]
 		Kit.button(_log_bar, f[1], func(): set_log_filter(id), "SmallSel" if log_filter == id else "SmallButton")
+	Kit.button(_log_bar, "Überspringen", func(): _typer.finish_all(), "SmallButton", false, "Alle Zeilen sofort ganz zeigen")
 	var entries: Array = s.log
 	var first := _last_log_id < 0 or rebuild
 	if rebuild:

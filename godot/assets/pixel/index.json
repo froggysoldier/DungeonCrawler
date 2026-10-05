@@ -97,6 +97,13 @@
   "x": 96,
   "y": 64
  },
+ "boden/arena_gross": {
+  "h": 128,
+  "sheet": "kacheln",
+  "w": 128,
+  "x": 1024,
+  "y": 160
+ },
  "boden/beton0": {
   "h": 32,
   "sheet": "kacheln",
@@ -125,6 +132,13 @@
   "x": 480,
   "y": 0
  },
+ "boden/beton_gross": {
+  "h": 128,
+  "sheet": "kacheln",
+  "w": 128,
+  "x": 384,
+  "y": 160
+ },
  "boden/blutstein0": {
   "h": 32,
   "sheet": "kacheln",
@@ -152,6 +166,13 @@
   "w": 32,
   "x": 480,
   "y": 32
+ },
+ "boden/blutstein_gross": {
+  "h": 128,
+  "sheet": "kacheln",
+  "w": 128,
+  "x": 896,
+  "y": 160
  },
  "boden/bruecke0": {
   "h": 32,
@@ -237,6 +258,13 @@
   "x": 224,
   "y": 0
  },
+ "boden/dielen_gross": {
+  "h": 128,
+  "sheet": "kacheln",
+  "w": 128,
+  "x": 128,
+  "y": 160
+ },
  "boden/fliesen0": {
   "h": 32,
   "sheet": "kacheln",
@@ -264,6 +292,13 @@
   "w": 32,
   "x": 352,
   "y": 0
+ },
+ "boden/fliesen_gross": {
+  "h": 128,
+  "sheet": "kacheln",
+  "w": 128,
+  "x": 256,
+  "y": 160
  },
  "boden/kanal0": {
   "h": 32,
@@ -321,6 +356,13 @@
   "x": 352,
   "y": 32
  },
+ "boden/marmor_gross": {
+  "h": 128,
+  "sheet": "kacheln",
+  "w": 128,
+  "x": 768,
+  "y": 160
+ },
  "boden/oel0": {
   "h": 32,
   "sheet": "kacheln",
@@ -376,6 +418,13 @@
   "w": 32,
   "x": 96,
   "y": 0
+ },
+ "boden/pflaster_gross": {
+  "h": 128,
+  "sheet": "kacheln",
+  "w": 128,
+  "x": 0,
+  "y": 160
  },
  "boden/schlamm0": {
   "h": 32,
@@ -433,6 +482,13 @@
   "x": 224,
   "y": 32
  },
+ "boden/teppich_gross": {
+  "h": 128,
+  "sheet": "kacheln",
+  "w": 128,
+  "x": 640,
+  "y": 160
+ },
  "boden/wasser0": {
   "h": 32,
   "sheet": "kacheln",
@@ -488,6 +544,13 @@
   "w": 32,
   "x": 96,
   "y": 32
+ },
+ "boden/ziegelboden_gross": {
+  "h": 128,
+  "sheet": "kacheln",
+  "w": 128,
+  "x": 512,
+  "y": 160
  },
  "boss/abschleppwurm": {
   "h": 96,

@@ -117,7 +117,13 @@ static func item_body(gv: GameView, v: Node, it: Dictionary, with_actions: bool,
 		else:
 			var bid: String = it.baseId
 			Kit.button(f, "Als Nächstes werfen", func(): gv.act(func(): return Game.choose_throwable(s, bid)), "SmallButton")
-	Kit.button(f, "Ablegen", func(): gv.act(func(): return Game.drop_item(s, uid)), "SmallButton")
+	if from == "equip":
+		var slot = J.find(EQUIP_ORDER, func(sl): return is_same(s.player.equipment.get(sl), it))
+		if slot != null:
+			var sl: String = slot
+			Kit.button(f, "Ausziehen", func(): gv.act(func(): return Game.unequip(s, sl)), "SmallButton")
+	else:
+		Kit.button(f, "Ablegen", func(): gv.act(func(): return Game.drop_item(s, uid)), "SmallButton")
 	var room = Game.current_room(s)
 	if from == "inv" and room != null and room.kind == "safe" and Game.has_unlock(s, "handel") and it.kind != "box" and it.get("questId") == null:
 		Kit.button(f, "Verkaufen (%d G)" % Shop.sell_price(it, s), func(): gv.act(func(): return Game.sell_item(s, uid)), "SmallButton")
@@ -177,7 +183,7 @@ static func crawler_tab(gv: GameView, root: VBoxContainer) -> void:
 		Kit.locked(root, "Gesperrt: Deine Werte siehst du erst nach dem Tutorial.\nFinde die [b]Gilde der Einweisung[/b].")
 		Kit.section(root, "In der Hand")
 		if p.get("hand") != null:
-			item_card(gv, root, p.hand, true, "hand")
+			item_row(gv, root, p.hand, "hand")
 		else:
 			Kit.text(root, "Nichts. Heb etwas auf (G).", 14, "muted")
 		return
@@ -207,7 +213,7 @@ static func crawler_tab(gv: GameView, root: VBoxContainer) -> void:
 		["Ausweichen", "%d %%" % J.rnd(Player.ausweichen(s, b))],
 		["Krit-Chance", "%s %%" % J.s(5 + J.num(b, "krit") + maxf(0, st.ges - 5))],
 		["Waffe", w.name if w != null else "–"],
-		["Sichtweite", "%d Felder" % Player.lichtradius(s, b)],
+		["Sichtweite", FreeMove.meters(Player.lichtradius(s, b))],
 	]:
 		Kit.label(kv, row[0]).size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		Kit.label(kv, row[1], 14, null, 700)
@@ -417,42 +423,86 @@ static func inventory_tab(gv: GameView, root: VBoxContainer) -> void:
 		Kit.locked(root, "Gesperrt: Kein Inventar. Du kannst nur einen Gegenstand in der Hand halten.\nFinde die [b]Gilde der Einweisung[/b].")
 		Kit.section(root, "In der Hand")
 		if p.get("hand") != null:
-			item_card(gv, root, p.hand, true, "hand")
+			item_row(gv, root, p.hand, "hand")
 		else:
 			Kit.text(root, "Nichts.", 14, "muted")
 	else:
-		Kit.section(root, "Ausrüstung")
-		var g := Kit.grid(root, 3, 8, 4)
-		for slot in EQUIP_ORDER:
-			var it = p.equipment.get(slot)
-			Kit.icon(g, Sprites.slot_sprite(slot), rarity_color(it.rarity) if it != null else null, 1, Vector2(32, 32), it == null)
-			if it != null:
-				var d := Identify.describe_item(s, it)
-				var name_rt := Kit.text(g, "%s\n%s" % [Kit.col(Kit.esc(Identify.item_name(s, it)), rarity_color(it.rarity)), Kit.small(Kit.muted(equip_name(slot)))], 13, null, 0)
-				var tip: Array = [J.nn(d, "flavor", "")]
-				tip.append_array(d.bonuses)
-				name_rt.tooltip_text = " | ".join(tip)
-				name_rt.mouse_filter = Control.MOUSE_FILTER_PASS
-				name_rt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-				var sl: String = slot
-				Kit.button(g, "Ablegen", func(): gv.act(func(): return Game.unequip(s, sl)), "SmallButton").size_flags_vertical = Control.SIZE_SHRINK_CENTER
-			else:
-				var l := Kit.label(g, equip_name(slot), 13, "muted")
-				l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-				l.modulate.a = 0.7
-				g.add_child(Control.new())
-		Kit.section(root, "Rucksack (%d)" % p.inventory.size())
+		Kit.section(root, "Dabei (%d)" % p.inventory.size())
 		if p.inventory.is_empty():
 			Kit.text(root, "Leer.", 14, "muted")
+		else:
+			Kit.text(root, "Klicke auf einen Eintrag für Einzelheiten und Aktionen.", 12, "muted")
 		for it in p.inventory:
-			item_card(gv, root, it, true)
+			item_row(gv, root, it)
 	Kit.section(root, "Lootboxen (%d)" % p.boxes.size())
 	if p.boxes.is_empty():
 		Kit.text(root, "Keine. Achievements bringen Boxen!", 14, "muted")
 	else:
 		for bx in p.boxes:
-			Kit.text(root, Kit.col(Kit.esc(bx.name), Db.world("BOX_TIER_COLORS")[bx.box.tier]), 12)
+			Kit.text(root, Kit.col(Kit.esc(bx.name), Db.world("BOX_TIER_COLORS")[bx.box.tier]), 13)
 		Kit.text(root, "Öffnen in einem Safe Room oder einer Gilde.", 12, "muted")
+
+
+## Eine Zeile der Liste: Symbol, Name, Art. Ein Klick klappt Werte und
+## Aktionen auf, ein zweiter wieder zu.
+static func item_row(gv: GameView, parent: Node, it: Dictionary, from: String = "inv", label: String = "") -> void:
+	var s := gv.s
+	var key := "item:%s" % it.uid
+	var open: bool = gv.folds.get(key, false)
+	var row := ClickPanel.new("ListRow")
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	parent.add_child(row)
+	var h := Kit.hbox(row, 8)
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var look := Sprites.item_sprite(it)
+	Kit.icon(h, look[0], look[1], 1, Vector2(28, 28))
+	var menge := J.num(it, "menge")
+	var name := Kit.esc(Identify.item_name(s, it)) + (" ×%s" % J.s(menge) if menge > 1 and it.kind != "gold" else "")
+	var rt := Kit.text(h, Kit.col(name, rarity_color(it.rarity)), 15)
+	rt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rt.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	rt.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var kind := label if label != "" else _kind_name(it)
+	var k := Kit.label(h, kind, 12, "muted")
+	k.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var arrow := Kit.label(h, "-" if open else "+", 16, UiTheme.ACCENT)
+	arrow.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	arrow.custom_minimum_size.x = 14
+	row.pressed.connect(func():
+		gv.folds[key] = not open
+		gv.refresh_side())
+	if open:
+		var m := Kit.margin(parent, 38, 0, 6, 6)
+		item_body(gv, Kit.vbox(m, 2), it, true, from)
+
+
+static func _kind_name(it: Dictionary) -> String:
+	if it.get("slot") != null:
+		return Db.t("items", "SLOT_NAMES").get(it.slot, "")
+	match String(it.kind):
+		"verbrauch": return "Verbrauch"
+		"wurf": return "Wurfwaffe"
+		"buch": return "Buch"
+		"material": return "Material"
+		"box": return "Box"
+	return ""
+
+
+## Eigene Seite für die getragene Ausrüstung: belegte Plätze als Liste zum
+## Aufklappen, darunter die freien Plätze.
+static func gear_tab(gv: GameView, root: VBoxContainer) -> void:
+	var s := gv.s
+	var p: Dictionary = s.player
+	var worn: Array = EQUIP_ORDER.filter(func(slot): return p.equipment.get(slot) != null)
+	Kit.section(root, "Am Körper (%d)" % worn.size())
+	if worn.is_empty():
+		Kit.text(root, "Du trägst nichts Besonderes. Kleidung vom Boden ziehst du per Rechtsklick an.", 14, "muted")
+	for slot in worn:
+		item_row(gv, root, p.equipment[slot], "equip", equip_name(slot))
+	var free: Array = EQUIP_ORDER.filter(func(slot): return p.equipment.get(slot) == null)
+	if not free.is_empty():
+		Kit.section(root, "Frei")
+		Kit.text(root, Kit.esc(", ".join(free.map(func(slot): return equip_name(slot)))), 13, "muted")
 
 
 # ================================================================ Handwerk

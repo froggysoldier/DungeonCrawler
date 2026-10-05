@@ -20,6 +20,8 @@ var _shown := ""
 var _acc := 0.0
 
 static var _re: RegEx
+## Gerade getippte Texte (für den Überspringen-Knopf).
+static var running: Array = []
 
 
 static func tokenize(bb: String) -> PackedStringArray:
@@ -45,8 +47,26 @@ static func type_text(l: RichTextLabel, bb: String, ms_per_char: float = 18.0, s
 		return t
 	t.tokens = tokenize(bb)
 	l.text = ""
+	running.append(t)
 	t._tick()
 	return t
+
+
+## Läuft gerade ein Text (außer dem Chat), den man überspringen kann?
+static func skippable() -> bool:
+	_prune()
+	return running.any(func(t): return t.sound != "log")
+
+
+## Alle laufenden Texte sofort ganz zeigen.
+static func skip_all() -> void:
+	_prune()
+	for t in running.duplicate():
+		t.finish()
+
+
+static func _prune() -> void:
+	running = running.filter(func(t): return is_instance_valid(t) and not t.finished)
 
 
 func is_done() -> bool:
@@ -88,6 +108,7 @@ func finish() -> void:
 	if finished:
 		return
 	finished = true
+	running.erase(self)
 	set_process(false)
 	if is_instance_valid(label):
 		label.text = full

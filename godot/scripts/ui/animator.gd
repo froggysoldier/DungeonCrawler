@@ -37,6 +37,11 @@ var _fx: Array = []
 var _shots: Array = []
 var _floaters: Array = []
 var _cam: Variant = null
+## Freie Position der Spielfigur (in Feldern, stufenlos) oder null: Beim
+## freien Laufen steht die Figur irgendwo auf ihrem Feld, nicht in der Mitte.
+var free: Variant = null
+## Läuft die Figur gerade frei (für die Laufbilder)?
+var free_moving := false
 
 
 static func now_ms() -> float:
@@ -61,17 +66,33 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 	if now < 0:
 		now = now_ms()
 	var current := snapshot(s)
+	# Frei laufend: Solange die Figur auf ihrem Feld bleibt, gilt die freie
+	# Position. Versetzt die Spiellogik sie (Rückstoß, Treppe …), gleitet sie hin.
+	var free_from: Variant = null
+	if free != null:
+		var fv: Vector2 = free
+		if Vector2i(roundi(fv.x), roundi(fv.y)) == Vector2i(int(s.player.pos.x), int(s.player.pos.y)):
+			current.erase("p")
+			_tweens.erase("p")
+		else:
+			free_from = fv
+			free = null
+			free_moving = false
 	for key in current:
 		var to: Vector2 = current[key]
 		var from = before.get(key)
 		var prev := draw_pos(key, from if from != null else to, now)
+		if key == "p" and free_from != null:
+			prev = free_from
+			from = free_from
 		if from == null or from == to:
 			continue
 		var jump := maxf(absf(to.x - from.x), absf(to.y - from.y))
 		if jump > 3:
 			_tweens.erase(key)
 			continue
-		_tweens[key] = {"from": prev, "to": to, "start": now, "dur": STEP_MS * minf(2, jump)}
+		# Gleiches Tempo in alle Richtungen: schräg dauert ein Schritt länger
+		_tweens[key] = {"from": prev, "to": to, "start": now, "dur": maxf(30.0, STEP_MS * minf(2.0, (to - prev).length()))}
 	var bp = before.get("p")
 	if bp != null and maxf(absf(bp.x - s.player.pos.x), absf(bp.y - s.player.pos.y)) > 3:
 		_cam = null
@@ -136,6 +157,8 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 
 
 func draw_pos(key: String, fallback: Vector2, now: float = -1.0) -> Vector2:
+	if key == "p" and free != null:
+		return free
 	var t = _tweens.get(key)
 	if t == null:
 		return fallback
@@ -294,6 +317,8 @@ func moving(key: String) -> bool:
 
 ## Läuft gerade noch eine Bewegung des Spielers?
 func player_moving(now: float = -1.0) -> float:
+	if free != null:
+		return 1.0 if free_moving else 0.0
 	var t = _tweens.get("p")
 	if t == null:
 		return 0.0
@@ -330,6 +355,8 @@ func reset() -> void:
 	_fx.clear()
 	_shake = {}
 	_cam = null
+	free = null
+	free_moving = false
 
 
 ## Bild für den aktuellen Zeitpunkt: Kamera, Geschosse, Zahlen.

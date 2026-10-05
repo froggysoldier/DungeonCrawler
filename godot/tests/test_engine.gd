@@ -160,9 +160,11 @@ func test_gilde_schaltet_inventar_frei(t) -> void:
 	t.ok(J.some(s.pendingDialogs, func(d): return d.title == "Gilde der Einweisung"), "Dialog")
 	var tut = J.find(s.pendingDialogs, func(d): return d.title == "Gilde der Einweisung")
 	if tut != null:
+		# Den Bildschirm erklärt das interaktive Tutorial (test_guide), hier nur Regeln
 		var all := " ".join(tut.pages)
-		for w in ["Reiter", "Chat", "Aktionsleiste", "rechte Maustaste"]:
-			t.ok(all.contains(w), "Tutorial erklärt: %s" % w)
+		for w in ["Timer", "Safe Rooms", "Toilette"]:
+			t.ok(all.contains(w), "Guide erklärt: %s" % w)
+		t.ok(not all.contains("Aktionsleiste"), "kein Bildschirm-Text mehr")
 	var potion = J.find(s.player.inventory, func(i): return i.baseId == "kleiner_heiltrank")
 	t.not_null(potion, "Heiltrank")
 	s.player.hp = 1
@@ -195,9 +197,10 @@ func test_treppen_bis_etage_3(t) -> void:
 	t.eq(s.status, "victory", "Sieg")
 
 
-func test_start_erklaert_und_zeigt_die_gilde(t) -> void:
+## Die Steuerung erklärt das Tutorial in der Oberfläche (siehe test_guide).
+func test_start_zeigt_die_gilde(t) -> void:
 	var s := Game.new_game({"name": "Neu", "answers": {}, "seed": 31, "meta": Meta.empty_meta()})
-	t.ok(J.some(s.pendingDialogs, func(d): return d.title == "So spielst du"), "Steuerung wird erklärt")
+	t.ok(not J.some(s.pendingDialogs, func(d): return d.title == "So spielst du"), "kein Texttutorial mehr")
 	var guild = J.find(s.map.rooms, func(r): return r.get("marked", false))
 	t.not_null(guild, "Gilde markiert")
 	if guild != null:

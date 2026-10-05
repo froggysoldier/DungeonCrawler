@@ -116,18 +116,26 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
 - **Darstellung:** Mauern mit Vorderseite und Schattenwurf, Böden je nach Raum
   (Dielen, Fliesen, Beton, Ziegel, Teppich im Safe Room, Marmor in der Gilde,
   Pflaster in Gängen), Einrichtung, Türen, Fallen- und Beutesymbole, weicher
-  flackernder Lichtkegel.
-- **Bewegung:** Figuren gleiten von Feld zu Feld, die Kamera folgt weich.
-  Solange kein Gegner hinter dir her ist, läuft man mit gehaltener
-  Richtungstaste flüssig weiter; Klick-Reisen öffnen Türen unterwegs.
+  flackernder Lichtkegel. Böden sind große, nahtlose Flächen über 4 × 4
+  Felder: Keine Fuge liegt auf einer Feldgrenze, man sieht kein Raster.
+- **Freie Bewegung (wie Baldur's Gate, `free_move.gd`):** Die Spielfigur hat
+  eine stufenlose Position und läuft auf geraden Linien. Ein Klick läuft
+  genau zur geklickten Stelle; der Weg wird aus dem Feldweg zu wenigen geraden
+  Stücken geglättet (mit Abstand zu Ecken, Türen gerade hindurch). Gedrückte
+  linke Maustaste folgt der Maus, Pfeiltasten laufen frei (zwei zugleich
+  schräg), an Wänden gleitet man entlang. Im Hintergrund rechnet das Spiel in
+  Feldern: Betritt die Figur ein neues Feld, ist das ein Schritt. Die
+  Vorschau ist eine gepunktete Linie mit Länge in Metern (ein Feld = 1,5 m).
+  Klick-Reisen öffnen Türen unterwegs.
 - **Untersuchen ohne Hinlaufen:** Ein Klick auf Gegenstände, Möbel, Fallen
   oder die Treppe zeigt eine Info-Karte; erst der zweite Klick läuft hin.
 - **Kampfmodus in Runden (wie Baldur's Gate):** Sobald ein wacher Gegner
   dich sieht, erscheint ein Banner, die Karte bekommt einen roten Rahmen, ein
   Klang ertönt, und der Kampf läuft in Runden (`rounds.gd`). Pro Runde hast du
-  einen Bewegungsvorrat (6 Felder, Geschick ±, Reittier +2, festgehalten 1),
-  auf der Karte blau eingefärbt, und eine Aktion (Angriff, Zauber, Gegenstand,
-  Deckung, Warten). Ein Klick auf ein blaues Feld läuft am Stück hin; ein
+  einen Bewegungsvorrat (9 m = 6 Felder, Geschick ±, Reittier +3 m,
+  festgehalten 1,5 m) und eine Aktion (Angriff, Zauber, Gegenstand, Deckung,
+  Warten). Die Weglinie ist grün, soweit die Bewegung reicht, danach rot.
+  Ein Klick läuft am Stück hin; ein
   Klick auf einen Gegner läuft hin und greift an, wenn die Bewegung reicht.
   Schritte kosten keine Spielzeit, die Gegner warten. Auch nach der Aktion
   darf man mit der übrigen Bewegung weiterlaufen (zuschlagen und zurückweichen).
@@ -716,15 +724,16 @@ Dazu: Achievement-Familien „Einlagen“ (1/5/12) und „Kopfgelder“ (1/3/8),
 
 ### 3.30 Aufbau der Oberfläche
 Schrift überall: Jersey 10 (Pixelschrift im Stil von Tiny Swords).
-- **Kopfzeile:** links Etage, Uhrzeit, Einsturz-Zeit, laufende Einlage, Zuschauer (Details im Tooltip), Gold, Lootboxen (nur wenn vorhanden) und „Menü“ (Esc); rechts die **Reiter** Crawler (P), Ziele (Z), Inventar (I), Handwerk (B), Skills (L), Erfolge (O). Ein Klick oder die Taste klappt den Reiter als Tafel oben rechts über der Karte auf, derselbe Klick, „Schließen“ oder Esc klappt ihn zu; Tab blättert außerhalb des Kampfes. Ein goldener Punkt zeigt, wo etwas wartet (freie Punkte, Angebote, Abgaben, Kopfgeld).
+- **Kopfzeile:** links Etage, Uhrzeit, Einsturz-Zeit, laufende Einlage, Zuschauer (Details im Tooltip), Gold, Lootboxen (nur wenn vorhanden) und „Menü“ (Esc); rechts die **Reiter** Crawler (P), Ziele (Z), Inventar (I), Ausrüstung (A), Handwerk (B), Skills (L), Erfolge (O). Ein Klick oder die Taste klappt den Reiter als Tafel oben rechts über der Karte auf, derselbe Klick, „Schließen“, Esc oder ein Klick daneben klappt ihn zu; das zuletzt geöffnete Fenster liegt oben, Dialoge immer über allem; Tab blättert außerhalb des Kampfes. Ein goldener Punkt zeigt, wo etwas wartet (freie Punkte, Angebote, Abgaben, Kopfgeld). Das **Inventar** ist eine schlichte Liste (Symbol, Name, Art); ein Klick klappt Werte und Aktionen auf. Die **Ausrüstung** hat eine eigene Seite: was am Körper ist, ebenso aufklappbar (Ausziehen), darunter die freien Plätze.
 - **Rechts, oben immer sichtbar:** Name, Stufe, Klasse, Balken für HP, Ausdauer, Mana, Blase und Erfahrung, dazu Zustände, Haustier, Reittier und Party. Freie Wertepunkte erscheinen als Knopf.
 - **„Hier“** darunter: nur wenn es am Standort etwas zu tun gibt (Safe Room, Gilde mit Lootboxen, Händler, Crawler, Fallen); einklappbar (N), höchstens 40 % der Höhe.
-- **Chat** rechts darunter, über die ganze restliche Höhe und in größerer Schrift: Filter Alles, Kampf, Beute und Erfolge, Gespräche; gleiche Zeilen hintereinander werden zusammengefasst („(9×)“).
+- **Chat** rechts darunter, über die ganze restliche Höhe und in größerer Schrift: Filter Alles, Kampf, Funde, Gespräche und ein Knopf „Überspringen“; nur drei Farben (Text, Gold für Funde und Erfolge, Rot für Gefahr); gleiche Zeilen hintereinander werden zusammengefasst („(9×)“).
 - **Aktionsleiste unten** außerhalb des Kampfes: eine Zeile mit dem gewählten Angriff, Fähigkeit, Warten, Aufheben, Reittier und Zaubern; im Kampf die Kampfsequenz (womit, wie, wohin, welcher Gegner).
 - **Rechtsklick auf die Karte:** Menü mit allem, was auf dem Feld geht (aufheben, angreifen, ansprechen, benutzen, Tür öffnen, Kiste zerschlagen, Wrack durchsuchen, entschärfen, hinabsteigen, hierher gehen, untersuchen). Liegt das Ziel weiter weg, läuft die Figur erst hin.
 - **Laufen:** Außerhalb des Kampfes läuft die Figur ohne Halt bis ans Ziel (Klick) oder solange die Taste gedrückt ist, in festem Takt und gleichmäßig. Anhalten nur bei Gefahr: Kampf beginnt, Schaden, neu entdeckte Falle. Gespeichert und alles neu aufgebaut wird, sobald sie steht.
 - **Start:** Nach der Begrüßung erklärt „So spielst du“ in fünf Seiten Laufen, Handeln (Rechtsklick), Kämpfen, Bildschirm und das erste Ziel. Die Gilde der Einweisung ist von Anfang an aufgedeckt, auf der Karte beschriftet und auf der Übersichtskarte umrahmt, bis das Inventar freigeschaltet ist.
-- **Tutorial:** Der Guide in der Gilde erklärt auch den Bildschirm (Reiter, Chat, Aktionsleiste, Rechtsklick, Karte, Hilfe mit H).
+- **Interaktives Tutorial (`guide.gd`):** Statt Texttafeln zeigt ein goldener Pfeil auf ein Teil der Oberfläche, das Teil blinkt, ein Kasten daneben sagt, was es ist und was man jetzt tun soll. Weiter geht es erst, wenn man es ausprobiert hat: laufen, Maus gedrückt halten, Rechtsklick, Lebenspunkte, Chat, „Hier“, Inventar öffnen und durch Klick daneben schließen, Ausrüstung, Ziele, Crawler, Einsturz-Zeit, „Warten“, Menü – zum Schluss der Hinweis auf die Gilde der Einweisung. Beim ersten Kampf folgen drei Schritte: Bewegung und Aktion der Runde, einen Gegner anklicken, Runde beenden. „Tutorial beenden“ lässt alles aus; im Menü lässt es sich wiederholen. Der Fortschritt steht in den Metadaten (meta.guide). Der Guide in der Gilde erklärt nur noch Regeln (Timer, Bosse, Safe Rooms, Mana, Toiletten), nicht mehr den Bildschirm.
+- **Texte überspringen:** Solange ein Dialogtext getippt wird, steht unten „Text überspringen“; mehrseitige Dialoge haben „Alles überspringen“.
 - **Linke Maustaste halten:** Nach einem kurzen Moment folgt die Figur der Maus, bis man loslässt oder ein Kampf beginnt.
 - **Anziehen vom Boden:** Ausrüstung am Boden lässt sich direkt anziehen (Rechtsklick oder „Hier“); was vorher an dem Platz war, bleibt liegen. Geht auch ohne Inventar, nur Waffen nimmt man dann in die Hand.
 

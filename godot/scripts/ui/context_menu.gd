@@ -75,6 +75,7 @@ static func open(gv: GameView, t: Vector2i, at: Vector2) -> void:
 	var list := actions(gv, t)
 	if list.is_empty():
 		return
+	gv.context_count += 1
 	var menu := PopupMenu.new()
 	menu.add_theme_font_size_override("font_size", UiFonts.px(15))
 	for k in list.size():

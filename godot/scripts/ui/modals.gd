@@ -19,11 +19,15 @@ var _job: Job
 var _back: ColorRect
 var _center: CenterContainer
 var _toasts: VBoxContainer
+## Knopf unten in der Mitte, solange ein Text getippt wird.
+var _skip: Button
 
 
 func _init() -> void:
 	instance = self
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	# Dialoge liegen immer über allem, was die Spielansicht aufklappt
+	z_index = 20
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_back = ColorRect.new()
 	_back.color = Color(4 / 255.0, 5 / 255.0, 9 / 255.0, 0.66)
@@ -44,6 +48,18 @@ func _init() -> void:
 	_toasts.offset_right = -350
 	_toasts.offset_top = 56
 	add_child(_toasts)
+	_skip = Kit.button(self, "Text überspringen", Typing.skip_all, "Button", false, "Den gerade getippten Text sofort ganz zeigen")
+	_skip.visible = false
+
+
+func _process(_d: float) -> void:
+	var on := Typing.skippable()
+	if on != _skip.visible:
+		_skip.visible = on
+	if on:
+		var vs := get_viewport_rect().size
+		_skip.reset_size()
+		_skip.position = Vector2(roundf((vs.x - _skip.size.x) / 2), vs.y - _skip.size.y - 18)
 
 
 func _exit_tree() -> void:
@@ -184,6 +200,8 @@ func dialog(t: String, who: Variant, pages: Array) -> Job:
 		var f := Modals.foot(root)
 		var no: RichTextLabel = f[0]
 		var state := {"page": 0, "typing": null}
+		if pages.size() > 1:
+			Kit.button(f[1], "Alles überspringen", func(): close.call(), "Button", false, "Die restlichen Seiten auslassen")
 		var btn := Kit.button(f[1], "Weiter", Callable(), "PrimaryButton")
 		var draw := func() -> void:
 			state.typing = Typing.type_text(page_el, Modals._bb(pages[state.page]), 22)

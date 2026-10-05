@@ -187,6 +187,11 @@ static func get_theme() -> Theme:
 	_button(t, "TabButton", tn, tex("carved", Vector4(8, 8, 8, 8), tab_pad, Color(1, 1, 1, 0.45)), tn, tn, MUTED, TEXT, 13, 600)
 	var ta := tex("carved_active", Vector4(8, 8, 8, 8), tab_pad)
 	_button(t, "TabActive", ta, ta, ta, ta, ACCENT, ACCENT, 13, 600)
+	# Zeile einer Liste (Inventar, Ausrüstung): flach, beim Überfahren heller
+	var lp := Vector4(8, 4, 8, 4)
+	var lr := box(Color(0, 0, 0, 0.10), Color(0, 0, 0, 0), 4, 0, lp)
+	var lh := box(Color(0, 0, 0, 0.22), Color(0, 0, 0, 0), 4, 0, lp)
+	_button(t, "ListRow", lr, lh, lh, lr, TEXT, TEXT, 14, 500)
 	# Link
 	var ln := StyleBoxEmpty.new()
 	ln.content_margin_top = 2

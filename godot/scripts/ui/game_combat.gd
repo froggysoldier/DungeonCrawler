@@ -123,8 +123,8 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 		var rh := Kit.hbox(outer, 10)
 		var left := int(s.round.move)
 		var acted: bool = s.round.get("acted", false)
-		var act_bb := "[color=#e0a040]verbraucht[/color]   [color=#8b8f99]Du kannst noch laufen oder die Runde beenden. Ein weiterer Angriff beginnt die nächste Runde.[/color]" if acted else "[color=#6ee07a]bereit[/color]   [color=#8b8f99]Klick auf ein blaues Feld läuft dorthin, Klick auf einen Gegner läuft hin und greift an.[/color]"
-		var info := Kit.text(rh, "[b]Runde %d[/b]   Bewegung: [color=#8cc8ff][b]%d[/b] von %d Feldern[/color]   Aktion: %s" % [int(s.round.n), left, int(s.round.max), act_bb], 13)
+		var act_bb := "[color=#e0a040]verbraucht[/color]   [color=#8b8f99]Du kannst noch laufen oder die Runde beenden. Ein weiterer Angriff beginnt die nächste Runde.[/color]" if acted else "[color=#6ee07a]bereit[/color]   [color=#8b8f99]Klick auf die Karte läuft dorthin (grüne Linie reicht, rote nicht), Klick auf einen Gegner läuft hin und greift an.[/color]"
+		var info := Kit.text(rh, "[b]Runde %d[/b]   Bewegung: [color=#8cc8ff][b]%s[/b] von %s[/color]   Aktion: %s" % [int(s.round.n), FreeMove.meters(left), FreeMove.meters(int(s.round.max)), act_bb], 13)
 		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		Kit.kbutton(rh, "Runde beenden", "Leer", func(): gv.act(func(): return Game.wait(s)), "Button")
 	var cols := HBoxContainer.new()
@@ -279,9 +279,9 @@ static func _target_row(gv: GameView, list: Node, m: Dictionary) -> void:
 			if need <= left:
 				blocker = null
 				approach = true
-				chance = "Hinlaufen (%d %s) und zuschlagen" % [need, "Feld" if need == 1 else "Felder"]
+				chance = "Hinlaufen (%s) und zuschlagen" % FreeMove.meters(need)
 			else:
-				blocker = "Zu weit für diese Runde (%d Felder, %d übrig)." % [need, left]
+				blocker = "Zu weit für diese Runde (%s, noch %s Bewegung)." % [FreeMove.meters(need), FreeMove.meters(left)]
 	var states: Array = []
 	if m.get("asleep", false):
 		states.append("schläft")
@@ -315,7 +315,7 @@ static func _target_row(gv: GameView, list: Node, m: Dictionary) -> void:
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(v)
 	var name_col = "#b0a898" if info.insight >= 3 else m.color
-	Kit.text(v, "[b]%s[/b] %s %s" % [Kit.col(Kit.esc(info.name), name_col), Kit.small(Kit.muted("%s · %d %s" % [Kit.esc(info.level), d, "Feld" if d == 1 else "Felder"])), Kit.small(Kit.col(Kit.esc(info.challenge.name), info.challenge.color))], 13)
+	Kit.text(v, "[b]%s[/b] %s %s" % [Kit.col(Kit.esc(info.name), name_col), Kit.small(Kit.muted("%s · %s" % [Kit.esc(info.level), FreeMove.meters(d)])), Kit.small(Kit.col(Kit.esc(info.challenge.name), info.challenge.color))], 13)
 	var line := Kit.esc(info.health)
 	if not states.is_empty():
 		line += " · " + Kit.col(Kit.esc(", ".join(states)), "#7cc4ff")

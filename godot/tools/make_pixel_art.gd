@@ -415,6 +415,9 @@ func _build_all() -> void:
 	for mat in FLOORS:
 		for v in 4:
 			_add("kacheln", "boden/%s%d" % [mat, v], _floor(mat, v))
+	# Große, nahtlose Böden über 4 × 4 Felder: keine Fugen an den Feldgrenzen
+	for mat in BIG_FLOORS:
+		_add("kacheln", "boden/%s_gross" % mat, _floor_big(mat))
 	for boss in [false, true]:
 		for hor in [true, false]:
 			for open in [false, true]:
@@ -730,6 +733,167 @@ func _block(img: Image, x0: int, y0: int, w: int, h: int, col: Color, speck: flo
 			elif yy == y0 + h - 1 or xx == x0 + w - 1:
 				c = col.darkened(0.18)
 			img.set_pixel(xx, yy, c)
+
+
+const BIG_FLOORS := ["pflaster", "dielen", "fliesen", "beton", "ziegelboden", "teppich", "marmor", "blutstein", "arena"]
+const BW := 128
+
+
+## Pixel mit Umbruch an den Rändern (nahtlos kachelbar).
+static func _wset(img: Image, x: int, y: int, c: Color) -> void:
+	img.set_pixel(posmod(x, BW), posmod(y, BW), c)
+
+
+## Wie _block, aber über die Ränder hinweg umgebrochen.
+func _wblock(img: Image, x0: int, y0: int, w: int, h: int, col: Color, speck: float = 0.06) -> void:
+	for yy in range(y0, y0 + h):
+		for xx in range(x0, x0 + w):
+			var c := _jit(col, speck, _r())
+			if yy == y0 or xx == x0:
+				c = col.lightened(0.14)
+			elif yy == y0 + h - 1 or xx == x0 + w - 1:
+				c = col.darkened(0.18)
+			_wset(img, xx, yy, c)
+
+
+## Teilt die Länge n in Stücke zwischen a und b (Summe genau n).
+func _cuts(n: int, a: int, b: int) -> Array:
+	var out: Array = []
+	var left := n
+	while left > 0:
+		var w := _ri(a, b)
+		if left - w < a:
+			w = left
+		out.append(w)
+		left -= w
+	return out
+
+
+func _floor_big(mat: String) -> Image:
+	_rng = Rng.new(900 + mat.length() * 131)
+	var spec: Dictionary = FLOORS[mat]
+	var base := Color(spec.base)
+	var gap := Color(spec.gap)
+	var img := Image.create(BW, BW, false, Image.FORMAT_RGBA8)
+	img.fill(gap)
+	match mat:
+		"pflaster", "blutstein":
+			# Unregelmäßige Steine in versetzten Reihen
+			var big := mat == "blutstein"
+			var y := 0
+			for hgt in _cuts(BW, 11 if big else 7, 15 if big else 10):
+				var x := _ri(0, 12)
+				for wd in _cuts(BW, 12 if big else 8, 20 if big else 14):
+					_wblock(img, x, y, wd - 1, hgt - 1, _jit(base, 0.12, _r()), 0.08 if big else 0.05)
+					x += wd
+				y += hgt
+			if big:
+				var vein := Color(spec.vein)
+				for n in 5:
+					var vx := _ri(0, BW)
+					var vy := _ri(0, BW)
+					for i in _ri(10, 22):
+						_wset(img, vx + i, vy, vein)
+						if _r() < 0.4:
+							vy += 1 if _r() < 0.6 else -1
+		"dielen":
+			for row in BW / 8:
+				var y0 := row * 8
+				var x := _ri(0, 40)
+				for len in _cuts(BW, 36, 70):
+					var col := _jit(base, 0.09, _r())
+					for yy in range(y0, y0 + 7):
+						for xx in range(x, x + len - 1):
+							var c := col
+							if yy == y0:
+								c = col.lightened(0.1)
+							elif yy == y0 + 6:
+								c = col.darkened(0.12)
+							_wset(img, xx, yy, _jit(c, 0.03, _r()))
+					for g in 3:
+						var gy := y0 + _ri(1, 5)
+						var gx := x + _ri(0, len - 12)
+						for i in _ri(6, 14):
+							_wset(img, gx + i, gy, col.darkened(0.16))
+					for nx in [x + 2, x + len - 4]:
+						_wset(img, nx, y0 + 2, Color("#9a958a"))
+						_wset(img, nx, y0 + 4, Color("#6a655c"))
+					x += len
+		"fliesen":
+			# Kleine Fliesen, um ein halbes Feld versetzt
+			for ty in BW / 16:
+				for tx in BW / 16:
+					var col := base if (tx + ty) % 2 == 0 else base.darkened(0.08)
+					var ox := tx * 16 + 8
+					var oy := ty * 16 + 8
+					_wblock(img, ox, oy, 15, 15, _jit(col, 0.03, _r()), 0.02)
+					_wset(img, ox + 2, oy + 2, col.lightened(0.28))
+					_wset(img, ox + 3, oy + 2, col.lightened(0.18))
+					_wset(img, ox + 2, oy + 3, col.lightened(0.18))
+		"beton", "arena", "marmor":
+			var speck := 0.025 if mat == "marmor" else 0.05
+			for yy in BW:
+				for xx in BW:
+					img.set_pixel(xx, yy, _jit(base, speck, _r()))
+			if mat != "marmor":
+				for i in 420:
+					var c := base.darkened(0.18) if _r() < 0.6 else base.lightened(0.12)
+					var qx := _ri(0, BW - 1)
+					var qy := _ri(0, BW - 1)
+					_wset(img, qx, qy, c)
+					if _r() < 0.3:
+						_wset(img, qx + 1, qy, c)
+			if mat == "arena":
+				for i in 90:
+					var qx := _ri(0, BW - 1)
+					var qy := _ri(0, BW - 1)
+					_wset(img, qx, qy, Color("#b09a74"))
+					_wset(img, qx + 1, qy, Color("#9a8460"))
+					_wset(img, qx, qy + 1, Color("#6c5a3e"))
+					_wset(img, qx + 1, qy + 1, Color("#5a4a32"))
+			else:
+				# Große Platten, deren Fugen nicht auf den Feldgrenzen liegen
+				var line := gap if mat == "beton" else gap.lightened(0.05)
+				for i in BW:
+					for f in [21, 85]:
+						_wset(img, f, i, line)
+						_wset(img, f + 1, i, base.lightened(0.08))
+					for f in [13, 77]:
+						_wset(img, i, f, line)
+						_wset(img, i, f + 1, base.lightened(0.08))
+			if mat == "marmor":
+				var vein := Color(spec.vein)
+				for n in 7:
+					var vx := _ri(0, BW)
+					var vy := _ri(0, BW)
+					for i in _ri(30, 70):
+						_wset(img, vx, vy, vein if n % 2 == 0 else vein.lightened(0.15))
+						vx += 1
+						if _r() < 0.5:
+							vy += _ri(-1, 1)
+		"ziegelboden":
+			for r in BW / 8:
+				var off := 5 + (8 if r % 2 == 1 else 0)
+				for b in BW / 16:
+					_wblock(img, b * 16 + off, r * 8 + 3, 15, 7, _jit(base, 0.1, _r()), 0.05)
+		"teppich":
+			for yy in BW:
+				for xx in BW:
+					var c := _jit(base, 0.04, _r())
+					if (xx + yy) % 4 == 0:
+						c = c.darkened(0.06)
+					img.set_pixel(xx, yy, c)
+			var trim := Color(spec.trim)
+			# Rauten im großen Abstand, versetzt
+			for center in [Vector2i(37, 29), Vector2i(101, 93)]:
+				for i in 13:
+					for q in [Vector2i(-i, -13 + i), Vector2i(i, -13 + i), Vector2i(-i, 13 - i), Vector2i(i, 13 - i)]:
+						_wset(img, center.x + q.x, center.y + q.y, trim.darkened(0.2))
+				for i in 6:
+					for q in [Vector2i(-i, -6 + i), Vector2i(i, -6 + i), Vector2i(-i, 6 - i), Vector2i(i, 6 - i)]:
+						_wset(img, center.x + q.x, center.y + q.y, trim.darkened(0.45))
+				_wset(img, center.x, center.y, trim)
+	return img
 
 
 func _floor(mat: String, v: int) -> Image:

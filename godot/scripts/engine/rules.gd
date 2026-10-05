@@ -98,17 +98,6 @@ static func affix_bonuses(id: String, p: int) -> Dictionary:
 
 # ================================================================ Tutorial
 
-## Gleich nach dem Start: wie man spielt (Steuerung, Bildschirm, erstes Ziel).
-static func controls_pages() -> Array:
-	return [
-		"Laufen: Klick auf ein Feld, und du läufst hin. Linke Maustaste gedrückt halten, und du folgst der Maus. Die Pfeiltasten gehen auch, gedrückt halten heißt weiterlaufen. Solange dich nichts angreift, läufst du ohne Pause.",
-		"Handeln: Rechtsklick auf ein Feld öffnet ein Menü mit allem, was dort geht – aufheben, anziehen, angreifen, ansprechen, öffnen, untersuchen. Ist es weiter weg, läufst du von selbst hin. Gold sammelst du beim Drüberlaufen ein.",
-		"Kämpfen: Sobald dich etwas entdeckt, läuft der Kampf in Runden. Pro Runde kannst du dich ein Stück bewegen – die blauen Felder – und eine Aktion ausführen. Klick auf ein blaues Feld, und du läufst am Stück hin. Klick auf einen Gegner, und du läufst hin und schlägst zu. Unten wählst du, womit (1 bis 7), wie (Q bis R) und wohin (Y bis V). Nach dem Angriff kannst du mit der übrigen Bewegung noch zurückweichen. Die Leertaste beendet die Runde, dann sind die Gegner dran.",
-		"Dein Bildschirm: Oben stehen Etage, Uhrzeit und der Countdown bis zum Einsturz, rechts oben die Reiter (Inventar, Erfolge und mehr). Rechts siehst du deine Werte und den Chat mit allem, was passiert. Links oben ist die Karte, K macht sie groß.",
-		"Dein erstes Ziel: die Gilde der Einweisung. Sie ist auf deiner Karte markiert. Dort bekommst du ein Inventar und erfährst den Rest. Danach suchst du die Treppe nach unten, bevor die Etage einstürzt. H zeigt dir jederzeit alle Tasten.",
-	]
-
-
 static func tutorial_pages(guide_name: String, guide_description: String, former_crawler: bool) -> Array:
 	var intro: String
 	if former_crawler:
@@ -119,9 +108,6 @@ static func tutorial_pages(guide_name: String, guide_description: String, former
 		intro,
 		"„Also, die Grundlagen. Du bist in einer Gameshow. Die ganze Galaxis schaut zu. Jede Etage hat einen Timer – wenn er abläuft, stürzt die Etage ein. Bist du dann nicht im Treppenhaus, bist du tot. Punkt.“",
 		"„Ab jetzt hast du ein Inventar. Du kannst also mehr tragen als das, was du in der Hand hältst. Glückwunsch. Außerdem siehst du jetzt deine Werte, und deine Karte merkt sich, wo du schon warst.“",
-		"„Jetzt zu deinem Bildschirm. Oben siehst du Etage, Uhrzeit und wie lange die Etage noch hält. Rechts oben sind deine Reiter: Crawler, Ziele, Inventar, Handwerk, Skills, Erfolge. Ein Klick klappt einen über der Karte auf, noch ein Klick klappt ihn wieder zu. Die Tasten dafür stehen im Hinweis, wenn du mit der Maus darüberfährst.“",
-		"„Rechts läuft der Chat mit: alles, was passiert, mit Filtern für Kampf, Beute und Gespräche. Darüber stehen deine Lebenspunkte und deine Ausdauer, darunter, was es genau hier zu tun gibt. Unten ist deine Aktionsleiste. Im Kampf wählst du dort, womit, wie und wohin du zuschlägst.“",
-		"„Und das Wichtigste für Faule: rechte Maustaste. Auf einem Feld bekommst du ein Menü mit allem, was dort geht – aufheben, angreifen, ansprechen, benutzen, öffnen, untersuchen. Ist es weiter weg, läufst du von selbst hin. Links oben ist deine Karte, K macht sie groß. H zeigt dir alle Tasten.“",
 		"„Kämpfen: Die Systemstimme beobachtet, WIE du kämpfst. Tritt viel, und du wirst besser im Treten. Wirf Steine, und du wirst besser im Werfen. Probier Dinge aus. Wer immer dasselbe macht, wird darin gut – aber auch vorhersehbar.“",
 		"„Bosse: Jedes Viertel hat einen Nachbarschafts-Boss. Solange er lebt, spawnen dort neue Monster nach. Er verlässt seine Kammer nicht. Wenn du ihn tötest, lässt er eine Gebietskarte fallen – heb sie auf. Und in der Mitte der Etage haust etwas Größeres. Die Treppe liegt direkt hinter ihm.“",
 		"„Safe Rooms erkennst du am grünen Schimmern. Dort darf niemand Gewalt anwenden. Monster, die dich dort angreifen, werden weggebeamt. Dort und in der Gilde kannst du Lootboxen öffnen. Und schlafen. Schlaf ist wichtig. Tot sein ist schlimmer.“",

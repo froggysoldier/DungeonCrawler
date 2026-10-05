@@ -45,6 +45,12 @@ static func budget(s: Dictionary) -> int:
 	return clampi(n, 1, 12)
 
 
+## Ein Feld sind 1,5 Meter (für Texte).
+static func _meters(n: int) -> String:
+	var m := n * 1.5
+	return ("%d m" % int(m)) if is_equal_approx(m, floorf(m)) else ("%.1f m" % m).replace(".", ",")
+
+
 ## Nach jedem Zug: Kampf beginnt, neue Runde, oder der Kampf ist vorbei.
 static func after_turn(s: Dictionary) -> void:
 	if s.status != "playing":
@@ -55,7 +61,7 @@ static func after_turn(s: Dictionary) -> void:
 		var n := budget(s)
 		s.round = {"move": n, "max": n, "n": 1 if first else int(s.round.n) + 1, "acted": false}
 		if first:
-			Log.add(s, "Kampf! Ab jetzt in Runden: pro Runde bis zu %d Felder Bewegung und eine Aktion." % n, "gefahr")
+			Log.add(s, "Kampf! Ab jetzt in Runden: pro Runde %s Bewegung und eine Aktion." % _meters(n), "gefahr")
 	elif active(s):
 		s.erase("round")
 		Log.add(s, "Der Kampf ist vorbei. Du bewegst dich wieder frei.", "system")

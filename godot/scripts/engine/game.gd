@@ -166,7 +166,6 @@ static func new_game(opts: Dictionary) -> Dictionary:
 		pages.append("Die Systemstimme hat dich analysiert. Deine Eigenschaften: %s. Details findest du im Crawler-Tab." % ", ".join(names))
 	pages.append("Du hast nichts. Kein Inventar, keine Karte, keine Ahnung. Irgendwo auf dieser Etage gibt es eine Gilde der Einweisung – such sie. Bis dahin kannst du genau einen Gegenstand in der Hand halten. Und deine Fäuste. Und Füße. Viel Spaß!")
 	s.pendingDialogs.append({"title": "%s – Staffel %d" % [show_name, s.season], "speaker": Db.world("SYSTEM_NAME"), "pages": pages})
-	s.pendingDialogs.append({"title": "So spielst du", "speaker": Db.world("SYSTEM_NAME"), "pages": Rules.controls_pages()})
 	Events.emit(s, {"type": "start"})
 	return s
 

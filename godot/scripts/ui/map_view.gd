@@ -22,8 +22,11 @@ var tiles: Tiles
 var anim: Animator
 var hover: Variant = null
 var path: Variant = null
-## Kampfrunde: erreichbare Felder (Index -> Schritte), sonst leer.
-var reach: Dictionary = {}
+## Geglätteter Weg (freie Punkte in Feldern), im Kampf grün bis path_ok
+## (Länge in Feldern), danach rot; path_label steht am Ende (Meter).
+var path_pts: Array = []
+var path_ok := -1.0
+var path_label := ""
 var selected: Variant = null
 
 var zoom_index: int = 1
@@ -219,6 +222,17 @@ func zoom(delta: int) -> bool:
 
 func zoom_bounds() -> Dictionary:
 	return {"min": zoom_index == 0, "max": zoom_index == ZOOM_STEPS.size() - 1}
+
+
+## Freie Position (in Feldern) unter einem Punkt der Karte: die Figur steht
+## dann mit ihrer Mitte genau dort.
+func pos_from_local(p: Vector2) -> Vector2:
+	return (p + _cam_px) / tile_px - Vector2(0.5, 0.5)
+
+
+## Rechteck einer Figur an der freien Position p auf dem Bildschirm (global).
+func screen_rect(p: Vector2) -> Rect2:
+	return Rect2(global_position + Vector2(_sx(p.x), _sy(p.y) - tile_px * 0.5), Vector2(tile_px, tile_px * 1.5))
 
 
 func tile_from_local(p: Vector2) -> Vector2i:
@@ -479,7 +493,7 @@ func _draw_static(ci: CanvasItem) -> void:
 				var across: bool = MapGen.tile_at(m, x - 1, y) == Kanalstadt.CANAL or MapGen.tile_at(m, x + 1, y) == Kanalstadt.CANAL
 				_spr(ci, "boden/%s%d" % ["bruecke" if across else "bruecke_quer", floori(Tiles.hash(x, y) * 4)], sx, sy)
 			else:
-				_spr(ci, "boden/%s%d" % [mat, floori(Tiles.hash(x, y) * 4)], sx, sy)
+				_spr(ci, floor_name(mat, x, y), sx, sy)
 			# Harte Schatten unter und neben Wänden
 			var n: bool = y == 0 or tl[i - mw] == "wall"
 			var we: bool = x == 0 or tl[i - 1] == "wall"
@@ -550,7 +564,7 @@ func _draw_static(ci: CanvasItem) -> void:
 					if nmat == null:
 						nmat = Tiles.room_material(m.rooms[nri] if nri >= 0 else null)
 						materials[nri] = nmat
-					_spr(ci, "boden/%s%d" % [nmat, floori(Tiles.hash(nx, ny) * 4)], sx, sy)
+					_spr(ci, floor_name(nmat, nx, ny), sx, sy)
 					break
 			var cell := wall_cell(x, y)
 			ci.draw_texture_rect_region(sheet, Rect2(sx, sy, T, T), Rect2(cell.x * 64, cell.y * 64, 64, 64))
@@ -559,6 +573,24 @@ func _draw_static(ci: CanvasItem) -> void:
 					_animated.append(["torch", x, y])
 				else:
 					_spr(ci, "moebel/fackel", sx, sy)
+
+
+## Boden eines Feldes: Ausschnitt aus der großen, nahtlosen Fläche (4 × 4
+## Felder), damit die Fugen nicht auf den Feldgrenzen liegen. Ältere Böden
+## ohne große Fläche nehmen eine der vier Einzelkacheln.
+static func floor_name(mat: String, x: int, y: int) -> String:
+	var big := "boden/%s_gross" % mat
+	var part := "%s@%d" % [big, posmod(y, 4) * 4 + posmod(x, 4)]
+	if PixelArt.has(part):
+		return part
+	if not PixelArt.has(big):
+		return "boden/%s%d" % [mat, floori(Tiles.hash(x, y) * 4)]
+	var img := PixelArt.image(big)
+	var n := img.get_width() / 4
+	for cy in 4:
+		for cx in 4:
+			PixelArt.register("%s@%d" % [big, cy * 4 + cx], img.get_region(Rect2i(cx * n, cy * n, n, n)))
+	return part
 
 
 const FOAM_FRAMES := 16
@@ -941,6 +973,36 @@ func _tag(ci: CanvasItem, cx: float, y: float, text: String, color: String) -> v
 	ci.draw_string(f, Vector2(r.position.x + 6, r.position.y + fs * 0.82), text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, _col(color))
 
 
+## Gepunktete Linie entlang des freien Weges, am Ende ein Ring und die Länge.
+func _draw_route(ci: CanvasItem, T: float) -> void:
+	var total := FreeMove.length(path_pts)
+	var gold := Color(1, 214 / 255.0, 90 / 255.0, 0.9)
+	var green := Color(0.55, 0.95, 0.6, 0.95)
+	var red := Color(1, 0.38, 0.36, 0.9)
+	var dot := 2 * px
+	var d := 0.45
+	while d < total - 0.3:
+		var q := FreeMove.point_at(path_pts, d)
+		var c := gold if path_ok < 0 else (green if d <= path_ok else red)
+		var x := roundf(_sx(q.x) + T / 2 - dot / 2.0)
+		var y := roundf(_sy(q.y) + T / 2 - dot / 2.0)
+		ci.draw_rect(Rect2(x, y, dot, dot), Color(0, 0, 0, 0.45 * c.a))
+		ci.draw_rect(Rect2(x - px, y - px, dot, dot), c)
+		d += 0.35
+	var end: Vector2 = path_pts[-1]
+	var ec := gold if path_ok < 0 else (green if path_ok >= total - 0.01 else red)
+	var center := Vector2(_sx(end.x) + T / 2, _sy(end.y) + T / 2)
+	ci.draw_arc(center + Vector2(0, T * 0.28), T * 0.26, 0, TAU, 24, Color(0, 0, 0, 0.5), 3 * px)
+	ci.draw_arc(center + Vector2(0, T * 0.25), T * 0.26, 0, TAU, 24, ec, 1.5 * px)
+	if path_label != "":
+		var font := UiFonts.pixel(700)
+		var fs := UiFonts.px(14 if px < 2 else 20)
+		var w := font.get_string_size(path_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var pos := Vector2(roundf(center.x - w / 2), roundf(center.y - T * 0.15))
+		ci.draw_string_outline(font, pos, path_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 6, Color(0, 0, 0, 0.85))
+		ci.draw_string(font, pos, path_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, ec)
+
+
 func _draw_dynamic() -> void:
 	if s.is_empty():
 		return
@@ -957,36 +1019,9 @@ func _draw_dynamic_body() -> void:
 	var time: float = frame_anim.time
 	var T := tile_px
 
-	# --- Kampfrunde: wie weit der Crawler noch kommt (blau), Rand betont
-	if not reach.is_empty():
-		var w: int = m.width
-		var fill := Color(0.42, 0.72, 1.0, 0.13)
-		var edge := Color(0.55, 0.8, 1.0, 0.55)
-		for i in reach:
-			var x: int = i % w
-			var y: int = i / w
-			var sx := _sx(x)
-			var sy := _sy(y)
-			ci.draw_rect(Rect2(sx, sy, T, T), fill)
-			for d in [[0, -1, 0, 0, 32, 2], [0, 1, 0, 30, 32, 2], [-1, 0, 0, 0, 2, 32], [1, 0, 30, 0, 2, 32]]:
-				if not reach.has(i + d[0] + d[1] * w):
-					_rect(ci, sx, sy, d[2], d[3], d[4], d[5], edge)
-
-	# --- Pfadvorschau (im Kampf: was über die Bewegung der Runde hinausgeht, rot)
-	if path is Array and not (path as Array).is_empty():
-		var pl: Array = path
-		for n in pl.size():
-			var p = pl[n]
-			var sx := _sx(p.x)
-			var sy := _sy(p.y)
-			var c := Color(1, 214 / 255.0, 90 / 255.0, maxf(0.3, 0.85 - n * 0.03))
-			if not reach.is_empty() and not reach.has(MapGen.idx(m, p.x, p.y)):
-				c = Color(1, 0.36, 0.36, 0.7)
-			if n == pl.size() - 1:
-				for q in [[10, 10, 12, 2], [10, 20, 12, 2], [10, 10, 2, 12], [20, 10, 2, 12]]:
-					_rect(ci, sx, sy, q[0], q[1], q[2], q[3], c)
-			else:
-				_rect(ci, sx, sy, 14, 14, 4, 4, c)
+	# --- Weg als gepunktete Linie (im Kampf: was über die Runde hinausgeht, rot)
+	if path_pts.size() > 1:
+		_draw_route(ci, T)
 
 	# --- Andere Crawler (nur sichtbare)
 	for cr in J.arr(s, "crawlers"):
@@ -1285,14 +1320,13 @@ func _draw_top() -> void:
 		var c := _col(f.color, f.alpha)
 		ci.draw_string_outline(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 6, Color(0, 0, 0, 0.9 * f.alpha))
 		ci.draw_string(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, c)
-	if hover != null:
-		var hx := _sx(hover.x)
-		var hy := _sy(hover.y)
-		var c := Color(1, 214 / 255.0, 90 / 255.0, 0.9)
-		ci.draw_rect(Rect2(hx, hy, T, T), Color(1, 214 / 255.0, 90 / 255.0, 0.08))
-		# Ecken als Pixelwinkel
-		for q in [[0, 0, 8, 2], [0, 0, 2, 8], [24, 0, 8, 2], [30, 0, 2, 8], [0, 30, 8, 2], [0, 24, 2, 8], [24, 30, 8, 2], [30, 24, 2, 8]]:
-			_rect(ci, hx, hy, q[0], q[1], q[2], q[3], c)
+	# Maus über einem sichtbaren Gegner: roter Ring unter ihm (kein Feldraster)
+	if hover != null and MapGen.in_bounds(s.map, hover.x, hover.y) and visible_set.has(MapGen.idx(s.map, hover.x, hover.y)):
+		var mon = Ai.monster_at(s, {"x": hover.x, "y": hover.y})
+		if mon != null:
+			var mp := _at(mon.uid, mon.pos)
+			var center := Vector2(_sx(mp.x) + T / 2, _sy(mp.y) + T * 0.78)
+			ci.draw_arc(center, T * 0.36, 0, TAU, 28, Color(1, 0.35, 0.3, 0.9), 1.5 * px)
 	if selected != null:
 		var qx := _sx(selected.x)
 		var qy := _sy(selected.y)
