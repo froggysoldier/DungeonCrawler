@@ -37,9 +37,31 @@ func _initialize() -> void:
 	var t0 := Time.get_ticks_usec()
 	gv.refresh()
 	print("refresh: %.1f ms" % ((Time.get_ticks_usec() - t0) / 1000.0))
+	for fn in ["refresh_top", "refresh_vitals", "refresh_here", "refresh_side", "refresh_log", "_draw_frame", "_update_combat_mode"]:
+		var a0 := Time.get_ticks_usec()
+		for k in 5:
+			gv.call(fn)
+		print("  %s: %.2f ms" % [fn, (Time.get_ticks_usec() - a0) / 5000.0])
+	var a1 := Time.get_ticks_usec()
+	Meta.save_run(s)
+	print("  save_run: %.2f ms" % ((Time.get_ticks_usec() - a1) / 1000.0))
+	a1 = Time.get_ticks_usec()
+	Meta.sync_meta(gv.meta, s)
+	Meta.save_meta(gv.meta)
+	print("  sync+save_meta: %.2f ms" % ((Time.get_ticks_usec() - a1) / 1000.0))
+	a1 = Time.get_ticks_usec()
+	var snap := gv.anim.snapshot(s)
+	gv.anim.after(s, snap, [])
+	print("  anim: %.2f ms" % ((Time.get_ticks_usec() - a1) / 1000.0))
+	gv._bar_state = ""
+	gv.bar_static_key = ""
 	t0 = Time.get_ticks_usec()
 	gv.refresh_actions()
-	print("refresh_actions: %.1f ms" % ((Time.get_ticks_usec() - t0) / 1000.0))
+	print("refresh_actions (neu gebaut): %.1f ms" % ((Time.get_ticks_usec() - t0) / 1000.0))
+	gv._bar_state = ""
+	t0 = Time.get_ticks_usec()
+	gv.refresh_actions()
+	print("refresh_actions (nur nachgezogen): %.1f ms" % ((Time.get_ticks_usec() - t0) / 1000.0))
 	var to: Dictionary = TH.free_neighbor(s, s.player.pos)
 	t0 = Time.get_ticks_usec()
 	gv.act(func(): return Game.move_step(s, to))

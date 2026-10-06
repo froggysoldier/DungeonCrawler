@@ -117,6 +117,11 @@ var guide: Guide
 var _bar_state := ""
 var move_meter: Control
 var move_label: Label
+## Hotbar im Kampf: Knopfreihe, obere Zeile, Inhalt der Reihe, Knöpfe.
+var bar_static_key := ""
+var bar_top: HBoxContainer
+var bar_row: Control
+var hot: Array = []
 
 
 func _init(state: Dictionary, meta_state: Dictionary) -> void:
@@ -599,9 +604,7 @@ func banner(title: String, sub: String, kind: String) -> void:
 	b.kind = kind
 	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_mapwrap.add_child(b)
-	b.set_anchors_preset(Control.PRESET_FULL_RECT)
-	b.position = Vector2.ZERO
-	b.size = _mapwrap.size
+	b.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_banner = b
 
 
@@ -1585,10 +1588,11 @@ func refresh_actions() -> void:
 		return
 	_bar_state = key
 	_actionbar.theme_type_variation = "CombatBar" if fighting else "ActionBar"
-	Kit.clear(_actionbar)
 	if fighting:
 		GameCombat.render_combat(self, _actionbar)
 	else:
+		bar_static_key = ""
+		Kit.clear(_actionbar)
 		GameCombat.render_actions(self, _actionbar)
 
 

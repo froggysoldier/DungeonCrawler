@@ -108,22 +108,77 @@ static func _hot(parent: Node, text: String, key: String, cb: Callable, selected
 ## Aktion, Ziel und „Runde beenden“; darunter in einer Reihe Angriff (womit),
 ## Ausführung (wie), Trefferzone (wohin), Zauber und Sonstiges. Erklärungen
 ## stehen in den Tooltips, Gegner wählt man auf dem Boden (Klick, Tab).
+## Die Knopfreihe wird nur neu gebaut, wenn sich ihr Inhalt ändert (Waffe,
+## Wurfgeschosse, Zauber …); sonst werden nur Auswahl und Sperren nachgezogen.
 static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 	var s := gv.s
-	var p: Dictionary = s.player
 	var targets := gv.combat_targets()
 	if not J.some(targets, func(m): return m.uid == gv.target_uid):
 		gv.target_uid = targets[0].uid if not targets.is_empty() else null
-	var tech := gv.technique()
-	var weapon = Player.current_weapon(s)
 	var target = J.find(targets, func(m): return m.uid == gv.target_uid)
-	var outer := VBoxContainer.new()
-	outer.add_theme_constant_override("separation", 6)
-	bar.add_child(outer)
+	var skey := _static_key(gv)
+	var reuse: bool = skey == gv.bar_static_key and is_instance_valid(gv.bar_top) and is_instance_valid(gv.bar_row) and gv.bar_row.get_parent() != null and gv.bar_row.get_parent().get_parent() == bar
+	if not reuse:
+		Kit.clear(bar)
+		var outer := VBoxContainer.new()
+		outer.add_theme_constant_override("separation", 6)
+		bar.add_child(outer)
+		gv.bar_top = Kit.hbox(outer, 14)
+		var row := HFlowContainer.new()
+		row.add_theme_constant_override("h_separation", 18)
+		row.add_theme_constant_override("v_separation", 6)
+		outer.add_child(row)
+		gv.bar_row = row
+		gv.hot = []
+		gv.bar_parts = {}
+		_build_row(gv, row)
+		gv.bar_static_key = skey
+	else:
+		Kit.clear(gv.bar_top)
+	_build_top(gv, gv.bar_top, target)
+	_update_hot(gv, target)
 
-	gv.bar_parts = {}
-	# --- Zeile 1: Runde, Bewegung, Aktion, Ziel, Runde beenden
-	var top := Kit.hbox(outer, 14)
+
+## Was die Knopfreihe enthält (ändert es sich, wird sie neu gebaut).
+static func _static_key(gv: GameView) -> String:
+	var s := gv.s
+	var p: Dictionary = s.player
+	var w = Player.current_weapon(s)
+	var th := Player.throwables(s)
+	var throw := ""
+	if not th.is_empty():
+		var n := 0
+		for x in th:
+			if x.baseId == th[0].baseId:
+				n += int(J.nn(x, "menge", 1))
+		throw = "%s:%d:%d" % [th[0].baseId, n, J.uniq(th.map(func(x): return x.baseId)).size()]
+	var spells := J.arr(p, "spells").map(func(k): return "%s:%d:%d" % [k.id, Magic.spell_cost(k.id, gv.missile_mana), int(J.num(J.nn(p, "spellCooldowns", {}), k.id))])
+	var ability = Classes.current_ability(s)
+	return "%s|%s|%s|%s|%s|%s|%s" % [w.name if w != null else "", throw, ",".join(spells), Player.heal_item(s) != null, (ability.name + str(J.num(p, "abilityCooldown"))) if ability != null else "", str(gv.pending_spell), Rounds.active(s)]
+
+
+## Knopf der Hotbar, dessen Auswahl, Sperre und Hinweis sich nachziehen lassen.
+static func _live(gv: GameView, parent: Node, text: String, key: String, cb: Callable, sel: Callable, dis: Callable, tip: Callable, variant: String = "") -> ClickPanel:
+	var cp := Kit.kbutton(parent, text, key, cb, variant if variant != "" else "SmallButton", false, "", "", 12)
+	gv.hot.append({"cp": cp, "sel": sel, "dis": dis, "tip": tip, "variant": variant})
+	return cp
+
+
+static func _update_hot(gv: GameView, target: Variant) -> void:
+	for e in gv.hot:
+		var cp: ClickPanel = e.cp
+		if not is_instance_valid(cp):
+			continue
+		if e.variant == "":
+			cp.variant = "SmallSel" if e.sel.call() else "SmallButton"
+		cp.disabled = e.dis.call()
+		cp.tooltip_text = e.tip.call(target)
+		cp._applied = ""
+		cp._apply()
+
+
+static func _build_top(gv: GameView, top: HBoxContainer, target: Variant) -> void:
+	var s := gv.s
 	var round_box := Kit.hbox(top, 14)
 	gv.bar_parts.runde = round_box
 	if Rounds.active(s):
@@ -142,9 +197,7 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 		gv.move_meter = meter
 		gv.move_label = Kit.label(mv, "%s / %s" % [FreeMove.meters(left), FreeMove.meters(int(s.round.max))], 13, Color("#8cc8ff"), 700)
 		gv.move_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		var ac := Kit.text(round_box, "Aktion %s" % ("[color=#e0a040][b]verbraucht[/b][/color]" if acted else "[color=#6ee07a][b]bereit[/b][/color]"), 13)
-		ac.autowrap_mode = TextServer.AUTOWRAP_OFF
-		ac.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		var ac := Kit.label(round_box, "Aktion verbraucht" if acted else "Aktion bereit", 13, Color("#e0a040") if acted else Color("#6ee07a"), 700)
 		ac.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		ac.tooltip_text = "Eine Aktion pro Runde (Angriff, Zauber, Trank, Deckung, Spurt). Danach darfst du mit der übrigen Bewegung noch laufen." if not acted else "Aktion verbraucht: Du kannst noch laufen. Ein weiterer Angriff beginnt die nächste Runde."
 		ac.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -155,25 +208,30 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 	if Rounds.active(s):
 		gv.bar_parts.ende = Kit.kbutton(top, "Runde beenden", "Leer", func(): gv.act(func(): return Game.wait(s)), "PrimaryButton", false, "Die Gegner sind dran, danach beginnt eine neue Runde")
 
-	# --- Zeile 2: die Hotbar
-	var row := HFlowContainer.new()
-	row.add_theme_constant_override("h_separation", 18)
-	row.add_theme_constant_override("v_separation", 6)
-	outer.add_child(row)
+
+static func _build_row(gv: GameView, row: HFlowContainer) -> void:
+	var s := gv.s
+	var p: Dictionary = s.player
+	var weapon = Player.current_weapon(s)
+	var none := func(_t): return ""
 	var g1 := _group(row, "Womit")
 	gv.bar_parts.womit = g1
 	for part in ["faust", "tritt", "knie", "ellbogen", "kopf", "waffe"]:
-		var disabled: bool = part == "waffe" and weapon == null
 		var label: String = (weapon.name if weapon != null else "Waffe") if part == "waffe" else Bonuses.PART_NAMES[part]
 		var pp: String = part
-		var probe := tech.duplicate()
-		probe.part = part
-		_hot(g1, label, GameView.PART_KEYS[part], func():
+		var no_weapon: bool = part == "waffe" and weapon == null
+		_live(gv, g1, label, GameView.PART_KEYS[part], func():
 			gv.pending_spell = null
 			gv.part = pp
 			if pp != "tritt" and gv.move == "stampfen":
 				gv.move = "normal"
-			gv.refresh_actions(), gv.part == part and gv.pending_spell == null, disabled, "%s · %d Ausdauer" % [label, Combat.attack_cost(probe)])
+			gv.refresh_actions(),
+			func(): return gv.part == pp and gv.pending_spell == null,
+			func(): return no_weapon,
+			func(_t):
+				var probe := gv.technique()
+				probe.part = pp
+				return "%s · %d Ausdauer" % [label, Combat.attack_cost(probe)])
 	var th := Player.throwables(s)
 	if not th.is_empty():
 		var it: Dictionary = th[0]
@@ -182,7 +240,7 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 			if x.baseId == it.baseId:
 				n += int(J.nn(x, "menge", 1))
 		var kinds := J.uniq(th.map(func(x): return x.baseId)).size()
-		_hot(g1, "%s ×%d" % [Identify.item_name(s, it), n], "7", func():
+		_live(gv, g1, "%s ×%d" % [Identify.item_name(s, it), n], "7", func():
 			gv.pending_spell = null
 			if gv.part == "wurf" and kinds > 1:
 				# Noch einmal: zur nächsten Art Wurfgeschoss wechseln
@@ -190,27 +248,38 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 				Game.choose_throwable(s, ids[(ids.find(it.baseId) + 1) % ids.size()])
 			gv.part = "wurf"
 			gv.move = "normal"
-			gv.refresh_actions(), gv.part == "wurf" and gv.pending_spell == null, false, "Werfen%s" % (" · noch einmal klicken wechselt die Art" if kinds > 1 else ""))
+			gv.refresh_actions(),
+			func(): return gv.part == "wurf" and gv.pending_spell == null,
+			func(): return false,
+			func(_t): return "Werfen%s" % (" · noch einmal klicken wechselt die Art" if kinds > 1 else ""))
 	var g2 := _group(row, "Wie")
 	gv.bar_parts.wie = g2
 	for mv2 in Combat.ATTACK_MOVES:
-		var probe := tech.duplicate()
-		probe.move = mv2
-		var blocker = Combat.technique_blocker(s, target, probe) if target != null else null
 		var m2: String = mv2
-		_hot(g2, Combat.MOVE_NAMES[mv2], GameView.MOVE_KEYS[mv2], func():
+		_live(gv, g2, Combat.MOVE_NAMES[mv2], GameView.MOVE_KEYS[mv2], func():
 			gv.move = m2
 			if m2 == "stampfen":
 				gv.part = "tritt"
-			gv.refresh_actions(), gv.move == mv2, gv.part == "wurf" and mv2 != "normal", "%s · %d Ausdauer%s" % [Combat.MOVE_NAMES[mv2], Combat.attack_cost(probe), (" · " + String(blocker)) if blocker != null else ""])
+			gv.refresh_actions(),
+			func(): return gv.move == m2,
+			func(): return gv.part == "wurf" and m2 != "normal",
+			func(target):
+				var probe := gv.technique()
+				probe.move = m2
+				var blocker = Combat.technique_blocker(s, target, probe) if target != null else null
+				return "%s · %d Ausdauer%s" % [Combat.MOVE_NAMES[m2], Combat.attack_cost(probe), (" · " + String(blocker)) if blocker != null else ""])
 	var g3 := _group(row, "Wohin")
 	gv.bar_parts.wohin = g3
 	for z in Combat.HIT_ZONES:
 		var zd: Dictionary = Combat.ZONES[z]
 		var zz: String = z
-		_hot(g3, zd.name, GameView.ZONE_KEYS[z], func():
+		var tip: String = "%s: %s" % [zd.name, zd.effekt]
+		_live(gv, g3, zd.name, GameView.ZONE_KEYS[z], func():
 			gv.zone = zz
-			gv.refresh_actions(), gv.zone == z, false, "%s: %s" % [zd.name, zd.effekt])
+			gv.refresh_actions(),
+			func(): return gv.zone == zz,
+			func(): return false,
+			func(_t): return tip)
 	var spells := J.arr(p, "spells")
 	if not spells.is_empty():
 		var g4 := _group(row, "Zauber")
@@ -219,20 +288,37 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 			var cd := int(J.num(J.nn(p, "spellCooldowns", {}), k.id))
 			var cost := Magic.spell_cost(k.id, gv.missile_mana)
 			var id: String = k.id
-			Kit.button(g4, "%s %d%s" % [def.name, cost, (" (%d)" % cd) if cd else ""], func(): _spell(gv, id), "SmallSel" if gv.pending_spell == k.id else "SmallButton", cd > 0 or J.num(p, "mp") < cost, "%s · %d MP · %s" % [def.name, cost, def.description])
+			var stip: String = "%s · %d MP · %s" % [def.name, cost, def.description]
+			_live(gv, g4, "%s %d%s" % [def.name, cost, (" (%d)" % cd) if cd else ""], "", func(): _spell(gv, id),
+				func(): return gv.pending_spell == id,
+				func(): return cd > 0 or J.num(p, "mp") < cost,
+				func(_t): return stip)
 	var g5 := _group(row, "Sonstiges")
 	gv.bar_parts.sonstiges = g5
-	_hot(g5, "Deckung", "", func(): gv.act(func(): return Game.defend(s)), false, false, "Bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung, +2 Ausdauer")
-	_hot(g5, "Spurt", "S", func(): gv.act(func(): return Game.dash(s)), false, int(p.ausdauer) < Game.DASH_COST or J.num(p, "immobile") > 0, "Aktion gegen Bewegung: noch einmal %s in dieser Runde, kostet %d Ausdauer" % [FreeMove.meters(int(s.round.max)) if Rounds.active(s) else "die volle Bewegung", Game.DASH_COST])
+	_live(gv, g5, "Deckung", "", func(): gv.act(func(): return Game.defend(s)), func(): return false, func(): return false,
+		func(_t): return "Bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung, +2 Ausdauer")
+	_live(gv, g5, "Spurt", "S", func(): gv.act(func(): return Game.dash(s)), func(): return false,
+		func(): return int(p.ausdauer) < Game.DASH_COST or J.num(p, "immobile") > 0,
+		func(_t): return "Aktion gegen Bewegung: noch einmal %s in dieser Runde, kostet %d Ausdauer" % [FreeMove.meters(int(s.round.max)) if Rounds.active(s) else "die volle Bewegung", Game.DASH_COST])
 	var potion = Player.heal_item(s)
 	if potion != null:
-		var puid: String = potion.uid
-		_hot(g5, "Trank", "", func(): gv.act(func(): return Game.use_item(s, puid)), false, false, "%s trinken" % Identify.item_name(s, potion))
+		_live(gv, g5, "Trank", "", func():
+			var pot = Player.heal_item(s)
+			if pot != null:
+				var puid: String = pot.uid
+				gv.act(func(): return Game.use_item(s, puid)),
+			func(): return false, func(): return false,
+			func(_t):
+				var pot = Player.heal_item(s)
+				return "%s trinken" % Identify.item_name(s, pot) if pot != null else "Trank trinken")
 	var ability = Classes.current_ability(s)
 	if ability != null:
 		var cd := int(J.num(p, "abilityCooldown"))
-		Kit.kbutton(g5, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())), "AbilityButton", cd > 0, ability.description, "", 12)
-	_hot(g5, "Warten", "", func(): gv.act(func(): return Game.wait(s)), false, false, "Runde beenden ohne Aktion (Leertaste)")
+		var atip: String = ability.description
+		_live(gv, g5, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())),
+			func(): return false, func(): return cd > 0, func(_t): return atip, "AbilityButton")
+	_live(gv, g5, "Warten", "", func(): gv.act(func(): return Game.wait(s)), func(): return false, func(): return false,
+		func(_t): return "Runde beenden ohne Aktion (Leertaste)")
 	if gv.pending_spell != null:
 		var tgt: String = Db.spell(gv.pending_spell).target
 		var hint := Kit.label(row, "Klicke auf %s (Esc bricht ab)" % ("eine freie Stelle am Boden" if tgt == "feld" else "einen Gegner"), 13, "accent")

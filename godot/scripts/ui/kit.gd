@@ -199,8 +199,11 @@ static func kbutton(parent: Node, t: String, key: String, cb: Callable, variant:
 	cp.add_child(h)
 	var l := Label.new()
 	l.text = t
-	l.add_theme_font_size_override("font_size", UiTheme.pixel_size(size))
-	l.add_theme_font_override("font", UiFonts.pixel(500))
+	if size in [12, 13, 14]:
+		l.theme_type_variation = "KText%d" % size
+	else:
+		l.add_theme_font_size_override("font_size", UiTheme.pixel_size(size))
+		l.add_theme_font_override("font", UiFonts.pixel(500))
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(l)
@@ -233,23 +236,14 @@ static func rbutton(parent: Node, bb: String, cb: Callable, variant: String = "B
 
 
 ## Kleine Tastenkappe.
-static var _keycap_box: StyleBox
-
-
 static func keycap(key: String) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if _keycap_box == null:
-		var sb := UiTheme.box(Color("#e6d7b0"), UiTheme.OUTLINE, 4, 1, Vector4(4, 0, 4, 0))
-		sb.border_width_bottom = 4
-		_keycap_box = sb
-	p.add_theme_stylebox_override("panel", _keycap_box)
+	p.theme_type_variation = "KeyCap"
 	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var l := Label.new()
 	l.text = key
-	l.add_theme_font_size_override("font_size", UiFonts.px(14))
-	l.add_theme_font_override("font", UiFonts.pixel(700))
-	l.add_theme_color_override("font_color", UiTheme.OUTLINE)
+	l.theme_type_variation = "KeyCapText"
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.custom_minimum_size = Vector2(9, 0)
 	p.add_child(l)

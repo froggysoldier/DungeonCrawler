@@ -277,5 +277,19 @@ static func get_theme() -> Theme:
 	t.set_stylebox("panel", "TooltipPanel", tp)
 	t.set_color("font_color", "TooltipLabel", TEXT)
 	t.set_font_size("font_size", "TooltipLabel", UiFonts.px(13))
+	# Tastenkappe und Beschriftung der Knöpfe mit Tastenkappe: feste Varianten
+	# statt Überschreibungen je Knopf (die kosten bei vielen Knöpfen spürbar Zeit)
+	var kc := box(Color("#e6d7b0"), OUTLINE, 4, 1, Vector4(4, 0, 4, 0))
+	kc.border_width_bottom = 4
+	_panel(t, "KeyCap", kc)
+	t.set_type_variation("KeyCapText", "Label")
+	t.set_font_size("font_size", "KeyCapText", UiFonts.px(14))
+	t.set_font("font", "KeyCapText", UiFonts.pixel(700))
+	t.set_color("font_color", "KeyCapText", OUTLINE)
+	for size in [12, 13, 14]:
+		var kt := "KText%d" % size
+		t.set_type_variation(kt, "Label")
+		t.set_font_size("font_size", kt, pixel_size(size))
+		t.set_font("font", kt, UiFonts.pixel(500))
 	_theme = t
 	return t

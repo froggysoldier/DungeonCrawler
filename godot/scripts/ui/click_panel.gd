@@ -56,9 +56,17 @@ func _gui_input(ev: InputEvent) -> void:
 		accept_event()
 
 
+var _applied := ""
+
+
 func _apply() -> void:
 	var th := UiTheme.get_theme()
 	var state := "disabled" if disabled else ("pressed" if _down else ("hover" if _hover else "normal"))
+	# Nur bei einem Wechsel neu setzen: jede Überschreibung kostet Zeit
+	var stamp := "%s|%s|%d|%s" % [state, variant, _labels.size(), fixed_panel != null]
+	if stamp == _applied:
+		return
+	_applied = stamp
 	add_theme_stylebox_override("panel", fixed_panel if fixed_panel != null else th.get_stylebox(state, variant))
 	var key := "font_disabled_color" if disabled else ("font_hover_color" if _hover else "font_color")
 	var col := th.get_color(key, variant)
