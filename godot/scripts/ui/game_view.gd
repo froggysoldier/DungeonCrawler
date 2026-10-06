@@ -425,6 +425,7 @@ func _draw_frame() -> void:
 		path = _path_cache.path
 		attack = _path_cache.get("attack", false)
 	map.hover = hover
+	map.hover_label = _path_cache.get("hover_label", "") if hover != null and _path_cache.key != "" else ""
 	map.path = path
 	map.path_pts = _path_cache.get("pts", []) if path != null else []
 	# Im Kampf: Weg bis zur Reichweite der Runde, Länge in Metern
@@ -432,7 +433,7 @@ func _draw_frame() -> void:
 	map.path_label = ""
 	if path != null and not map.path_pts.is_empty():
 		var steps: int = (path as Array).size()
-		map.path_label = ("Angriff · %s" % FreeMove.meters(steps)) if attack else FreeMove.meters(steps)
+		map.path_label = ("Angriff · %s · %s" % [FreeMove.meters(steps), _path_cache.get("chance", "")]) if attack else FreeMove.meters(steps)
 		if in_combat():
 			var left := int(s.round.move)
 			map.path_ok = FreeMove.length(map.path_pts) * minf(1.0, float(left) / steps)
@@ -440,6 +441,15 @@ func _draw_frame() -> void:
 	var room = Game.current_room(s)
 	_room_label.text = room.name if room != null else "Gang"
 	_draw_minimap()
+
+
+## Trefferchance gegen einen Gegner, so weit man sie kennt.
+func _hit_text(mon: Dictionary) -> String:
+	if pending_spell != null:
+		return "Zauber"
+	if not Identify.describe_monster(s, mon).showHitChance:
+		return "Treffer unklar"
+	return "%d %%" % clampi(Combat.hit_chance(s, mon, technique()), 0, 100)
 
 
 ## Wegvorschau zum Feld unter der Maus. Über einem Gegner: der Weg bis
@@ -456,7 +466,13 @@ func _plan_preview(key: String) -> Dictionary:
 	var mon = Ai.monster_at(s, tp)
 	var grid: Variant = null
 	if mon != null:
-		if not _vis_now().has(i) or part == "wurf" or Fov.chebyshev(tp, s.player.pos) <= 1:
+		if not _vis_now().has(i):
+			return out
+		out.chance = _hit_text(mon)
+		var blocker = Combat.technique_blocker(s, mon, technique())
+		if part == "wurf" or Fov.chebyshev(tp, s.player.pos) <= 1:
+			# Kein Weg nötig: Chance (oder was fehlt) steht über dem Gegner
+			out.hover_label = ("Angriff · %s" % out.chance) if blocker == null else String(blocker).trim_suffix(".")
 			return out
 		grid = Game.plan_path(s, tp)
 		if grid is Array and not grid.is_empty():
@@ -751,11 +767,15 @@ func _try_move(pos: Vector2, nxt: Vector2, now: float) -> bool:
 	var fight := in_combat()
 	var hp: int = s.player.hp
 	var traps := _known_traps()
+	var turn: int = s.turn
 	anim.free = nxt
 	act(func(): return Game.move_step(s, tp))
 	if s.player.pos.x != t.x or s.player.pos.y != t.y:
-		# Nicht weitergekommen (Schlamm, festgehalten, verriegelt …)
+		# Nicht weitergekommen. Im Schlamm oder festgehalten verging dabei ein
+		# Zug: außerhalb des Kampfes weiter versuchen, sonst anhalten
 		_wait_until = now + STEP_MS
+		if s.turn > turn and not in_combat() and s.player.hp >= hp and s.status == "playing":
+			return true
 		_route.clear()
 		return false
 	if (not fight and in_combat()) or s.player.hp < hp or _known_traps() > traps:

@@ -27,6 +27,8 @@ var path: Variant = null
 var path_pts: Array = []
 var path_ok := -1.0
 var path_label := ""
+## Text über dem Gegner unter der Maus (Trefferchance oder was fehlt).
+var hover_label := ""
 var selected: Variant = null
 
 var zoom_index: int = 1
@@ -1007,7 +1009,7 @@ func _draw_route(ci: CanvasItem, T: float) -> void:
 		var font := UiFonts.pixel(700)
 		var fs := UiFonts.px(14 if px < 2 else 20)
 		var w := font.get_string_size(path_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-		var pos := Vector2(roundf(center.x - w / 2), roundf(center.y - T * 0.15))
+		var pos := Vector2(roundf(clampf(center.x - w / 2, 6, size.x - w - 6)), roundf(center.y - T * 0.15))
 		ci.draw_string_outline(font, pos, path_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 6, Color(0, 0, 0, 0.85))
 		ci.draw_string(font, pos, path_label, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, ec)
 
@@ -1336,6 +1338,15 @@ func _draw_top() -> void:
 			var mp := _at(mon.uid, mon.pos)
 			var center := Vector2(_sx(mp.x) + T / 2, _sy(mp.y) + T * 0.78)
 			ci.draw_arc(center, T * 0.36, 0, TAU, 28, Color(1, 0.35, 0.3, 0.9), 1.5 * px)
+			if hover_label != "":
+				var hfont := UiFonts.pixel(700)
+				var hfs := UiFonts.px(14 if px < 2 else 20)
+				var w := hfont.get_string_size(hover_label, HORIZONTAL_ALIGNMENT_LEFT, -1, hfs).x
+				var look := Sprites.sprite_name(String(mon.defId), mon.rank == "geist")
+				var tall := PixelArt.size_of(look).y - sprite_top(look)
+				var pos := Vector2(roundf(clampf(center.x - w / 2, 6, size.x - w - 6)), roundf(_sy(mp.y) + T - maxi(tall, TILE) * px - 4 * px))
+				ci.draw_string_outline(hfont, pos, hover_label, HORIZONTAL_ALIGNMENT_LEFT, -1, hfs, 6, Color(0, 0, 0, 0.85))
+				ci.draw_string(hfont, pos, hover_label, HORIZONTAL_ALIGNMENT_LEFT, -1, hfs, Color(1, 0.84, 0.36))
 	if selected != null:
 		var qx := _sx(selected.x)
 		var qy := _sy(selected.y)

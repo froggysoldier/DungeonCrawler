@@ -331,6 +331,15 @@ func _initialize() -> void:
 				gv.hover = Vector2i(ghul.pos.x, ghul.pos.y)
 				await wait(0.6)
 				await shot("kampfweg")
+				# Daneben stehen: Trefferchance über dem Gegner
+				var near_spot = TH.free_neighbor(s, ghul.pos)
+				TH.teleport(s, near_spot)
+				gv.anim.reset()
+				gv.hover = null
+				await wait(0.1)
+				gv.hover = Vector2i(ghul.pos.x, ghul.pos.y)
+				await wait(0.4)
+				await shot("kampfweg_nah")
 				gv.hover = null
 				gv.act(func(): return Game.wait(s))
 				Modals.instance.close_all()

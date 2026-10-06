@@ -126,7 +126,10 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   schräg), an Wänden gleitet man entlang. Im Hintergrund rechnet das Spiel in
   Feldern: Betritt die Figur ein neues Feld, ist das ein Schritt. Die
   Vorschau ist eine gepunktete Linie mit Länge in Metern (ein Feld = 1,5 m);
-  über einem Gegner zeigt sie den Weg bis neben ihn („Angriff · 6 m“).
+  über einem Gegner zeigt sie den Weg bis neben ihn mit Trefferchance
+  („Angriff · 6 m · 72 %“); steht er schon daneben, steht die Chance (oder
+  was fehlt) über ihm. Bleibt man im Schlamm stecken, läuft der Klick-Weg
+  außerhalb des Kampfes weiter, sobald man sich befreit hat.
   Klick-Reisen öffnen Türen unterwegs. Gegner, Haustier und Gruppe, die in
   einer Kampfrunde mehrere Felder laufen, gleiten den echten Weg entlang
   (geglättet, um Ecken statt durch Wände). Andere Figuren stehen je etwas
