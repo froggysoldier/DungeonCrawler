@@ -271,9 +271,19 @@ static func plan_path(s: Dictionary, target: Dictionary) -> Variant:
 	if not known.call(target.x, target.y):
 		return null
 	var is_target := func(x: int, y: int) -> bool: return x == target.x and y == target.y
+	# Gegner, Fallen und Möbel vorab als Mengen: die Suche fragt jedes Feld oft
+	var w: int = m.width
+	var mons := {}
+	for mo in s.monsters:
+		mons[int(mo.pos.y) * w + int(mo.pos.x)] = true
+	var traps := {}
+	for tr in J.arr(s, "traps"):
+		if not tr.hidden and tr.owner == "dungeon":
+			traps[int(tr.pos.y) * w + int(tr.pos.x)] = true
 	var ok := func(x: int, y: int) -> bool:
-		return known.call(x, y) and Ai.monster_at(s, J.pos(x, y)) == null and (is_target.call(x, y) or (MapGen.furniture_at(m, J.pos(x, y)) == null and Dungeon.lock_at(s, J.pos(x, y)) == null))
-	var path = Pathfinding.find_path(m, s.player.pos, target, func(x, y): return ok.call(x, y) and (is_target.call(x, y) or not Traps.avoid_tile(s, x, y)), 6000, true)
+		var i := y * w + x
+		return m.explored[i] and not mons.has(i) and (is_target.call(x, y) or (MapGen.furniture_at(m, J.pos(x, y)) == null and Dungeon.lock_at(s, J.pos(x, y)) == null))
+	var path = Pathfinding.find_path(m, s.player.pos, target, func(x, y): return ok.call(x, y) and (is_target.call(x, y) or not traps.has(y * w + x)), 6000, true)
 	if path == null:
 		path = Pathfinding.find_path(m, s.player.pos, target, ok, 6000, true)
 	return path

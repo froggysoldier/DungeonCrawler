@@ -51,6 +51,10 @@ var _route_round := -1
 ## Nach einem vergeblichen Schritt (Schlamm, festgehalten) kurz warten.
 var _wait_until := 0.0
 var _follow_cache := {"key": "", "pts": []}
+## Wegvorschau: Feld, über dem die Maus gerade ist, und seit wann.
+var _preview_key := ""
+var _preview_at := 0.0
+const PREVIEW_DELAY_MS := 70.0
 ## Linke Maustaste gedrückt auf der Karte: nach kurzer Zeit folgt die Figur
 ## der Maus, bis ein Kampf beginnt oder die Taste losgelassen wird.
 var _press_at := -1.0
@@ -410,8 +414,14 @@ func _draw_frame() -> void:
 	var attack := false
 	if hover != null and not traveling and held.is_empty() and not _mouse_follow and s.status == "playing":
 		var key := "%d,%d|%d,%d|%d|%s" % [hover.x, hover.y, s.player.pos.x, s.player.pos.y, s.turn, part]
+		# Erst rechnen, wenn die Maus kurz ruht: Weite Wege kosten Zeit, und
+		# beim Wischen über die Karte soll nichts ruckeln
 		if _path_cache.key != key:
-			_path_cache = _plan_preview(key)
+			if _preview_key != key:
+				_preview_key = key
+				_preview_at = Animator.now_ms()
+			if Animator.now_ms() - _preview_at >= PREVIEW_DELAY_MS:
+				_path_cache = _plan_preview(key)
 		path = _path_cache.path
 		attack = _path_cache.get("attack", false)
 	map.hover = hover
@@ -704,9 +714,10 @@ func _follow_goal(pos: Vector2) -> Variant:
 		return mp
 	var t := FreeMove.tile_of(mp)
 	var key := "%d,%d|%d,%d" % [t.x, t.y, s.player.pos.x, s.player.pos.y]
-	if _follow_cache.key != key:
+	# Höchstens alle 150 ms einen neuen Weg suchen (die Maus wandert ständig)
+	if _follow_cache.key != key and Animator.now_ms() - float(_follow_cache.get("at", 0.0)) >= 150.0:
 		var grid = Game.plan_path(s, J.pos(t.x, t.y)) if MapGen.in_bounds(s.map, t.x, t.y) else null
-		_follow_cache = {"key": key, "pts": FreeMove.smooth(s, pos, grid) if grid is Array and not grid.is_empty() else []}
+		_follow_cache = {"key": key, "at": Animator.now_ms(), "pts": FreeMove.smooth(s, pos, grid) if grid is Array and not grid.is_empty() else []}
 	var pts: Array = _follow_cache.pts
 	return pts[1] if pts.size() > 1 else mp
 

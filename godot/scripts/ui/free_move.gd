@@ -72,7 +72,8 @@ static func smooth(s: Dictionary, start: Vector2, path: Array) -> Array:
 	var i := 0
 	while i < pts.size() - 1:
 		var j := i + 1
-		var k := pts.size() - 1
+		# Höchstens 16 Punkte voraus prüfen: lange Wege bleiben schnell
+		var k := mini(pts.size() - 1, i + 16)
 		while k > i + 1:
 			if _no_door_between(s, pts, i, k) and clear_line(s, pts[i], pts[k]):
 				j = k

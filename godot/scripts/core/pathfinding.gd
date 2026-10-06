@@ -17,33 +17,29 @@ static func find_path(m: Dictionary, from: Dictionary, to: Dictionary, passable:
 	var ty: int = to.y
 	if tx < 0 or ty < 0 or tx >= width or ty >= height:
 		return null
-	var walk := func(x: int, y: int) -> bool:
-		if x < 0 or y < 0 or x >= width or y >= height:
-			return false
-		var t: String = tiles[y * width + x]
-		return t == "floor" or t == "stairs" or t == "dooropen" or t == "wasser" or t == "schlamm" or t == "bruecke" or t == "oel" or (through_doors and t == "door")
-	var is_door := func(x: int, y: int) -> bool:
-		if x < 0 or y < 0 or x >= width or y >= height:
-			return false
-		var t: String = tiles[y * width + x]
-		return t == "door" or t == "dooropen"
+	var n := width * height
+	# Felder werden erst bei Bedarf eingestuft und dann gemerkt:
+	# Bit 1 geprüft, Bit 2 begehbar, Bit 4 Tür, Bit 8 Zusatzbedingung geprüft, Bit 16 erfüllt
+	var info := PackedByteArray()
+	info.resize(n)
 	var has_pass := passable.is_valid()
 	var start_i: int = int(from.y) * width + int(from.x)
 	var goal_i := ty * width + tx
-	var g := {start_i: 0.0}
-	var came := {}
-	var open_i: Array[int] = [start_i]
-	var open_f: Array[float] = [0.0]
-	var closed := {}
+	var g := PackedFloat64Array()
+	g.resize(n)
+	g.fill(INF)
+	g[start_i] = 0.0
+	var came := PackedInt32Array()
+	came.resize(n)
+	var closed := PackedByteArray()
+	closed.resize(n)
+	# Offene Liste als Heap; bei gleichem Wert gewinnt der früher eingefügte
+	# Eintrag (wie bei der einfachen Suche, damit die Wege gleich bleiben)
+	var heap := _Heap.new()
+	heap.push(0.0, start_i)
 	var nodes := 0
-	while not open_i.is_empty():
-		var best := 0
-		for k in range(1, open_i.size()):
-			if open_f[k] < open_f[best]:
-				best = k
-		var i: int = open_i[best]
-		open_i.remove_at(best)
-		open_f.remove_at(best)
+	while heap.size() > 0:
+		var i: int = heap.pop()
 		if i == goal_i:
 			var path := []
 			var cur := i
@@ -52,34 +48,116 @@ static func find_path(m: Dictionary, from: Dictionary, to: Dictionary, passable:
 				cur = came[cur]
 			path.reverse()
 			return path
-		if closed.has(i):
+		if closed[i]:
 			continue
-		closed[i] = true
+		closed[i] = 1
 		nodes += 1
 		if nodes > max_nodes:
 			return null
 		var x := i % width
 		var y := i / width
+		var here := _info(info, tiles, i, through_doors)
 		for d in DIRS:
 			var dx: int = d[0]
 			var dy: int = d[1]
 			var nx := x + dx
 			var ny := y + dy
-			if not walk.call(nx, ny):
-				continue
-			# Keine Diagonale durch Wandecken und nicht schräg durch Türrahmen
-			if dx != 0 and dy != 0 and (not walk.call(x + dx, y) or not walk.call(x, y + dy) or is_door.call(x, y) or is_door.call(nx, ny)):
+			if nx < 0 or ny < 0 or nx >= width or ny >= height:
 				continue
 			var ni := ny * width + nx
-			if ni != goal_i and has_pass and not passable.call(nx, ny):
+			var there := _info(info, tiles, ni, through_doors)
+			if there & 2 == 0:
 				continue
+			# Keine Diagonale durch Wandecken und nicht schräg durch Türrahmen
+			if dx != 0 and dy != 0:
+				if _info(info, tiles, y * width + nx, through_doors) & 2 == 0 or _info(info, tiles, ny * width + x, through_doors) & 2 == 0 or here & 4 or there & 4:
+					continue
+			if ni != goal_i and has_pass:
+				var pv: int = info[ni]
+				if pv & 8 == 0:
+					pv |= 8 | (16 if passable.call(nx, ny) else 0)
+					info[ni] = pv
+				if pv & 16 == 0:
+					continue
 			var ng: float = g[i] + (1.01 if dx != 0 and dy != 0 else 1.0)
-			if ng < g.get(ni, INF):
+			if ng < g[ni]:
 				g[ni] = ng
 				came[ni] = i
-				open_i.append(ni)
-				open_f.append(ng + maxi(absi(nx - tx), absi(ny - ty)))
+				heap.push(ng + maxi(absi(nx - tx), absi(ny - ty)), ni)
 	return null
+
+
+static func _info(info: PackedByteArray, tiles: Array, i: int, through_doors: bool) -> int:
+	var v: int = info[i]
+	if v & 1:
+		return v
+	var t: String = tiles[i]
+	v |= 1
+	if t == "floor" or t == "stairs" or t == "dooropen" or t == "wasser" or t == "schlamm" or t == "bruecke" or t == "oel" or (through_doors and t == "door"):
+		v |= 2
+	if t == "door" or t == "dooropen":
+		v |= 4
+	info[i] = v
+	return v
+
+
+## Kleinster Wert zuerst, bei Gleichstand der früher eingefügte.
+class _Heap:
+	var f: Array[float] = []
+	var seq: Array[int] = []
+	var val: Array[int] = []
+	var _n := 0
+
+	func size() -> int:
+		return f.size()
+
+	func _less(a: int, b: int) -> bool:
+		return f[a] < f[b] or (f[a] == f[b] and seq[a] < seq[b])
+
+	func _swap(a: int, b: int) -> void:
+		var tf := f[a]
+		f[a] = f[b]
+		f[b] = tf
+		var ts := seq[a]
+		seq[a] = seq[b]
+		seq[b] = ts
+		var tv := val[a]
+		val[a] = val[b]
+		val[b] = tv
+
+	func push(fv: float, v: int) -> void:
+		f.append(fv)
+		seq.append(_n)
+		val.append(v)
+		_n += 1
+		var k := f.size() - 1
+		while k > 0:
+			var up := (k - 1) / 2
+			if not _less(k, up):
+				break
+			_swap(k, up)
+			k = up
+
+	func pop() -> int:
+		var top := val[0]
+		var last := f.size() - 1
+		_swap(0, last)
+		f.resize(last)
+		seq.resize(last)
+		val.resize(last)
+		var k := 0
+		while true:
+			var l := k * 2 + 1
+			if l >= last:
+				break
+			var c := l
+			if l + 1 < last and _less(l + 1, l):
+				c = l + 1
+			if not _less(c, k):
+				break
+			_swap(c, k)
+			k = c
+		return top
 
 
 static func is_door(m: Dictionary, x: int, y: int) -> bool:
