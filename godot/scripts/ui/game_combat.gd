@@ -185,6 +185,7 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 	_sub(c1, "Sonstiges")
 	var bo := Kit.flow(c1, 4)
 	Kit.button(bo, "Deckung", func(): gv.act(func(): return Game.defend(s)), "Button", false, "Bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung, +2 Ausdauer")
+	Kit.kbutton(bo, "Spurt", "S", func(): gv.act(func(): return Game.dash(s)), "Button", int(p.ausdauer) < Game.DASH_COST or J.num(p, "immobile") > 0, "Aktion gegen Bewegung: noch einmal %s in dieser Runde, kostet %d Ausdauer" % [FreeMove.meters(int(s.round.max)) if Rounds.active(s) else "die volle Bewegung", Game.DASH_COST])
 	var potion = Player.heal_item(s)
 	if potion != null:
 		var puid: String = potion.uid

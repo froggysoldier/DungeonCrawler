@@ -145,7 +145,8 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   Warten). Die Weglinie ist grün, soweit die Bewegung reicht, danach rot.
   Ein Klick läuft am Stück hin; ein
   Klick auf einen Gegner läuft hin und greift an, wenn die Bewegung reicht.
-  Schritte kosten keine Spielzeit, die Gegner warten. Auch nach der Aktion
+  **Spurt** (S) macht aus der Aktion Bewegung: noch einmal der volle Vorrat,
+  kostet 2 Ausdauer. Schritte kosten keine Spielzeit, die Gegner warten. Auch nach der Aktion
   darf man mit der übrigen Bewegung weiterlaufen (zuschlagen und zurückweichen).
   Die Runde endet mit der Leertaste („Runde beenden“), von selbst, wenn Aktion
   und Bewegung verbraucht sind, oder wenn man eine zweite Aktion wählt (die

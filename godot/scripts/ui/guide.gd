@@ -312,7 +312,7 @@ func _main_steps() -> Array:
 
 func _fight_steps() -> Array:
 	return [
-		{"text": "[b]Kampf![/b] Jetzt geht es in Runden. Hier unten siehst du, wie viele Meter du in dieser Runde noch laufen kannst und ob deine Aktion bereit ist.",
+		{"text": "[b]Kampf![/b] Jetzt geht es in Runden. Hier unten siehst du, wie viele Meter du in dieser Runde noch laufen kannst und ob deine Aktion bereit ist. Brauchst du mehr Weg, macht „Spurt“ (S) aus der Aktion Bewegung.",
 			"target": func(): return gv._actionbar, "info": true},
 		{"text": "[b]Klicke auf einen Gegner[/b], um ihn anzugreifen. Ist er zu weit weg, läufst du erst hin. Die Linie zum Mauszeiger ist grün, solange deine Bewegung reicht.",
 			"target": _foe_rect, "done": func(): return gv.in_combat() and gv.s.round.get("acted", false)},

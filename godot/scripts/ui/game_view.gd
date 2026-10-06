@@ -1222,6 +1222,8 @@ func _unhandled_input(ev: InputEvent) -> void:
 		act(func(): return Game.wait(s))
 	elif ch == "f" and Classes.current_ability(s) != null:
 		act(func(): return Classes.use_ability(s, technique()))
+	elif ch == "s" and in_combat():
+		act(func(): return Game.dash(s))
 	elif ch == "m" and s.player.get("mount") != null:
 		act(func(): return Game.ride_toggle(s))
 	elif ch == "g":

@@ -534,6 +534,33 @@ static func defend(s: Dictionary) -> Dictionary:
 	return _ok()
 
 
+## Spurt (nur im Kampf): Die Aktion der Runde wird zu Bewegung – noch
+## einmal der volle Vorrat. Kostet 2 Ausdauer.
+const DASH_COST := 2
+
+
+static func dash(s: Dictionary) -> Dictionary:
+	if s.status != "playing":
+		return _fail("Das Spiel ist vorbei.")
+	if s.pendingSelection:
+		return _fail(SELECT_FIRST)
+	var p: Dictionary = s.player
+	if not Rounds.active(s):
+		return _fail("Spurten lohnt sich nur im Kampf. Sonst läufst du ohnehin frei.")
+	if J.num(p, "immobile") > 0:
+		return _fail("Du bist festgehalten und kannst nicht spurten.")
+	if int(p.ausdauer) < DASH_COST:
+		return _fail("Zu erschöpft zum Spurten (%d Ausdauer nötig)." % DASH_COST)
+	Rounds.before_action(s)
+	if s.status != "playing" or not Rounds.active(s):
+		return _ok()
+	p.ausdauer -= DASH_COST
+	s.round.move = int(s.round.move) + int(s.round.max)
+	Log.add(s, "Du spurtest: noch %s Bewegung in dieser Runde." % Rounds.meters(int(s.round.move)), "kampf")
+	end_turn(s)
+	return _ok()
+
+
 static func wait(s: Dictionary) -> Dictionary:
 	if s.status != "playing":
 		return _fail("Das Spiel ist vorbei.")

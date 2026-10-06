@@ -156,3 +156,24 @@ func test_haustier_laeuft_in_der_runde(t) -> void:
 	pet.pos = at.call(4)
 	Ai.pet_close_in(s, Rounds.ALLY_SPEED - 1)
 	t.le(J.cheb(pet.pos, s.player.pos), 2, "Haustier folgt mehrere Felder")
+
+
+func test_spurt(t) -> void:
+	var s := TH.make(9100, {"beruf": 1})
+	var at := _arena(s)
+	t.ok(not Game.dash(s).ok, "ohne Kampf kein Spurt")
+	var ghul := _spawn(s, "ghul", 2, at.call(5))
+	ghul.aware = true
+	s.monsters = [ghul]
+	Rounds.after_turn(s)
+	t.ok(Rounds.active(s), "Kampf")
+	var n: int = s.round.n
+	var full: int = s.round.max
+	var stamina: int = s.player.ausdauer
+	t.ok(Game.dash(s).ok, "Spurt")
+	t.eq(int(s.round.move), full * 2, "doppelte Bewegung")
+	t.ok(s.round.acted, "Aktion verbraucht")
+	t.eq(int(s.round.n), n, "Runde läuft weiter")
+	t.eq(int(s.player.ausdauer), stamina - Game.DASH_COST, "kostet Ausdauer")
+	s.player.ausdauer = 0
+	t.ok(not Game.dash(s).ok, "erschöpft: kein Spurt")

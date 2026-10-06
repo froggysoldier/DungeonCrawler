@@ -499,6 +499,7 @@ static func show_help(gv: GameView) -> void:
 		["Trefferzone", "Y Kopf · X Körper · C Arme · V Beine"],
 		["Ziel wechseln", "Tab"],
 		["Warten / Runde beenden", "Leertaste (wer brennt, wälzt sich am Boden)"],
+		["Spurt", "S im Kampf: Die Aktion der Runde wird zu Bewegung (noch einmal der volle Vorrat, 2 Ausdauer)"],
 		["Aufheben", "G"],
 		["Treppe nehmen", "Enter auf der Treppe"],
 		["Klassenfähigkeit", "F (ab Etage 3)"],
