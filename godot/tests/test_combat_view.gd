@@ -69,3 +69,29 @@ func test_zoom_beim_kampf(t) -> void:
 	t.ok(not Rounds.active(s), "Kampf vorbei")
 	t.eq(gv.map.zoom_index, close, "wieder hineingezoomt")
 	await _free(pair)
+
+
+func test_gegnerzug_haelt_eingaben_zurueck(t) -> void:
+	var pair: Array = await _view()
+	var gv: GameView = pair[0]
+	var s := gv.s
+	var r := TH.ready(s, 9)
+	TH.teleport(s, {"x": r.x + 1, "y": r.y + 1})
+	var a := Monsters.spawn_monster(s, Db.monster("ghul"), 1, {"x": r.x + 5, "y": r.y + 1}, 0)
+	var b := Monsters.spawn_monster(s, Db.monster("ghul"), 1, {"x": r.x + 5, "y": r.y + 2}, 0)
+	a.aware = true
+	b.aware = true
+	s.monsters = [a, b]
+	Game.after_move(s)
+	Rounds.after_turn(s)
+	gv.refresh()
+	await _tree.process_frame
+	var turn: int = s.turn
+	t.ok(gv.act(func(): return Game.wait(s)), "Runde beendet")
+	pair[1].close_all()
+	t.ok(gv.anim.enemy_turn(), "Gegnerzug läuft")
+	t.ok(not gv.act(func(): return Game.wait(s)), "Eingabe wartet")
+	t.eq(s.turn, turn + 1, "kein zweiter Zug")
+	gv.anim.turn_until = 0.0
+	t.ok(gv.act(func(): return Game.wait(s)), "danach geht es weiter")
+	await _free(pair)

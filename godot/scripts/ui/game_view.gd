@@ -112,6 +112,9 @@ var top_refs := {}
 var zoom_box: Control
 var bar_parts := {}
 var key_presses := 0
+## Eingaben während des Gegnerzugs zurückhalten (Tests, die Aufnahmen
+## nachspielen, schalten das ab).
+var wait_for_enemies := true
 var guide: Guide
 ## Kampfleiste: Stand beim letzten Aufbau und der Bewegungsbalken.
 var _bar_state := ""
@@ -719,7 +722,7 @@ func _stop_moving() -> void:
 ## schräg), der Maus nach (Taste gehalten) oder einen Klick-Weg entlang.
 ## Betritt sie ein neues Feld, macht das Spiel im Hintergrund einen Schritt.
 func _move_free(dt: float, now: float) -> void:
-	if s.status != "playing" or modal_open() or now < _wait_until:
+	if s.status != "playing" or modal_open() or now < _wait_until or (anim.enemy_turn(now) and in_combat()):
 		anim.free_moving = false
 		return
 	var pos := _pos_now()
@@ -861,6 +864,9 @@ func _refresh_light() -> void:
 ## Führt eine Engine-Aktion aus und kümmert sich um alles danach.
 func act(fn: Callable) -> bool:
 	if s.status != "playing" or modal_open():
+		return false
+	# Während des Gegnerzugs warten Eingaben, bis alle dran waren
+	if wait_for_enemies and anim.enemy_turn() and in_combat():
 		return false
 	var before := anim.snapshot(s)
 	var floor: int = s.floor

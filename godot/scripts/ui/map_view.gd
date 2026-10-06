@@ -1333,6 +1333,16 @@ func _draw_top() -> void:
 		var c := _col(f.color, f.alpha)
 		ci.draw_string_outline(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 6, Color(0, 0, 0, 0.9 * f.alpha))
 		ci.draw_string(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, c)
+	# Gegnerzug: Schild oben in der Mitte
+	if anim != null and anim.enemy_turn(frame_anim.get("now", -1.0)):
+		var gfont := UiFonts.pixel(700, 2)
+		var gfs := UiFonts.px(18)
+		var gt := "GEGNERZUG"
+		var gw := gfont.get_string_size(gt, HORIZONTAL_ALIGNMENT_LEFT, -1, gfs).x
+		var gp := Vector2(roundf((size.x - gw) / 2), 34.0 + gfs)
+		ci.draw_rect(Rect2(gp.x - 14, gp.y - gfs - 4, gw + 28, gfs + 14), Color(0.35, 0.04, 0.03, 0.85))
+		ci.draw_string_outline(gfont, gp, gt, HORIZONTAL_ALIGNMENT_LEFT, -1, gfs, 6, Color(0, 0, 0, 0.9))
+		ci.draw_string(gfont, gp, gt, HORIZONTAL_ALIGNMENT_LEFT, -1, gfs, Color(1, 0.75, 0.6))
 	# Gewähltes Ziel im Kampf: goldener Ring
 	if target_uid != null:
 		var tm = J.find(s.monsters, func(x): return x.uid == target_uid)

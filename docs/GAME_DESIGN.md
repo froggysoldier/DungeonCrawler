@@ -214,7 +214,8 @@ für den Wirt im Restaurant und für Etage 3.
 - **Gegnerzug:** Handeln im Kampf mehrere Gegner, kommen sie sichtbar
   nacheinander dran (jeder läuft und schlägt zu, der nächste folgt gut eine
   Viertelsekunde später), in der Reihenfolge, in der das Spiel sie rechnet.
-  Außerhalb des Kampfes bewegen sich alle zugleich.
+  Außerhalb des Kampfes bewegen sich alle zugleich. Solange der Gegnerzug
+  läuft, steht oben „GEGNERZUG“, und Eingaben warten, bis alle dran waren.
 - **Kampfkamera:** Beginnt ein Kampf, zoomt die Kamera so weit heraus, dass
   alle sichtbaren Gegner im Bild sind; ist er vorbei, geht es wieder auf die
   vorige Nähe (außer man hat im Kampf selbst gezoomt).

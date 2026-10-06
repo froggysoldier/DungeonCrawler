@@ -42,6 +42,8 @@ var _cam: Variant = null
 var free: Variant = null
 ## Läuft die Figur gerade frei (für die Laufbilder)?
 var free_moving := false
+## Bis wann der Gegnerzug läuft (ms; 0 = keiner).
+var turn_until := 0.0
 
 
 static func now_ms() -> float:
@@ -82,6 +84,11 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 	# nacheinander dran (laufen, dann zuschlagen), nicht alle zugleich
 	var stagger := _stagger(s, before, current, fx)
 	var move_end := {}
+	if not stagger.is_empty():
+		var last := 0.0
+		for k in stagger:
+			last = maxf(last, stagger[k])
+		turn_until = now + last + STEP_MS * 3 + LUNGE_MS
 	for key in current:
 		var to: Vector2 = current[key]
 		var from = before.get(key)
@@ -393,6 +400,13 @@ func player_moving(now: float = -1.0) -> float:
 	return maxf(0.0, 1 - (now - t.start) / t.dur)
 
 
+## Läuft gerade der Gegnerzug (mehrere Gegner nacheinander)?
+func enemy_turn(now: float = -1.0) -> bool:
+	if now < 0:
+		now = now_ms()
+	return now < turn_until
+
+
 func busy(now: float = -1.0) -> bool:
 	if now < 0:
 		now = now_ms()
@@ -421,6 +435,7 @@ func reset() -> void:
 	_fx.clear()
 	_shake = {}
 	_cam = null
+	turn_until = 0.0
 	free = null
 	free_moving = false
 
