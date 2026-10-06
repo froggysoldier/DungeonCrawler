@@ -492,8 +492,8 @@ static func run_talk_show(gv: GameView, title: String, intro: Array) -> Modals.J
 ## Alle Tasten und Bedienhinweise auf einen Blick.
 static func show_help(gv: GameView) -> void:
 	var rows := [
-		["Laufen", "Klick auf die Karte: frei dorthin laufen · linke Maustaste gedrückt halten: der Maus folgen · Pfeiltasten (zwei zugleich = schräg) oder Ziffernblock"],
-		["Kampfrunde", "Pro Runde Bewegung (in Metern) und eine Aktion · Klick auf die Karte läuft frei dorthin, die Linie zeigt grün, was noch reicht · Klick auf einen Gegner läuft hin und greift an · Enter greift das gewählte Ziel an · Leertaste beendet die Runde"],
+		["Laufen", "Klick auf den Boden: frei dorthin laufen · linke Maustaste gedrückt halten: der Maus folgen · Pfeiltasten (zwei zugleich = schräg) oder Ziffernblock"],
+		["Kampfrunde", "Pro Runde Bewegung (in Metern) und eine Aktion · Klick auf den Boden läuft frei dorthin, die Linie zeigt grün, was noch reicht · Klick auf einen Gegner läuft hin und greift an · Enter greift das gewählte Ziel an · Leertaste beendet die Runde"],
 		["Körperteil", "1 Faust · 2 Tritt · 3 Knie · 4 Ellbogen · 5 Kopfstoß · 6 Waffe · 7 Wurf"],
 		["Ausführung", "Q Normal · W Sprung · E Stampfen · R Anlauf"],
 		["Trefferzone", "Y Kopf · X Körper · C Arme · V Beine"],
@@ -508,7 +508,7 @@ static func show_help(gv: GameView) -> void:
 		["Übersichtskarte", "K oder Klick auf die kleine Karte"],
 		["Rechtsklick", "Menü mit allem, was auf dem Feld geht: aufheben, angreifen, ansprechen, benutzen, öffnen, untersuchen, hingehen"],
 		["Text sofort zeigen", "Knopf „Text überspringen“ unten, Klick auf den Text oder „Überspringen“ im Chat"],
-		["Reiter oben", "P Crawler · Z Ziele · I Inventar · A Ausrüstung · B Handwerk · L Skills · O Erfolge · klappen über der Karte auf, dieselbe Taste, Esc oder ein Klick daneben klappt zu · Tab blättert (außerhalb des Kampfes)"],
+		["Reiter oben", "P Crawler · Z Ziele · I Inventar · A Ausrüstung · B Handwerk · L Skills · O Erfolge · klappen über dem Spielfeld auf, dieselbe Taste, Esc oder ein Klick daneben klappt zu · Tab blättert (außerhalb des Kampfes)"],
 		["Bereich „Hier“", "N klappt ein und aus"],
 		["Chat rechts", "Alles, was passiert. Filter: Alles, Kampf, Funde, Gespräche. „Überspringen“ zeigt alle Zeilen sofort"],
 		["Menü", "Esc (Ton, Musik, Tippgeräusch)"],

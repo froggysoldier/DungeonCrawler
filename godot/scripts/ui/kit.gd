@@ -233,12 +233,17 @@ static func rbutton(parent: Node, bb: String, cb: Callable, variant: String = "B
 
 
 ## Kleine Tastenkappe.
+static var _keycap_box: StyleBox
+
+
 static func keycap(key: String) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sb := UiTheme.box(Color("#e6d7b0"), UiTheme.OUTLINE, 4, 1, Vector4(4, 0, 4, 0))
-	sb.border_width_bottom = 4
-	p.add_theme_stylebox_override("panel", sb)
+	if _keycap_box == null:
+		var sb := UiTheme.box(Color("#e6d7b0"), UiTheme.OUTLINE, 4, 1, Vector4(4, 0, 4, 0))
+		sb.border_width_bottom = 4
+		_keycap_box = sb
+	p.add_theme_stylebox_override("panel", _keycap_box)
 	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var l := Label.new()
 	l.text = key

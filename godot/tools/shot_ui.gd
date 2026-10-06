@@ -315,7 +315,7 @@ func _initialize() -> void:
 			if mode == "kampfweg":
 				# Kampfrunde: Gegner in einiger Entfernung, Maus darauf (Weg bis neben ihn),
 				# dann Runde beenden und mitten in seinem Lauf fotografieren
-				gv.meta["guide"] = {"step": 99, "fight": true}
+				gv.meta["guide"] = {"step": 99, "fight": OS.get_environment("FIGHT_STEP") == "", "fight_i": int(OS.get_environment("FIGHT_STEP")) if OS.get_environment("FIGHT_STEP") != "" else 0}
 				TH.tutorial(s)
 				var r := TH.ready(s, 9)
 				TH.teleport(s, {"x": r.x, "y": r.y + 1})

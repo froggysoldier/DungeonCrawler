@@ -106,7 +106,17 @@ var tab_buttons := {}
 var collapse_pill: Control
 var menu_button: Control
 var context_count := 0
+## Für das Tutorial: Pills der Kopfzeile, Zoom-Knöpfe, Teile der Kampfleiste,
+## wie oft eine Richtungstaste gedrückt wurde.
+var top_refs := {}
+var zoom_box: Control
+var bar_parts := {}
+var key_presses := 0
 var guide: Guide
+## Kampfleiste: Stand beim letzten Aufbau und der Bewegungsbalken.
+var _bar_state := ""
+var move_meter: Control
+var move_label: Label
 
 
 func _init(state: Dictionary, meta_state: Dictionary) -> void:
@@ -230,6 +240,7 @@ func _build() -> void:
 	var zc := VBoxContainer.new()
 	zc.add_theme_constant_override("separation", 6)
 	_mapwrap.add_child(zc)
+	zoom_box = zc
 	_zoom_out = Kit.button(null, "−", func(): zoom_map(-1), "RoundButton", false, "Herauszoomen (Taste -)")
 	_zoom_in = Kit.button(null, "+", func(): zoom_map(1), "RoundButton", false, "Hineinzoomen (Taste +)")
 	for zb in [_zoom_out, _zoom_in]:
@@ -425,6 +436,7 @@ func _draw_frame() -> void:
 		path = _path_cache.path
 		attack = _path_cache.get("attack", false)
 	map.hover = hover
+	map.target_uid = target_uid if in_combat() else null
 	map.hover_label = _path_cache.get("hover_label", "") if hover != null and _path_cache.key != "" else ""
 	map.path = path
 	map.path_pts = _path_cache.get("pts", []) if path != null else []
@@ -588,6 +600,8 @@ func banner(title: String, sub: String, kind: String) -> void:
 	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_mapwrap.add_child(b)
 	b.set_anchors_preset(Control.PRESET_FULL_RECT)
+	b.position = Vector2.ZERO
+	b.size = _mapwrap.size
 	_banner = b
 
 
@@ -851,8 +865,12 @@ func after_action() -> void:
 	# Beim Laufen außerhalb des Kampfes nur das Nötigste: Karte, Werte, Log.
 	# Gespeichert und alles neu aufgebaut wird, sobald die Figur steht.
 	_save_due = true
-	if walking() and s.status == "playing" and not in_combat():
+	if walking() and s.status == "playing":
+		# Beim Laufen (auch im Kampf) nur das Nötigste; im Kampf dazu die
+		# Leiste mit der übrigen Bewegung
 		_refresh_light()
+		if in_combat() or _actionbar.theme_type_variation == "CombatBar":
+			refresh_actions()
 	else:
 		_persist()
 		refresh()
@@ -1163,6 +1181,7 @@ func _unhandled_input(ev: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		if ev.echo:
 			return
+		key_presses += 1
 		_stop_moving()
 		# Steht in dieser Richtung ein Gegner, wird angegriffen statt gelaufen
 		var to := {"x": s.player.pos.x + dir.x, "y": s.player.pos.y + dir.y}
@@ -1304,8 +1323,9 @@ func refresh_top() -> void:
 	show.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	show.tooltip_text = "Staffel %d" % s.season
 	show.mouse_filter = Control.MOUSE_FILTER_PASS
-	_pill_bb("Etage [b]%d[/b] · %s" % [s.floor, Kit.esc(def.name if def else "")])
-	_pill(Highlights.clock_text(s), "text", "Pill", 400, "Uhrzeit im Dungeon. Ab Etage 2 laufen jeden Abend um 21 Uhr die Highlights auf den Bildschirmen der Safe Rooms.")
+	top_refs = {}
+	top_refs.etage = _pill_bb("Etage [b]%d[/b] · %s" % [s.floor, Kit.esc(def.name if def else "")])
+	top_refs.uhr = _pill(Highlights.clock_text(s), "text", "Pill", 400, "Uhrzeit im Dungeon. Ab Etage 2 laufen jeden Abend um 21 Uhr die Highlights auf den Bildschirmen der Safe Rooms.")
 	if Arena.active(s):
 		_pill("Die Grube", "danger", "PillWarn", 700, "Gladiatorenkampf: Wer liegen bleibt, verliert – sterben kannst du hier nicht.")
 	elif Game.has_unlock(s, "zuschauer") and Highlights.on_air(s):
@@ -1325,9 +1345,9 @@ func refresh_top() -> void:
 	_top.add_child(sp)
 	if Game.has_unlock(s, "zuschauer"):
 		_pill("Zuschauer %s" % J.de(Viewers.live_viewers(s)), "achv", "Pill", 400, "Follower %s · Hype %d%s" % [J.de(s.viewers.follower), J.rnd(s.viewers.hype), (" · Crawler übrig %s" % J.de(Crawlers.population(s).alive)) if Game.has_unlock(s, "inventar") else ""])
-	_pill("Gold %s" % J.s(p.gold), Color("#ffd700"))
+	top_refs.gold = _pill("Gold %s" % J.s(p.gold), Color("#ffd700"))
 	if not p.boxes.is_empty():
-		_pill("Lootboxen %d" % p.boxes.size(), "accent", "PillTimer", 700, "Öffnen kannst du sie in einem Safe Room oder einer Gilde")
+		top_refs.boxen = _pill("Lootboxen %d" % p.boxes.size(), "accent", "PillTimer", 700, "Öffnen kannst du sie in einem Safe Room oder einer Gilde")
 	var btn := Kit.button(_top, "Menü", open_menu, "PillButton", false, "Hilfe, Ton und Musik (Esc)")
 	btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	menu_button = btn
@@ -1377,7 +1397,7 @@ func _pill(text: String, color: Variant, variant: String = "Pill", weight: int =
 	return pc
 
 
-func _pill_bb(bb: String) -> void:
+func _pill_bb(bb: String) -> Control:
 	var pc := PanelContainer.new()
 	pc.theme_type_variation = "Pill"
 	pc.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -1389,6 +1409,7 @@ func _pill_bb(bb: String) -> void:
 		rt.add_theme_font_size_override(k, UiFonts.px(16))
 	rt.autowrap_mode = TextServer.AUTOWRAP_OFF
 	rt.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	return pc
 
 
 func _toggle_sound() -> void:
@@ -1556,12 +1577,28 @@ func refresh_side() -> void:
 
 func refresh_actions() -> void:
 	var fighting := in_combat()
+	# Im Kampf ändert ein Schritt meist nur die übrige Bewegung: dann nur den
+	# Balken nachziehen statt die ganze Leiste neu zu bauen
+	var key := _bar_key() if fighting else ""
+	if fighting and key == _bar_state and is_instance_valid(move_meter):
+		GameCombat.update_move(self)
+		return
+	_bar_state = key
 	_actionbar.theme_type_variation = "CombatBar" if fighting else "ActionBar"
 	Kit.clear(_actionbar)
 	if fighting:
 		GameCombat.render_combat(self, _actionbar)
 	else:
 		GameCombat.render_actions(self, _actionbar)
+
+
+## Alles, was die Kampfleiste zeigt, außer der übrigen Bewegung.
+func _bar_key() -> String:
+	var p: Dictionary = s.player
+	var foes := combat_targets().map(func(m): return "%s@%d,%d:%d" % [m.uid, m.pos.x, m.pos.y, m.hp])
+	var target = J.find(s.monsters, func(m): return m.uid == target_uid)
+	var reach = Combat.technique_blocker(s, target, technique()) if target != null else null
+	return "%s|%s|%s|%s|%s|%s|%s|%s|%d|%s|%s|%s|%s|%s|%s" % [str(s.round.get("n")), str(s.round.get("acted")), str(s.round.get("max")), part, move, zone, str(target_uid), str(pending_spell), int(p.ausdauer), str(p.get("mp")), str(p.get("spellCooldowns")), str(p.get("abilityCooldown")), str(Player.throwables(s).size()), ",".join(foes), str(reach)]
 
 
 ## Gegner, die gerade zu sehen sind – nach Entfernung sortiert.

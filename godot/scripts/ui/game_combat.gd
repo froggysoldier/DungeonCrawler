@@ -34,15 +34,15 @@ static func render_actions(gv: GameView, bar: PanelContainer) -> void:
 	var cd := int(J.num(s.player, "abilityCooldown"))
 	if ability != null:
 		_vsep(f)
-		Kit.kbutton(f, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())), "AbilityButton", cd > 0, "Taste F · " + ability.description)
+		Kit.kbutton(f, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())), "AbilityButton", cd > 0, "Taste F · " + ability.description, "", 12)
 	_vsep(f)
 	var grp := HBoxContainer.new()
 	grp.add_theme_constant_override("separation", 4)
 	f.add_child(grp)
-	Kit.button(grp, "Warten", func(): gv.act(func(): return Game.wait(s)), "Button", false, "Leertaste")
-	Kit.button(grp, "Aufheben", func(): gv.act(func(): return Game.pickup(s)), "Button", false, "G")
+	_hot(grp, "Warten", "Leer", func(): gv.act(func(): return Game.wait(s)), false, false, "Ein Zug vergeht")
+	_hot(grp, "Aufheben", "G", func(): gv.act(func(): return Game.pickup(s)), false, false, "Aufheben, was hier liegt")
 	if s.player.get("mount") != null:
-		Kit.button(grp, "Absteigen" if s.player.get("riding", false) else "Aufsitzen", func(): gv.act(func(): return Game.ride_toggle(s)), "Button", false, "M")
+		_hot(grp, "Absteigen" if s.player.get("riding", false) else "Aufsitzen", "M", func(): gv.act(func(): return Game.ride_toggle(s)), false)
 	_spell_bar(gv, f)
 
 
@@ -64,7 +64,7 @@ static func _spell_bar(gv: GameView, f: Node) -> void:
 		var pending: bool = gv.pending_spell == k.id
 		var disabled := cd > 0 or J.num(p, "mp") < cost
 		var id: String = k.id
-		Kit.button(grp, "%s (%d MP)%s" % [def.name, cost, (" – %d" % cd) if cd else ""], func(): _spell(gv, id), "SpellSel" if pending else "SpellButton", disabled and not pending, def.description)
+		Kit.button(grp, "%s %d MP%s" % [def.name, cost, (" (%d)" % cd) if cd else ""], func(): _spell(gv, id), "SmallSel" if pending else "SmallButton", disabled and not pending, def.description)
 	if gv.pending_spell == "geschoss":
 		Kit.label(grp, "Geschoss-Mana:", 12, "muted").size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		for m in [3, 4, 5, 6]:
@@ -87,26 +87,27 @@ static func _spell(gv: GameView, id: String) -> void:
 	gv.refresh_actions()
 
 
-static func _col(parent: Node, title: String, ratio: float, hint: String = "") -> VBoxContainer:
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 4)
-	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	v.size_flags_stretch_ratio = ratio
-	parent.add_child(v)
-	var h := Kit.hbox(v, 6)
-	var l := Kit.label(h, title.to_upper(), 16, Color("#ff9b85"))
+## Gruppe der Hotbar: kleine Überschrift links, daneben die Knöpfe.
+static func _group(parent: Node, title: String) -> HBoxContainer:
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 3)
+	parent.add_child(h)
+	var l := Kit.label(h, title.to_upper(), 11, "muted")
 	l.add_theme_font_override("font", UiFonts.pixel(700, 1))
-	if hint != "":
-		Kit.label(h, hint, 12, "muted")
-	return v
+	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	Kit.spacer(h, 3)
+	return h
 
 
-static func _sub(parent: Node, text: String) -> void:
-	Kit.spacer(parent, 2)
-	Kit.label(parent, text, 11, "muted")
+## Kleiner Knopf mit Tastenkappe; gewählt in Gold.
+static func _hot(parent: Node, text: String, key: String, cb: Callable, selected: bool, disabled: bool = false, tip: String = "") -> ClickPanel:
+	return Kit.kbutton(parent, text, key, cb, "SmallSel" if selected else "SmallButton", disabled, tip, "", 12)
 
 
-## Im Kampf: die vierteilige Kampfsequenz.
+## Im Kampf: eine schmale Hotbar wie in Baldur's Gate. Oben Runde, Bewegung,
+## Aktion, Ziel und „Runde beenden“; darunter in einer Reihe Angriff (womit),
+## Ausführung (wie), Trefferzone (wohin), Zauber und Sonstiges. Erklärungen
+## stehen in den Tooltips, Gegner wählt man auf dem Boden (Klick, Tab).
 static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 	var s := gv.s
 	var p: Dictionary = s.player
@@ -115,225 +116,190 @@ static func render_combat(gv: GameView, bar: PanelContainer) -> void:
 		gv.target_uid = targets[0].uid if not targets.is_empty() else null
 	var tech := gv.technique()
 	var weapon = Player.current_weapon(s)
+	var target = J.find(targets, func(m): return m.uid == gv.target_uid)
 	var outer := VBoxContainer.new()
 	outer.add_theme_constant_override("separation", 6)
 	bar.add_child(outer)
-	# Runde: Bewegung übrig, eine Aktion, Runde beenden
-	if Rounds.active(s):
-		var rh := Kit.hbox(outer, 10)
-		var left := int(s.round.move)
-		var acted: bool = s.round.get("acted", false)
-		var act_bb := "[color=#e0a040]verbraucht[/color]   [color=#8b8f99]Du kannst noch laufen oder die Runde beenden. Ein weiterer Angriff beginnt die nächste Runde.[/color]" if acted else "[color=#6ee07a]bereit[/color]   [color=#8b8f99]Klick auf die Karte läuft dorthin (grüne Linie reicht, rote nicht), Klick auf einen Gegner läuft hin und greift an.[/color]"
-		var info := Kit.text(rh, "[b]Runde %d[/b]   Bewegung: [color=#8cc8ff][b]%s[/b] von %s[/color]   Aktion: %s" % [int(s.round.n), FreeMove.meters(left), FreeMove.meters(int(s.round.max)), act_bb], 13)
-		info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		Kit.kbutton(rh, "Runde beenden", "Leer", func(): gv.act(func(): return Game.wait(s)), "Button")
-	var cols := HBoxContainer.new()
-	cols.add_theme_constant_override("separation", 12)
-	outer.add_child(cols)
 
-	# 1 · Womit?
-	var c1 := _col(cols, "1 · Womit?", 1.35)
-	var b1 := Kit.flow(c1, 4)
+	gv.bar_parts = {}
+	# --- Zeile 1: Runde, Bewegung, Aktion, Ziel, Runde beenden
+	var top := Kit.hbox(outer, 14)
+	var round_box := Kit.hbox(top, 14)
+	gv.bar_parts.runde = round_box
+	if Rounds.active(s):
+		var left := int(s.round.move)
+		var full := maxi(int(s.round.max), left)
+		var acted: bool = s.round.get("acted", false)
+		Kit.label(round_box, "RUNDE %d" % int(s.round.n), 14, Color("#ff9b85"), 700).add_theme_font_override("font", UiFonts.pixel(700, 1))
+		var mv := Kit.hbox(round_box, 6)
+		Kit.label(mv, "Bewegung", 12, "muted").size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var meter := MoveBar.new()
+		meter.frac = float(left) / maxf(1.0, float(full))
+		meter.custom_minimum_size = Vector2(110, 10)
+		meter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		meter.tooltip_text = "Wie weit du in dieser Runde noch laufen kannst. Die Linie zum Mauszeiger ist grün, solange es reicht."
+		mv.add_child(meter)
+		gv.move_meter = meter
+		gv.move_label = Kit.label(mv, "%s / %s" % [FreeMove.meters(left), FreeMove.meters(int(s.round.max))], 13, Color("#8cc8ff"), 700)
+		gv.move_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var ac := Kit.text(round_box, "Aktion %s" % ("[color=#e0a040][b]verbraucht[/b][/color]" if acted else "[color=#6ee07a][b]bereit[/b][/color]"), 13)
+		ac.autowrap_mode = TextServer.AUTOWRAP_OFF
+		ac.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		ac.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		ac.tooltip_text = "Eine Aktion pro Runde (Angriff, Zauber, Trank, Deckung, Spurt). Danach darfst du mit der übrigen Bewegung noch laufen." if not acted else "Aktion verbraucht: Du kannst noch laufen. Ein weiterer Angriff beginnt die nächste Runde."
+		ac.mouse_filter = Control.MOUSE_FILTER_PASS
+	var sp := Control.new()
+	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(sp)
+	gv.bar_parts.ziel = _target_chip(gv, top, target)
+	if Rounds.active(s):
+		gv.bar_parts.ende = Kit.kbutton(top, "Runde beenden", "Leer", func(): gv.act(func(): return Game.wait(s)), "PrimaryButton", false, "Die Gegner sind dran, danach beginnt eine neue Runde")
+
+	# --- Zeile 2: die Hotbar
+	var row := HFlowContainer.new()
+	row.add_theme_constant_override("h_separation", 18)
+	row.add_theme_constant_override("v_separation", 6)
+	outer.add_child(row)
+	var g1 := _group(row, "Womit")
+	gv.bar_parts.womit = g1
 	for part in ["faust", "tritt", "knie", "ellbogen", "kopf", "waffe"]:
 		var disabled: bool = part == "waffe" and weapon == null
 		var label: String = (weapon.name if weapon != null else "Waffe") if part == "waffe" else Bonuses.PART_NAMES[part]
-		var sel: bool = gv.part == part and gv.pending_spell == null
 		var pp: String = part
-		Kit.kbutton(b1, label, GameView.PART_KEYS[part], func():
+		var probe := tech.duplicate()
+		probe.part = part
+		_hot(g1, label, GameView.PART_KEYS[part], func():
 			gv.pending_spell = null
 			gv.part = pp
 			if pp != "tritt" and gv.move == "stampfen":
 				gv.move = "normal"
-			gv.refresh_actions(), "SelButton" if sel else "Button", disabled)
-	var throw_list := {}
-	var order: Array = []
-	for it in Player.throwables(s):
-		if not throw_list.has(it.baseId):
-			throw_list[it.baseId] = {"name": Identify.item_name(s, it), "n": 0, "explosive": it.get("explosion") != null and it.explosion}
-			order.append(it.baseId)
-		throw_list[it.baseId].n += int(J.nn(it, "menge", 1))
+			gv.refresh_actions(), gv.part == part and gv.pending_spell == null, disabled, "%s · %d Ausdauer" % [label, Combat.attack_cost(probe)])
 	var th := Player.throwables(s)
-	var next_throw = th[0].baseId if not th.is_empty() else null
-	if not order.is_empty():
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override("separation", 4)
-		c1.add_child(h)
-		Kit.label(h, "Werfen", 11, "muted")
-		h.add_child(Kit.keycap("7"))
-		var bt := Kit.flow(c1, 4)
-		for id in order:
-			var e: Dictionary = throw_list[id]
-			var bid: String = id
-			var sel: bool = gv.part == "wurf" and next_throw == id and gv.pending_spell == null
-			Kit.button(bt, "%s ×%d%s" % [e.name, e.n, " (explodiert)" if e.explosive else ""], func():
-				gv.pending_spell = null
-				Game.choose_throwable(s, bid)
-				gv.part = "wurf"
-				gv.move = "normal"
-				gv.refresh_actions(), "SelButton" if sel else "Button")
+	if not th.is_empty():
+		var it: Dictionary = th[0]
+		var n := 0
+		for x in th:
+			if x.baseId == it.baseId:
+				n += int(J.nn(x, "menge", 1))
+		var kinds := J.uniq(th.map(func(x): return x.baseId)).size()
+		_hot(g1, "%s ×%d" % [Identify.item_name(s, it), n], "7", func():
+			gv.pending_spell = null
+			if gv.part == "wurf" and kinds > 1:
+				# Noch einmal: zur nächsten Art Wurfgeschoss wechseln
+				var ids: Array = J.uniq(Player.throwables(s).map(func(x): return x.baseId))
+				Game.choose_throwable(s, ids[(ids.find(it.baseId) + 1) % ids.size()])
+			gv.part = "wurf"
+			gv.move = "normal"
+			gv.refresh_actions(), gv.part == "wurf" and gv.pending_spell == null, false, "Werfen%s" % (" · noch einmal klicken wechselt die Art" if kinds > 1 else ""))
+	var g2 := _group(row, "Wie")
+	gv.bar_parts.wie = g2
+	for mv2 in Combat.ATTACK_MOVES:
+		var probe := tech.duplicate()
+		probe.move = mv2
+		var blocker = Combat.technique_blocker(s, target, probe) if target != null else null
+		var m2: String = mv2
+		_hot(g2, Combat.MOVE_NAMES[mv2], GameView.MOVE_KEYS[mv2], func():
+			gv.move = m2
+			if m2 == "stampfen":
+				gv.part = "tritt"
+			gv.refresh_actions(), gv.move == mv2, gv.part == "wurf" and mv2 != "normal", "%s · %d Ausdauer%s" % [Combat.MOVE_NAMES[mv2], Combat.attack_cost(probe), (" · " + String(blocker)) if blocker != null else ""])
+	var g3 := _group(row, "Wohin")
+	gv.bar_parts.wohin = g3
+	for z in Combat.HIT_ZONES:
+		var zd: Dictionary = Combat.ZONES[z]
+		var zz: String = z
+		_hot(g3, zd.name, GameView.ZONE_KEYS[z], func():
+			gv.zone = zz
+			gv.refresh_actions(), gv.zone == z, false, "%s: %s" % [zd.name, zd.effekt])
 	var spells := J.arr(p, "spells")
 	if not spells.is_empty():
-		_sub(c1, "Zauber (%s MP)" % J.s(J.nn(p, "mp", 0)))
-		var bs := Kit.flow(c1, 4)
+		var g4 := _group(row, "Zauber")
 		for k in spells:
 			var def: Dictionary = Db.spell(k.id)
 			var cd := int(J.num(J.nn(p, "spellCooldowns", {}), k.id))
 			var cost := Magic.spell_cost(k.id, gv.missile_mana)
-			var disabled := cd > 0 or J.num(p, "mp") < cost
 			var id: String = k.id
-			Kit.button(bs, "%s (%d MP)%s" % [def.name, cost, (" – %d" % cd) if cd else ""], func(): _spell(gv, id), "SpellSel" if gv.pending_spell == k.id else "SpellButton", disabled, def.description)
-	_sub(c1, "Sonstiges")
-	var bo := Kit.flow(c1, 4)
-	Kit.button(bo, "Deckung", func(): gv.act(func(): return Game.defend(s)), "Button", false, "Bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung, +2 Ausdauer")
-	Kit.kbutton(bo, "Spurt", "S", func(): gv.act(func(): return Game.dash(s)), "Button", int(p.ausdauer) < Game.DASH_COST or J.num(p, "immobile") > 0, "Aktion gegen Bewegung: noch einmal %s in dieser Runde, kostet %d Ausdauer" % [FreeMove.meters(int(s.round.max)) if Rounds.active(s) else "die volle Bewegung", Game.DASH_COST])
+			Kit.button(g4, "%s %d%s" % [def.name, cost, (" (%d)" % cd) if cd else ""], func(): _spell(gv, id), "SmallSel" if gv.pending_spell == k.id else "SmallButton", cd > 0 or J.num(p, "mp") < cost, "%s · %d MP · %s" % [def.name, cost, def.description])
+	var g5 := _group(row, "Sonstiges")
+	gv.bar_parts.sonstiges = g5
+	_hot(g5, "Deckung", "", func(): gv.act(func(): return Game.defend(s)), false, false, "Bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung, +2 Ausdauer")
+	_hot(g5, "Spurt", "S", func(): gv.act(func(): return Game.dash(s)), false, int(p.ausdauer) < Game.DASH_COST or J.num(p, "immobile") > 0, "Aktion gegen Bewegung: noch einmal %s in dieser Runde, kostet %d Ausdauer" % [FreeMove.meters(int(s.round.max)) if Rounds.active(s) else "die volle Bewegung", Game.DASH_COST])
 	var potion = Player.heal_item(s)
 	if potion != null:
 		var puid: String = potion.uid
-		Kit.button(bo, "%s trinken" % Identify.item_name(s, potion), func(): gv.act(func(): return Game.use_item(s, puid)))
+		_hot(g5, "Trank", "", func(): gv.act(func(): return Game.use_item(s, puid)), false, false, "%s trinken" % Identify.item_name(s, potion))
 	var ability = Classes.current_ability(s)
-	var cd := int(J.num(p, "abilityCooldown"))
 	if ability != null:
-		Kit.kbutton(bo, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())), "AbilityButton", cd > 0, ability.description)
-	Kit.button(bo, "Warten", func(): gv.act(func(): return Game.wait(s)))
-
-	# 2 · Wie?
-	var c2 := _col(cols, "2 · Wie?", 0.8)
-	var target = J.find(targets, func(m): return m.uid == gv.target_uid)
-	for mv in Combat.ATTACK_MOVES:
-		var probe := tech.duplicate()
-		probe.move = mv
-		var blocker = Combat.technique_blocker(s, target, probe) if target != null else null
-		var m2: String = mv
-		var cp := Kit.kbutton(c2, Combat.MOVE_NAMES[mv], GameView.MOVE_KEYS[mv], func():
-			gv.move = m2
-			if m2 == "stampfen":
-				gv.part = "tritt"
-			gv.refresh_actions(), "SelButton" if gv.move == mv else "Button", gv.part == "wurf" and mv != "normal", blocker if blocker != null else "", Kit.muted("· %d Ausdauer" % Combat.attack_cost(probe)))
-		cp.size_flags_horizontal = Control.SIZE_FILL
-	Kit.text(c2, "Ausdauer %s/%d" % [J.s(p.ausdauer), Player.max_ausdauer(s)], 12, "muted")
-
-	# 3 · Wohin?
-	var c3 := _col(cols, "3 · Wohin?", 1.2)
-	for z in Combat.HIT_ZONES:
-		var zd: Dictionary = Combat.ZONES[z]
-		var zz: String = z
-		var cp := Kit.rbutton(c3, "[b]%s[/b]\n%s" % [Kit.esc(zd.name), Kit.small(Kit.esc(zd.effekt))], func():
-			gv.zone = zz
-			gv.refresh_actions(), "SelButton" if gv.zone == z else "Button", false, zd.effekt, 13)
-		var rt: RichTextLabel = cp.get_child(0)
-		rt.add_theme_constant_override("line_separation", 1)
-		var cap := Kit.keycap(GameView.ZONE_KEYS[z])
-		cap.position = Vector2(0, 0)
-		cp.add_child(cap)
-		cap.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-		cap.size_flags_horizontal = Control.SIZE_SHRINK_END
-		cap.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-
-	# 4 · Wen?
-	var c4 := _col(cols, "4 · Wen?", 1.5, "(Tab wechselt, Enter greift an)")
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.custom_minimum_size = Vector2(0, 0)
-	c4.add_child(scroll)
-	var list := Kit.vbox(scroll, 5)
-	if targets.is_empty():
-		Kit.text(list, "Kein Gegner in Sicht.", 12, "muted")
-	for m in targets:
-		_target_row(gv, list, m)
-	list.minimum_size_changed.connect(func():
-		if is_instance_valid(scroll):
-			scroll.custom_minimum_size.y = minf(250, list.get_combined_minimum_size().y))
-	scroll.custom_minimum_size.y = minf(250, list.get_combined_minimum_size().y)
-
-	var sum := "KAMPF · Gewählt: [b]%s[/b]" % Kit.col(Kit.esc(Db.spell(gv.pending_spell).name if gv.pending_spell != null else Combat.technique_name(tech)), "accent")
-	if gv.pending_spell == null:
-		sum += " · %d Ausdauer" % Combat.attack_cost(tech)
-	sum += " · Bewegen mit Pfeiltasten oder Klick auf die Karte"
-	Kit.text(outer, sum, 12, "muted")
-
-
-static func _target_row(gv: GameView, list: Node, m: Dictionary) -> void:
-	var s := gv.s
-	var p: Dictionary = s.player
-	var info := Identify.describe_monster(s, m)
-	var d := Fov.chebyshev(m.pos, p.pos)
-	var chance := ""
-	var blocker = null
-	var approach := false
-	var tech := gv.technique()
+		var cd := int(J.num(p, "abilityCooldown"))
+		Kit.kbutton(g5, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())), "AbilityButton", cd > 0, ability.description, "", 12)
+	_hot(g5, "Warten", "", func(): gv.act(func(): return Game.wait(s)), false, false, "Runde beenden ohne Aktion (Leertaste)")
 	if gv.pending_spell != null:
-		var def: Dictionary = Db.spell(gv.pending_spell)
-		if def.target != "gegner":
-			blocker = "Dieser Zauber braucht kein Ziel."
-		elif d > int(J.nn(def, "range", 6)):
-			blocker = "Zu weit weg für den Zauber."
-		chance = "" if blocker != null else "Zauber trifft sicher"
+		var tgt: String = Db.spell(gv.pending_spell).target
+		var hint := Kit.label(row, "Klicke auf %s (Esc bricht ab)" % ("eine freie Stelle am Boden" if tgt == "feld" else "einen Gegner"), 13, "accent")
+		hint.size_flags_vertical = Control.SIZE_SHRINK_END
+
+
+## Nur die übrige Bewegung nachziehen (Balken und Zahl).
+static func update_move(gv: GameView) -> void:
+	var s := gv.s
+	if not Rounds.active(s):
+		return
+	var left := int(s.round.move)
+	var meter: MoveBar = gv.move_meter
+	meter.frac = float(left) / maxf(1.0, float(maxi(int(s.round.max), left)))
+	meter.queue_redraw()
+	if is_instance_valid(gv.move_label):
+		gv.move_label.text = "%s / %s" % [FreeMove.meters(left), FreeMove.meters(int(s.round.max))]
+
+
+## Gewähltes Ziel als kleiner Chip: Name, Abstand, Chance, Angreifen (Enter).
+## Andere Ziele wählt man mit Klick auf den Gegner oder Tab.
+static func _target_chip(gv: GameView, parent: Node, m: Variant) -> Control:
+	if m == null:
+		var none := Kit.label(parent, "Kein Gegner in Sicht", 12, "muted")
+		none.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		return none
+	var s := gv.s
+	var info := Identify.describe_monster(s, m)
+	var d := Fov.chebyshev(m.pos, s.player.pos)
+	var blocker = Combat.technique_blocker(s, m, gv.technique())
+	var text := ""
+	var approach := false
+	if gv.pending_spell != null:
+		text = "Zauber"
+	elif blocker == null:
+		text = gv._hit_text(m)
+	elif d > 1 and gv.part != "wurf":
+		# Wie weit es ist, zeigt die Linie zum Mauszeiger (grün reicht, rot nicht)
+		approach = true
+		text = "hinlaufen und zuschlagen"
 	else:
-		blocker = Combat.technique_blocker(s, m, tech)
-		if blocker == null:
-			chance = ("%d %% Treffer" % Combat.hit_chance(s, m, tech)) if info.showHitChance else "Trefferchance unklar"
-		elif d > 1 and tech.part != "wurf":
-			# Nahkampf auf Entfernung: hinlaufen und zuschlagen, wenn die Bewegung reicht
-			var path = Game.plan_path(s, m.pos)
-			var need: int = (path.size() - 1) if path is Array and not path.is_empty() else 99
-			var left: int = int(s.round.move) if Rounds.active(s) else 99
-			if need <= left:
-				blocker = null
-				approach = true
-				chance = "Hinlaufen (%s) und zuschlagen" % FreeMove.meters(need)
-			else:
-				blocker = "Zu weit für diese Runde (%s, noch %s Bewegung)." % [FreeMove.meters(need), FreeMove.meters(left)]
-	var states: Array = []
-	if m.get("asleep", false):
-		states.append("schläft")
-	elif not m.get("aware", false):
-		states.append("ahnungslos")
-	if J.num(m, "downed") > 0:
-		states.append("am Boden")
-	if m.get("stunned"):
-		states.append("benommen")
-	if m.get("slowed"):
-		states.append("humpelt")
-	if m.get("weakened"):
-		states.append("geschwächt")
-	var conds := ", ".join(Conditions.condition_list(m).map(func(c): return Kit.col(Kit.esc(c.state), c.color)))
-	var sel: bool = m.uid == gv.target_uid
+		text = String(blocker).trim_suffix(".")
+	var chip := Kit.hbox(parent, 8)
+	var nm := Kit.text(chip, "%s [b]%s[/b] · %s" % [Kit.muted("Ziel"), Kit.col(Kit.esc(info.name), "#b0a898" if info.insight >= 3 else m.color), Kit.col(Kit.esc(text), "ok" if blocker == null or approach else "muted")], 13)
+	nm.autowrap_mode = TextServer.AUTOWRAP_OFF
+	nm.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	nm.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	nm.tooltip_text = "%s, %s. Ziel wechseln: Klick auf einen Gegner oder Tab." % [info.name, info.health]
+	nm.mouse_filter = Control.MOUSE_FILTER_PASS
 	var uid: String = m.uid
-	var cp := ClickPanel.new("Button")
-	cp.fixed_panel = UiTheme.get_theme().get_stylebox("panel", "TargetSel" if sel else "Target")
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	cp.add_child(row)
-	# Die Figur, wie sie auf der Karte steht (eigene Boss-Figuren sind größer)
-	var look := Sprites.monster_sprite(m)
-	var fig := Kit.icon(row, look[0], look[1], 2, Vector2(64, 64))
-	if m.get("rank") == "geist":
-		fig.modulate.a = 0.75
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 2)
-	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(v)
-	var name_col = "#b0a898" if info.insight >= 3 else m.color
-	Kit.text(v, "[b]%s[/b] %s %s" % [Kit.col(Kit.esc(info.name), name_col), Kit.small(Kit.muted("%s · %s" % [Kit.esc(info.level), FreeMove.meters(d)])), Kit.small(Kit.col(Kit.esc(info.challenge.name), info.challenge.color))], 13)
-	var line := Kit.esc(info.health)
-	if not states.is_empty():
-		line += " · " + Kit.col(Kit.esc(", ".join(states)), "#7cc4ff")
-	if conds != "":
-		line += " · " + conds
-	Kit.text(v, line, 12)
-	var h := Kit.hbox(v, 6)
-	var ct := Kit.text(h, Kit.esc(blocker if blocker != null else chance), 12, "muted" if blocker != null else "ok")
-	ct.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var btn := Kit.button(h, "Zaubern" if gv.pending_spell != null else "Angreifen", func():
+	var b := Kit.kbutton(chip, "Zaubern" if gv.pending_spell != null else "Angreifen", "Enter", func():
 		if approach:
-			gv.target_uid = uid
 			gv.attack_or_approach(uid)
 		else:
-			gv.strike(uid), "SmallPrimary", blocker != null)
-	btn.mouse_filter = Control.MOUSE_FILTER_STOP
-	cp.pressed.connect(func():
-		gv.target_uid = uid
-		gv.refresh_actions())
-	list.add_child(cp)
+			gv.strike(uid), "SmallPrimary", blocker != null and not approach and gv.pending_spell == null, "", "", 12)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return chip
+
+
+## Balken der übrigen Bewegung.
+class MoveBar:
+	extends Control
+	var frac := 1.0
+
+	func _draw() -> void:
+		draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.45))
+		draw_rect(Rect2(Vector2(1, 1), Vector2((size.x - 2) * clampf(frac, 0.0, 1.0), size.y - 2)), Color("#5aa8ff"))
+		draw_rect(Rect2(Vector2(1, 1), Vector2((size.x - 2) * clampf(frac, 0.0, 1.0), 2)), Color(1, 1, 1, 0.3))
+
+

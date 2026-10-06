@@ -26,6 +26,24 @@ static func monster_at(s: Dictionary, p: Dictionary) -> Variant:
 	return null
 
 
+## Alle besetzten Felder als Menge (Index -> true), wie occupied() sie
+## sieht. Für Wegsuchen: einmal bauen statt für jedes Feld alle Figuren
+## durchzugehen.
+static func occupied_set(s: Dictionary, except: Variant = null) -> Dictionary:
+	var w: int = s.map.width
+	var out := {int(s.player.pos.y) * w + int(s.player.pos.x): true}
+	var pet = s.player.pet
+	if pet != null and pet.alive:
+		out[int(pet.pos.y) * w + int(pet.pos.x)] = true
+	for c in Crawlers.crawlers(s):
+		if c.alive:
+			out[int(c.pos.y) * w + int(c.pos.x)] = true
+	for m in s.monsters:
+		if not is_same(m, except):
+			out[int(m.pos.y) * w + int(m.pos.x)] = true
+	return out
+
+
 static func _allowed_tile(s: Dictionary, m: Dictionary, p: Dictionary) -> bool:
 	var r: int = s.map.roomAt[MapGen.idx(s.map, p.x, p.y)]
 	if m.get("homeRoom") != null:
@@ -36,6 +54,56 @@ static func _allowed_tile(s: Dictionary, m: Dictionary, p: Dictionary) -> bool:
 		return false
 	# Safe Rooms: das schimmernde Feld an der Tür hält jedes Monster draußen
 	return kind != "boss" and kind != "arena" and kind != "safe"
+
+
+## Entfernung jedes Feldes zum Crawler in Schritten (nur Wände und
+## geschlossene Türen zählen, keine Figuren), höchstens FIELD_RANGE weit;
+## -1 = nicht erreichbar oder zu weit. Einmal pro Zug und Standort berechnet.
+const FIELD_RANGE := 40
+static var _field := PackedInt32Array()
+static var _field_key := ""
+static var _field_map: Dictionary = {}
+
+
+static func player_field(s: Dictionary) -> PackedInt32Array:
+	var m: Dictionary = s.map
+	var key := "%d|%d|%d,%d" % [s.floor, s.turn, s.player.pos.x, s.player.pos.y]
+	if key == _field_key and is_same(m, _field_map):
+		return _field
+	_field_key = key
+	_field_map = m
+	var w: int = m.width
+	var h: int = m.height
+	var field := PackedInt32Array()
+	field.resize(w * h)
+	field.fill(-1)
+	var start: int = int(s.player.pos.y) * w + int(s.player.pos.x)
+	field[start] = 0
+	var frontier := PackedInt32Array([start])
+	var dist := 0
+	while not frontier.is_empty() and dist < FIELD_RANGE:
+		dist += 1
+		var next := PackedInt32Array()
+		for i in frontier:
+			var x := i % w
+			var y := i / w
+			var from := J.pos(x, y)
+			for d in DIRS:
+				var nx: int = x + d[0]
+				var ny: int = y + d[1]
+				if nx < 0 or ny < 0 or nx >= w or ny >= h:
+					continue
+				var ni := ny * w + nx
+				if field[ni] >= 0:
+					continue
+				# Rückwärts gedacht: vom Nachbarn aus muss der Schritt hierher gehen
+				if not Pathfinding.can_step(m, J.pos(nx, ny), from):
+					continue
+				field[ni] = dist
+				next.append(ni)
+		frontier = next
+	_field = field
+	return field
 
 
 static func _neighbors_of(p: Dictionary) -> Array:
@@ -51,7 +119,32 @@ static func _step_toward(s: Dictionary, m: Dictionary, goal: Dictionary) -> void
 		if not drift.is_empty() and J.cheb(drift[0], goal) < J.cheb(m.pos, goal):
 			m.pos = drift[0]
 		return
-	var path = Pathfinding.find_path(s.map, m.pos, goal, func(x, y): return _allowed_tile(s, m, J.pos(x, y)) and not occupied(s, J.pos(x, y), m), 250)
+	# Auf den Crawler zu: dem gemeinsamen Entfernungsfeld folgen (eine
+	# Rechnung pro Zug statt einer Wegsuche je Gegner und Schritt)
+	if goal.x == s.player.pos.x and goal.y == s.player.pos.y:
+		var field := player_field(s)
+		var w0: int = s.map.width
+		var here: int = field[int(m.pos.y) * w0 + int(m.pos.x)]
+		if here > 0:
+			var best = null
+			var best_d := here
+			for d in DIRS:
+				var q := J.pos(m.pos.x + d[0], m.pos.y + d[1])
+				if not MapGen.in_bounds(s.map, q.x, q.y):
+					continue
+				var fd: int = field[q.y * w0 + q.x]
+				if fd < 0 or fd >= best_d:
+					continue
+				if not Pathfinding.can_step(s.map, m.pos, q) or occupied(s, q, m) or not _allowed_tile(s, m, q):
+					continue
+				best = q
+				best_d = fd
+			if best != null:
+				m.pos = best
+			return
+	var occ := occupied_set(s, m)
+	var w: int = s.map.width
+	var path = Pathfinding.find_path(s.map, m.pos, goal, func(x, y): return _allowed_tile(s, m, J.pos(x, y)) and not occ.has(y * w + x), 250)
 	var next = path[0] if path != null and not path.is_empty() else null
 	if next != null and not occupied(s, next, m) and _allowed_tile(s, m, next):
 		m.pos = next
@@ -480,7 +573,9 @@ static func pet_close_in(s: Dictionary, steps: int) -> void:
 		if goal == null:
 			return
 		var g: Dictionary = goal
-		var path = Pathfinding.find_path(s.map, pet.pos, g, func(x, y): return not occupied(s, J.pos(x, y)) or (x == g.x and y == g.y), 120)
+		var occ := occupied_set(s)
+		var w: int = s.map.width
+		var path = Pathfinding.find_path(s.map, pet.pos, g, func(x, y): return not occ.has(y * w + x) or (x == g.x and y == g.y), 120)
 		var next = path[0] if path != null and not path.is_empty() else null
 		if next == null or occupied(s, next):
 			return
@@ -535,7 +630,9 @@ static func pet_turn(s: Dictionary) -> void:
 		return
 	# Folgen
 	if J.cheb(pet.pos, p.pos) > 2:
-		var path = Pathfinding.find_path(s.map, pet.pos, p.pos, func(x, y): return not occupied(s, J.pos(x, y)), 300)
+		var occ := occupied_set(s)
+		var w: int = s.map.width
+		var path = Pathfinding.find_path(s.map, pet.pos, p.pos, func(x, y): return not occ.has(y * w + x), 300)
 		var next = path[0] if path != null and not path.is_empty() else null
 		if next != null and not (next.x == p.pos.x and next.y == p.pos.y) and not occupied(s, next):
 			pet.pos = next

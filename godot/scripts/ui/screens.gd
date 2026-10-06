@@ -173,7 +173,7 @@ static func title_screen(root: Control, meta: Dictionary, has_save: bool, on_new
 	hall_of_fame(v, meta)
 	Kit.section(v, "So funktioniert’s")
 	for li in [
-		"Klick auf die Karte, um dich zu bewegen. Klick auf Gegner, um mit der gewählten Technik anzugreifen.",
+		"Klick auf den Boden, um dich zu bewegen. Klick auf Gegner, um mit der gewählten Technik anzugreifen.",
 		"Rundenbasiert: Jede Aktion kostet einen Zug (3 Minuten Spielzeit). Die Etage stürzt nach 5 Tagen ein.",
 		"Wie du kämpfst, bestimmt deine Skills. Tritt viel – werde gut im Treten.",
 		"Hardcore: Tod ist endgültig. Dein Geist bleibt aber im Dungeon zurück…",

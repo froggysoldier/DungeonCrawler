@@ -200,11 +200,17 @@ für den Wirt im Restaurant und für Etage 3.
 - **Zustände:** Blutung, Brennen, Gift, Furcht und Blindheit (siehe 3.24).
 - **Stufen-Abstand:** Gegner weit über dir sind schwerer zu treffen und treffen
   dich leichter (bis zu 20 Prozentpunkte), bei viel schwächeren ist es umgekehrt.
-- **Kampfsequenz:** Sobald ein Gegner, der dich bemerkt hat, in Sicht ist,
-  wird die Aktionsleiste zum Kampfpanel: 1. womit (Körperteil, Waffe,
-  bestimmtes Wurfobjekt, Zauber, Deckung, Trank, Klassenfähigkeit), 2. wie,
-  3. wohin, 4. wen – jeder sichtbare Gegner mit Entfernung, Zustand und der
-  Trefferchance für genau diese Kombination.
+- **Kampfleiste (Hotbar):** Sobald ein Gegner, der dich bemerkt hat, in Sicht
+  ist, wird die Aktionsleiste zu einer schmalen Hotbar wie in Baldur's Gate,
+  damit das Spielfeld groß bleibt. Oben: Runde, Bewegungsbalken (Meter),
+  Aktion bereit oder verbraucht, das gewählte Ziel mit Trefferchance und
+  „Angreifen“ (Enter), „Runde beenden“ (Leertaste). Darunter in einer Reihe
+  kleine Knöpfe mit Tastenkappen: Womit (1–7), Wie (Q–R), Wohin (Y–V),
+  Zauber, Sonstiges (Deckung, Spurt, Trank, Fähigkeit, Warten). Was eine Wahl
+  kostet und bewirkt, steht im Tooltip. Gegner wählt man auf dem Boden (Klick
+  greift an, Tab wechselt das Ziel); das Ziel trägt einen goldenen Ring, über
+  dem Gegner unter der Maus steht die Trefferchance. Läuft man im Kampf, wird
+  nur der Bewegungsbalken nachgezogen.
 
 ### 3.4a Erfahrung und Stufen
 - Erfahrung hängt vom **Stufen-Abstand** ab: Ein gleich starker Gegner gibt
@@ -737,11 +743,11 @@ Schrift überall: Jersey 10 (Pixelschrift im Stil von Tiny Swords).
 - **Rechts, oben immer sichtbar:** Name, Stufe, Klasse, Balken für HP, Ausdauer, Mana, Blase und Erfahrung, dazu Zustände, Haustier, Reittier und Party. Freie Wertepunkte erscheinen als Knopf.
 - **„Hier“** darunter: nur wenn es am Standort etwas zu tun gibt (Safe Room, Gilde mit Lootboxen, Händler, Crawler, Fallen); einklappbar (N), höchstens 40 % der Höhe.
 - **Chat** rechts darunter, über die ganze restliche Höhe und in größerer Schrift: Filter Alles, Kampf, Funde, Gespräche und ein Knopf „Überspringen“; nur drei Farben (Text, Gold für Funde und Erfolge, Rot für Gefahr); gleiche Zeilen hintereinander werden zusammengefasst („(9×)“).
-- **Aktionsleiste unten** außerhalb des Kampfes: eine Zeile mit dem gewählten Angriff, Fähigkeit, Warten, Aufheben, Reittier und Zaubern; im Kampf die Kampfsequenz (womit, wie, wohin, welcher Gegner).
+- **Aktionsleiste unten** außerhalb des Kampfes: eine schmale Zeile mit dem gewählten Angriff, Fähigkeit, Warten, Aufheben, Reittier und Zaubern; im Kampf die Hotbar (siehe 3.4).
 - **Rechtsklick auf die Karte:** Menü mit allem, was auf dem Feld geht (aufheben, angreifen, ansprechen, benutzen, Tür öffnen, Kiste zerschlagen, Wrack durchsuchen, entschärfen, hinabsteigen, hierher gehen, untersuchen). Liegt das Ziel weiter weg, läuft die Figur erst hin.
 - **Laufen:** Außerhalb des Kampfes läuft die Figur ohne Halt bis ans Ziel (Klick) oder solange die Taste gedrückt ist, in festem Takt und gleichmäßig. Anhalten nur bei Gefahr: Kampf beginnt, Schaden, neu entdeckte Falle. Gespeichert und alles neu aufgebaut wird, sobald sie steht.
 - **Start:** Nach der Begrüßung erklärt „So spielst du“ in fünf Seiten Laufen, Handeln (Rechtsklick), Kämpfen, Bildschirm und das erste Ziel. Die Gilde der Einweisung ist von Anfang an aufgedeckt, auf der Karte beschriftet und auf der Übersichtskarte umrahmt, bis das Inventar freigeschaltet ist.
-- **Interaktives Tutorial (`guide.gd`):** Statt Texttafeln zeigt ein goldener Pfeil auf ein Teil der Oberfläche, das Teil blinkt, ein Kasten daneben sagt, was es ist und was man jetzt tun soll. Weiter geht es erst, wenn man es ausprobiert hat: laufen, Maus gedrückt halten, Rechtsklick, Lebenspunkte, Chat, „Hier“, Inventar öffnen und durch Klick daneben schließen, Ausrüstung, Ziele, Crawler, Einsturz-Zeit, „Warten“, Menü – zum Schluss der Hinweis auf die Gilde der Einweisung. Beim ersten Kampf folgen drei Schritte: Bewegung und Aktion der Runde, einen Gegner anklicken, Runde beenden. „Tutorial beenden“ lässt alles aus; im Menü lässt es sich wiederholen. Der Fortschritt steht in den Metadaten (meta.guide). Der Guide in der Gilde erklärt nur noch Regeln (Timer, Bosse, Safe Rooms, Mana, Toiletten), nicht mehr den Bildschirm.
+- **Interaktives Tutorial (`guide.gd`):** Statt Texttafeln zeigt ein goldener Pfeil auf ein Teil der Oberfläche, das Teil blinkt, ein Kasten daneben sagt, was es ist und was man jetzt tun soll. Weiter geht es erst, wenn man es ausprobiert hat. Jeder Bereich kommt einzeln dran (26 Schritte): auf den Boden klicken, Maus gedrückt halten, Pfeiltasten, Rechtsklick, Karte oben links (groß und klein), Ortsname, Zoom, Etage, Uhrzeit, Einsturz, Gold, Lootboxen, Werte (Lebenspunkte, Ausdauer, Mana, Blase), „Hier“, Chat mit Filtern, jeder Reiter einzeln (Crawler, Ziele, Inventar, Ausrüstung, Handwerk, Skills, Erfolge), Zuklappen per Klick daneben, Aktionsleiste („Warten“), Menü und zum Schluss der Weg zur Gilde der Einweisung. Die Texte sagen „Boden“ für das Spielfeld und „Karte“ nur für die Karte oben links. Beim ersten Kampf folgt die Kampfleiste Teil für Teil (8 Schritte): Runde und Bewegung, Womit (etwas anderes wählen), Wie, Wohin (eine Zone wählen), Sonstiges mit Spurt, Ziel, einen Gegner anklicken, Runde beenden; endet der Kampf vorher, geht es beim nächsten an derselben Stelle weiter. „Tutorial beenden“ lässt alles aus; im Menü lässt es sich wiederholen. Der Fortschritt steht in den Metadaten (meta.guide). Der Guide in der Gilde erklärt nur noch Regeln (Timer, Bosse, Safe Rooms, Mana, Toiletten), nicht mehr den Bildschirm.
 - **Texte überspringen:** Solange ein Dialogtext getippt wird, steht unten „Text überspringen“; mehrseitige Dialoge haben „Alles überspringen“.
 - **Linke Maustaste halten:** Nach einem kurzen Moment folgt die Figur der Maus, bis man loslässt oder ein Kampf beginnt.
 - **Anziehen vom Boden:** Ausrüstung am Boden lässt sich direkt anziehen (Rechtsklick oder „Hier“); was vorher an dem Platz war, bleibt liegen. Geht auch ohne Inventar, nur Waffen nimmt man dann in die Hand.

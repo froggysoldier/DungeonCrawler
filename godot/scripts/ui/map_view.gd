@@ -29,6 +29,8 @@ var path_ok := -1.0
 var path_label := ""
 ## Text über dem Gegner unter der Maus (Trefferchance oder was fehlt).
 var hover_label := ""
+## Im Kampf gewähltes Ziel (goldener Ring).
+var target_uid: Variant = null
 var selected: Variant = null
 
 var zoom_index: int = 1
@@ -1331,6 +1333,14 @@ func _draw_top() -> void:
 		var c := _col(f.color, f.alpha)
 		ci.draw_string_outline(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, 6, Color(0, 0, 0, 0.9 * f.alpha))
 		ci.draw_string(font, pos, text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, c)
+	# Gewähltes Ziel im Kampf: goldener Ring
+	if target_uid != null:
+		var tm = J.find(s.monsters, func(x): return x.uid == target_uid)
+		if tm != null and visible_set.has(MapGen.idx(s.map, tm.pos.x, tm.pos.y)):
+			var tp := _at(tm.uid, tm.pos)
+			var tc := Vector2(_sx(tp.x) + T / 2, _sy(tp.y) + T * 0.78)
+			ci.draw_arc(tc, T * 0.42, 0, TAU, 28, Color(0, 0, 0, 0.5), 3 * px)
+			ci.draw_arc(tc, T * 0.42, 0, TAU, 28, Color(1, 0.84, 0.36, 0.95), 1.5 * px)
 	# Maus über einem sichtbaren Gegner: roter Ring unter ihm (kein Feldraster)
 	if hover != null and MapGen.in_bounds(s.map, hover.x, hover.y) and visible_set.has(MapGen.idx(s.map, hover.x, hover.y)):
 		var mon = Ai.monster_at(s, {"x": hover.x, "y": hover.y})
