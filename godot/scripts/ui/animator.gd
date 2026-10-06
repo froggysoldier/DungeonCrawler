@@ -78,6 +78,10 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 			free_from = fv
 			free = null
 			free_moving = false
+	# Gegnerzug wie in Baldur's Gate: Handeln mehrere Gegner, kommen sie
+	# nacheinander dran (laufen, dann zuschlagen), nicht alle zugleich
+	var stagger := _stagger(s, before, current, fx)
+	var move_end := {}
 	for key in current:
 		var to: Vector2 = current[key]
 		var from = before.get(key)
@@ -93,13 +97,17 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 		if jump > 1:
 			var pts := _trail(s, prev, from, to, jump)
 			if pts.size() > 1:
-				_tweens[key] = {"pts": pts, "start": now, "dur": maxf(30.0, STEP_MS * FreeMove.length(pts))}
+				var pd := maxf(30.0, STEP_MS * FreeMove.length(pts))
+				_tweens[key] = {"pts": pts, "start": now + stagger.get(key, 0.0), "dur": pd}
+				move_end[key] = stagger.get(key, 0.0) + pd
 				continue
 		if jump > 3:
 			_tweens.erase(key)
 			continue
 		# Gleiches Tempo in alle Richtungen: schräg dauert ein Schritt länger
-		_tweens[key] = {"from": prev, "to": to, "start": now, "dur": maxf(30.0, STEP_MS * minf(2.0, (to - prev).length()))}
+		var sd := maxf(30.0, STEP_MS * minf(2.0, (to - prev).length()))
+		_tweens[key] = {"from": prev, "to": to, "start": now + stagger.get(key, 0.0), "dur": sd}
+		move_end[key] = stagger.get(key, 0.0) + sd
 	var bp = before.get("p")
 	if bp != null and maxf(absf(bp.x - s.player.pos.x), absf(bp.y - s.player.pos.y)) > 3:
 		_cam = null
@@ -132,9 +140,11 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 				var key = at_key.get("%d,%d" % [f.from.x, f.from.y])
 				var d := Vector2(f.to.x - f.from.x, f.to.y - f.from.y)
 				if key != null and d != Vector2.ZERO:
-					_lunges[key] = {"dir": d.normalized(), "start": now + delay, "dur": LUNGE_MS}
-					_attacks[key] = {"start": now + delay, "dir": d.normalized()}
-					arrival["%d,%d" % [f.to.x, f.to.y]] = now + delay + LUNGE_MS * 0.5
+					# Erst hinlaufen, dann zuschlagen (im Gegnerzug der Reihe nach)
+					var at: float = now + maxf(delay, move_end.get(key, stagger.get(key, 0.0)))
+					_lunges[key] = {"dir": d.normalized(), "start": at, "dur": LUNGE_MS}
+					_attacks[key] = {"start": at, "dir": d.normalized()}
+					arrival["%d,%d" % [f.to.x, f.to.y]] = at + LUNGE_MS * 0.5
 			"hit":
 				var tile := "%d,%d" % [f.at.x, f.at.y]
 				var t0: float = maxf(now + delay, arrival.get(tile, 0.0))
@@ -161,6 +171,34 @@ func after(s: Dictionary, before: Dictionary, fx: Array, now: float = -1.0) -> v
 				per_tile[tile] = n + 1
 				var t0: float = maxf(now + delay, arrival.get(tile, 0.0))
 				_floaters.append({"at": Vector2(f.at.x, f.at.y), "text": f.text, "color": f.color, "start": t0 + n * 260, "dur": 900.0})
+
+
+const STAGGER_MS := 260.0
+
+
+## Wartezeit je Gegner (uid -> ms), wenn mehrere in diesem Zug laufen oder
+## zuschlagen: in der Reihenfolge, in der sie im Spiel handeln.
+static func _stagger(s: Dictionary, before: Dictionary, current: Dictionary, fx: Array) -> Dictionary:
+	if not Rounds.active(s):
+		return {}
+	var strikers := {}
+	for f in fx:
+		if f.kind == "strike" or f.kind == "shot":
+			strikers["%d,%d" % [f.from.x, f.from.y]] = true
+	var order: Array = []
+	for m in J.arr(s, "monsters"):
+		var key: String = m.uid
+		var moved: bool = before.has(key) and current.has(key) and before[key] != current[key]
+		var here := "%d,%d" % [m.pos.x, m.pos.y]
+		var was := "%d,%d" % [before[key].x, before[key].y] if before.has(key) else ""
+		if moved or strikers.has(here) or strikers.has(was):
+			order.append(key)
+	var out := {}
+	if order.size() < 2:
+		return out
+	for n in order.size():
+		out[order[n]] = n * STAGGER_MS
+	return out
 
 
 ## Weg einer Figur über mehrere Felder (Linienzug ab prev) oder leer, wenn
@@ -197,7 +235,7 @@ func draw_pos(key: String, fallback: Vector2, now: float = -1.0) -> Vector2:
 		_tweens.erase(key)
 		return t.to
 	# Gleichmäßig: beim Dauerlaufen gehen die Schritte ohne Abbremsen ineinander über
-	return (t.from as Vector2).lerp(t.to, k)
+	return (t.from as Vector2).lerp(t.to, maxf(0.0, k))
 
 
 ## Ausfallschritt einer Figur in Kacheln (0 außerhalb eines Angriffs).

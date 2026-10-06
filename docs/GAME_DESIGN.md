@@ -211,6 +211,10 @@ für den Wirt im Restaurant und für Etage 3.
   greift an, Tab wechselt das Ziel); das Ziel trägt einen goldenen Ring, über
   dem Gegner unter der Maus steht die Trefferchance. Läuft man im Kampf, wird
   nur der Bewegungsbalken nachgezogen.
+- **Gegnerzug:** Handeln im Kampf mehrere Gegner, kommen sie sichtbar
+  nacheinander dran (jeder läuft und schlägt zu, der nächste folgt gut eine
+  Viertelsekunde später), in der Reihenfolge, in der das Spiel sie rechnet.
+  Außerhalb des Kampfes bewegen sich alle zugleich.
 - **Kampfkamera:** Beginnt ein Kampf, zoomt die Kamera so weit heraus, dass
   alle sichtbaren Gegner im Bild sind; ist er vorbei, geht es wieder auf die
   vorige Nähe (außer man hat im Kampf selbst gezoomt).

@@ -73,3 +73,35 @@ func test_nicht_durch_waende(t) -> void:
 		var tile := FreeMove.tile_of(p)
 		t.ok(MapGen.is_walkable(s.map, tile.x, tile.y), "Zwischenstand auf Boden (%s)" % p)
 	t.eq(anim.draw_pos("m1", Vector2(1, 4), 99999.0), Vector2(1, 4), "kommt an")
+
+
+func test_gegnerzug_nacheinander(t) -> void:
+	var s := _map([
+		"##########",
+		"#........#",
+		"#........#",
+		"#........#",
+		"##########",
+	])
+	s.round = {"move": 6, "max": 6, "n": 1, "acted": false}
+	var anim := Animator.new()
+	var a := {"uid": "a", "pos": J.pos(5, 1)}
+	var b := {"uid": "b", "pos": J.pos(5, 3)}
+	s.monsters = [a, b]
+	var before := anim.snapshot(s)
+	a.pos = J.pos(3, 1)
+	b.pos = J.pos(3, 3)
+	anim.after(s, before, [], 0.0)
+	t.eq(anim.draw_pos("a", Vector2(3, 1), 100.0).x < 5.0, true, "der erste läuft sofort")
+	t.eq(anim.draw_pos("b", Vector2(3, 3), 100.0), Vector2(5, 3), "der zweite wartet")
+	t.ok(anim.draw_pos("b", Vector2(3, 3), 400.0).x < 5.0, "dann läuft der zweite")
+	# Ohne Kampf laufen alle zugleich
+	s.erase("round")
+	var anim2 := Animator.new()
+	a.pos = J.pos(5, 1)
+	b.pos = J.pos(5, 3)
+	before = anim2.snapshot(s)
+	a.pos = J.pos(4, 1)
+	b.pos = J.pos(4, 3)
+	anim2.after(s, before, [], 0.0)
+	t.ok(anim2.draw_pos("b", Vector2(4, 3), 60.0).x < 5.0, "ohne Kampf zugleich")
