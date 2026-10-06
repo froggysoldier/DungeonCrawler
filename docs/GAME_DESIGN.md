@@ -211,6 +211,12 @@ für den Wirt im Restaurant und für Etage 3.
   greift an, Tab wechselt das Ziel); das Ziel trägt einen goldenen Ring, über
   dem Gegner unter der Maus steht die Trefferchance. Läuft man im Kampf, wird
   nur der Bewegungsbalken nachgezogen.
+- **Kampfkamera:** Beginnt ein Kampf, zoomt die Kamera so weit heraus, dass
+  alle sichtbaren Gegner im Bild sind; ist er vorbei, geht es wieder auf die
+  vorige Nähe (außer man hat im Kampf selbst gezoomt).
+- **Mauszeiger:** ein Pixel-Schwert über Gegnern (und beim Zielen eines
+  Zaubers), eine Pixel-Hand über allem, womit man etwas tun kann
+  (Gegenstände, Türen, Treppe, Möbel, Kisten, Personen, Knöpfe), sonst der Pfeil.
 
 ### 3.4a Erfahrung und Stufen
 - Erfahrung hängt vom **Stufen-Abstand** ab: Ein gleich starker Gegner gibt

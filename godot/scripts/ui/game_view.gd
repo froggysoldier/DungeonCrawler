@@ -135,6 +135,7 @@ func _init(state: Dictionary, meta_state: Dictionary) -> void:
 
 
 func _ready() -> void:
+	Cursors.install()
 	_build()
 	_typer.on_step = _scroll_log
 	refresh()
@@ -210,7 +211,7 @@ func _build() -> void:
 	_mapwrap.add_child(map)
 	map.tile_hovered.connect(_on_hover)
 	map.tile_clicked.connect(_on_map_click)
-	map.zoom_requested.connect(zoom_map)
+	map.zoom_requested.connect(func(d): zoom_map(d, true))
 	tiles.build()
 	tiles.ready_changed.connect(func(): map.tiles = tiles)
 	# Innerer Schatten und roter Kampfrahmen
@@ -246,8 +247,8 @@ func _build() -> void:
 	zc.add_theme_constant_override("separation", 6)
 	_mapwrap.add_child(zc)
 	zoom_box = zc
-	_zoom_out = Kit.button(null, "−", func(): zoom_map(-1), "RoundButton", false, "Herauszoomen (Taste -)")
-	_zoom_in = Kit.button(null, "+", func(): zoom_map(1), "RoundButton", false, "Hineinzoomen (Taste +)")
+	_zoom_out = Kit.button(null, "−", func(): zoom_map(-1, true), "RoundButton", false, "Herauszoomen (Taste -)")
+	_zoom_in = Kit.button(null, "+", func(): zoom_map(1, true), "RoundButton", false, "Hineinzoomen (Taste +)")
 	for zb in [_zoom_out, _zoom_in]:
 		zb.custom_minimum_size = Vector2(34, 34)
 	zc.add_child(_zoom_out)
@@ -403,9 +404,11 @@ class FrameGlow:
 
 
 ## Karte vergrößern oder verkleinern.
-func zoom_map(delta: int) -> void:
+func zoom_map(delta: int, by_hand: bool = false) -> void:
 	if not map.zoom(delta):
 		return
+	if by_hand and fight != null:
+		fight.erase("auto_zoom")
 	var bounds := map.zoom_bounds()
 	_zoom_out.disabled = bounds.min
 	_zoom_in.disabled = bounds.max
@@ -560,7 +563,8 @@ func _update_combat_mode() -> void:
 	_combat_frame.combat = now
 	_combat_frame.queue_redraw()
 	if now and fight == null:
-		fight = {"kills": Stats.stat(s, "kills"), "xp": Stats.stat(s, "xp.gesamt"), "turn": s.turn, "hp": s.player.hp}
+		fight = {"kills": Stats.stat(s, "kills"), "xp": Stats.stat(s, "xp.gesamt"), "turn": s.turn, "hp": s.player.hp, "zoom": map.zoom_index}
+		_fit_foes()
 		_stop_moving()
 		held.clear()
 		var foes := combat_targets().filter(func(m): return m.get("aware", false))
@@ -575,6 +579,9 @@ func _update_combat_mode() -> void:
 	elif not now and fight != null:
 		var f: Dictionary = fight
 		fight = null
+		# Nach dem Kampf wieder so nah wie vorher (außer man hat selbst gezoomt)
+		if f.get("auto_zoom", false) and map.zoom_index < int(f.zoom):
+			zoom_map(int(f.zoom) - map.zoom_index)
 		if s.status != "playing":
 			return
 		var kills := int(Stats.stat(s, "kills") - f.kills)
@@ -592,6 +599,22 @@ func _update_combat_mode() -> void:
 		banner("Sieg" if kills else "Kampf vorbei", " · ".join(bits), "end")
 		if sound():
 			sound().play_combat_end()
+
+
+## Kampfbeginn: so weit herauszoomen, dass alle sichtbaren Gegner im Bild
+## sind (wie in Baldur's Gate); nach dem Kampf geht es zurück.
+func _fit_foes() -> void:
+	if map.size.x <= 0:
+		return
+	var p: Dictionary = s.player.pos
+	for k in MapView.ZOOM_STEPS.size():
+		var cols := map.size.x / map.tile_px
+		var rows := map.size.y / map.tile_px
+		var out := J.some(combat_targets(), func(m): return absf(m.pos.x - p.x) > cols / 2.0 - 1.5 or absf(m.pos.y - p.y) > rows / 2.0 - 1.5)
+		if not out or map.zoom_index == 0:
+			return
+		zoom_map(-1)
+		fight.auto_zoom = true
 
 
 ## Banner quer über die Karte bei Kampfbeginn und -ende.
@@ -1022,6 +1045,7 @@ func travel(path: Array, exact: Variant = null) -> void:
 
 func _on_hover(t: Variant) -> void:
 	hover = t
+	_update_cursor()
 	if t == null:
 		_tip.visible = false
 		return
@@ -1029,6 +1053,28 @@ func _on_hover(t: Variant) -> void:
 		inspected = null
 	if inspected == null:
 		_update_tooltip()
+
+
+## Mauszeiger über dem Boden: Schwert über Gegnern (und beim Zielen eines
+## Zaubers), Hand über allem, womit man etwas tun kann, sonst der Pfeil.
+func _update_cursor() -> void:
+	var shape := Control.CURSOR_ARROW
+	if hover != null and MapGen.in_bounds(s.map, hover.x, hover.y):
+		var i := MapGen.idx(s.map, hover.x, hover.y)
+		var tp := _pos(hover)
+		var seen := _vis_now().has(i)
+		if pending_spell != null:
+			shape = Control.CURSOR_CROSS
+		elif seen and Ai.monster_at(s, tp) != null:
+			shape = Control.CURSOR_CROSS
+		elif s.map.explored[i]:
+			var tile := MapGen.tile_at(s.map, hover.x, hover.y)
+			var npc = Crawlers.crawler_at(s, tp) if seen else null
+			if (npc != null and not npc.get("party", false)) or not Game.items_at(s, tp).is_empty() or MapGen.furniture_at(s.map, tp) != null \
+					or tile in ["door", "stairs", Tiefgarage.WRECK] or Dungeon.is_crate(tile):
+				shape = Control.CURSOR_POINTING_HAND
+	if map.mouse_default_cursor_shape != shape:
+		map.mouse_default_cursor_shape = shape
 
 
 func _on_map_click(t: Vector2i, button: int) -> void:
@@ -1257,9 +1303,9 @@ func _unhandled_input(ev: InputEvent) -> void:
 	elif ch == "h" or ch == "?":
 		GameDialogs.show_help(self)
 	elif ch == "+" or ch == "=" or k == KEY_KP_ADD:
-		zoom_map(1)
+		zoom_map(1, true)
 	elif ch == "-" or k == KEY_KP_SUBTRACT:
-		zoom_map(-1)
+		zoom_map(-1, true)
 	elif ch == "n":
 		here_folded = not here_folded
 		refresh_here()
