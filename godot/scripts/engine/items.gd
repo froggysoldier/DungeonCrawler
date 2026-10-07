@@ -104,7 +104,7 @@ static func create_area_map(s: Dictionary, hood: int) -> Dictionary:
 		"kind": "karte",
 		"rarity": "selten",
 		"hood": hood,
-		"flavor": "Zeigt den kompletten Grundriss dieses Viertels. Beim Aufheben wird die Karte sofort eingetragen.",
+		"flavor": "Zeigt das ganze Viertel: Grundriss, Safe Rooms, Gilden, Treppen und wer sich dort herumtreibt. Im Inventar lesen.",
 		"wert": 0,
 	}
 

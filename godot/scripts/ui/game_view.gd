@@ -86,6 +86,7 @@ var _tip_text: RichTextLabel
 var _combat_frame: Control
 var _here: VBoxContainer
 var _vitals: VBoxContainer
+var _vitals_box: PanelContainer
 var _here_scroll: ScrollContainer
 var _tabs: HBoxContainer
 var _tab_content: VBoxContainer
@@ -273,7 +274,7 @@ func _build() -> void:
 	var tm := Kit.margin(_tab_scroll, 2, 2, 10, 2)
 	_tab_content = Kit.vbox(tm, 5)
 	_mapwrap.resized.connect(func():
-		zc.position = _mapwrap.size - Vector2(12 + 34, 12 + 74)
+		_layout_vitals()
 		_layout_minimap()
 		_layout_drawer())
 	# Tooltip
@@ -296,7 +297,7 @@ func _build() -> void:
 	_actionbar = PanelContainer.new()
 	_actionbar.theme_type_variation = "ActionBar"
 	bv.add_child(_actionbar)
-	# Rechts: Werte, "Hier" und der Chat (Log)
+	# Links: "Hier" und der Chat (Log); die Werte stehen unten rechts im Spielfeld
 	var vline := ColorRect.new()
 	vline.color = UiTheme.LINE
 	vline.custom_minimum_size = Vector2(1, 0)
@@ -305,12 +306,18 @@ func _build() -> void:
 	_side.theme_type_variation = "Side"
 	_side.custom_minimum_size = Vector2(400, 0)
 	body.add_child(_side)
+	body.move_child(_side, 0)
+	body.move_child(vline, 1)
+	_vitals_box = PanelContainer.new()
+	_vitals_box.theme_type_variation = "Tip"
+	_vitals_box.mouse_filter = Control.MOUSE_FILTER_PASS
+	_mapwrap.add_child(_vitals_box)
+	_vitals = Kit.vbox(_vitals_box, 5)
+	_vitals.custom_minimum_size = Vector2(380, 0)
+	_vitals.minimum_size_changed.connect(func(): _layout_vitals.call_deferred())
 	var sv := VBoxContainer.new()
 	sv.add_theme_constant_override("separation", 0)
 	_side.add_child(sv)
-	var vm := Kit.margin(sv, 14, 10, 14, 10)
-	_vitals = Kit.vbox(vm, 5)
-	_line(sv)
 	_here_scroll = ScrollContainer.new()
 	_here_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	sv.add_child(_here_scroll)
@@ -338,9 +345,21 @@ static func _line(parent: Node) -> void:
 	parent.add_child(l)
 
 
+## Werte unten rechts im Spielfeld, die Zoom-Knöpfe darüber.
+func _layout_vitals() -> void:
+	if not is_instance_valid(_vitals_box):
+		return
+	var w := _mapwrap.size
+	_vitals_box.reset_size()
+	var vs := _vitals_box.size
+	_vitals_box.position = w - vs - Vector2(12, 12)
+	if is_instance_valid(zoom_box):
+		zoom_box.position = Vector2(w.x - 12 - 34, w.y - vs.y - 12 - 10 - 74)
+
+
 func _fit_here() -> void:
 	var h := _here.get_combined_minimum_size().y
-	var sv_h := size.y - 52 - _vitals.get_combined_minimum_size().y - 20
+	var sv_h := size.y - 52 - 20
 	# Der Chat behält immer mindestens gut die Hälfte
 	_here_scroll.custom_minimum_size.y = minf(h + 2, sv_h * 0.4) if h > 1 else 0.0
 
@@ -1402,7 +1421,11 @@ func refresh_top() -> void:
 		_pill("Zuschauer %s" % J.de(Viewers.live_viewers(s)), "achv", "Pill", 400, "Follower %s · Hype %d%s" % [J.de(s.viewers.follower), J.rnd(s.viewers.hype), (" · Crawler übrig %s" % J.de(Crawlers.population(s).alive)) if Game.has_unlock(s, "inventar") else ""])
 	top_refs.gold = _pill("Gold %s" % J.s(p.gold), Color("#ffd700"))
 	if not p.boxes.is_empty():
-		top_refs.boxen = _pill("Lootboxen %d" % p.boxes.size(), "accent", "PillTimer", 700, "Öffnen kannst du sie in einem Safe Room oder einer Gilde")
+		top_refs.boxen = _pill("Lootboxen %d" % p.boxes.size(), "accent", "PillTimer", 700, "Klick: zum Inventar. Öffnen kannst du sie in einem Safe Room oder einer Gilde")
+		top_refs.boxen.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		top_refs.boxen.gui_input.connect(func(ev):
+			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+				open_tab("inventar"))
 	var btn := Kit.button(_top, "Menü", open_menu, "PillButton", false, "Hilfe, Ton und Musik (Esc)")
 	btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	menu_button = btn

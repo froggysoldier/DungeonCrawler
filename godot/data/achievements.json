@@ -383,7 +383,7 @@
    "name": "Kartograph",
    "tier": "bronze",
    "box": null,
-   "description": "Hebe eine Gebietskarte auf.",
+   "description": "Lies eine Gebietskarte.",
    "comment": "Ein Stück Papier, das dir sagt, wo du bist. Luxus.",
    "category": "erkundung"
   },
@@ -914,7 +914,7 @@
    "name": "Weltkarte",
    "tier": "gold",
    "box": "abenteurer",
-   "description": "Sammle alle vier Gebietskarten einer Etage.",
+   "description": "Lies alle vier Gebietskarten einer Etage.",
    "comment": "Du kennst jetzt jeden Winkel. Jeden feuchten, stinkenden Winkel.",
    "category": "erkundung"
   },

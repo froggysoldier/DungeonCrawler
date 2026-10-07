@@ -112,7 +112,9 @@ static func build(gv: GameView, root: VBoxContainer) -> void:
 	elif room != null and room.kind == "guild" and not s.player.boxes.is_empty():
 		any = true
 		Kit.section(v, "Gilde")
-		_boxes(gv, v)
+		var bh := Kit.hbox(v, 6)
+		Kit.text(bh, "Hier kannst du Lootboxen öffnen ([b]%d[/b])." % s.player.boxes.size(), 13).size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		Kit.button(bh, "Zum Inventar", func(): gv.open_tab("inventar"), "SmallPrimary")
 	elif room != null and (room.get("feature") != null or not J.arr(room, "furniture").is_empty()):
 		any = _feature_room(gv, v, room) or any
 	if any:
@@ -173,29 +175,11 @@ static func _safe_room(gv: GameView, v: VBoxContainer, room: Dictionary) -> void
 	var shop = room.get("shop")
 	if shop != null and (legacy or near.call("haendler")):
 		_shop(gv, v, room, shop)
-	_boxes(gv, v)
-
-
-## Lootboxen zum Öffnen (Safe Room und Gilde).
-static func _boxes(gv: GameView, v: VBoxContainer) -> void:
-	var boxes: Array = gv.s.player.boxes
-	if boxes.is_empty():
-		return
-	Kit.spacer(v, 6)
-	var bh := Kit.hbox(v, 6)
-	var bl := Kit.text(bh, "Lootboxen [b]%d[/b]" % boxes.size(), 13)
-	bl.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	if boxes.size() > 1:
-		Kit.button(bh, "Alle öffnen", func(): _open_all(gv), "SmallPrimary")
-	var shown := boxes if gv.show_all_boxes else boxes.slice(0, 3)
-	for bx in shown:
-		var uid: String = bx.uid
-		var h := _row(v, Kit.col(Kit.esc(bx.name), Db.world("BOX_TIER_COLORS")[bx.box.tier]), 13)
-		Kit.button(h, "Öffnen", func(): _open_box(gv, uid), "SmallButton")
-	if boxes.size() > 3:
-		Kit.button(v, "Weniger anzeigen" if gv.show_all_boxes else "%d weitere anzeigen" % (boxes.size() - 3), func():
-			gv.show_all_boxes = not gv.show_all_boxes
-			gv.refresh_here(), "LinkBtn").size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	if not gv.s.player.boxes.is_empty() and Combat.can_open_boxes(gv.s, gv.s.player.pos):
+		Kit.spacer(v, 4)
+		var bh := Kit.hbox(v, 6)
+		Kit.text(bh, "Hier kannst du Lootboxen öffnen ([b]%d[/b])." % gv.s.player.boxes.size(), 13).size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		Kit.button(bh, "Zum Inventar", func(): gv.open_tab("inventar"), "SmallPrimary")
 
 
 static func _shop(gv: GameView, v: VBoxContainer, room: Dictionary, shop: Dictionary) -> void:
@@ -280,28 +264,3 @@ static func _freebie(gv: GameView) -> void:
 		GameDialogs.reveal_items(gv, "Gratis-Automat", [got.item])
 
 
-static func _open_box(gv: GameView, uid: String) -> void:
-	var box = J.find(gv.s.player.boxes, func(x): return x.uid == uid)
-	var got := {"items": null}
-	gv.act(func():
-		var res := Game.open_box(gv.s, uid)
-		got.items = res.get("contents")
-		return res)
-	if got.items != null and box != null:
-		GameDialogs.reveal_items(gv, box.name, got.items, box.box.tier)
-
-
-static func _open_all(gv: GameView) -> void:
-	var opened: Array = []
-	for box in gv.s.player.boxes.duplicate():
-		var got := {"items": null}
-		var uid: String = box.uid
-		var ok := gv.act(func():
-			var res := Game.open_box(gv.s, uid)
-			got.items = res.get("contents")
-			return res)
-		if not ok or got.items == null:
-			break
-		opened.append({"name": box.name, "items": got.items, "tier": box.box.tier})
-	if not opened.is_empty():
-		GameDialogs.reveal_boxes(gv, opened)

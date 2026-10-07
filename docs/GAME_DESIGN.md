@@ -286,8 +286,11 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
   Mutter aller Motten, Pfandflaschen-Baron, Heizungsbestie; Etage 3:
   Kanalkönigin, Kommandant Klärschlamm, Schwarzmarkt-Oger, Nixe vom Überlauf).
   Nachbarschafts-Bosse verlassen ihre Kammer nicht, solange
-  sie leben spawnen im Viertel Mobs nach, droppen **Gebietskarte** (muss
-  aufgehoben werden → deckt das Viertel auf) + Boss-Box + Unikat.
+  sie leben spawnen im Viertel Mobs nach, droppen **Gebietskarte** + Boss-Box + Unikat.
+  Die Gebietskarte kommt ins Inventar; erst „Lesen“ deckt das ganze Viertel auf
+  (vor dem Rucksack wird sie gleich eingetragen). Danach zeigt die Karte dort
+  Safe Rooms und Gilden umrandet, Treppen, Gegner als rote und Crawler als blaue
+  Punkte, laufend aktuell.
 - **Borough-Bosse** je Etage: Oma Gulasch (1), Der Hausverwalter (2),
   Der Rattenkaiser (3) – die Treppe liegt direkt dahinter.
 - Mobs fliehen selten: kleine Tiere bei wenig Leben, Feiglinge erst ab 40 % Verlust, Diebe mit Beute, alle unter Furcht. Wer in die Ecke gedrängt ist, wehrt sich. Fernkämpfer weichen ab und zu (30 %) einen Schritt zurück. Mobs verlieren das Interesse, wenn man weit weg ist.
@@ -299,7 +302,7 @@ letzte Stunde) und der Raum. Er zählt alle Kombinationen.
   pro Crawler; meist nützlich, manchmal ein Scherzartikel), ab Etage 3
   einen Händler, ein Bett und eine Toilette. **Restaurants** haben zusätzlich einen Wirt mit
   Buff-Essen und Zimmer. Möbel benutzt man, indem man hineinläuft.
-- Hier (und in der Gilde) **Lootboxen öffnen**; nur hier **schlafen** (8 h, heilt, Haustier kehrt zurück).
+- Hier (und in der Gilde) **Lootboxen öffnen** – im Inventar: Liste nach Art und Stufe (wertvollste zuerst) mit „Öffnen“, „Alle N“ (alle dieser Art und Stufe) und „Alle öffnen“. Die Boxen springen einzeln auf: eine Truhe wackelt, springt auf und zeigt ihren Inhalt; „Nächste Box“ (Enter, Leertaste) öffnet die nächste, „Schließen“ lässt die übrigen zu. Je Stufe eigene Szene: Bronze Staubwolke, Silber vier Strahlen, Gold Licht aus den Ritzen und Goldregen, Platin Lichtringe und Beben, Legendär drehende Strahlen und Glut, Himmlisch Sternenhimmel; je wertvoller, desto länger die Spannung. „Hier“ verweist nur noch aufs Inventar, der Knopf „Lootboxen“ oben öffnet es; nur hier **schlafen** (8 h, heilt, Haustier kehrt zurück).
 - **Toilette:** Erleichtern darf man sich nur hier (siehe Blase).
 - **Laden** (ab Etage 3) mit wechselnder Besitzerin oder wechselndem Besitzer: kaufen,
   verkaufen (40 % des Werts) und **feilschen** – einmal pro Angebot, Chance
@@ -751,9 +754,9 @@ Dazu: Achievement-Familien „Einlagen“ (1/5/12) und „Kopfgelder“ (1/3/8),
 ### 3.30 Aufbau der Oberfläche
 Schrift überall: Jersey 10 (Pixelschrift im Stil von Tiny Swords).
 - **Kopfzeile:** links Etage, Uhrzeit, Einsturz-Zeit, laufende Einlage, Zuschauer (Details im Tooltip), Gold, Lootboxen (nur wenn vorhanden) und „Menü“ (Esc); rechts die **Reiter** Crawler (P), Ziele (Z), Inventar (I), Ausrüstung (A), Handwerk (B), Skills (L), Erfolge (O). Ein Klick oder die Taste klappt den Reiter als Tafel oben rechts über der Karte auf, derselbe Klick, „Schließen“, Esc oder ein Klick daneben klappt ihn zu; das zuletzt geöffnete Fenster liegt oben, Dialoge immer über allem; Tab blättert außerhalb des Kampfes. Ein goldener Punkt zeigt, wo etwas wartet (freie Punkte, Angebote, Abgaben, Kopfgeld). Das **Inventar** ist eine schlichte Liste (Symbol, Name, Art); ein Klick klappt Werte und Aktionen auf. Die **Ausrüstung** hat eine eigene Seite: was am Körper ist, ebenso aufklappbar (Ausziehen), darunter die freien Plätze.
-- **Rechts, oben immer sichtbar:** Name, Stufe, Klasse, Balken für HP, Ausdauer, Mana, Blase und Erfahrung, dazu Zustände, Haustier, Reittier und Party. Freie Wertepunkte erscheinen als Knopf.
-- **„Hier“** darunter: nur wenn es am Standort etwas zu tun gibt (Safe Room, Gilde mit Lootboxen, Händler, Crawler, Fallen); einklappbar (N), höchstens 40 % der Höhe.
-- **Chat** rechts darunter, über die ganze restliche Höhe und in größerer Schrift: Filter Alles, Kampf, Funde, Gespräche und ein Knopf „Überspringen“; nur drei Farben (Text, Gold für Funde und Erfolge, Rot für Gefahr); gleiche Zeilen hintereinander werden zusammengefasst („(9×)“).
+- **Werte unten rechts im Spielfeld** (Tafel über der Karte, Zoom-Knöpfe darüber): Name, Stufe, Klasse, Balken für HP, Ausdauer, Mana, Blase und Erfahrung, dazu Zustände, Haustier, Reittier und Party. Freie Wertepunkte erscheinen als Knopf.
+- **„Hier“** links oben: nur wenn es am Standort etwas zu tun gibt (Safe Room, Gilde mit Lootboxen, Händler, Crawler, Fallen); einklappbar (N), höchstens 40 % der Höhe.
+- **Chat** links darunter, über die ganze restliche Höhe und in größerer Schrift: Filter Alles, Kampf, Funde, Gespräche und ein Knopf „Überspringen“; nur drei Farben (Text, Gold für Funde und Erfolge, Rot für Gefahr); gleiche Zeilen hintereinander werden zusammengefasst („(9×)“).
 - **Aktionsleiste unten** außerhalb des Kampfes: eine schmale Zeile mit dem gewählten Angriff, Fähigkeit, Warten, Aufheben, Reittier und Zaubern; im Kampf die Hotbar (siehe 3.4).
 - **Rechtsklick auf die Karte:** Menü mit allem, was auf dem Feld geht (aufheben, angreifen, ansprechen, benutzen, Tür öffnen, Kiste zerschlagen, Wrack durchsuchen, entschärfen, hinabsteigen, hierher gehen, untersuchen). Liegt das Ziel weiter weg, läuft die Figur erst hin.
 - **Laufen:** Außerhalb des Kampfes läuft die Figur ohne Halt bis ans Ziel (Klick) oder solange die Taste gedrückt ist, in festem Takt und gleichmäßig. Anhalten nur bei Gefahr: Kampf beginnt, Schaden, neu entdeckte Falle. Gespeichert und alles neu aufgebaut wird, sobald sie steht.

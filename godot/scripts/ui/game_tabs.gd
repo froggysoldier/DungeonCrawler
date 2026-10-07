@@ -103,6 +103,8 @@ static func item_body(gv: GameView, v: Node, it: Dictionary, with_actions: bool,
 		Kit.button(f, "Anlegen", func(): gv.act(func(): return Game.equip(s, uid)), "SmallButton")
 	if it.kind == "verbrauch":
 		Kit.button(f, "Benutzen", func(): gv.act(func(): return Game.use_item(s, uid)), "SmallButton")
+	if it.kind == "karte" and from == "inv":
+		Kit.button(f, "Lesen", func(): gv.act(func(): return Game.use_item(s, uid)), "SmallPrimary", false, "Das Viertel auf deiner Karte aufdecken")
 	if it.kind == "buch":
 		Kit.button(f, "Lesen", func(): gv.act(func(): return Game.use_item(s, uid)), "SmallButton")
 	if pb != null and from == "inv" and s.player.get("pet") != null:
@@ -434,13 +436,49 @@ static func inventory_tab(gv: GameView, root: VBoxContainer) -> void:
 			Kit.text(root, "Klicke auf einen Eintrag für Einzelheiten und Aktionen.", 12, "muted")
 		for it in p.inventory:
 			item_row(gv, root, it)
-	Kit.section(root, "Lootboxen (%d)" % p.boxes.size())
+	_box_list(gv, root)
+
+
+## Lootboxen nach Art und Stufe gruppiert: eine öffnen, alle dieser Art und
+## Stufe oder alle auf einmal. Gezeigt werden sie dann einzeln nacheinander.
+static func _box_list(gv: GameView, root: VBoxContainer) -> void:
+	var s := gv.s
+	var p: Dictionary = s.player
+	var h := Kit.section(root, "Lootboxen (%d)" % p.boxes.size())
 	if p.boxes.is_empty():
 		Kit.text(root, "Keine. Achievements bringen Boxen!", 14, "muted")
-	else:
-		for bx in p.boxes:
-			Kit.text(root, Kit.col(Kit.esc(bx.name), Db.world("BOX_TIER_COLORS")[bx.box.tier]), 13)
-		Kit.text(root, "Öffnen in einem Safe Room oder einer Gilde.", 12, "muted")
+		return
+	var can := Combat.can_open_boxes(s, p.pos)
+	if p.boxes.size() > 1:
+		var all: Array = p.boxes.map(func(b): return b.uid)
+		Kit.button(h, "Alle öffnen (%d)" % all.size(), func(): GameDialogs.open_boxes(gv, all), "SmallPrimary", not can)
+	if not can:
+		Kit.text(root, "Öffnen kannst du sie in einem Safe Room oder einer Gilde.", 12, "muted")
+	var tiers: Array = Db.world("BOX_TIERS")
+	var groups := {}
+	var order: Array = []
+	for bx in p.boxes:
+		var key := "%s|%s" % [bx.box.type, bx.box.tier]
+		if not groups.has(key):
+			groups[key] = []
+			order.append(key)
+		groups[key].append(bx)
+	# Wertvollste zuerst
+	order.sort_custom(func(a, b): return tiers.find(groups[a][0].box.tier) > tiers.find(groups[b][0].box.tier))
+	for key in order:
+		var list: Array = groups[key]
+		var first: Dictionary = list[0]
+		var row := Kit.hbox(root, 8)
+		var look := Sprites.item_sprite(first)
+		Kit.icon(row, look[0], look[1], 1, Vector2(28, 28))
+		var name := Kit.text(row, "%s%s" % [Kit.col(Kit.esc(first.name), Db.world("BOX_TIER_COLORS")[first.box.tier]), (" ×%d" % list.size()) if list.size() > 1 else ""], 15)
+		name.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var one: String = first.uid
+		Kit.button(row, "Öffnen", func(): GameDialogs.open_boxes(gv, [one]), "SmallButton", not can)
+		if list.size() > 1:
+			var uids: Array = list.map(func(b): return b.uid)
+			Kit.button(row, "Alle %d" % list.size(), func(): GameDialogs.open_boxes(gv, uids), "SmallButton", not can, "Alle Boxen dieser Art und Stufe nacheinander öffnen")
 
 
 ## Eine Zeile der Liste: Symbol, Name, Art. Ein Klick klappt Werte und
@@ -485,6 +523,7 @@ static func _kind_name(it: Dictionary) -> String:
 		"buch": return "Buch"
 		"material": return "Material"
 		"box": return "Box"
+		"karte": return "Gebietskarte"
 	return ""
 
 

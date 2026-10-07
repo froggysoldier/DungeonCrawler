@@ -887,7 +887,9 @@ static func pickup(s: Dictionary, uid: Variant = null) -> Dictionary:
 		return _fail("Hier liegt nichts.")
 	for entry in here:
 		var it: Dictionary = entry.item
-		if it.kind == "karte":
+		# Gebietskarte: kommt ins Inventar und wird dort gelesen. Ohne
+		# Rucksack (vor der Gilde) wird sie gleich eingetragen.
+		if it.kind == "karte" and not has_unlock(s, "inventar"):
 			s.items = J.without(s.items, entry)
 			_reveal_hood(s, int(J.nn(it, "hood", 0)))
 			continue
@@ -923,7 +925,7 @@ static func _reveal_hood(s: Dictionary, hood: int) -> void:
 			if near:
 				m.explored[MapGen.idx(m, x, y)] = true
 	m.hoods[hood].mapFound = true
-	Log.add(s, "Die Gebietskarte zeigt dir den kompletten Grundriss: %s." % m.hoods[hood].name, "system")
+	Log.add(s, "Die Gebietskarte zeigt dir das ganze Viertel %s: Grundriss, Safe Rooms, Gilden, Treppen, Gegner (rot) und Crawler (blau) auf deiner Karte." % m.hoods[hood].name, "system")
 	Events.emit(s, {"type": "mapPicked", "hood": hood})
 
 
@@ -993,6 +995,11 @@ static func use_item(s: Dictionary, uid: String) -> Dictionary:
 	if owned == null:
 		return _fail("Nicht gefunden.")
 	var it: Dictionary = owned.item
+	if it.kind == "karte":
+		_remove_one(s, uid)
+		_reveal_hood(s, int(J.nn(it, "hood", 0)))
+		end_turn(s)
+		return _ok()
 	if it.kind == "buch":
 		if not has_unlock(s, "inventar"):
 			return _fail("Ohne Tutorial verstehst du die Schrift in diesem Buch nicht. Finde die Gilde.")

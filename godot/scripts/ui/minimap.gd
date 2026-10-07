@@ -9,6 +9,11 @@ const ROOM_COLORS := {"safe": "#dcaa46", "guild": "#4697ac", "boss": "#b65555", 
 var s: Dictionary
 
 
+func _dot(x: float, y: float, r: float, c: Color) -> void:
+	draw_rect(Rect2(floorf(x - r) - 1, floorf(y - r) - 1, r * 2 + 2, r * 2 + 2), Color(0, 0, 0, 0.7))
+	draw_rect(Rect2(floorf(x - r), floorf(y - r), r * 2, r * 2), c)
+
+
 func _draw() -> void:
 	if s.is_empty():
 		return
@@ -101,6 +106,23 @@ func _draw() -> void:
 		for r in m.rooms:
 			if r.get("marked", false):
 				draw_rect(Rect2(ox + (r.x - 1) * cell, oy + (r.y - 1) * cell, (r.w + 2) * cell, (r.h + 2) * cell), Color("#7cd4ea"), false, 2.0)
+	# Viertel mit gelesener Gebietskarte: Safe Rooms und Gilden umrahmt,
+	# Gegner als rote, Crawler als blaue Punkte (laufend aktuell)
+	var found := {}
+	for hi in J.arr(m, "hoods").size():
+		if m.hoods[hi].get("mapFound", false):
+			found[hi] = true
+	if not found.is_empty():
+		for r in m.rooms:
+			if (r.kind == "safe" or r.kind == "guild") and found.has(MapGen.hood_of(m, MapGen.center(r))):
+				draw_rect(Rect2(ox + (r.x - 1) * cell, oy + (r.y - 1) * cell, (r.w + 2) * cell, (r.h + 2) * cell), Color(ROOM_COLORS[r.kind]).lightened(0.3), false, 2.0)
+		var dot := maxf(2, floorf(cell * 0.9))
+		for mo in s.monsters:
+			if found.has(MapGen.hood_of(m, mo.pos)):
+				_dot(ox + mo.pos.x * cell + cell / 2, oy + mo.pos.y * cell + cell / 2, dot, Color("#ff4a3c"))
+		for c in Crawlers.crawlers(s):
+			if c.alive and found.has(MapGen.hood_of(m, c.pos)):
+				_dot(ox + c.pos.x * cell + cell / 2, oy + c.pos.y * cell + cell / 2, dot, Color("#5aa8ff"))
 	var px: float = ox + s.player.pos.x * cell + cell / 2
 	var py: float = oy + s.player.pos.y * cell + cell / 2
 	var g := maxf(4, floorf(cell * 2.4))

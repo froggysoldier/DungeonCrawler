@@ -139,22 +139,89 @@ static func reveal_items(gv: GameView, title: String, items: Array, tier: Varian
 			_pop(v.get_parent(), delay + n * 0.25), "Super!")
 
 
-## Mehrere Boxen auf einmal: Inhalt nach Box gruppiert, die Truhe in der besten Stufe.
-static func reveal_boxes(gv: GameView, list: Array) -> Modals.Job:
-	var tiers: Array = Db.world("BOX_TIERS")
-	var best = null
-	for b in list:
-		if b.get("tier") != null and (best == null or tiers.find(b.tier) > tiers.find(best)):
-			best = b.tier
-	return gv.modals().html("%d Lootboxen geöffnet" % list.size(), func(root: VBoxContainer):
-		var delay := _chest(root, best)
-		for bi in list.size():
-			var b: Dictionary = list[bi]
-			Kit.section(root, b.name)
-			var box := Kit.vbox(root, 8)
+## Boxen öffnen (eine, alle einer Art und Stufe oder alle): Eine Box nach
+## der anderen springt mit ihrer Truhe auf, erst „Nächste Box“ öffnet die
+## nächste. „Schließen“ lässt die übrigen zu.
+static func open_boxes(gv: GameView, uids: Array) -> Modals.Job:
+	var list: Array = uids.filter(func(u): return J.some(gv.s.player.boxes, func(x): return x.uid == u))
+	if list.is_empty() or not gv.act(func(): return {"ok": true}):
+		return null
+	if not Combat.can_open_boxes(gv.s, gv.s.player.pos):
+		Log.add(gv.s, "Lootboxen kannst du nur in einem Safe Room oder einer Gilde öffnen.", "info")
+		gv.refresh()
+		return null
+	return show_boxes(gv, list)
+
+
+## Eine Box öffnen, während das Box-Fenster offen ist (gv.act wartet sonst
+## auf das Fenster). Neue Dialoge stellen sich hinten an.
+static func _open_one(gv: GameView, uid: String) -> Variant:
+	var box = J.find(gv.s.player.boxes, func(x): return x.uid == uid)
+	if box == null:
+		return null
+	var res := Game.open_box(gv.s, uid)
+	var sfx := Fx.drain_sfx(gv.s)
+	Fx.drain_fx(gv.s)
+	if gv.sound():
+		gv.sound().play_sfx(sfx)
+	gv.after_action()
+	if not res.get("ok", false):
+		if res.get("message") != null:
+			Log.add(gv.s, res.message, "info")
+		return null
+	return {"name": box.name, "items": res.contents, "tier": box.box.tier}
+
+
+## Boxen nacheinander öffnen und zeigen.
+static func show_boxes(gv: GameView, uids: Array) -> Modals.Job:
+	var build := func(root: VBoxContainer, close: Callable) -> void:
+		var st := {"i": 0}
+		var title := Modals.title(root, "")
+		var counter := Kit.label(root, "", 13, "muted")
+		var stage := Kit.vbox(root, 8)
+		var f := Modals.foot(root)
+		f[0].size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		Kit.button(f[1], "Schließen", func(): close.call(), "Button", false, "Die übrigen Boxen bleiben zu und warten im Inventar")
+		var next := Kit.button(f[1], "Weiter", Callable(), "PrimaryButton")
+		var show := func() -> bool:
+			Kit.clear(stage)
+			var b = _open_one(gv, uids[st.i])
+			if b == null:
+				return false
+			title.text = b.name
+			title.add_theme_color_override("font_color", Color(String(Db.world("BOX_TIER_COLORS").get(b.tier, "#ffd34a"))).lightened(0.2))
+			var left: int = uids.size() - st.i - 1
+			counter.text = ("Box %d von %d" % [st.i + 1, uids.size()]) if uids.size() > 1 else ""
+			var delay := _chest(stage, b.tier)
+			# Fundstücke in einem eigenen Bereich, damit die Knöpfe immer
+			# sichtbar bleiben
+			var sc := ScrollContainer.new()
+			sc.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+			sc.custom_minimum_size = Vector2(0, 260)
+			stage.add_child(sc)
+			var lst := Kit.vbox(sc, 8)
+			lst.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			for n in b.items.size():
-				var v := GameTabs.item_card(gv, box, b.items[n], false)
-				_pop(v.get_parent(), delay + minf(2.0, bi * 0.15 + n * 0.08)), "Super!")
+				var v := GameTabs.item_card(gv, lst, b.items[n], false)
+				_pop(v.get_parent(), delay + n * 0.35)
+			next.text = ("Nächste Box (%d übrig)" % left) if left > 0 else "Super!"
+			return true
+		var advance := func() -> void:
+			if st.i < uids.size() - 1:
+				st.i += 1
+				if not show.call():
+					close.call()
+			else:
+				close.call()
+		next.pressed.connect(advance)
+		gv.modals()._job.on_key = func(ev: InputEventKey) -> void:
+			if ev.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_SPACE]:
+				advance.call()
+			elif ev.keycode == KEY_ESCAPE:
+				close.call()
+		if not show.call():
+			close.call.call_deferred()
+	return gv.modals().custom(build, 700)
 
 
 ## Truhe über den Gegenständen; gibt zurück, wie lange die Karten warten.
@@ -165,30 +232,45 @@ static func _chest(root: VBoxContainer, tier: Variant) -> float:
 	c.tier = String(tier)
 	c.color = Color(String(Db.world("BOX_TIER_COLORS").get(c.tier, "#c8a060")))
 	c.sound = SoundBox.instance
+	c.setup()
 	root.add_child(c)
-	return Chest.OPEN_AT + 0.2
+	return c.open_at + 0.35
 
 
 ## Die Truhe wackelt, springt auf, strahlt in der Farbe der Box-Stufe und
-## sprüht Funken. Alles in Kunstpixeln (PX Bildschirmpixel). Strahlen und
-## Leuchten zeichnet die Truhe selbst (additiv), Truhe und Funken ein Kind davor.
+## sprüht Funken. Je wertvoller die Stufe, desto länger die Spannung und desto
+## prächtiger der Auftritt:
+##   Bronze: Staubwolke und ein paar Funken
+##   Silber: vier Strahlen, silbernes Glitzern
+##   Gold: acht Strahlen, Licht dringt schon vorher aus den Ritzen, Goldregen
+##   Platin: Lichtringe, eisblaues Funkeln, die Truhe bebt beim Aufspringen
+##   Legendär: drehende Strahlen, aufsteigende Glut
+##   Himmlisch: drehender Strahlenkranz, Sternenhimmel in allen Farben
+## Alles in Kunstpixeln (PX Bildschirmpixel). Strahlen und Leuchten zeichnet die
+## Truhe selbst (additiv), Truhe und Funken ein Kind davor.
 class Chest:
 	extends Control
-	const OPEN_AT := 0.8
-	## Strahlenraster und Kunstpixel der Truhe (32er-Bild, 128 Bildschirmpixel breit)
+	## Strahlenraster und Kunstpixel der Truhe (32er-Bild, 192 Bildschirmpixel breit)
 	const PX := 8
-	const ART := 4
-	const R := 17
+	const ART := 6
+	const R := 22
 	var tier := "bronze"
 	var color := Color.WHITE
 	var sound: SoundBox = null
+	## Stufe 0 (Bronze) bis 5 (Himmlisch) und wann die Truhe aufspringt.
+	var level := 0
+	var open_at := 0.9
 	var _t0 := 0.0
 	var _played := false
 	var _front := Control.new()
 
+	func setup() -> void:
+		level = maxi(0, Db.world("BOX_TIERS").find(tier))
+		open_at = 1.5 + level * 0.35
+
 	func _init() -> void:
 		texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		custom_minimum_size = Vector2(0, 196)
+		custom_minimum_size = Vector2(0, 300)
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var mat := CanvasItemMaterial.new()
 		mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
@@ -205,7 +287,7 @@ class Chest:
 
 	func _process(_d: float) -> void:
 		# Der Klang knarzt zuerst und macht nach 0,3 s „Plopp“
-		if not _played and elapsed() >= OPEN_AT - 0.3:
+		if not _played and elapsed() >= open_at - 0.3:
 			_played = true
 			if sound != null:
 				sound.play_box(tier)
@@ -223,27 +305,37 @@ class Chest:
 		draw_rect(Rect2(at, Vector2(PX, PX)), c)
 
 	func _draw() -> void:
-		var k := elapsed() - OPEN_AT
+		var t := elapsed()
+		var k := t - open_at
+		var mid := _mid()
+		var glow := color.lightened(0.35)
+		# Ab Gold dringt schon vor dem Aufspringen Licht aus den Ritzen
 		if k < 0.0:
+			if level >= 2:
+				var pre := clampf(t / open_at, 0.0, 1.0)
+				for gx in range(-3, 4):
+					var a := pre * pre * (0.9 - absf(gx) * 0.18) * (0.75 + 0.25 * sin(t * 18.0 + gx))
+					if a > 0.05:
+						_square(mid + Vector2(gx, -1) * PX, Color(glow, ceilf(a * 4.0) / 4.0))
 			return
 		var intro := minf(1.0, k / 0.25)
-		var glow := color.lightened(0.35)
-		var mid := _mid()
-		# Acht Strahlen in festen Richtungen (sauber im Pixelraster): gerade lang
-		# und zwei Pixel breit, schräge kürzer; sie pulsieren
+		# Strahlen je Stufe: Bronze keine, Silber 4, Gold und Platin 8, darüber
+		# 12 bzw. 16, ab Legendär drehen sie sich langsam
+		var count: int = [0, 4, 8, 8, 12, 16][mini(level, 5)]
+		var spin := k * 0.5 if level >= 4 else 0.0
 		var rays: Array = []
-		for i in 8:
-			var q := i * TAU / 8.0
+		for i in count:
+			var q := i * TAU / count + spin
 			var pulse := 0.85 + 0.15 * sin(k * 5.0 + i * 1.7)
-			rays.append([Vector2(cos(q), sin(q)), (R if i % 2 == 0 else R * 0.8) * PX * pulse])
+			rays.append([Vector2(cos(q), sin(q)), (R if i % 2 == 0 else R * 0.8) * PX * pulse * (0.7 if level == 1 else 1.0)])
 		for gy in range(-R, R + 1):
 			for gx in range(-R, R + 1):
 				var v := (Vector2(gx, gy) + Vector2(0.5, 0.5)) * PX
 				var d := v.length()
 				if d > R * PX:
 					continue
-				# Helle Scheibe um die Öffnung
-				var a := 0.85 * clampf(1.0 - d / (4.5 * PX), 0.0, 1.0)
+				# Helle Scheibe um die Öffnung (wächst mit der Stufe)
+				var a := 0.85 * clampf(1.0 - d / ((3.0 + level * 0.8) * PX), 0.0, 1.0)
 				for ray in rays:
 					var dir: Vector2 = ray[0]
 					var reach: float = ray[1]
@@ -256,29 +348,68 @@ class Chest:
 				a = ceilf(a * intro * 4.0) / 4.0
 				if a > 0.0:
 					_square(mid + Vector2(gx, gy) * PX, Color(glow, a))
-		# Heller Ring beim Aufspringen
+		# Heller Ring beim Aufspringen, ab Platin wiederkehrende Lichtringe
 		if k < 0.3:
 			var rad := 3.0 * PX + k * 360.0
 			for i in 28:
 				var q := i * TAU / 28.0
 				_square((mid + Vector2(cos(q), sin(q)) * rad / PX).floor() * PX, Color(1, 1, 1, 1.0 - k / 0.3))
+		if level >= 3:
+			var ph := fmod(k, 0.9) / 0.9
+			var rr := (3.0 + ph * (R - 3)) * PX
+			for i in 36:
+				var q := i * TAU / 36.0
+				_square((mid + Vector2(cos(q), sin(q)) * rr / PX).floor() * PX, Color(glow, 0.6 * (1.0 - ph) * intro))
 
 	func _draw_front() -> void:
 		var t := elapsed()
 		var origin := _origin()
-		if t < OPEN_AT:
-			# Immer stärkeres Wackeln
-			var amp := 1.0 + 2.0 * t / OPEN_AT
-			var dx := roundf(sin(t * 55.0) * amp) * 2.0
-			PixelArt.draw(_front, "ding/truhe", origin + Vector2(dx, 0), ART, color)
-			return
-		var k := t - OPEN_AT
-		var mid := _mid()
-		PixelArt.draw(_front, "ding/truhe_offen", origin, ART, color)
-		# Funken: ein Schwall nach oben, der zurückfällt, dann steigendes Glitzern
 		var spark := color.lightened(0.45)
+		if t < open_at:
+			# Immer stärkeres Wackeln, kurz vor dem Aufspringen hüpft die Truhe
+			var amp := 1.0 + (2.0 + level * 0.6) * t / open_at
+			var dx := roundf(sin(t * 55.0) * amp) * 2.0
+			var hop := -roundf(maxf(0.0, sin((t / open_at) * PI * (2 + level))) * level * 1.5) * 2.0 if t > open_at * 0.5 else 0.0
+			PixelArt.draw(_front, "ding/truhe", origin + Vector2(dx, hop), ART, color)
+			return
+		var k := t - open_at
+		var mid := _mid()
+		# Ab Platin bebt die Truhe beim Aufspringen
+		var shake := Vector2.ZERO
+		if level >= 3 and k < 0.35:
+			shake = Vector2(roundf(sin(k * 90.0) * 2.0) * 2.0, roundf(cos(k * 70.0)) * 2.0)
+		PixelArt.draw(_front, "ding/truhe_offen", origin + shake, ART, color)
+		var w := size.x
+		# Bronze: Staubwolke
+		if level == 0 and k < 0.9:
+			for i in 10:
+				var a := PI + float(i) / 9.0 * PI
+				var p := mid + Vector2(0, 40) + Vector2(cos(a) * 3.0, sin(a) * 0.6) * k * 70.0
+				_front.draw_rect(Rect2((p / PX).floor() * PX, Vector2(PX, PX)), Color(0.75, 0.68, 0.55, 0.6 * (1.0 - k / 0.9)))
+		# Gold und mehr: Goldregen über die ganze Breite
+		if level >= 2 and k < 2.4:
+			for i in 26:
+				var x := fmod(float(i * 97 % 101) / 101.0 * w + i * 13.0, w)
+				var y := -20.0 + fmod(k * (160.0 + (i % 5) * 30.0) + i * 23.0, size.y + 30.0)
+				var c := Color("#ffd700") if i % 3 else Color("#fff4b0")
+				_front.draw_rect(Rect2(Vector2(floorf(x / 4) * 4, floorf(y / 4) * 4), Vector2(8, 4) if i % 2 else Vector2(4, 8)), Color(c, 0.9 * minf(1.0, (2.4 - k) / 0.6)))
+		# Legendär: aufsteigende Glut
+		if level == 4:
+			for i in 18:
+				var ph := fmod(k * 0.5 + i / 18.0, 1.0)
+				var p := mid + Vector2(float((i * 29) % 21 - 10) * PX * 0.8 + sin(ph * 6.0 + i) * 6.0, -ph * 180.0)
+				_front.draw_rect(Rect2((p / 4).floor() * 4, Vector2(4, 4)), Color(Color("#ff7a1a") if i % 2 else Color("#ffd04a"), sin(ph * PI)))
+		# Himmlisch: funkelnder Sternenhimmel in allen Farben
+		if level >= 5:
+			var cols := [Color("#ff8ad8"), Color("#8ad8ff"), Color("#fff08a"), Color("#b08aff"), Color("#8affb0")]
+			for i in 40:
+				var p := Vector2(fmod(i * 173.0, maxf(1.0, w)), fmod(i * 61.0, size.y - 20.0))
+				var tw := 0.5 + 0.5 * sin(k * 4.0 + i * 1.3)
+				var sz := 4.0 if tw < 0.8 else 8.0
+				_front.draw_rect(Rect2((p / 4).floor() * 4, Vector2(sz, sz)), Color(cols[i % cols.size()], tw * minf(1.0, k / 0.5)))
+		# Funken: ein Schwall nach oben, der zurückfällt, dann steigendes Glitzern
 		if k < 1.4:
-			for i in 16:
+			for i in 8 + level * 6:
 				var a := -PI / 2 + (float((i * 37) % 16) / 15.0 - 0.5) * 2.2
 				var speed := 150.0 + float((i * 53) % 7) * 22.0
 				var p := mid + Vector2(cos(a), sin(a)) * speed * k + Vector2(0, 170.0 * k * k)
@@ -510,7 +641,7 @@ static func show_help(gv: GameView) -> void:
 		["Text sofort zeigen", "Knopf „Text überspringen“ unten, Klick auf den Text oder „Überspringen“ im Chat"],
 		["Reiter oben", "P Crawler · Z Ziele · I Inventar · A Ausrüstung · B Handwerk · L Skills · O Erfolge · klappen über dem Spielfeld auf, dieselbe Taste, Esc oder ein Klick daneben klappt zu · Tab blättert (außerhalb des Kampfes)"],
 		["Bereich „Hier“", "N klappt ein und aus"],
-		["Chat rechts", "Alles, was passiert. Filter: Alles, Kampf, Funde, Gespräche. „Überspringen“ zeigt alle Zeilen sofort"],
+		["Chat links", "Alles, was passiert. Filter: Alles, Kampf, Funde, Gespräche. „Überspringen“ zeigt alle Zeilen sofort"],
 		["Menü", "Esc (Ton, Musik, Tippgeräusch)"],
 		["Hilfe", "H"],
 	]

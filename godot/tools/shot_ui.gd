@@ -37,7 +37,7 @@ func _initialize() -> void:
 			main.show_interview()
 			await wait(3.0)
 			await shot("interview")
-		"select", "versus", "talkshow", "safe", "floor3", "bildschirm", "grube":
+		"select", "versus", "talkshow", "safe", "floor3", "bildschirm", "grube", "boxen":
 			# Aufgezeichnete Partie nachspielen, bis das Ereignis eintritt
 			var replays: Array = J.load_json("res://tests/fixtures/replays.json")
 			var r: Dictionary = replays.filter(func(x): return x.seed == (seed if seed != 1 or mode != "floor3" else 5))[0]
@@ -51,7 +51,7 @@ func _initialize() -> void:
 					"select": hit = s.get("pendingSelection", false)
 					"versus": hit = s.get("pendingVersus") != null
 					"talkshow": hit = J.some(s.pendingDialogs, func(d): return d.get("kind") == "talkshow")
-					"safe", "bildschirm", "grube":
+					"safe", "bildschirm", "grube", "boxen":
 						var room = Game.current_room(s)
 						hit = room != null and room.kind == "safe" and not s.player.boxes.is_empty()
 					"floor3": hit = s.floor == 3 and J.some(s.monsters, func(m): return Fov.chebyshev(m.pos, s.player.pos) <= 4)
@@ -96,6 +96,33 @@ func _initialize() -> void:
 				main.view.refresh()
 				await wait(0.8)
 				await shot(mode + "_karte")
+			if mode == "boxen":
+				# Inventar mit Boxliste, dann eine Box nach der anderen öffnen
+				var gv: GameView = main.view
+				for t in ["gold", "silber", "bronze", "himmlisch"]:
+					s.player.boxes.append(Items.create_box(s, s.player.boxes[0].box.type, t, true))
+				gv.open_tab("inventar")
+				await wait(0.8)
+				await shot("boxen_inventar")
+				gv.close_tab()
+				var best: Array = s.player.boxes.duplicate()
+				best.sort_custom(func(a, b): return Db.world("BOX_TIERS").find(a.box.tier) > Db.world("BOX_TIERS").find(b.box.tier))
+				GameDialogs.open_boxes(gv, best.map(func(b): return b.uid))
+				await wait(1.0)
+				await shot("boxen_zu")
+				await wait(1.9)
+				await shot("boxen_auf")
+				await wait(1.5)
+				await shot("boxen_inhalt")
+				# Gebietskarte gelesen: Viertel des Crawlers mit Gegnern und Crawlern
+				Modals.instance.close_all()
+				var karte := Items.create_area_map(s, MapGen.hood_of(s.map, s.player.pos))
+				Inventory.give_item(s, karte)
+				Game.use_item(s, karte.uid)
+				gv.refresh()
+				gv.toggle_minimap()
+				await wait(0.8)
+				await shot("gebietskarte")
 			if mode == "versus":
 				# Danach die Boss-Kammer ohne Dialog, näher herangezoomt
 				Modals.instance.close_all()
