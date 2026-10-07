@@ -120,3 +120,20 @@ func test_normale_monster_unberuehrt(t) -> void:
 	var m := TH.foe(s, "kellerratte", 1)
 	t.ok(not BossFight.turn(s, m), "kein Boss")
 	t.is_null(m.get("telegraph"), "keine Ankündigung")
+
+
+## Bosse sind deutlich stärker als ihre Grundwerte; der Bezirksboss hat
+## einen eigenen Faktor (boroughScale) und ist erst gegen Ende der Etage
+## zu schaffen.
+func test_boss_staerke_je_etage(t) -> void:
+	var s := TH.make(6301, {"beruf": 1})
+	for fl in [1, 2, 3]:
+		var fd := Db.floor_def0(fl)
+		t.ok(fd.has("bossScale") and fd.has("boroughScale"), "Etage %d: beide Faktoren" % fl)
+		for def in Db.t("monsters", "HOOD_BOSSES"):
+			if int(def.floors.min()) != fl:
+				continue
+			var m := Monsters.spawn_boss(s, def, {"x": 1, "y": 1}, 0, 0, fl)
+			var scale: Dictionary = fd.boroughScale if def.rank == "boroughboss" else fd.bossScale
+			t.eq(m.maxHp, J.rnd(def.hp * float(scale.hp)), "%s: Leben mit Etagenfaktor" % def.id)
+			t.ge(m.maxHp, def.hp * 3, "%s: mindestens dreifache Grundwerte" % def.id)

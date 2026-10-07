@@ -19,6 +19,16 @@
     5
    ],
    "rarityCap": "selten",
+   "bossScale": {
+    "hp": 4.0,
+    "dmg": 2.8,
+    "xp": 1.5
+   },
+   "boroughScale": {
+    "hp": 4.0,
+    "dmg": 3.0,
+    "xp": 1.5
+   },
    "boxTierCap": "silber",
    "goldChance": 0.0
   },
@@ -88,9 +98,14 @@
    },
    "rarityCap": "episch",
    "bossScale": {
-    "hp": 2.6,
-    "dmg": 2.6,
-    "xp": 2.5
+    "hp": 3.6,
+    "dmg": 3.6,
+    "xp": 3.0
+   },
+   "boroughScale": {
+    "hp": 3.4,
+    "dmg": 3.2,
+    "xp": 3.0
    },
    "boxTierCap": "gold",
    "goldChance": 0.1
@@ -177,9 +192,14 @@
    },
    "rarityCap": "legendaer",
    "bossScale": {
-    "hp": 5.0,
-    "dmg": 5.0,
-    "xp": 4.0
+    "hp": 7.0,
+    "dmg": 7.0,
+    "xp": 4.5
+   },
+   "boroughScale": {
+    "hp": 5.5,
+    "dmg": 5.5,
+    "xp": 4.5
    },
    "boxTierCap": "gold",
    "goldChance": 0.25

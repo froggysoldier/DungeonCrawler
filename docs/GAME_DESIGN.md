@@ -770,12 +770,20 @@ Schrift überall: Jersey 10 (Pixelschrift im Stil von Tiny Swords).
 Jede Etage ist so ausgelegt, dass man sie gut schafft, wenn man die vorige
 Etage weitgehend ausgenutzt hat – und nicht, wenn man zu früh hinuntergeht.
 
-- **Stärkefaktor je Etage** (`world.json` FLOORS[].mobScale, bossScale):
-  | Etage | normale Monster (HP / Schaden / XP) | Bosse (HP / Schaden / XP) | höchste Box-Seltenheit |
-  |---|---|---|---|
-  | 1 | 1 / 1 / 1 | 1 / 1 / 1 | selten |
-  | 2 | 4,5 / 4 / 3 | 2,6 / 2,6 / 2,5 | episch |
-  | 3 | 5 / 4,5 / 3,5 | 5 / 5 / 4 | legendär |
+- **Stärkefaktor je Etage** (`world.json` FLOORS[].mobScale, bossScale, boroughScale):
+  | Etage | normale Monster (HP / Schaden / XP) | Nachbarschafts-Bosse (HP / Schaden / XP) | Borough-Boss (HP / Schaden / XP) | höchste Box-Seltenheit |
+  |---|---|---|---|---|
+  | 1 | 1 / 1 / 1 | 4 / 2,8 / 1,5 | 4 / 3 / 1,5 | selten |
+  | 2 | 4,5 / 4 / 3 | 3,6 / 3,6 / 3 | 3,4 / 3,2 / 3 | episch |
+  | 3 | 5 / 4,5 / 3,5 | 7 / 7 / 4,5 | 5,5 / 5,5 / 4,5 | legendär |
+  Abgestimmt mit `tools/balance_sim.gd` (SNAPAT: Crawler bei 25/50/75/90 %
+  der Etagenzeit) und `tools/calib_sim.gd` (BOSSES=1 ONLYBOSSES=1, Duell mit
+  zwei Heiltränken, ohne Haustier). Ziel und Stand Etage 1: Nachbarschafts-Bosse
+  nach einem Viertel der Zeit selten (~25 %), zur Hälfte etwa jedes zweite Mal,
+  ab drei Vierteln meist (~80 %). Der Borough-Boss ist vor der Hälfte
+  aussichtslos und erst kurz vor dem Einsturz zu schaffen (~50–60 % im Duell,
+  mit Haustier, Tränken und Taktik mehr). Er ist freiwillig: zwei Treppen
+  liegen außerhalb seines Gewölbes.
   Elite-Gegner bekommen auf Etage 2 und 3 nur einen kleineren Aufschlag
   (1,4-fache HP, 1,15-facher Schaden) zusätzlich zum Etagenfaktor.
 - **Beute wächst mit dem Abstieg:** Box-Inhalte sind auf die Seltenheit der
