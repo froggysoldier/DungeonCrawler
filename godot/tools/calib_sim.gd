@@ -6,7 +6,7 @@ extends SceneTree
 ## dass nur Werte, Ausrüstung und Schaden zählen.
 ##   godot --headless --path godot -s res://tools/calib_sim.gd -- <snapdir> [duelle]
 ##   SCALE2=hp,dmg und SCALE3=hp,dmg probieren andere Stärkefaktoren aus,
-##   BOSSSCALE2/3=hp,dmg die der Bosse; BOSSES=1 lässt auch gegen Bosse antreten
+##   BOSSSCALE1/2/3=hp,dmg die der Bosse, BOROUGHSCALE1/2/3 die der Bezirksbosse; BOSSES=1 lässt auch gegen Bosse antreten
 ##   ONLY=E2 beschränkt auf eine Etage; ONLYBOSSES=1 nur Bossduelle (dann
 ##   zählt die Ankunft auf Etage n als Ende von Etage n-1)
 ## Ausgabe je Etage und Abgangszeitpunkt: Siegquote und verlorene HP pro Kampf,
@@ -23,6 +23,10 @@ func _initialize() -> void:
 		if env != "":
 			var parts := env.split(",")
 			Db.floor_def0(fl).mobScale = {"hp": float(parts[0]), "dmg": float(parts[1]), "xp": 1.0}
+		var renv := OS.get_environment("BOROUGHSCALE%d" % fl)
+		if renv != "":
+			var rp := renv.split(",")
+			Db.floor_def0(fl).boroughScale = {"hp": float(rp[0]), "dmg": float(rp[1]), "xp": 1.0}
 		var benv := OS.get_environment("BOSSSCALE%d" % fl)
 		if benv != "":
 			var bp := benv.split(",")

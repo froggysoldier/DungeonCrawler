@@ -55,8 +55,10 @@ static func spawn_boss(s: Dictionary, def: Dictionary, pos: Dictionary, hood: in
 	# Bosse, die tiefer als auf ihrer ersten Etage auftauchen, werden stärker.
 	var level_bonus: int = maxi(0, floor - int(def.floors.min())) * 2
 	var scale := 1 + level_bonus * 0.25
-	# Etagenfaktor für Bosse (world.json FLOORS[].bossScale)
-	var bs: Dictionary = J.nn(Db.floor_def0(floor), "bossScale", {})
+	# Etagenfaktor für Bosse (world.json FLOORS[].bossScale, für den
+	# Bezirksboss boroughScale: erst gegen Ende der Etage zu schaffen)
+	var fd := Db.floor_def0(floor)
+	var bs: Dictionary = J.nn(fd, "boroughScale" if def.rank == "boroughboss" and fd.has("boroughScale") else "bossScale", {})
 	var max_hp := J.rnd(def.hp * scale * float(bs.get("hp", 1.0)))
 	var dmul: float = scale * float(bs.get("dmg", 1.0))
 	return Items.compact({
