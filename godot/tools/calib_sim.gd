@@ -17,7 +17,7 @@ func _initialize() -> void:
 	var dir: String = args[0]
 	var runs := int(args[1]) if args.size() > 1 else 4
 	# SCALE2=hp,dmg / SCALE3=hp,dmg: Stärkefaktor der Etage probeweise ersetzen
-	for fl in [2, 3]:
+	for fl in [1, 2, 3]:
 		var env := OS.get_environment("SCALE%d" % fl)
 		if env != "":
 			var parts := env.split(",")
@@ -52,7 +52,7 @@ func _initialize() -> void:
 		print("%-16s %3d  %5.1f   %10d %%  %6d %%   %10d %%  %6d %%" % [key, list.size(), lvl / list.size(), J.rnd(res_lo.win * 100), J.rnd(res_lo.lost * 100), J.rnd(res_mid.win * 100), J.rnd(res_mid.lost * 100)])
 		if OS.get_environment("BOSSES") != "":
 			for bd in Db.t("monsters", "HOOD_BOSSES"):
-				if int(bd.floors[0]) != fl or bd.rank != "nachbarschaftsboss":
+				if not bd.floors.has(fl) or (bd.rank == "boroughboss" and int(bd.floors[0]) != fl):
 					continue
 				var wins := 0.0
 				var lost := 0.0
@@ -62,7 +62,7 @@ func _initialize() -> void:
 						wins += 1.0 if res.win else 0.0
 						lost += res.lost
 				var n := float(list.size() * runs)
-				print("     Boss %-28s Sieg %3d %%  HP-Verl %3d %%" % [String(bd.name).left(28), J.rnd(wins / n * 100), J.rnd(lost / n * 100)])
+				print("     %s %-28s Sieg %3d %%  HP-Verl %3d %%" % ["BEZIRK" if bd.rank == "boroughboss" else "Boss  ", String(bd.name).left(28), J.rnd(wins / n * 100), J.rnd(lost / n * 100)])
 	quit()
 
 

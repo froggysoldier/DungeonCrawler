@@ -301,7 +301,16 @@ func _toilet(s: Dictionary) -> bool:
 	if safe == null or Game.time_left(s) < 60:
 		return false
 	if Combat.is_in_safe_room(s, s.player.pos):
-		return Game.toilet(s).ok
+		if Game.toilet(s).ok:
+			return true
+		# Neben die Toilette stellen (Möbel des Raums)
+		var room = Game.current_room(s)
+		var wc = J.find(J.arr(room, "furniture"), func(f): return f.kind == "toilette") if room != null else null
+		if wc != null:
+			var spot = TH.free_neighbor(s, wc.pos)
+			if spot != null and _go_to(s, spot):
+				return true
+		return false
 	if J.some(s.monsters, func(m): return J.cheb(m.pos, s.player.pos) <= 1):
 		return false
 	return _go_to(s, _center(safe))
@@ -325,6 +334,18 @@ func _run_bot(seed: int, max_floor: int = 3) -> Dictionary:
 			print("  [Zug %d] Phase %s, Pos %s, Raum %s, HP %d/%d, Blase %d, wach in der Nähe %d %s" % [s.turn, phase, p.pos, rr.name if rr != null else "-", p.hp, Player.max_hp(s), int(J.num(p, "blase")), near.size(), near.map(func(m): return "%s@%s(%s)" % [m.defId, m.pos, m.behavior])])
 		if s.floor > max_floor:
 			break
+		# SNAPAT=0.3,0.6,0.9 (mit SNAPDIR): Crawler mitten in der Etage
+		# speichern, sobald dieser Anteil der Etagenzeit vorbei ist. So misst
+		# tools/calib_sim.gd, wie früh die Bosse einer Etage schaffbar sind.
+		if OS.get_environment("SNAPAT") != "" and OS.get_environment("SNAPDIR") != "" and s.unlocks.has("inventar"):
+			var used_now := 1.0 - float(Game.time_left(s)) / float(Db.floor_def0(s.floor).duration)
+			for at in OS.get_environment("SNAPAT").split(","):
+				var key := "_snap_%d_%s" % [s.floor, at]
+				if used_now >= float(at) and not s.has(key):
+					s[key] = true
+					var sf := FileAccess.open("%s/snap_at%s_%d_E%d.json" % [OS.get_environment("SNAPDIR"), at, s.seed, s.floor], FileAccess.WRITE)
+					sf.store_string(JSON.stringify({"player": s.player, "unlocks": s.unlocks, "floor": s.floor, "leave": "at" + at, "seed": s.seed}))
+					sf.close()
 		if s.floor != floor_no:
 			floor_no = s.floor
 			phase = "clear"
