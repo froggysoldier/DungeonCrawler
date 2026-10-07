@@ -7,7 +7,8 @@ extends SceneTree
 ##   godot --headless --path godot -s res://tools/calib_sim.gd -- <snapdir> [duelle]
 ##   SCALE2=hp,dmg und SCALE3=hp,dmg probieren andere Stärkefaktoren aus,
 ##   BOSSSCALE2/3=hp,dmg die der Bosse; BOSSES=1 lässt auch gegen Bosse antreten
-##   ONLY=E2 beschränkt auf eine Etage
+##   ONLY=E2 beschränkt auf eine Etage; ONLYBOSSES=1 nur Bossduelle (dann
+##   zählt die Ankunft auf Etage n als Ende von Etage n-1)
 ## Ausgabe je Etage und Abgangszeitpunkt: Siegquote und verlorene HP pro Kampf,
 ## am Etagenanfang (untere Stufe + 1) und in der Mitte des Stufenbereichs.
 
@@ -31,6 +32,12 @@ func _initialize() -> void:
 		if not f.begins_with("snap_") or not f.ends_with(".json"):
 			continue
 		var d: Dictionary = J.load_json("%s/%s" % [dir, f])
+		# ONLYBOSSES=1: Ankunft auf Etage n zählt als Ende von Etage n-1
+		if OS.get_environment("ONLYBOSSES") != "" and not String(d.leave).begins_with("at"):
+			if int(d.floor) <= 1:
+				continue
+			d.floor = int(d.floor) - 1
+			d.leave = "Ende"
 		var key := "E%d @ %s" % [int(d.floor), String(d.leave)]
 		if not snaps.has(key):
 			snaps[key] = []
@@ -44,8 +51,9 @@ func _initialize() -> void:
 		var list: Array = snaps[key]
 		var fl := int(list[0].floor)
 		var lv: Array = Db.floor_def0(fl).mobLevel
-		var res_lo := _gauntlet(list, fl, int(lv[0]) + 1, runs)
-		var res_mid := _gauntlet(list, fl, roundi((int(lv[0]) + int(lv[1])) / 2.0), runs)
+		var none := {"win": 0.0, "lost": 0.0}
+		var res_lo := none if OS.get_environment("ONLYBOSSES") != "" else _gauntlet(list, fl, int(lv[0]) + 1, runs)
+		var res_mid := none if OS.get_environment("ONLYBOSSES") != "" else _gauntlet(list, fl, roundi((int(lv[0]) + int(lv[1])) / 2.0), runs)
 		var lvl := 0.0
 		for d in list:
 			lvl += float(d.player.level)
