@@ -81,6 +81,8 @@ func test_stampfen_nur_auf_liegende(t) -> void:
 	var s := TH.make(78)
 	var rat := TH.spawn_near(s)
 	rat.size = "klein"
+	t.matches(Combat.technique_blocker(s, rat, {"part": "tritt", "move": "stampfen"}), "gelernt")
+	s.player.techniques.append("stampfen")
 	t.matches(Combat.technique_blocker(s, rat, {"part": "tritt", "move": "stampfen"}), "Boden")
 	rat.downed = 2
 	t.is_null(Combat.technique_blocker(s, rat, {"part": "tritt", "move": "stampfen"}))

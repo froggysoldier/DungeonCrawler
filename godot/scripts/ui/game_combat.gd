@@ -34,7 +34,19 @@ static func render_actions(gv: GameView, bar: PanelContainer) -> void:
 	var cd := int(J.num(s.player, "abilityCooldown"))
 	if ability != null:
 		_vsep(f)
-		Kit.kbutton(f, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())), "AbilityButton", cd > 0, "Taste F · " + ability.description, "", 12)
+		Kit.kbutton(f, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.action(func(): return Classes.use_ability(s, gv.technique())), "AbilityButton", cd > 0, "Taste F · " + ability.description, "", 12)
+	var known := Techniques.learned(s).filter(func(d): return d.art != "ausfuehrung")
+	if not known.is_empty():
+		_vsep(f)
+		var tg := HBoxContainer.new()
+		tg.add_theme_constant_override("separation", 4)
+		f.add_child(tg)
+		var near = _technique_target(gv)
+		for d in known:
+			var id: String = d.id
+			var tcd := Techniques.cooldown(s, id)
+			var block = Techniques.blocker(s, d, near)
+			Kit.button(tg, "%s%s" % [d.name, (" (%d)" % tcd) if tcd else ""], func(): use_technique(gv, id), "SmallButton", tcd > 0, technique_tip(s, d, block))
 	_vsep(f)
 	var grp := HBoxContainer.new()
 	grp.add_theme_constant_override("separation", 4)
@@ -81,10 +93,64 @@ static func _spell(gv: GameView, id: String) -> void:
 	var def: Dictionary = Db.spell(id)
 	if def.target == "selbst":
 		gv.pending_spell = null
-		gv.act(func(): return Game.cast(gv.s, id))
+		gv.action(func(): return Game.cast(gv.s, id))
 		return
 	gv.pending_spell = null if gv.pending_spell == id else id
 	gv.refresh_actions()
+
+
+## Hinweis zu einer Technik: Wirkung, Kosten, Abklingzeit, warum es gerade
+## nicht geht.
+static func technique_tip(s: Dictionary, d: Dictionary, block: Variant) -> String:
+	var bits: Array = [d.name]
+	if int(J.nn(d, "cost", 0)) > 0:
+		bits.append("%d Ausdauer" % int(d.cost))
+	if int(J.num(d, "mp")) > 0:
+		bits.append("%d Mana" % int(d.mp))
+	if int(J.nn(d, "cd", 0)) > 0:
+		bits.append("Abklingzeit %d" % int(d.cd))
+	if d.get("free"):
+		bits.append("kostet nicht die Aktion")
+	var out := "%s\n%s" % [" · ".join(bits), d.description]
+	if block != null:
+		out += "\n" + String(block)
+	return out
+
+
+## Ziel einer Angriffstechnik: das gewählte Ziel, sonst der nächste sichtbare
+## Gegner.
+static func _technique_target(gv: GameView) -> Variant:
+	var list := gv.combat_targets()
+	var t = J.find(list, func(m): return m.uid == gv.target_uid)
+	if t == null and not list.is_empty():
+		t = list[0]
+	return t
+
+
+## Technik einsetzen. Angriffe gehen auf das gewählte Ziel; steht es zu
+## weit weg, läuft die Figur erst hin (außer beim Hechtsprung). Techniken,
+## die die Aktion nicht kosten, beenden auch keine verbrauchte Runde.
+static func use_technique(gv: GameView, id: String) -> void:
+	var s := gv.s
+	var d = Techniques.def(id)
+	var cur := gv.technique()
+	var run := gv.act if d.get("free") else gv.action
+	if d.art != "angriff":
+		run.call(func(): return Game.use_technique(s, id, null, cur))
+		return
+	var target = _technique_target(gv)
+	if target == null:
+		gv.say("Kein Ziel in Sicht für %s." % d.name)
+		return
+	var uid: String = target.uid
+	gv.target_uid = uid
+	var t := Techniques.attack_t(d, cur)
+	var reach := Combat.WURF_RANGE if t.part == "wurf" else int(J.nn(d, "leap", 1))
+	var fn := func(): return Game.use_technique(s, id, uid, cur)
+	if Fov.chebyshev(s.player.pos, target.pos) > reach:
+		gv.go_then(target.pos, true, fn)
+		return
+	run.call(fn)
 
 
 ## Gruppe der Hotbar: kleine Überschrift links, daneben die Knöpfe.
@@ -154,7 +220,8 @@ static func _static_key(gv: GameView) -> String:
 		throw = "%s:%d:%d" % [th[0].baseId, n, J.uniq(th.map(func(x): return x.baseId)).size()]
 	var spells := J.arr(p, "spells").map(func(k): return "%s:%d:%d" % [k.id, Magic.spell_cost(k.id, gv.missile_mana), int(J.num(J.nn(p, "spellCooldowns", {}), k.id))])
 	var ability = Classes.current_ability(s)
-	return "%s|%s|%s|%s|%s|%s|%s" % [w.name if w != null else "", throw, ",".join(spells), Player.heal_item(s) != null, (ability.name + str(J.num(p, "abilityCooldown"))) if ability != null else "", str(gv.pending_spell), Rounds.active(s)]
+	var techs := Techniques.learned(s).map(func(d): return "%s:%d" % [d.id, Techniques.cooldown(s, d.id)])
+	return "%s|%s|%s|%s|%s|%s|%s|%s" % [w.name if w != null else "", throw, ",".join(spells), Player.heal_item(s) != null, (ability.name + str(J.num(p, "abilityCooldown"))) if ability != null else "", str(gv.pending_spell), Rounds.active(s), ",".join(techs)]
 
 
 ## Knopf der Hotbar, dessen Auswahl, Sperre und Hinweis sich nachziehen lassen.
@@ -257,13 +324,20 @@ static func _build_row(gv: GameView, row: HFlowContainer) -> void:
 	for mv2 in Combat.ATTACK_MOVES:
 		var m2: String = mv2
 		_live(gv, g2, Combat.MOVE_NAMES[mv2], GameView.MOVE_KEYS[mv2], func():
+			var locked = Techniques.move_blocker(s, m2)
+			if locked != null:
+				gv.say(locked)
+				return
 			gv.move = m2
 			if m2 == "stampfen":
 				gv.part = "tritt"
 			gv.refresh_actions(),
 			func(): return gv.move == m2,
-			func(): return gv.part == "wurf" and m2 != "normal",
+			func(): return (gv.part == "wurf" and m2 != "normal") or not Techniques.move_ok(s, m2),
 			func(target):
+				var locked = Techniques.move_blocker(s, m2)
+				if locked != null:
+					return "%s · %s" % [Combat.MOVE_NAMES[m2], locked]
 				var probe := gv.technique()
 				probe.move = m2
 				var blocker = Combat.technique_blocker(s, target, probe) if target != null else null
@@ -280,6 +354,22 @@ static func _build_row(gv: GameView, row: HFlowContainer) -> void:
 			func(): return gv.zone == zz,
 			func(): return false,
 			func(_t): return tip)
+	var known := Techniques.learned(s).filter(func(d): return d.art != "ausfuehrung")
+	if not known.is_empty():
+		var gt := _group(row, "Techniken")
+		gv.bar_parts.techniken = gt
+		for d in known:
+			var dd: Dictionary = d
+			var id: String = d.id
+			var tcd := Techniques.cooldown(s, id)
+			_live(gv, gt, "%s%s" % [d.name, (" (%d)" % tcd) if tcd else ""], "", func(): use_technique(gv, id),
+				func(): return false,
+				func(): return Techniques.cooldown(s, id) > 0 or int(p.ausdauer) < int(J.nn(dd, "cost", 0)),
+				func(target):
+					var tgt = target if dd.art == "angriff" else null
+					var block = Techniques.blocker(s, dd, tgt) if dd.art != "angriff" or target != null else null
+					return technique_tip(s, dd, block),
+				"AbilityButton" if dd.get("free") else "")
 	var spells := J.arr(p, "spells")
 	if not spells.is_empty():
 		var g4 := _group(row, "Zauber")
@@ -295,7 +385,7 @@ static func _build_row(gv: GameView, row: HFlowContainer) -> void:
 				func(_t): return stip)
 	var g5 := _group(row, "Sonstiges")
 	gv.bar_parts.sonstiges = g5
-	_live(gv, g5, "Deckung", "", func(): gv.act(func(): return Game.defend(s)), func(): return false, func(): return false,
+	_live(gv, g5, "Deckung", "", func(): gv.action(func(): return Game.defend(s)), func(): return false, func(): return false,
 		func(_t): return "Bis zum nächsten Zug +20 % Ausweichen, +2 Rüstung, +2 Ausdauer")
 	_live(gv, g5, "Spurt", "S", func(): gv.act(func(): return Game.dash(s)), func(): return false,
 		func(): return int(p.ausdauer) < Game.DASH_COST or J.num(p, "immobile") > 0,
@@ -306,7 +396,7 @@ static func _build_row(gv: GameView, row: HFlowContainer) -> void:
 			var pot = Player.heal_item(s)
 			if pot != null:
 				var puid: String = pot.uid
-				gv.act(func(): return Game.use_item(s, puid)),
+				gv.action(func(): return Game.use_item(s, puid)),
 			func(): return false, func(): return false,
 			func(_t):
 				var pot = Player.heal_item(s)
@@ -315,7 +405,7 @@ static func _build_row(gv: GameView, row: HFlowContainer) -> void:
 	if ability != null:
 		var cd := int(J.num(p, "abilityCooldown"))
 		var atip: String = ability.description
-		_live(gv, g5, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.act(func(): return Classes.use_ability(s, gv.technique())),
+		_live(gv, g5, "%s%s" % [ability.name, (" (%d)" % cd) if cd else ""], "F", func(): gv.action(func(): return Classes.use_ability(s, gv.technique())),
 			func(): return false, func(): return cd > 0, func(_t): return atip, "AbilityButton")
 	_live(gv, g5, "Warten", "", func(): gv.act(func(): return Game.wait(s)), func(): return false, func(): return false,
 		func(_t): return "Runde beenden ohne Aktion (Leertaste)")

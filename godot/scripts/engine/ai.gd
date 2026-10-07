@@ -222,7 +222,8 @@ static func _attack_player(s: Dictionary, m: Dictionary, ranged: bool) -> void:
 		Events.emit(s, {"type": "dodged", "source": m.name, "facets": source})
 		if not ranged:
 			Skills.train_skill(s, "counter", Skills.learn_factor(s, m.level))
-			if R.chance(s, Player.skill_level(s, "konter") * 0.03 + (0.15 if Abilities.has_special(s, "konterprofi") else 0.0)):
+			var lurk := J.some(p.buffs, func(x): return x.name == "Lauerstellung")
+			if lurk or R.chance(s, Player.skill_level(s, "konter") * 0.03 + (0.15 if Abilities.has_special(s, "konterprofi") else 0.0)):
 				Combat.counter_strike(s, m)
 		return
 	var raw := R.int_(s, m.dmg[0], m.dmg[1])
@@ -418,6 +419,11 @@ static func _monster_turn(s: Dictionary, m: Dictionary) -> void:
 	var died := Conditions.turn(s, m, func(x, part): Combat.kill_monster(s, x, null, false, ["t:%s" % part] + Observer.target_facets(s, x) + Observer.self_facets(s)))
 	if died or not J.has_same(s.monsters, m) or s.status != "playing":
 		return
+	# Offene Deckung (Finte, Rippenstoß …) schließt sich mit der Zeit
+	if J.num(m, "exposed") > 0:
+		m.exposed -= 1
+		if m.exposed <= 0:
+			m.erase("exposed")
 	if m.downed > 0:
 		m.downed -= 1
 		if m.downed == 0 and Sight.player_sees(s, m.pos):
@@ -621,6 +627,8 @@ static func pet_turn(s: Dictionary) -> void:
 				dmg = J.rnd(dmg * 1.5)
 			if J.some(p.buffs, func(b): return b.name == "Rudelruf"):
 				dmg *= 2
+			if J.some(p.buffs, func(b): return b.name == "Fass!"):
+				dmg = J.rnd(dmg * 1.5)
 			var dealt := maxi(1, dmg - t.ruestung)
 			t.hp -= dealt
 			t.aware = true

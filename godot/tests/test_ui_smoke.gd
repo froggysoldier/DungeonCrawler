@@ -29,6 +29,7 @@ func _play(t, r: Dictionary) -> void:
 	var gv := GameView.new(s, Meta.empty_meta())
 	_tree.root.add_child(gv)
 	gv.wait_for_enemies = false
+	gv.auto_end_rounds = false
 	gv.flush_dialogs()
 	var tabs := GameView.TABS.map(func(x): return x[0])
 	for i in r.actions.size():

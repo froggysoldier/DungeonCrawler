@@ -13,6 +13,9 @@ extends SceneTree
 ## am Etagenanfang (untere Stufe + 1) und in der Mitte des Stufenbereichs.
 
 
+const BALANCE := preload("res://tools/balance_sim.gd")
+
+
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	var dir: String = args[0]
@@ -110,6 +113,13 @@ func _duel(snap: Dictionary, fl: int, def: Dictionary, mlvl: int, seed: int, bos
 	s.player.inventory = s.player.inventory.filter(func(i): return i.kind != "verbrauch")
 	s.player.hp = Player.max_hp(s)
 	s.player.ausdauer = Player.max_ausdauer(s)
+	if s.player.get("techniques") == null:
+		s.player.techniques = []
+	s.player.techCd = {}
+	if OS.get_environment("NOTECH") == "":
+		Techniques.check(s)
+	else:
+		s.player.techniques = []
 	s.player.pos = {"x": r.x + 1, "y": r.y + 1}
 	var m: Dictionary
 	if boss:
@@ -145,6 +155,8 @@ func _duel(snap: Dictionary, fl: int, def: Dictionary, mlvl: int, seed: int, bos
 			Game.wait(s)
 			continue
 		var done := false
+		if OS.get_environment("NOTECH") == "" and J.cheb(m.pos, s.player.pos) <= 1 and BALANCE.use_technique(s, m):
+			continue
 		for t in [{"part": "waffe", "move": "normal", "zone": "koerper"}, {"part": "tritt", "move": "normal", "zone": "koerper"}, {"part": "faust", "move": "normal", "zone": "koerper"}]:
 			if Combat.technique_blocker(s, m, t) == null and Game.attack(s, m.uid, t).ok:
 				done = true

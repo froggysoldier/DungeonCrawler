@@ -116,6 +116,16 @@ var key_presses := 0
 ## Eingaben während des Gegnerzugs zurückhalten (Tests, die Aufnahmen
 ## nachspielen, schalten das ab).
 var wait_for_enemies := true
+## Aktion, die nach dem Gegnerzug folgt (die eigene Aktion der Runde war
+## schon verbraucht), und wann eine verbrauchte Runde von selbst endet.
+var _queued: Callable = Callable()
+var _auto_end_at := 0.0
+## Verbrauchte Runden von selbst beenden (Tests, die Aufnahmen nachspielen,
+## schalten das ab).
+var auto_end_rounds := true
+## So lange nach der eigenen Aktion, bevor eine verbrauchte Runde endet:
+## erst sieht man den eigenen Schlag, dann sind die Gegner dran.
+const AUTO_END_MS := 650.0
 var guide: Guide
 ## Kampfleiste: Stand beim letzten Aufbau und der Bewegungsbalken.
 var _bar_state := ""
@@ -442,6 +452,7 @@ func _process(delta: float) -> void:
 	var now := Animator.now_ms()
 	_follow_mouse(now)
 	_move_free(minf(delta, 0.05), now)
+	_run_pending(now)
 	if not walking():
 		if _refresh_due:
 			_refresh_due = false
@@ -905,7 +916,39 @@ func act(fn: Callable) -> bool:
 	if not res.get("ok", false) and res.get("message") != null:
 		Log.add(s, res.message, "info")
 	after_action()
+	# Aktion und Bewegung verbraucht: die Runde endet gleich von selbst
+	_auto_end_at = Animator.now_ms() + AUTO_END_MS if auto_end_rounds and Rounds.spent(s) and not Techniques.free_ready(s) else 0.0
 	return res.get("ok", false)
+
+
+## Eine Aktion (Angriff, Zauber, Gegenstand …). Ist die Aktion dieser Runde
+## schon verbraucht, endet zuerst die Runde – die Gegner sind der Reihe nach
+## dran –, und erst danach folgt die neue Aktion.
+func action(fn: Callable) -> bool:
+	if Rounds.active(s) and s.round.get("acted", false):
+		if not act(func(): return Game.wait(s)):
+			return false
+		_queued = fn
+		return true
+	return act(fn)
+
+
+## Wartende Aktion ausführen und verbrauchte Runden beenden, sobald der
+## Gegnerzug vorbei ist.
+func _run_pending(now: float) -> void:
+	if modal_open() or traveling or s.status != "playing":
+		return
+	if wait_for_enemies and anim.enemy_turn(now):
+		return
+	if _queued.is_valid():
+		var f := _queued
+		_queued = Callable()
+		act(f)
+		return
+	if _auto_end_at > 0.0 and now >= _auto_end_at:
+		_auto_end_at = 0.0
+		if Rounds.spent(s) and not Techniques.free_ready(s):
+			act(func(): return Game.wait(s))
 
 
 func after_action() -> void:
@@ -979,7 +1022,7 @@ func technique() -> Dictionary:
 
 
 func attack_monster(uid: String) -> void:
-	act(func(): return Game.attack(s, uid, technique()))
+	action(func(): return Game.attack(s, uid, technique()))
 
 
 func step_dir(dir: Vector2i) -> void:
@@ -1025,7 +1068,7 @@ func go_then(tp: Dictionary, adjacent: bool, fn: Callable) -> void:
 		# Ohne Kampf hält man an, sobald einer beginnt; im Kampf zählt nur, ob es reicht
 		if not close.call() or s.status != "playing" or (not fight and in_combat()):
 			return
-	act(fn)
+	action(fn)
 
 
 func step_toward(target: Dictionary) -> void:
@@ -1123,7 +1166,7 @@ func _on_map_click(t: Vector2i, button: int) -> void:
 		var sp: String = pending_spell
 		pending_spell = null
 		var target = mon if mon != null and seen else null
-		act(func(): return Game.cast(s, sp, {"targetUid": target.uid if target != null else null, "pos": tp, "mana": missile_mana}))
+		action(func(): return Game.cast(s, sp, {"targetUid": target.uid if target != null else null, "pos": tp, "mana": missile_mana}))
 		return
 	if mon != null and seen:
 		attack_or_approach(mon.uid)
@@ -1277,6 +1320,11 @@ func _unhandled_input(ev: InputEvent) -> void:
 			return
 	for mv in MOVE_KEYS:
 		if ch == MOVE_KEYS[mv].to_lower():
+			var locked = Techniques.move_blocker(s, mv)
+			if locked != null:
+				say(locked)
+				get_viewport().set_input_as_handled()
+				return
 			move = mv
 			if mv == "stampfen":
 				part = "tritt"
@@ -1314,7 +1362,7 @@ func _unhandled_input(ev: InputEvent) -> void:
 	if k == KEY_SPACE or k == KEY_KP_5:
 		act(func(): return Game.wait(s))
 	elif ch == "f" and Classes.current_ability(s) != null:
-		act(func(): return Classes.use_ability(s, technique()))
+		action(func(): return Classes.use_ability(s, technique()))
 	elif ch == "s" and in_combat():
 		act(func(): return Game.dash(s))
 	elif ch == "m" and s.player.get("mount") != null:
@@ -1693,7 +1741,7 @@ func strike(uid: String) -> void:
 		var sp: String = pending_spell
 		pending_spell = null
 		var m = J.find(s.monsters, func(x): return x.uid == uid)
-		act(func(): return Game.cast(s, sp, {"targetUid": uid, "pos": m.pos if m != null else null, "mana": missile_mana}))
+		action(func(): return Game.cast(s, sp, {"targetUid": uid, "pos": m.pos if m != null else null, "mana": missile_mana}))
 		return
 	attack_monster(uid)
 

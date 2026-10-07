@@ -352,7 +352,7 @@ func _fight_steps() -> Array:
 			"target": func(): return _part("runde"), "info": true},
 		{"id": "k_womit", "text": "[b]Womit[/b] schlägst du zu? Faust, Tritt, Knie, Ellbogen, Kopfstoß, Waffe (1 bis 6) oder Werfen (7). [b]Wähle etwas anderes als jetzt.[/b]",
 			"target": func(): return _part("womit"), "done": func(): return gv.part != String(_base.part)},
-		{"id": "k_wie", "text": "[b]Wie[/b]: Normal, Sprung, Stampfen oder Anlauf (Q bis R). Wuchtigere Ausführungen kosten mehr Ausdauer, die Kosten stehen im Hinweis, wenn du mit der Maus darauf zeigst.",
+		{"id": "k_wie", "text": "[b]Wie[/b]: Normal, Sprung, Stampfen oder Anlauf (Q bis R). Sprung, Stampfen und Anlauf musst du erst lernen: über Skills wie Treten oder mit genug Geschick und Stärke. Der Hinweis auf dem Knopf sagt, ab wann und was es kostet. Später kommen so auch [b]Techniken[/b] wie der Mächtige Schlag dazu.",
 			"target": func(): return _part("wie"), "info": true},
 		{"id": "k_wohin", "text": "[b]Wohin[/b]: Kopf, Körper, Arme oder Beine (Y bis V). Der Kopf ist schwer zu treffen, kann aber benommen machen, Beine lassen Gegner humpeln. [b]Wähle eine Zone.[/b]",
 			"target": func(): return _part("wohin"), "done": func(): return gv.zone != String(_base.zone)},
@@ -362,7 +362,7 @@ func _fight_steps() -> Array:
 			"target": func(): return _part("ziel"), "info": true},
 		{"id": "k_angriff", "text": "[b]Klicke auf einen Gegner[/b], um ihn anzugreifen. Ist er zu weit weg, läufst du erst hin. Die Linie zum Mauszeiger ist grün, solange deine Bewegung reicht.",
 			"target": _foe_rect, "done": func(): return gv.in_combat() and gv.s.round.get("acted", false)},
-		{"id": "k_ende", "text": "Aktion verbraucht. Mit der übrigen Bewegung kannst du noch zurückweichen. [b]Beende die Runde[/b] (Leertaste), dann sind die Gegner dran.",
+		{"id": "k_ende", "text": "Aktion verbraucht. Mit der übrigen Bewegung kannst du noch zurückweichen. [b]Beende die Runde[/b] (Leertaste), dann sind die Gegner der Reihe nach dran. Ist auch die Bewegung aufgebraucht, endet die Runde von selbst.",
 			"target": func(): return _part("ende") if _part("ende") != null else gv._actionbar,
 			"done": func(): return not gv.in_combat() or int(gv.s.round.n) > int(_base.round)},
 	]

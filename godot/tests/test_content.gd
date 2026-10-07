@@ -117,5 +117,6 @@ func test_rufer_holen_verstaerkung(t) -> void:
 
 func test_fliegende_nicht_stampfen(t) -> void:
 	var s := _make(504)
+	s.player.techniques.append("stampfen")
 	var bat := _beside(s, "fledermaus")
 	t.matches(Combat.technique_blocker(s, bat, {"part": "tritt", "move": "stampfen"}), "fliegt")

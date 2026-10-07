@@ -172,12 +172,30 @@ func _fight(s: Dictionary) -> bool:
 	var adj: Dictionary = near[0]
 	if Magic.knows_spell(s, "geschoss") and adj.hp > 6 and int(J.num(s.player, "mp")) >= 4 and Game.cast(s, "geschoss", {"targetUid": adj.uid, "mana": mini(6, int(s.player.mp))}).ok:
 		return true
+	if use_technique(s, adj):
+		return true
 	for t in [{"part": "tritt", "move": "stampfen"}, {"part": "waffe", "move": "normal"}, {"part": "tritt", "move": "normal"}, {"part": "faust", "move": "normal"}]:
 		# Scheitert der Angriff (etwa ohne Ausdauer), lieber warten als stehen bleiben
 		if Combat.technique_blocker(s, adj, t) == null and Game.attack(s, adj.uid, t).ok:
 			return true
 	_wait(s, "L135")
 	return true
+
+
+## Gelernte Angriffstechnik einsetzen, wenn eine bereit ist (die erste in
+## Datenreihenfolge, die gegen dieses Ziel geht).
+static func use_technique(s: Dictionary, target: Dictionary) -> bool:
+	var cur := {"part": "waffe" if Player.current_weapon(s) != null else "tritt", "zone": "koerper"}
+	for d in Techniques.learned(s, "angriff"):
+		if d.get("free") or Techniques.blocker(s, d, target) != null:
+			continue
+		if J.cheb(target.pos, s.player.pos) > 1 and not d.get("leap"):
+			continue
+		if Combat.technique_blocker(s, target, Techniques.attack_t(d, cur)) != null and not d.get("leap"):
+			continue
+		if Game.use_technique(s, d.id, target.uid, cur).ok:
+			return true
+	return false
 
 
 func _nearest_room(s: Dictionary, kind: String) -> Variant:

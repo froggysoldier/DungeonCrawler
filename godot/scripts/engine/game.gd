@@ -56,6 +56,8 @@ static func new_game(opts: Dictionary) -> Dictionary:
 			"skills": [],
 			"buffs": [],
 			"techniqueUses": {},
+			"techniques": [],
+			"techCd": {},
 			"techniqueKills": {},
 			"lastMoveDir": null,
 			"pet": null,
@@ -509,9 +511,65 @@ static func attack(s: Dictionary, target_uid: String, t: Dictionary) -> Dictiona
 	var m = J.find(s.monsters, func(x): return x.uid == target_uid)
 	if m == null:
 		return _fail("Kein Ziel.")
+	var opening := not Rounds.active(s)
 	var res := Combat.player_attack(s, m, t)
 	if not res.ok:
 		return _fail(res.get("reason", "Geht nicht."))
+	# Erstschlag: eröffnet die Runde, die Gegner antworten erst nach ihrem Ende
+	if opening and Rounds.open(s):
+		return _ok()
+	end_turn(s)
+	return _ok()
+
+
+## Technik einsetzen (Techniques): Sonderangriff auf target_uid oder eine
+## Technik für dich selbst. current ist die gewählte Technik der Kampfleiste
+## (Körperteil und Zone, wo die Technik keine eigenen vorgibt). Techniken mit
+## „free“ kosten im Kampf nicht die Aktion der Runde.
+static func use_technique(s: Dictionary, id: String, target_uid: Variant = null, current: Dictionary = {}) -> Dictionary:
+	if s.status != "playing":
+		return _fail("Das Spiel ist vorbei.")
+	if s.pendingSelection:
+		return _fail(SELECT_FIRST)
+	var d = Techniques.def(id)
+	if d == null:
+		return _fail("Unbekannte Technik.")
+	var target = J.find(s.monsters, func(x): return x.uid == target_uid) if target_uid != null else null
+	var block = Techniques.blocker(s, d, target)
+	if block != null:
+		return _fail(block)
+	var free: bool = d.get("free", false)
+	if not free:
+		Rounds.before_action(s)
+		if s.status != "playing":
+			return _fail("Das Spiel ist vorbei.")
+		# Der Gegnerzug kann alles verändert haben
+		if target_uid != null and not J.has_same(s.monsters, target):
+			return _ok()
+	var opening := not Rounds.active(s)
+	var p: Dictionary = s.player
+	var res := Techniques.perform(s, d, target, current)
+	if not res.ok:
+		return _fail(res.get("reason", "Geht nicht."))
+	p.ausdauer = maxi(0, int(p.ausdauer) - int(J.nn(d, "cost", 0)))
+	if int(J.num(d, "mp")) > 0:
+		p.mp = maxi(0, int(p.mp) - int(d.mp))
+	if int(J.nn(d, "cost", 0)) >= 3:
+		Skills.train_skill(s, "stamina", 1)
+	if p.get("techCd") == null:
+		p.techCd = {}
+	p.techCd[id] = int(J.nn(d, "cd", 0))
+	Stats.track(s, "techniken.%s" % id)
+	Events.emit(s, {"type": "techniqueUsed", "id": id})
+	if s.status != "playing":
+		return _ok()
+	# Erstschlag mit einer Technik eröffnet die Runde wie ein Angriff
+	if opening and d.art == "angriff" and Rounds.open(s, not free):
+		Techniques.check(s)
+		return _ok()
+	if free and Rounds.active(s):
+		Techniques.check(s)
+		return _ok()
 	end_turn(s)
 	return _ok()
 
@@ -616,6 +674,7 @@ static func end_turn(s: Dictionary, keep_move_dir: bool = false, kind: String = 
 	_tick_time(s, 1, before)
 	Arena.check(s)
 	Rounds.after_turn(s)
+	Techniques.check(s)
 
 
 ## Zeit vergeht: Buffs, Regeneration, Nachspawns, Einsturz.
@@ -680,6 +739,7 @@ static func _tick_time(s: Dictionary, turns: int, before: int) -> void:
 		return
 	if p.get("abilityCooldown"):
 		p.abilityCooldown = maxi(0, p.abilityCooldown - turns)
+	Techniques.tick(s, turns)
 
 	while s.turn - s.lastSpawnTurn >= 30:
 		s.lastSpawnTurn += 30

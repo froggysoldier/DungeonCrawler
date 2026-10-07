@@ -148,9 +148,15 @@ Hand, versteckte Flags für die Klassenwahl und **Eigenschaften**:
   **Spurt** (S) macht aus der Aktion Bewegung: noch einmal der volle Vorrat,
   kostet 2 Ausdauer. Schritte kosten keine Spielzeit, die Gegner warten. Auch nach der Aktion
   darf man mit der übrigen Bewegung weiterlaufen (zuschlagen und zurückweichen).
-  Die Runde endet mit der Leertaste („Runde beenden“), von selbst, wenn Aktion
-  und Bewegung verbraucht sind, oder wenn man eine zweite Aktion wählt (die
-  zählt dann schon zur nächsten Runde): dann laufen die Gegner bis zu ihrer Reichweite
+  Die eigene Aktion beendet die Runde nie: Man schlägt zu, sieht den Treffer,
+  und erst wenn die Runde endet, sind die Gegner dran. Sie endet mit der
+  Leertaste („Runde beenden“), von selbst gut eine halbe Sekunde nach der
+  Animation, wenn Aktion und Bewegung verbraucht sind (außer eine Technik ohne
+  Aktionskosten ginge noch), oder wenn man eine zweite Aktion wählt: Dann endet
+  erst die Runde, die Gegner sind der Reihe nach dran, und danach folgt die
+  neue Aktion in der nächsten Runde. Ein **Erstschlag** außerhalb des Kampfes
+  eröffnet die erste Runde und ist ihre Aktion; der Gegner antwortet nicht
+  sofort, sondern erst, wenn die Runde endet. Dann laufen die Gegner bis zu ihrer Reichweite
   heran (4 Felder, klein 5, riesig 3, schnell +2, fliegend +1; Fernkämpfer nur,
   bis sie schießen können) und greifen an. Haustier und Gruppenmitglieder
   laufen ebenfalls bis zu 5 Felder zum bedrohlichsten Gegner oder dir hinterher.
@@ -206,7 +212,7 @@ für den Wirt im Restaurant und für Etage 3.
   Aktion bereit oder verbraucht, das gewählte Ziel mit Trefferchance und
   „Angreifen“ (Enter), „Runde beenden“ (Leertaste). Darunter in einer Reihe
   kleine Knöpfe mit Tastenkappen: Womit (1–7), Wie (Q–R), Wohin (Y–V),
-  Zauber, Sonstiges (Deckung, Spurt, Trank, Fähigkeit, Warten). Was eine Wahl
+  Techniken (gelernte Sonderangriffe und Selbsttechniken), Zauber, Sonstiges (Deckung, Spurt, Trank, Fähigkeit, Warten). Was eine Wahl
   kostet und bewirkt, steht im Tooltip. Gegner wählt man auf dem Boden (Klick
   greift an, Tab wechselt das Ziel); das Ziel trägt einen goldenen Ring, über
   dem Gegner unter der Maus steht die Trefferchance. Läuft man im Kampf, wird
@@ -222,6 +228,49 @@ für den Wirt im Restaurant und für Etage 3.
 - **Mauszeiger:** ein Pixel-Schwert über Gegnern (und beim Zielen eines
   Zaubers), eine Pixel-Hand über allem, womit man etwas tun kann
   (Gegenstände, Türen, Treppe, Möbel, Kisten, Personen, Knöpfe), sonst der Pfeil.
+
+### 3.4b Techniken: Kampfstil durch Skills und Werte
+Wer einen Skill hochlevelt oder einen Wert steigert, lernt neue Kampfweisen
+(`data/techniques.json`, `scripts/engine/techniques.gd`). Jede Technik nennt
+ihre Bedingung (Skill-Stufe oder Wert, mehrere Wege möglich); einmal gelernt,
+bleibt sie. Neue Techniken meldet der Chat („NEUE TECHNIK“), der Reiter Skills
+zeigt alle mit Bedingung, im Kampf stehen sie in der Kampfleiste unter
+„Techniken“ (mit Kosten und Abklingzeit im Tooltip). Außerhalb des Kampfes
+stehen sie in der Aktionsleiste; ein Angriff damit ist ein Erstschlag.
+- **Ausführungen** muss man jetzt lernen: Stampfen ab Treten Stufe 1, Sprung
+  ab Treten Stufe 2 oder Geschick 11, Anlauf ab Kondition Stufe 1 oder
+  Stärke 11 (auf dem Reittier immer). Gesperrte stehen grau in der Leiste,
+  der Tooltip sagt, ab wann.
+- **Angriffe** (Ziel daneben, sonst läuft man hin): Mächtiger Schlag (Faustkampf 2,
+  doppelter Schaden), Schlaghagel (Faustkampf 4, drei Schläge), Kinnhaken
+  (Faustkampf 7, sicher benommen), Beinfeger (Treten 4, wirft sicher um),
+  Drehtritt (Treten 7, alle daneben), Genickstampfer (Stampfer 3), Hechtsprung
+  (Sprungangriff 3, springt bis 3 Felder heran), Durchbruch (Sturmangriff 3,
+  stößt 2 Felder zurück), Rippenstoß (Ellbogen 3, Deckung offen), Magenschwinger
+  (Knie 3), Schädelspalter (Kopfnuss 3), Doppelwurf und Präzisionswurf (Werfen
+  2/5), Kurze Lunte (Sprengmeister 3), Wuchtiger Hieb und Rundumschlag
+  (Improvisierte Waffen 2/5), Vernichtungsschlag (Wuchtschlag 3), Einschlag
+  (Meteor-Stampfer 3, Schockwelle), Meuchelstoß (Hinterhalt 3, nur gegen
+  Ahnungslose, dreifach), Sehnenschnitt und Schwachstelle (Anatomie 3/6),
+  Manaschlag (Arkane Kunde 3); über Werte: Finte (Intelligenz 10: wenig
+  Schaden, Gegner offen und geschwächt), Doppelfinte (Intelligenz 14),
+  Wegstoßen (Stärke 12), Schnellangriff (Geschick 13, kostet nicht die Aktion).
+- **Selbst:** Ausweichrolle (Ausweichen 3), Eiserne Deckung (Abwehr 3),
+  Lauerstellung (Konter 3: wer verfehlt, wird sicher gekontert), Zähne
+  zusammenbeißen (Zähigkeit 3), Schmerz ignorieren (Schmerzresistenz 3), Gift
+  ausschwitzen (Giftfestigkeit 3), Abtauchen (Schleichen 3), Schwachpunkt
+  erkennen (Wahrnehmung 3), Zweiter Atem (Kondition 4), Aufbäumen (Reiten 3),
+  Befreiungsschlag (Entfesseln 3), Notverband (Erste Hilfe 2), Für die Kamera
+  (Rampenlicht 3), Fass! (Tierkunde 3), Stolperdraht (Fallenkunde 3),
+  Einschüchtern (Charisma 11), Verspotten (Charisma 14), Durchhalten
+  (Konstitution 12).
+- **Offene Deckung** (Finte, Rippenstoß, Sehnenschnitt, Verspotten): Angriffe
+  auf den Gegner treffen 25 Prozentpunkte leichter, solange sie wirkt.
+- Abklingzeiten zählen in Zügen; im Kampf ist eine Runde ein Zug. Manche
+  Techniken („free“) kosten nicht die Aktion der Runde.
+- Mit Techniken (Bot setzt sie ein, `tools/calib_sim.gd`) bleiben die Bosse im
+  Ziel: Etage 1 Nachbarschafts-Bosse 26/49/78/87/93 % Sieg im Duell nach
+  25/50/75/90/100 % der Etagenzeit, Borough-Boss 0/6/38/44/50 %.
 
 ### 3.4a Erfahrung und Stufen
 - Erfahrung hängt vom **Stufen-Abstand** ab: Ein gleich starker Gegner gibt

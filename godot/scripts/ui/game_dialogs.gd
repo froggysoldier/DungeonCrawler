@@ -624,7 +624,8 @@ static func run_talk_show(gv: GameView, title: String, intro: Array) -> Modals.J
 static func show_help(gv: GameView) -> void:
 	var rows := [
 		["Laufen", "Klick auf den Boden: frei dorthin laufen · linke Maustaste gedrückt halten: der Maus folgen · Pfeiltasten (zwei zugleich = schräg) oder Ziffernblock"],
-		["Kampfrunde", "Pro Runde Bewegung (in Metern) und eine Aktion · Klick auf den Boden läuft frei dorthin, die Linie zeigt grün, was noch reicht · Klick auf einen Gegner läuft hin und greift an · Enter greift das gewählte Ziel an · Leertaste beendet die Runde"],
+		["Kampfrunde", "Pro Runde Bewegung (in Metern) und eine Aktion · Klick auf den Boden läuft frei dorthin, die Linie zeigt grün, was noch reicht · Klick auf einen Gegner läuft hin und greift an · Enter greift das gewählte Ziel an · Leertaste beendet die Runde, dann sind die Gegner der Reihe nach dran · sind Aktion und Bewegung verbraucht, endet sie von selbst · ein Erstschlag eröffnet den Kampf, ohne dass der Gegner sofort antwortet"],
+		["Techniken", "Skills und Werte schalten neue Kampfweisen frei: Stampfen, Sprung und Anlauf, Sonderangriffe wie Mächtiger Schlag oder Finte und Techniken für dich selbst · im Kampf unter „Techniken“ in der Kampfleiste, Übersicht mit Bedingungen im Reiter Skills (L)"],
 		["Körperteil", "1 Faust · 2 Tritt · 3 Knie · 4 Ellbogen · 5 Kopfstoß · 6 Waffe · 7 Wurf"],
 		["Ausführung", "Q Normal · W Sprung · E Stampfen · R Anlauf"],
 		["Trefferzone", "Y Kopf · X Körper · C Arme · V Beine"],

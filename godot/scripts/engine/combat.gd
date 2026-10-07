@@ -45,11 +45,19 @@ static func _zone_modifier(s: Dictionary, target: Dictionary, t: Dictionary) -> 
 	return mod
 
 
+## Ausdauer eines Angriffs. Techniken kosten, was in ihren Daten steht
+## (Game.use_technique zieht es einmal ab).
 static func attack_cost(t: Dictionary) -> int:
+	if t.get("tech"):
+		return 0
 	return MOVE_COST[t.move] + (1 if t.part == "kopf" else 0)
 
 
 static func technique_name(t: Dictionary) -> String:
+	if t.get("tech"):
+		var d = Techniques.def(String(t.tech))
+		if d != null:
+			return d.name
 	var part: String = Bonuses.PART_NAMES[t.part]
 	var base := part if t.move == "normal" else "%s-%s" % [MOVE_NAMES[t.move], part]
 	var z = t.get("zone")
@@ -90,6 +98,11 @@ static func technique_blocker(s: Dictionary, target: Dictionary, t: Dictionary) 
 		return null
 	if d > 1:
 		return "Zu weit weg – du musst direkt daneben stehen."
+	# Stampfen, Sprung und Anlauf muss man erst lernen (Techniken)
+	if not t.get("tech"):
+		var mb = Techniques.move_blocker(s, t.move)
+		if mb != null:
+			return mb
 	if t.part == "waffe" and Player.current_weapon(s) == null:
 		return "Du hast keine Waffe."
 	if t.move == "stampfen" and target.downed <= 0 and target.size != "winzig":
@@ -127,6 +140,7 @@ static func hit_chance(s: Dictionary, target: Dictionary, t: Dictionary) -> int:
 		hit += 25
 	hit += _zone_modifier(s, target, t)
 	hit += Progression.level_gap_hit(s.player.level, target.level)
+	hit += Techniques.hit_bonus(target, t)
 	var facets := Observer.attack_facets(s, target, t)
 	hit += Observer.dyn_attack_bonus(s, facets, t).hit + Traits.trait_attack_bonus(s, facets).hit
 	return maxi(5, mini(95, J.rnd(hit)))
@@ -171,6 +185,8 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 	var is_hit := R.next(s) * 100 < hit_chance(s, target, t)
 
 	var name := technique_name(t)
+	var who := Techniques.your_name(t) if t.get("tech") else "%s %s" % [your(t), name]
+	var tm := Techniques.mods(t)
 	if thrown != null:
 		Fx.shot(s, p.pos, target.pos, "bombe" if thrown.get("explosion") else "stein")
 	else:
@@ -178,7 +194,7 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 	if not is_hit:
 		Fx.float_text(s, target.pos, "daneben", Fx.COLORS.info)
 		s.counters.missStreak += 1
-		Log.add(s, "%s %s verfehlt %s." % [your(t), name, Identify.name_of(s, target)], "kampf")
+		Log.add(s, "%s verfehlt %s." % [who, Identify.name_of(s, target)], "kampf")
 		target.aware = true
 		if thrown != null and thrown.get("special") == "bumerang":
 			_return_thrown(s, thrown)
@@ -189,7 +205,7 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 		elif thrown != null:
 			drop_near(s, thrown, target.pos)
 		Events.emit(s, Items.compact({"type": "attack", "technique": t, "hit": false, "crit": false, "damage": 0, "target": target, "thrown": thrown, "facets": facets}))
-		return {"ok": true}
+		return {"ok": true, "hit": false}
 	s.counters.missStreak = 0
 
 	# --- Schaden
@@ -202,6 +218,8 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 	else:
 		base = BASE_DAMAGE[t.part] + st.str / 2.0
 	base += ram
+	if tm.mana:
+		base += float(st.int)
 	var sch = b.get("schaden")
 	var pct: float = J.num(sch, t.part) + J.num(sch, "alle") + Observer.dyn_attack_bonus(s, facets, t).dmg + Traits.trait_attack_bonus(s, facets).dmg
 	for row in skills:
@@ -214,19 +232,19 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 	if Abilities.has_special(s, "jaeger") and J.num(s.counters.killsByDef, target.defId) >= 10:
 		pct += 15
 	var zone := _zone(t)
-	var dmg: float = base * MOVE_MULT[t.move] * ZONES[zone].schaden * (1 + pct / 100.0) * (0.8 + R.next(s) * 0.4)
+	var dmg: float = base * MOVE_MULT[t.move] * ZONES[zone].schaden * (1 + pct / 100.0) * (0.8 + R.next(s) * 0.4) * float(tm.dmg)
 	if target.hp < target.maxHp * 0.35 and J.some(p.buffs, func(x): return x.name == "Gnadenstoß"):
 		dmg *= 3
 	if target.downed > 0:
 		dmg *= 1.2
 	if Abilities.has(target, "gepanzert") and t.part == "faust":
 		dmg *= 0.5
-	var crit_chance: float = 5 + J.num(b, "krit") + maxf(0, st.ges - 5) + (5 if zone == "kopf" else 0)
+	var crit_chance: float = 5 + J.num(b, "krit") + maxf(0, st.ges - 5) + (5 if zone == "kopf" else 0) + float(tm.krit)
 	var crit := R.next(s) * 100 < crit_chance
 	if crit:
 		dmg *= 2
 		s.counters.crits += 1
-	var final := maxi(1, J.rnd(dmg - target.ruestung))
+	var final := maxi(1, J.rnd(dmg - (0 if tm.pierce else target.ruestung)))
 
 	target.hp -= final
 	target.aware = true
@@ -236,7 +254,7 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 	target.zonesHit = J.uniq(J.arr(target, "zonesHit") + [zone])
 	s.counters.damageDealt += final
 	var crit_txt := " KRITISCH!" if crit else ""
-	Log.add(s, "%s%s %s trifft %s für %d Schaden.%s" % ["Überraschungsangriff! " if ambush else "", your(t), name, Identify.name_of(s, target), final, crit_txt], "kampf")
+	Log.add(s, "%s%s trifft %s für %d Schaden.%s" % ["Überraschungsangriff! " if ambush else "", who, Identify.name_of(s, target), final, crit_txt], "kampf")
 
 	# Kopfstoß tut auch dir weh – außer du bist geübt darin.
 	if t.part == "kopf" and R.chance(s, maxf(0, 0.5 - Player.skill_level(s, "kopfnuss") * 0.1)):
@@ -313,7 +331,7 @@ static func player_attack(s: Dictionary, target: Dictionary, t: Dictionary) -> D
 		_detonate(s, thrown, at)
 	elif thrown != null and thrown.get("wurfZustand"):
 		_burst(s, thrown, at)
-	return {"ok": true}
+	return {"ok": true, "hit": true, "damage": final}
 
 
 static func bleed_chance(w: Variant) -> float:

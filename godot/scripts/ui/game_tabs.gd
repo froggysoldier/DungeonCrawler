@@ -575,6 +575,37 @@ static func craft_tab(gv: GameView, root: VBoxContainer) -> void:
 
 # ================================================================ Skills
 
+## Techniken: gelernte mit Wirkung und Kosten, darunter die noch gesperrten
+## mit der Bedingung (Skill-Stufe oder Wert) und wie weit man ist.
+static func _technique_list(s: Dictionary, root: VBoxContainer) -> void:
+	var learned := Techniques.learned(s)
+	Kit.section(root, "Techniken (%d von %d)" % [learned.size(), Techniques.all().size()])
+	Kit.text(root, "Skills und Werte schalten neue Kampfweisen frei: Ausführungen wie Stampfen, Sonderangriffe und Techniken für dich selbst. Im Kampf stehen sie in der Kampfleiste unter „Techniken“.", 12, "muted")
+	var art_names := {"ausfuehrung": "Ausführung", "angriff": "Angriff", "selbst": "Selbst"}
+	for d in learned:
+		var v := Kit.vbox(root, 2)
+		var top := Kit.hbox(v, 6)
+		Kit.text(top, "[b]%s[/b] %s" % [Kit.esc(d.name), Kit.small(Kit.muted(art_names.get(d.art, "")))])
+		var costs: Array = []
+		if int(J.nn(d, "cost", 0)) > 0:
+			costs.append("%d Ausdauer" % int(d.cost))
+		if int(J.num(d, "mp")) > 0:
+			costs.append("%d Mana" % int(d.mp))
+		if int(J.nn(d, "cd", 0)) > 0:
+			costs.append("Abklingzeit %d" % int(d.cd))
+		if not costs.is_empty():
+			Kit.label(top, " · ".join(costs), 12, "muted").size_flags_horizontal = Control.SIZE_SHRINK_END
+		Kit.text(v, Kit.esc(d.description), 12, "ok")
+	var locked := Techniques.all().filter(func(d): return not Techniques.known(s, d.id))
+	if not locked.is_empty():
+		Kit.spacer(root, 4)
+		Kit.label(root, "NOCH GESPERRT", 16, "muted").add_theme_font_override("font", UiFonts.pixel(500, 1))
+		for d in locked:
+			var v := Kit.vbox(root, 1)
+			Kit.text(v, "[b]%s[/b] %s" % [Kit.esc(d.name), Kit.small(Kit.muted("ab " + Kit.esc(Techniques.needs_text(d))))], 13, "muted")
+			Kit.text(v, Kit.esc(d.description), 11, "muted")
+
+
 static func skills_tab(gv: GameView, root: VBoxContainer) -> void:
 	var s := gv.s
 	var p: Dictionary = s.player
@@ -614,6 +645,7 @@ static func skills_tab(gv: GameView, root: VBoxContainer) -> void:
 				if Game.has_unlock(s, "skills"):
 					Kit.progress(v, float(st.xp) / need, "%d von %d" % [floori(st.xp), need])
 			Kit.spacer(root, 2)
+	_technique_list(s, root)
 	var dyn := J.arr(p, "dynSkills")
 	Kit.section(root, "Vom Beobachter entdeckt")
 	if dyn.is_empty():

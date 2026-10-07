@@ -374,6 +374,37 @@ func _initialize() -> void:
 				await shot("kampfweg_lauf")
 				quit()
 				return
+			if mode == "techniken":
+				# Kampfleiste mit gelernten Techniken, Skills-Reiter mit der Übersicht
+				gv.meta["guide"] = {"step": 99, "fight": true}
+				TH.tutorial(s)
+				var r := TH.ready(s, 9)
+				TH.teleport(s, {"x": r.x + 1, "y": r.y + 1})
+				Skills.learn_skill(s, "faustkampf", 4, true)
+				Skills.learn_skill(s, "treten", 4, true)
+				s.player.stats.int = 10
+				Techniques.check(s)
+				var ghul := Monsters.spawn_monster(s, Db.monster("ghul"), 1, {"x": r.x + 2, "y": r.y + 1}, 0)
+				ghul.aware = true
+				s.monsters = [ghul]
+				Game.after_move(s)
+				Rounds.after_turn(s)
+				s.pendingDialogs.clear()
+				Modals.instance.close_all()
+				gv.anim.reset()
+				gv.refresh()
+				await wait(0.6)
+				await shot("techniken_kampf")
+				GameCombat.use_technique(gv, "maechtiger_schlag")
+				await wait(0.3)
+				await shot("techniken_schlag")
+				await wait(1.2)
+				await shot("techniken_gegnerzug")
+				gv.open_tab("skills")
+				await wait(0.6)
+				await shot("techniken_skills")
+				quit()
+				return
 			if mode == "tutorial":
 				# Interaktives Tutorial: Schritt STEP (Standard 6: Inventar)
 				gv.meta["guide"] = {"step": int(OS.get_environment("STEP")) if OS.get_environment("STEP") != "" else 6, "fight": false}

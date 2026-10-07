@@ -5,9 +5,12 @@ extends RefCounted
 ## (Felder) und eine Aktion (Angriff, Zauber, Gegenstand, Deckung). Schritte
 ## innerhalb des Vorrats kosten keine Spielzeit, die Gegner warten; auch nach
 ## der Aktion darf man mit der übrigen Bewegung weiterlaufen. Die Runde endet
-## mit „Runde beenden“ (Warten) oder von selbst, wenn Aktion und Bewegung
-## verbraucht sind. Dann sind die Gegner dran, laufen bis zu ihrer Reichweite
-## und greifen an. Außerhalb des Kampfes ist jeder Schritt ein Zug wie bisher.
+## erst mit „Runde beenden“ (Warten) – nie mitten in der eigenen Aktion. Sind
+## Aktion und Bewegung verbraucht, beendet die Oberfläche sie nach der
+## Animation von selbst. Dann sind die Gegner der Reihe nach dran, laufen bis
+## zu ihrer Reichweite und greifen an. Ein Erstschlag außerhalb des Kampfes
+## eröffnet die erste Runde (er ist ihre Aktion), ohne dass die Gegner sofort
+## antworten. Außerhalb des Kampfes ist jeder Schritt ein Zug wie bisher.
 ##
 ## Zustand: s.round = {"move": übrige Felder, "max": Vorrat, "n": Runde,
 ## "acted": Aktion verbraucht}.
@@ -67,6 +70,23 @@ static func after_turn(s: Dictionary) -> void:
 		Log.add(s, "Der Kampf ist vorbei. Du bewegst dich wieder frei.", "system")
 
 
+## Kampf eröffnen, ohne dass Zeit vergeht: nach einem Erstschlag außerhalb
+## der Runden. Die Aktion der ersten Runde ist damit verbraucht. Gibt false
+## zurück, wenn danach kein Kampf läuft (dann ist es ein gewöhnlicher Zug).
+static func open(s: Dictionary, acted: bool = true) -> bool:
+	if active(s) or s.status != "playing" or not in_combat(s):
+		return false
+	var n := budget(s)
+	s.round = {"move": n, "max": n, "n": 1, "acted": acted}
+	Log.add(s, "Kampf! Ab jetzt in Runden: pro Runde %s Bewegung und eine Aktion.%s" % [meters(n), " Dein Erstschlag war die Aktion dieser Runde." if acted else ""], "gefahr")
+	return true
+
+
+## Sind Aktion und Bewegung der Runde verbraucht?
+static func spent(s: Dictionary) -> bool:
+	return active(s) and bool(s.round.get("acted", false)) and int(s.round.move) <= 0
+
+
 ## Ein Schritt in der Runde. Gibt false zurück, wenn der Vorrat leer ist.
 static func can_move(s: Dictionary) -> bool:
 	return not active(s) or int(s.round.move) > 0
@@ -74,8 +94,10 @@ static func can_move(s: Dictionary) -> bool:
 
 ## Endet mit dieser Handlung die Runde? kind: "move" (ein Schritt),
 ## "action" (Angriff, Zauber, Gegenstand …), "end" (Runde beenden).
-## Ohne Kampf endet jede Handlung den Zug. Nach einem Schritt ohne sichtbaren
-## Gegner endet der Kampf.
+## Ohne Kampf endet jede Handlung den Zug. Im Kampf endet die Runde nur mit
+## "end" (oder einer zweiten Aktion ohne before_action); Schritt und Aktion
+## verbrauchen nur den Vorrat. Nach einem Schritt ohne sichtbaren Gegner
+## endet der Kampf.
 static func spend(s: Dictionary, kind: String) -> bool:
 	if not active(s):
 		return true
@@ -85,13 +107,14 @@ static func spend(s: Dictionary, kind: String) -> bool:
 			if not in_combat(s):
 				s.erase("round")
 				Log.add(s, "Der Kampf ist vorbei. Du bewegst dich wieder frei.", "system")
-				return false
-			return bool(s.round.get("acted", false)) and int(s.round.move) <= 0
+			return false
 		"action":
 			if s.round.get("acted", false):
 				return true
 			s.round.acted = true
-			return int(s.round.move) <= 0
+			return false
+		"free":
+			return false
 	return true
 
 
